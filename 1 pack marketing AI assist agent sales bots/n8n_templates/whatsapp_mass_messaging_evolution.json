@@ -114,7 +114,7 @@
         },
         "options": {},
         "specifyBody": "json",
-        "jsonBody": "{\n  \"number\": \"{{ $json.phone || \"79991234567\" }}\",\n  \"options\": {\n    \"delay\": 1200,\n    \"presence\": \"composing\"\n  },\n  \"textMessage\": {\n    \"text\": \"{{ $json.message }}\"\n  }\n}"
+        "jsonBody": "{\n  \"number\": \"{{ $json.phone || '79991234567' }}\",\n  \"options\": {\n    \"delay\": 1200,\n    \"presence\": \"composing\"\n  },\n  \"textMessage\": {\n    \"text\": \"{{ $json.message }}\"\n  }\n}"
       },
       "id": "send-evolution",
       "name": "Evolution API Send",
