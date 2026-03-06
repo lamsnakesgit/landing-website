@@ -64,23 +64,21 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://151.241.100.226:8081/message/sendText/{{$json.instanceName}}",
+        "url": "http://151.241.100.226:8081/message/sendText/salesbot_v1",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
-        "bodyParameters": {
+        "headerParameters": {
           "parameters": [
             {
-              "name": "number",
-              "value": "={{$node[\"Evolution API Webhook\"].json[\"body\"][\"data\"][\"remoteJid\"]}}"
-            },
-            {
-              "name": "text",
-              "value": "={{ $json[\"output\"] }}"
+              "name": "apikey",
+              "value": "02F56A66-ED87-41F0-9AA0-9DB88E3C94A6"
             }
           ]
         },
-        "options": {}
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"number\": \"{{ $node[\"Evolution API Webhook\"].json[\"body\"][\"data\"][\"remoteJid\"] }}\",\n  \"options\": {\n    \"delay\": 1200,\n    \"presence\": \"composing\"\n  },\n  \"textMessage\": {\n    \"text\": \"{{ $json[\"output\"] }}\"\n  }\n}"
       },
       "id": "send-whatsapp",
       "name": "Send via Evolution API",

@@ -74,7 +74,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const greetings = [\"Здравствуйте\", \"Приветствую\", \"Добрый день\", \"Привет\"];\nconst intros = [\"Меня зовут ИИ Ассистент\", \"Я представитель\", \"Пишу вам от лица\"];\n\nconst randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];\nconst randomIntro = intros[Math.floor(Math.random() * intros.length)];\n\nreturn {\n  phone: $input.item.json[\"Phone\"],\n  row_number: $input.item.json.row_number,\n  message: `${randomGreeting}, ${$input.item.json[\"Name\"] || \"коллега\"}! ${randomIntro} логистической компании...`\n};"
+        "jsCode": "const greetings = [\"\u0417\u0434\u0440\u0430\u0432\u0441\u0442\u0432\u0443\u0439\u0442\u0435\", \"\u041f\u0440\u0438\u0432\u0435\u0442\u0441\u0442\u0432\u0443\u044e\", \"\u0414\u043e\u0431\u0440\u044b\u0439 \u0434\u0435\u043d\u044c\", \"\u041f\u0440\u0438\u0432\u0435\u0442\"];\nconst intros = [\"\u041c\u0435\u043d\u044f \u0437\u043e\u0432\u0443\u0442 \u0418\u0418 \u0410\u0441\u0441\u0438\u0441\u0442\u0435\u043d\u0442\", \"\u042f \u043f\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u0438\u0442\u0435\u043b\u044c\", \"\u041f\u0438\u0448\u0443 \u0432\u0430\u043c \u043e\u0442 \u043b\u0438\u0446\u0430\"];\n\nconst randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];\nconst randomIntro = intros[Math.floor(Math.random() * intros.length)];\n\nreturn {\n  phone: $input.item.json[\"Phone\"],\n  row_number: $input.item.json.row_number,\n  message: `${randomGreeting}, ${$input.item.json[\"Name\"] || \"\u043a\u043e\u043b\u043b\u0435\u0433\u0430\"}! ${randomIntro} \u043b\u043e\u0433\u0438\u0441\u0442\u0438\u0447\u0435\u0441\u043a\u043e\u0439 \u043a\u043e\u043c\u043f\u0430\u043d\u0438\u0438...`\n};"
       },
       "id": "spintax-generator",
       "name": "Spintax (Random Text)",
@@ -102,21 +102,19 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://151.241.100.226:8081/message/sendText/n8n_instance",
+        "url": "http://151.241.100.226:8081/message/sendText/salesbot_v1",
         "sendBody": true,
-        "bodyParameters": {
+        "headerParameters": {
           "parameters": [
             {
-              "name": "number",
-              "value": "={{ $json[\"phone\"] }}"
-            },
-            {
-              "name": "text",
-              "value": "={{ $json[\"message\"] }}"
+              "name": "apikey",
+              "value": "02F56A66-ED87-41F0-9AA0-9DB88E3C94A6"
             }
           ]
         },
-        "options": {}
+        "options": {},
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"number\": \"{{ $json[\"phone\"] || \"ENTER_TEST_PHONE_WITH_COUNTRY_CODE_HERE\" }}\",\n  \"options\": {\n    \"delay\": 1200,\n    \"presence\": \"composing\"\n  },\n  \"textMessage\": {\n    \"text\": \"{{ $json[\"message\"] }}\"\n  }\n}"
       },
       "id": "send-evolution",
       "name": "Evolution API Send",
