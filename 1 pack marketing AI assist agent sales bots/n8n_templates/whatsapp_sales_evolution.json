@@ -64,7 +64,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://151.241.100.226:8080/message/sendText/{{$json.instanceName}}",
+        "url": "http://151.241.100.226:8081/message/sendText/{{$json.instanceName}}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,

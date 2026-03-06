@@ -1,0 +1,246 @@
+{
+  "name": "WhatsApp Mass Messaging (Safe / Anti-Ban) + Status Update",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 10 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getMany",
+        "sheetId": "ENTER_YOUR_SHEET_ID_HERE",
+        "range": "A:E",
+        "options": {}
+      },
+      "id": "google-sheets",
+      "name": "Get Leads (Google Sheets)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json[\"Status\"] }}",
+              "operation": "notEqual",
+              "value2": "Sent"
+            }
+          ]
+        }
+      },
+      "id": "filter-sent",
+      "name": "Filter Unsent",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "split-batches",
+      "name": "Loop (1 by 1)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        600,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const greetings = [\"Здравствуйте\", \"Приветствую\", \"Добрый день\", \"Привет\"];\nconst intros = [\"Меня зовут ИИ Ассистент\", \"Я представитель\", \"Пишу вам от лица\"];\n\nconst randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];\nconst randomIntro = intros[Math.floor(Math.random() * intros.length)];\n\nreturn {\n  phone: $input.item.json[\"Phone\"],\n  row_number: $input.item.json.row_number,\n  message: `${randomGreeting}, ${$input.item.json[\"Name\"] || \"коллега\"}! ${randomIntro} логистической компании...`\n};"
+      },
+      "id": "spintax-generator",
+      "name": "Spintax (Random Text)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "amount": "={{ Math.floor(Math.random() * (10 - 2 + 1)) + 2 }}",
+        "unit": "minutes"
+      },
+      "id": "random-delay",
+      "name": "Random Delay (2-10 min)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://151.241.100.226:8081/message/sendText/n8n_instance",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $json[\"phone\"] }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json[\"message\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-evolution",
+      "name": "Evolution API Send",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1200,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "sheetId": "ENTER_YOUR_SHEET_ID_HERE",
+        "range": "A:E",
+        "key": "row_number",
+        "keyType": "rowNumber",
+        "keyValue": "={{ $node[\"Spintax (Random Text)\"].json[\"row_number\"] }}",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "Sent"
+          }
+        },
+        "options": {}
+      },
+      "id": "update-status",
+      "name": "Update Status in Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1400,
+        -100
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Leads (Google Sheets)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Leads (Google Sheets)": {
+      "main": [
+        [
+          {
+            "node": "Filter Unsent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Unsent": {
+      "main": [
+        [
+          {
+            "node": "Loop (1 by 1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop (1 by 1)": {
+      "main": [
+        [
+          {
+            "node": "Spintax (Random Text)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spintax (Random Text)": {
+      "main": [
+        [
+          {
+            "node": "Random Delay (2-10 min)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Random Delay (2-10 min)": {
+      "main": [
+        [
+          {
+            "node": "Evolution API Send",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution API Send": {
+      "main": [
+        [
+          {
+            "node": "Update Status in Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status in Sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop (1 by 1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
