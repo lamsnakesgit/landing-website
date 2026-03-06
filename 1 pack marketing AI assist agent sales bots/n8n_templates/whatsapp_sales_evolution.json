@@ -78,7 +78,7 @@
         },
         "options": {},
         "specifyBody": "json",
-        "jsonBody": "{\n  \"number\": \"{{ $node[\"Evolution API Webhook\"].json[\"body\"][\"data\"][\"remoteJid\"] }}\",\n  \"options\": {\n    \"delay\": 1200,\n    \"presence\": \"composing\"\n  },\n  \"textMessage\": {\n    \"text\": \"{{ $json[\"output\"] }}\"\n  }\n}"
+        "jsonBody": "={{\n  \"number\": $node[\"Evolution API Webhook\"].json[\"body\"][\"data\"][\"remoteJid\"],\n  \"options\": {\n    \"delay\": 1200,\n    \"presence\": \"composing\"\n  },\n  \"textMessage\": {\n    \"text\": $json[\"output\"]\n  }\n}}"
       },
       "id": "send-whatsapp",
       "name": "Send via Evolution API",
