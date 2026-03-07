@@ -1,5 +1,5 @@
 {
-    "name": "WhatsApp Data: Export Chats & History",
+    "name": "WhatsApp Data: Export Chats & History (v1 Fix)",
     "nodes": [
         {
             "parameters": {
@@ -26,15 +26,19 @@
         },
         {
             "parameters": {
-                "values": {
-                    "string": [
+                "assignments": {
+                    "assignments": [
                         {
+                            "id": "a1b2c3d4-e5f6-4a5b-b6c7-d8e9f0a1b2c3",
                             "name": "api_key",
-                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f"
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
                         },
                         {
+                            "id": "f0e9d8c7-b6a5-4f3e-a2d1-c0b9a8f7e6d5",
                             "name": "instance",
-                            "value": "87..."
+                            "value": "87...",
+                            "type": "string"
                         }
                     ]
                 },
@@ -43,7 +47,7 @@
             "id": "2",
             "name": "Config",
             "type": "n8n-nodes-base.set",
-            "typeVersion": 3.2,
+            "typeVersion": 3.4,
             "position": [
                 200,
                 300
