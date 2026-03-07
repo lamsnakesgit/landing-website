@@ -1,0 +1,32 @@
+name: n8n Workflow Backup Agent
+
+on:
+  schedule:
+    # Запуск каждый день в полночь
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    # Возможность запустить вручную кнопкой
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create backup directory
+        run: mkdir -p backups/workflows
+
+      - name: Download all n8n workflows
+        run: |
+          curl -X GET "${{ secrets.N8N_URL }}/api/v1/workflows" \
+          -H "X-N8N-API-KEY: ${{ secrets.N8N_API_KEY }}" \
+          -o backups/all_workflows.json
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "n8n-backup-bot"
+          git add backups/
+          git commit -m "Automated backup: $(date +'%Y-%m-%d')" || echo "No changes to commit"
+          git push

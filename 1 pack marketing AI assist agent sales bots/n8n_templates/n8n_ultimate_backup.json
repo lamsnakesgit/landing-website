@@ -1,0 +1,273 @@
+{
+    "name": "N8N Ultimate Backup (Workflows + Creds + DB)",
+    "nodes": [
+        {
+            "parameters": {},
+            "id": "62edf095-a02a-4b8d-a7b1-e194ae0d3652",
+            "name": "On clicking 'execute'",
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [
+                -840,
+                1100
+            ]
+        },
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hoursInterval": 24
+                        }
+                    ]
+                }
+            },
+            "id": "c7b73036-1831-4dd6-8dd9-fef1356a184c",
+            "name": "Daily Schedule",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                -840,
+                1220
+            ]
+        },
+        {
+            "parameters": {
+                "resource": "folder",
+                "name": "={{ $now.format('yyyy-MM-dd') }} n8n Backup",
+                "driveId": {
+                    "__rl": true,
+                    "mode": "list",
+                    "value": "My Drive"
+                },
+                "folderId": {
+                    "__rl": true,
+                    "mode": "list",
+                    "value": "root"
+                }
+            },
+            "id": "755e0803-c5c0-48a7-9c0c-44f8d5718d0b",
+            "name": "Create Backup Folder",
+            "type": "n8n-nodes-base.googleDrive",
+            "typeVersion": 3,
+            "position": [
+                -620,
+                1160
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "getAll"
+            },
+            "id": "1e10875b-f54b-43a8-a7a2-43d4fcbf248d",
+            "name": "Get All Workflows",
+            "type": "n8n-nodes-base.n8n",
+            "typeVersion": 1,
+            "position": [
+                -400,
+                1040
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "toJson",
+                "options": {
+                    "fileName": "={{ $json.name }}.json"
+                }
+            },
+            "id": "22874532-6d87-4a72-bb51-dd8c6e03c0c1",
+            "name": "Convert Workflow to JSON",
+            "type": "n8n-nodes-base.convertToFile",
+            "typeVersion": 1.1,
+            "position": [
+                -180,
+                1040
+            ]
+        },
+        {
+            "parameters": {
+                "fileContent": "={{ $node[\"Convert Workflow to JSON\"].binary.data }}",
+                "name": "={{ $node[\"Get All Workflows\"].json.name }}.json",
+                "folderId": "={{ $node[\"Create Backup Folder\"].json.id }}"
+            },
+            "id": "0b0155f1-15bc-4580-af6e-7dec3b0d5737",
+            "name": "Upload Workflow to Drive",
+            "type": "n8n-nodes-base.googleDrive",
+            "typeVersion": 3,
+            "position": [
+                20,
+                1040
+            ]
+        },
+        {
+            "parameters": {
+                "command": "npx n8n export:credentials --all --output=/tmp/creds.json"
+            },
+            "id": "creds-export",
+            "name": "Export Credentials (CLI)",
+            "type": "n8n-nodes-base.executeCommand",
+            "typeVersion": 1,
+            "position": [
+                -400,
+                1160
+            ]
+        },
+        {
+            "parameters": {
+                "filePath": "/tmp/creds.json"
+            },
+            "id": "read-creds",
+            "name": "Read exported creds",
+            "type": "n8n-nodes-base.readBinaryFile",
+            "typeVersion": 1,
+            "position": [
+                -180,
+                1160
+            ]
+        },
+        {
+            "parameters": {
+                "fileContent": "={{ $json.data }}",
+                "name": "credentials_encrypted_backup.json",
+                "folderId": "={{ $node[\"Create Backup Folder\"].json.id }}"
+            },
+            "id": "upload-creds",
+            "name": "Upload Creds to Drive",
+            "type": "n8n-nodes-base.googleDrive",
+            "typeVersion": 3,
+            "position": [
+                20,
+                1160
+            ]
+        },
+        {
+            "parameters": {
+                "filePath": "/home/node/.n8n/database.sqlite"
+            },
+            "id": "read-db",
+            "name": "Read SQLite Database",
+            "type": "n8n-nodes-base.readBinaryFile",
+            "typeVersion": 1,
+            "position": [
+                -400,
+                1280
+            ]
+        },
+        {
+            "parameters": {
+                "fileContent": "={{ $json.data }}",
+                "name": "database_backup.sqlite",
+                "folderId": "={{ $node[\"Create Backup Folder\"].json.id }}"
+            },
+            "id": "upload-db",
+            "name": "Upload DB to Drive",
+            "type": "n8n-nodes-base.googleDrive",
+            "typeVersion": 3,
+            "position": [
+                20,
+                1280
+            ]
+        }
+    ],
+    "connections": {
+        "On clicking 'execute'": {
+            "main": [
+                [
+                    {
+                        "node": "Create Backup Folder",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Daily Schedule": {
+            "main": [
+                [
+                    {
+                        "node": "Create Backup Folder",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Create Backup Folder": {
+            "main": [
+                [
+                    {
+                        "node": "Get All Workflows",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Export Credentials (CLI)",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Read SQLite Database",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get All Workflows": {
+            "main": [
+                [
+                    {
+                        "node": "Convert Workflow to JSON",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Convert Workflow to JSON": {
+            "main": [
+                [
+                    {
+                        "node": "Upload Workflow to Drive",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Export Credentials (CLI)": {
+            "main": [
+                [
+                    {
+                        "node": "Read exported creds",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Read exported creds": {
+            "main": [
+                [
+                    {
+                        "node": "Upload Creds to Drive",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Read SQLite Database": {
+            "main": [
+                [
+                    {
+                        "node": "Upload DB to Drive",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

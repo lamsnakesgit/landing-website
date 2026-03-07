@@ -1,0 +1,123 @@
+{
+    "name": "N8N Universal GitHub Backup (No Question Marks)",
+    "nodes": [
+        {
+            "parameters": {},
+            "id": "manual-trig",
+            "name": "Start",
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [
+                250,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "url": "={{ $env.N8N_API_URL || 'http://localhost:5678' }}/api/v1/workflows",
+                "authentication": "headerAuth",
+                "options": {}
+            },
+            "id": "get-wf-http",
+            "name": "Get Workflows (HTTP)",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 1,
+            "position": [
+                450,
+                500
+            ],
+            "credentials": {
+                "httpHeaderAuth": {
+                    "id": "creds-id",
+                    "name": "n8n API Key (Header: X-N8N-API-KEY)"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "functionCode": "const workflows = items[0].json.data;\nreturn workflows.map(w => ({\n  json: {\n    name: w.name,\n    content: JSON.stringify(w, null, 2)\n  }\n}));"
+            },
+            "id": "format-data",
+            "name": "Format JSONs",
+            "type": "n8n-nodes-base.function",
+            "typeVersion": 1,
+            "position": [
+                650,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "method": "PUT",
+                "url": "=https://api.github.com/repos/GITHUB_USER/REPO_NAME/contents/workflows/{{ $json.name.replace(/\\s+/g, '_') }}.json",
+                "authentication": "headerAuth",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "message",
+                            "value": "Backup via n8n"
+                        },
+                        {
+                            "name": "content",
+                            "value": "={{ Buffer.from($json.content).toString('base64') }}"
+                        },
+                        {
+                            "name": "branch",
+                            "value": "main"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "github-push-http",
+            "name": "Push to GitHub (HTTP)",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 1,
+            "position": [
+                850,
+                500
+            ],
+            "credentials": {
+                "httpHeaderAuth": {
+                    "id": "git-creds-id",
+                    "name": "GitHub Token (Header: Authorization, Value: token GITHUB_TOKEN)"
+                }
+            }
+        }
+    ],
+    "connections": {
+        "Start": {
+            "main": [
+                [
+                    {
+                        "node": "Get Workflows (HTTP)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Workflows (HTTP)": {
+            "main": [
+                [
+                    {
+                        "node": "Format JSONs",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Format JSONs": {
+            "main": [
+                [
+                    {
+                        "node": "Push to GitHub (HTTP)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

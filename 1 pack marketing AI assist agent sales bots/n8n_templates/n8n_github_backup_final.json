@@ -1,0 +1,215 @@
+{
+    "name": "N8N Multi-Backup (GitHub + Security Best Practices)",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hoursInterval": 24
+                        }
+                    ]
+                }
+            },
+            "id": "schedule",
+            "name": "Daily Backup",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1,
+            "position": [
+                250,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "getAll"
+            },
+            "id": "n8n-api",
+            "name": "n8n API (Workflows)",
+            "type": "n8n-nodes-base.n8n",
+            "typeVersion": 1,
+            "position": [
+                450,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "batchSize": 1,
+                "options": {}
+            },
+            "id": "loop",
+            "name": "Process One by One",
+            "type": "n8n-nodes-base.splitInBatches",
+            "typeVersion": 1,
+            "position": [
+                650,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "toJson",
+                "options": {
+                    "fileName": "={{ $json.name }}.json"
+                }
+            },
+            "id": "convert",
+            "name": "Convert to File",
+            "type": "n8n-nodes-base.convertToFile",
+            "typeVersion": 1,
+            "position": [
+                850,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "authentication": "oAuth2",
+                "owner": "ВАШ_ЛОГИН",
+                "repository": "ИМЯ_РЕПОЗИТОРИЯ",
+                "filePath": "=workflows/{{ $node[\"Process One by One\"].json.name }}.json",
+                "fileContent": "={{ $json.data }}",
+                "commitMessage": "=Backup: {{ $node[\"Process One by One\"].json.name }}"
+            },
+            "id": "github-workflows",
+            "name": "GitHub (Workflows)",
+            "type": "n8n-nodes-base.github",
+            "typeVersion": 1,
+            "position": [
+                1050,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "command": "npx n8n export:credentials --all --output=/tmp/creds_backup.json"
+            },
+            "id": "export-creds",
+            "name": "CLI Export (Secure)",
+            "type": "n8n-nodes-base.executeCommand",
+            "typeVersion": 1,
+            "position": [
+                450,
+                600
+            ]
+        },
+        {
+            "parameters": {
+                "filePath": "/tmp/creds_backup.json"
+            },
+            "id": "read-creds",
+            "name": "Read Exported JSON",
+            "type": "n8n-nodes-base.readBinaryFile",
+            "typeVersion": 1,
+            "position": [
+                650,
+                600
+            ]
+        },
+        {
+            "parameters": {
+                "authentication": "oAuth2",
+                "owner": "ВАШ_ЛОГИН",
+                "repository": "ИМЯ_РЕПОЗИТОРИЯ",
+                "filePath": "backups/credentials.json",
+                "fileContent": "={{ $json.data }}",
+                "commitMessage": "Secure Backup: Credentials"
+            },
+            "id": "github-creds",
+            "name": "GitHub (Credentials)",
+            "type": "n8n-nodes-base.github",
+            "typeVersion": 1,
+            "position": [
+                850,
+                600
+            ]
+        }
+    ],
+    "connections": {
+        "Daily Backup": {
+            "main": [
+                [
+                    {
+                        "node": "n8n-api",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "export-creds",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "n8n-api": {
+            "main": [
+                [
+                    {
+                        "node": "loop",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "loop": {
+            "main": [
+                [],
+                [
+                    {
+                        "node": "convert",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "convert": {
+            "main": [
+                [
+                    {
+                        "node": "github-workflows",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "github-workflows": {
+            "main": [
+                [
+                    {
+                        "node": "loop",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "export-creds": {
+            "main": [
+                [
+                    {
+                        "node": "read-creds",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "read-creds": {
+            "main": [
+                [
+                    {
+                        "node": "github-creds",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
