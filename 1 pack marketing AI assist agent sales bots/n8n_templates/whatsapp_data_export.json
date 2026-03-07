@@ -1,0 +1,90 @@
+{
+    "name": "WhatsApp Data: Export Chats & History",
+    "nodes": [
+        {
+            "parameters": {
+                "url": "=https://evolutionapi.aiconicvibe.store/chat/fetchChats/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "1",
+            "name": "Fetch All Chats",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "values": {
+                    "string": [
+                        {
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f"
+                        },
+                        {
+                            "name": "instance",
+                            "value": "87..."
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "2",
+            "name": "Config",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.2,
+            "position": [
+                200,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Фильтруем и подготавливаем данные для таблицы\nreturn items.map(item => ({\n  json: {\n    id: item.json.id,\n    name: item.json.name || item.json.id.split('@')[0],\n    type: item.json.id.endsWith('@g.us') ? 'Group' : 'Private',\n    last_message: item.json.lastMessage?.message?.conversation || 'None'\n  }\n}));"
+            },
+            "id": "3",
+            "name": "Format Data",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                700,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Config": {
+            "main": [
+                [
+                    {
+                        "node": "Fetch All Chats",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch All Chats": {
+            "main": [
+                [
+                    {
+                        "node": "Format Data",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

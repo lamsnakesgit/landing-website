@@ -1,0 +1,106 @@
+{
+    "name": "WhatsApp Manager: Posting & Outreach",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "whatsapp-post",
+                "options": {}
+            },
+            "id": "1",
+            "name": "Webhook: Receive Post Data",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://evolutionapi.aiconicvibe.store/message/sendText/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $json[\"chat_id\"] }}"
+                        },
+                        {
+                            "name": "text",
+                            "value": "={{ $json[\"message\"] }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "2",
+            "name": "Evolution API: Send Message",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                700,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "values": {
+                    "string": [
+                        {
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f"
+                        },
+                        {
+                            "name": "instance",
+                            "value": "87..."
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "3",
+            "name": "Config",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.2,
+            "position": [
+                450,
+                100
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook: Receive Post Data": {
+            "main": [
+                [
+                    {
+                        "node": "Evolution API: Send Message",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Config": {
+            "main": [
+                [
+                    {
+                        "node": "Evolution API: Send Message",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
