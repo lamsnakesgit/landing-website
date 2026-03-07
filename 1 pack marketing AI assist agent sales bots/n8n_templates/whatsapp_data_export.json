@@ -1,9 +1,9 @@
 {
-    "name": "WhatsApp Data: Export Chats & History (v1 Fix)",
+    "name": "WhatsApp Data: Export Chats & History (v2 Corrected)",
     "nodes": [
         {
             "parameters": {
-                "url": "=https://evolutionapi.aiconicvibe.store/chat/fetchChats/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "url": "=https://evolutionapi.aiconicvibe.store/chat/findChats/{{ $node[\"Config\"].json[\"instance\"] }}",
                 "sendHeaders": true,
                 "headerParameters": {
                     "parameters": [
@@ -37,7 +37,7 @@
                         {
                             "id": "f0e9d8c7-b6a5-4f3e-a2d1-c0b9a8f7e6d5",
                             "name": "instance",
-                            "value": "87...",
+                            "value": "ВСТАВЬ_ИМЯ_ИНСТАНСА",
                             "type": "string"
                         }
                     ]
@@ -55,7 +55,7 @@
         },
         {
             "parameters": {
-                "jsCode": "// Фильтруем и подготавливаем данные для таблицы\nreturn items.map(item => ({\n  json: {\n    id: item.json.id,\n    name: item.json.name || item.json.id.split('@')[0],\n    type: item.json.id.endsWith('@g.us') ? 'Group' : 'Private',\n    last_message: item.json.lastMessage?.message?.conversation || 'None'\n  }\n}));"
+                "jsCode": "// Фильтруем и подготавливаем данные для таблицы\nconst chats = $input.all()[0].json.filter ? $input.all()[0].json : $input.all();\nreturn chats.map(item => ({\n  json: {\n    id: item.json.id || item.json.remoteJid,\n    name: item.json.name || item.json.pushName || 'Unknown',\n    type: (item.json.id || item.json.remoteJid || '').endsWith('@g.us') ? 'Group' : 'Private',\n    last_message: item.json.message?.conversation || 'None'\n  }\n}));"
             },
             "id": "3",
             "name": "Format Data",
