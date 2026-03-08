@@ -1,0 +1,178 @@
+{
+    "name": "WhatsApp: Export to n8n Data Table (No Google Sheets)",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "expression": "={{ 24 }}"
+                        }
+                    ]
+                }
+            },
+            "id": "1",
+            "name": "Schedule Trigger",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                0,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "a-key",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        },
+                        {
+                            "id": "inst",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "2",
+            "name": "Config",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                200,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/chat/findChats/{{ $json.instance }}?getParticipants=true",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $json.api_key }}"
+                        }
+                    ]
+                }
+            },
+            "id": "3",
+            "name": "Fetch Chats (Evolution)",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                400,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Классифицируем чаты (Группы, ЛС, Каналы)\nconst chats = $json.response || [];\nreturn chats.map(chat => {\n  const jid = chat.id || chat.remoteJid;\n  let type = 'Private';\n  if (jid.endsWith('@g.us')) type = 'Group';\n  else if (jid.endsWith('@newsletter')) type = 'Channel';\n  \n  return {\n    jid: jid,\n    name: chat.pushName || chat.name || 'Unknown',\n    type: type,\n    participants_count: chat.participants?.length || 0,\n    last_message_date: chat.messageTimestamp ? new Date(chat.messageTimestamp * 1000).toISOString() : null,\n    gender: '' // Задел на будущее\n  };\n});"
+            },
+            "id": "4",
+            "name": "Process & Classify",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                600,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "appendOrUpdate",
+                "tableId": "whatsapp_chats_db",
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": [
+                        {
+                            "columnName": "jid",
+                            "field": "jid"
+                        },
+                        {
+                            "columnName": "name",
+                            "field": "name"
+                        },
+                        {
+                            "columnName": "type",
+                            "field": "type"
+                        },
+                        {
+                            "columnName": "participants_count",
+                            "field": "participants_count"
+                        },
+                        {
+                            "columnName": "gender",
+                            "field": "gender"
+                        }
+                    ]
+                },
+                "options": {
+                    "primaryKey": "jid"
+                }
+            },
+            "id": "5",
+            "name": "Save to n8n Data Table",
+            "type": "n8n-nodes-base.n8nDataTable",
+            "typeVersion": 1,
+            "position": [
+                800,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Schedule Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Config",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Config": {
+            "main": [
+                [
+                    {
+                        "node": "Fetch Chats (Evolution)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch Chats (Evolution)": {
+            "main": [
+                [
+                    {
+                        "node": "Process & Classify",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Process & Classify": {
+            "main": [
+                [
+                    {
+                        "node": "Save to n8n Data Table",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
