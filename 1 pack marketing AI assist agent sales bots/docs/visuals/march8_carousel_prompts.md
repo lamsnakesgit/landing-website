@@ -21,9 +21,9 @@
 - **Текст на слайде**: "Согласно данным ВОЗ, каждая 3-я женщина в мире сталкивается с насилием. Это глобальный вызов, не знающий границ. Статистика напоминает: путь не окончен."
 - **Visual Prompt**: `Instagram carousel slide, 1:1. A stylized digital 'roadmap' or network graph on a dark background. Glowing nodes labeled 'Security', 'Rights'. Large glowing number "1/3" floating. Scientific data-viz style.`
 
-### Слайд 5: Невидимые проблемы (Статистика РФ)
-- **Текст на слайде**: "До 91% женщин в РФ, осужденных за превышение самообороны, на самом деле защищались. Более 70% пострадавших не обращаются в полицию. Тюрьма вместо защиты — это реальность тысяч."
-- **Visual Prompt**: `Instagram carousel slide, 1:1. Minimalist, semi-transparent glowing outline of the Russian Federation map silhouette on an obsidian background. Red and violet pulsing gradient on the map. Sharp digital arrows and data-noise pointing to it. No text on map.`
+### Слайд 5: Невидимые проблемы (Взгляд на регион)
+- **Текст на слайде**: "До 91% женщин, осужденных за превышение самообороны, на самом деле защищались от насилия. Более 70% пострадавших не обращаются в полицию. Тюрьма вместо защиты — это реальность тысяч."
+- **Visual Prompt**: `Instagram carousel slide, 1:1. Obsidian background. A minimalist, semi-transparent glowing outline of the Russian Federation territory (unlabeled). The map silhouette is filled with a subtle, very soft horizontal gradient overlay of white, blue, and red (colors of the flag). A sharp, digital glowing arrow connects the map silhouette to the main text block. Futuristic data-noise clusters and Aiconic style lighting. Cinematic atmosphere.`
 
 ### Слайд 6: Сила голоса (Кейс Салтанат)
 - **Текст на слайде**: "Казахстан, 2024. Кейс Салтанат Нукеновой стал символом того, как голос общества меняет законы. Солидарность миллионов привела к принятию закона о криминализации насилия."
