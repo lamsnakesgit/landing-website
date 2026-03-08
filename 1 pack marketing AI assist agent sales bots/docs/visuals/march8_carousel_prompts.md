@@ -1,12 +1,13 @@
 # Финальный гид: Текст + Промпты для карусели (8 Марта)
 
-Этот файл — ваша "инструкция по сборке". Здесь объединены смыслы (текст на слайдах) и визуальные промпты для генератора.
+Этот файл — ваша "инструкция по сборке". Здесь объединены смыслы (текст на слайдах) и визуальные промпты для генератора. 
+**Стиль**: Интегрируем премиальный футуризм Aiconic Agency с элементами уличного искусства (Inspired by Banksy's "Flower Bomber"), добавляя дух протеста и борьбы через трафаретную графику (stencil art) и городские текстуры.
 
 ---
 
 ### Слайд 1: Обложка (Хук)
 - **Текст на слайде**: "8 МАРТА — ЭТО БОЛЬШЕ, ЧЕМ ПРОСТО ЦВЕТЫ"
-- **Visual Prompt**: `Instagram carousel cover, 1:1. A hyper-realistic macro shot of a hybrid digital-biological flower bud powerfully breaking through a cracked obsidian-black carbon fiber surface. Golden liquid light leaks from the cracks. Aiconic Agency style, dark, premium, macro photography, 8k.`
+- **Visual Prompt**: `Instagram carousel cover, 1:1. A hyper-realistic macro shot of a hybrid digital-biological flower bud powerfully breaking through a cracked obsidian-black carbon fiber surface. Golden liquid light leaks from the cracks. Add a subtle urban stencil art texture in the background (Banksy inspired). Aiconic Agency style, dark, premium, macro photography, 8k.`
 
 ### Слайд 2: Повод (Солидарность)
 - **Текст на слайде**: "Всё началось в 1910 году, когда Клара Цеткин предложила учредить день борьбы за права женщин. 8 Марта — это день памяти о первой искре солидарности."
@@ -42,4 +43,4 @@
 
 ### Слайд 10: Финал
 - **Текст на слайде**: "Пусть каждый день будет шагом к свободе, уважению и любви. С Днем международной женской солидарности! Aiconic Agency (08.03)"
-- **Visual Prompt**: `Instagram carousel final slide, 1:1. Minimalist dark background, warm glow at the bottom. Bold golden text "08.03". Aiconic logo at the bottom. Elegant fashion aesthetic.`
+- **Visual Prompt**: `Instagram carousel final slide, 1:1. Minimalist dark background, warm glow at the bottom. Bold golden text "08.03". A subtle, elegant urban graffiti tag of the Aiconic logo in the corner. Elegant fashion aesthetic mixed with stencil art edge.`
