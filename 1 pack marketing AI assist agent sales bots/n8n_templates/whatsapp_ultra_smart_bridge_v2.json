@@ -1,5 +1,5 @@
 {
-    "name": "Telegram to WhatsApp: Ultra Smart Post Builder (v2)",
+    "name": "Telegram to WhatsApp: Ultra Smart Post Builder (v2 Connected)",
     "nodes": [
         {
             "parameters": {
@@ -11,9 +11,44 @@
             "id": "1",
             "name": "Telegram Trigger",
             "type": "n8n-nodes-base.telegramTrigger",
-            "typeVersion": 1,
+            "typeVersion": 1.1,
             "position": [
                 0,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "a-key",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        },
+                        {
+                            "id": "inst",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        },
+                        {
+                            "id": "grp",
+                            "name": "target_group_id",
+                            "value": "ВСТАВИ_ID_ГРУППЫ",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "14",
+            "name": "Config",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                200,
                 300
             ]
         },
@@ -26,7 +61,7 @@
             "type": "n8n-nodes-base.code",
             "typeVersion": 2,
             "position": [
-                200,
+                400,
                 300
             ]
         },
@@ -56,7 +91,7 @@
             "type": "n8n-nodes-base.aggregate",
             "typeVersion": 1,
             "position": [
-                450,
+                600,
                 300
             ]
         },
@@ -69,7 +104,7 @@
             "type": "n8n-nodes-base.code",
             "typeVersion": 2,
             "position": [
-                650,
+                800,
                 300
             ]
         },
@@ -98,7 +133,7 @@
             "type": "n8n-nodes-base.if",
             "typeVersion": 2,
             "position": [
-                850,
+                1000,
                 100
             ]
         },
@@ -112,7 +147,7 @@
             "type": "n8n-nodes-base.telegram",
             "typeVersion": 1.1,
             "position": [
-                1050,
+                1200,
                 50
             ]
         },
@@ -160,7 +195,7 @@
             "type": "n8n-nodes-base.httpRequest",
             "typeVersion": 4.1,
             "position": [
-                1250,
+                1400,
                 50
             ]
         },
@@ -189,7 +224,7 @@
             "type": "n8n-nodes-base.if",
             "typeVersion": 2,
             "position": [
-                850,
+                1000,
                 300
             ]
         },
@@ -203,7 +238,7 @@
             "type": "n8n-nodes-base.telegram",
             "typeVersion": 1.1,
             "position": [
-                1050,
+                1200,
                 250
             ]
         },
@@ -251,7 +286,7 @@
             "type": "n8n-nodes-base.httpRequest",
             "typeVersion": 4.1,
             "position": [
-                1250,
+                1400,
                 250
             ]
         },
@@ -280,7 +315,7 @@
             "type": "n8n-nodes-base.if",
             "typeVersion": 2,
             "position": [
-                850,
+                1000,
                 500
             ]
         },
@@ -316,48 +351,24 @@
             "type": "n8n-nodes-base.httpRequest",
             "typeVersion": 4.1,
             "position": [
-                1050,
-                500
-            ]
-        },
-        {
-            "parameters": {
-                "assignments": {
-                    "assignments": [
-                        {
-                            "id": "a-key",
-                            "name": "api_key",
-                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
-                            "type": "string"
-                        },
-                        {
-                            "id": "inst",
-                            "name": "instance",
-                            "value": "8326 301 n8n wa 1",
-                            "type": "string"
-                        },
-                        {
-                            "id": "grp",
-                            "name": "target_group_id",
-                            "value": "ВСТАВИ_ID_ГРУППЫ",
-                            "type": "string"
-                        }
-                    ]
-                },
-                "options": {}
-            },
-            "id": "14",
-            "name": "Config",
-            "type": "n8n-nodes-base.set",
-            "typeVersion": 3.4,
-            "position": [
-                450,
+                1200,
                 500
             ]
         }
     ],
     "connections": {
         "Telegram Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Config",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Config": {
             "main": [
                 [
                     {
