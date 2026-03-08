@@ -1,0 +1,284 @@
+{
+    "name": "WhatsApp Multi-Media Broadcast (8 March Special)",
+    "nodes": [
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "a1b2",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        },
+                        {
+                            "id": "c3d4",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        },
+                        {
+                            "id": "e5f6",
+                            "name": "image_url",
+                            "value": "ВСТАВЬ_ССЫЛКУ_НА_ФОТО",
+                            "type": "string"
+                        },
+                        {
+                            "id": "g7h8",
+                            "name": "audio_url",
+                            "value": "ВСТАВЬ_ССЫЛКУ_НА_АУДИО",
+                            "type": "string"
+                        },
+                        {
+                            "id": "i9j0",
+                            "name": "message_text",
+                            "value": "С прекрасным праздником 8 Марта! Пусть весна цветет в душе, а каждый день будет наполнен радостью и любовью! 🌹✨",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "1",
+            "name": "Config",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                0,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Здесь мы имитируем получение списка контактов.\n// В реальном сценарии сюда можно подключить Google Sheets\nreturn [\n  { json: { phone: \"77001234567\" } }, \n  { json: { phone: \"77009876543\" } }\n];"
+            },
+            "id": "2",
+            "name": "Contact List",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                200,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "batchSize": 1,
+                "options": {}
+            },
+            "id": "3",
+            "name": "Split In Batches",
+            "type": "n8n-nodes-base.splitInBatches",
+            "typeVersion": 3,
+            "position": [
+                400,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "amount": "={{ Math.floor(Math.random() * 10) + 15 }}",
+                "unit": "seconds"
+            },
+            "id": "4",
+            "name": "Wait (Random)",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1,
+            "position": [
+                600,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendText/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $json[\"phone\"] }}"
+                        },
+                        {
+                            "name": "text",
+                            "value": "={{ $node[\"Config\"].json[\"message_text\"] }}"
+                        }
+                    ]
+                }
+            },
+            "id": "5",
+            "name": "Send Text",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                800,
+                100
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendMedia/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $json[\"phone\"] }}"
+                        },
+                        {
+                            "name": "media",
+                            "value": "={{ $node[\"Config\"].json[\"image_url\"] }}"
+                        },
+                        {
+                            "name": "mediatype",
+                            "value": "image"
+                        }
+                    ]
+                }
+            },
+            "id": "6",
+            "name": "Send Image",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1000,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendWhatsAppAudio/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $json[\"phone\"] }}"
+                        },
+                        {
+                            "name": "audio",
+                            "value": "={{ $node[\"Config\"].json[\"audio_url\"] }}"
+                        }
+                    ]
+                }
+            },
+            "id": "7",
+            "name": "Send Audio",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1200,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Config": {
+            "main": [
+                [
+                    {
+                        "node": "Contact List",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Contact List": {
+            "main": [
+                [
+                    {
+                        "node": "Split In Batches",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Split In Batches": {
+            "main": [
+                [
+                    {
+                        "node": "Wait (Random)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Wait (Random)": {
+            "main": [
+                [
+                    {
+                        "node": "Send Text",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Send Text": {
+            "main": [
+                [
+                    {
+                        "node": "Send Image",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Send Image": {
+            "main": [
+                [
+                    {
+                        "node": "Send Audio",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Send Audio": {
+            "main": [
+                [
+                    {
+                        "node": "Split In Batches",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
