@@ -1,5 +1,5 @@
 {
-    "name": "WhatsApp: SEQUENTIAL Chat Sync (Timer -> DB -> API -> Loop)",
+    "name": "WhatsApp: SIMPLE SEQUENTIAL Sync (API -> Loop -> DB Check)",
     "nodes": [
         {
             "parameters": {
@@ -12,11 +12,11 @@
                 }
             },
             "id": "1",
-            "name": "Hourly Timer",
+            "name": "Timer Trigger",
             "type": "n8n-nodes-base.scheduleTrigger",
             "typeVersion": 1.1,
             "position": [
-                0,
+                -200,
                 200
             ]
         },
@@ -45,46 +45,31 @@
             "type": "n8n-nodes-base.set",
             "typeVersion": 3.4,
             "position": [
-                200,
-                200
-            ]
-        },
-        {
-            "parameters": {
-                "operation": "get",
-                "dataTableId": "whatsapp_chats_db",
-                "returnAll": true
-            },
-            "id": "3",
-            "name": "Step 1: Get DB State",
-            "type": "n8n-nodes-base.dataTable",
-            "typeVersion": 1,
-            "position": [
-                400,
+                50,
                 200
             ]
         },
         {
             "parameters": {
                 "method": "POST",
-                "url": "=http://localhost:8081/chat/findChats/{{ encodeURIComponent($node[\"Sync Config\"].json.instance) }}",
+                "url": "=http://localhost:8081/chat/findChats/{{ encodeURIComponent($json.instance) }}",
                 "sendHeaders": true,
                 "headerParameters": {
                     "parameters": [
                         {
                             "name": "apikey",
-                            "value": "={{ $node[\"Sync Config\"].json.api_key }}"
+                            "value": "={{ $json.api_key }}"
                         }
                     ]
                 },
                 "options": {}
             },
-            "id": "4",
-            "name": "Step 2: Fetch API All",
+            "id": "3",
+            "name": "Fetch API All",
             "type": "n8n-nodes-base.httpRequest",
             "typeVersion": 4.1,
             "position": [
-                600,
+                300,
                 200
             ]
         },
@@ -93,25 +78,39 @@
                 "batchSize": 1,
                 "options": {}
             },
-            "id": "5",
-            "name": "Step 3: Loop API Chats",
+            "id": "4",
+            "name": "Split into Loop",
             "type": "n8n-nodes-base.splitInBatches",
             "typeVersion": 1,
             "position": [
-                800,
+                550,
                 200
             ]
         },
         {
             "parameters": {
-                "jsCode": "// Проверка: есть ли текущий JID в списке из БД\nconst currentJid = $json.id || $json.remoteJid || $json.jid;\nconst dbItems = $items(\"Step 1: Get DB State\");\nconst dbJids = dbItems.map(i => i.json.jid || i.json.chat_id);\n\nconst isNew = !dbJids.includes(currentJid);\n\nreturn {\n  jid: currentJid,\n  name: $json.pushName || $json.name || \"Unknown\",\n  type: (currentJid || \"\").endsWith('@g.us') ? 'Group' : 'Private',\n  is_new: isNew\n};"
+                "operation": "get",
+                "dataTableId": "whatsapp_chats_db",
+                "filters": {
+                    "conditions": [
+                        {
+                            "columnName": "jid",
+                            "operator": "equal",
+                            "value": "={{ $json.id || $json.remoteJid || $json.jid }}"
+                        }
+                    ]
+                },
+                "returnAll": false,
+                "options": {
+                    "ignoreNoData": true
+                }
             },
-            "id": "6",
-            "name": "Step 4: Verify New",
-            "type": "n8n-nodes-base.code",
-            "typeVersion": 2,
+            "id": "5",
+            "name": "Check in DB (Search JID)",
+            "type": "n8n-nodes-base.dataTable",
+            "typeVersion": 1,
             "position": [
-                1000,
+                800,
                 200
             ]
         },
@@ -125,12 +124,12 @@
                     },
                     "conditions": [
                         {
-                            "id": "new-check",
-                            "leftValue": "={{ $json.is_new }}",
+                            "id": "found-check",
+                            "leftValue": "={{ $json.jid }}",
                             "rightValue": "",
                             "operator": {
-                                "type": "boolean",
-                                "operation": "true"
+                                "type": "string",
+                                "operation": "isEmpty"
                             }
                         }
                     ],
@@ -138,13 +137,13 @@
                 },
                 "options": {}
             },
-            "id": "7",
-            "name": "If New?",
+            "id": "6",
+            "name": "Is it NEW?",
             "type": "n8n-nodes-base.if",
             "typeVersion": 2,
             "position": [
-                1200,
-                150
+                1050,
+                200
             ]
         },
         {
@@ -156,25 +155,25 @@
                     "value": [
                         {
                             "columnName": "jid",
-                            "field": "jid"
+                            "field": "={{ $node[\"Split into Loop\"].json.id || $node[\"Split into Loop\"].json.remoteJid || $node[\"Split into Loop\"].json.jid }}"
                         },
                         {
                             "columnName": "name",
-                            "field": "name"
+                            "field": "={{ $node[\"Split into Loop\"].json.pushName || $node[\"Split into Loop\"].json.name || \"Unknown\" }}"
                         },
                         {
                             "columnName": "type",
-                            "field": "type"
+                            "field": "={{ ($node[\"Split into Loop\"].json.id || \"\").endsWith('@g.us') ? 'Group' : 'Private' }}"
                         }
                     ]
                 }
             },
-            "id": "8",
-            "name": "Step 5: Add to DB",
+            "id": "7",
+            "name": "Insert NEW Chat",
             "type": "n8n-nodes-base.dataTable",
             "typeVersion": 1,
             "position": [
-                1400,
+                1300,
                 100
             ]
         },
@@ -183,18 +182,18 @@
                 "amount": 1,
                 "unit": "seconds"
             },
-            "id": "9",
-            "name": "Batch Linker",
+            "id": "8",
+            "name": "Batch Finisher",
             "type": "n8n-nodes-base.wait",
             "typeVersion": 1.1,
             "position": [
-                1600,
+                1550,
                 250
             ]
         }
     ],
     "connections": {
-        "Hourly Timer": {
+        "Timer Trigger": {
             "main": [
                 [
                     {
@@ -209,91 +208,80 @@
             "main": [
                 [
                     {
-                        "node": "Step 1: Get DB State",
+                        "node": "Fetch API All",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Step 1: Get DB State": {
+        "Fetch API All": {
             "main": [
                 [
                     {
-                        "node": "Step 2: Fetch API All",
+                        "node": "Split into Loop",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Step 2: Fetch API All": {
+        "Split into Loop": {
             "main": [
                 [
                     {
-                        "node": "Step 3: Loop API Chats",
+                        "node": "Check in DB (Search JID)",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Step 3: Loop API Chats": {
+        "Check in DB (Search JID)": {
             "main": [
                 [
                     {
-                        "node": "Step 4: Verify New",
+                        "node": "Is it NEW?",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Step 4: Verify New": {
+        "Is it NEW?": {
             "main": [
                 [
                     {
-                        "node": "If New?",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "If New?": {
-            "main": [
-                [
-                    {
-                        "node": "Step 5: Add to DB",
+                        "node": "Insert NEW Chat",
                         "type": "main",
                         "index": 0
                     }
                 ],
                 [
                     {
-                        "node": "Batch Linker",
+                        "node": "Batch Finisher",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Step 5: Add to DB": {
+        "Insert NEW Chat": {
             "main": [
                 [
                     {
-                        "node": "Batch Linker",
+                        "node": "Batch Finisher",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Batch Linker": {
+        "Batch Finisher": {
             "main": [
                 [
                     {
-                        "node": "Step 3: Loop API Chats",
+                        "node": "Split into Loop",
                         "type": "main",
                         "index": 0
                     }
