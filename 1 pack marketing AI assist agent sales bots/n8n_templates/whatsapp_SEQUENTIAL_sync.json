@@ -73,9 +73,9 @@
         },
         {
             "parameters": {
-                "operation": "getMany",
+                "operation": "get",
                 "dataTableId": "whatsapp_chats_db",
-                "limit": 5000,
+                "returnAll": true,
                 "options": {}
             },
             "id": "4",
@@ -89,8 +89,9 @@
         },
         {
             "parameters": {
-                "mode": "chooseBranch",
-                "outputType": "both"
+                "mode": "combine",
+                "combinationMode": "multiplex",
+                "options": {}
             },
             "id": "5",
             "name": "Wait for Data",
@@ -103,7 +104,7 @@
         },
         {
             "parameters": {
-                "jsCode": "// ЭФФЕКТИВНАЯ МАССОВАЯ СВЕРКА (Bulk Compare)\nconst apiChats = $node[\"Fetch API All\"].json || [];\n// В n8n узел DataTable при getMany возвращает массив в $input.all()\nconst dbRows = $node[\"Fetch DB All\"].all().map(r => r.json);\n\nconst dbMap = new Map();\ndbRows.forEach(row => {\n  if (row.jid) dbMap.set(row.jid, row);\n});\n\nconst toInsert = [];\nconst toUpdate = [];\n\napiChats.forEach(chat => {\n  const jid = chat.remoteJid || chat.jid || chat.id;\n  const name = chat.pushName || chat.name || \"Unknown\";\n  const type = (jid || \"\").endsWith('@g.us') ? 'Group' : 'Private';\n  \n  if (!dbMap.has(jid)) {\n    toInsert.push({ jid, name, type });\n  } else {\n    const existing = dbMap.get(jid);\n    if (existing.name !== name) {\n      toUpdate.push({ rowId: existing.rowId, jid, name, type });\n    }\n  }\n});\n\n// Возвращаем два списка: новые и обновленные\nreturn [\n  toInsert.map(i => ({ json: i })),\n  toUpdate.map(u => ({ json: u }))\n];"
+                "jsCode": "// ЭФФЕКТИВНАЯ МАССОВАЯ СВЕРКА (Bulk Compare)\n// Используем .all(), чтобы гарантированно получить весь массив входных данных\nconst apiChats = $node[\"Fetch API All\"].all().map(r => r.json);\nconst dbRows = $node[\"Fetch DB All\"].all().map(r => r.json);\n\n// Создаем карту (Map) для мгновенного поиска по JID\nconst dbMap = new Map();\ndbRows.forEach(row => {\n  if (row.jid) dbMap.set(row.jid, row);\n});\n\nconst toInsert = [];\nconst toUpdate = [];\n\napiChats.forEach(chat => {\n  const jid = chat.remoteJid || chat.jid || chat.id;\n  const name = chat.pushName || chat.name || \"Unknown\";\n  const type = (jid || \"\").endsWith('@g.us') ? 'Group' : 'Private';\n  \n  if (!dbMap.has(jid)) {\n    // В базе такого нет — записываем в очередь на вставку\n    toInsert.push({ jid, name, type });\n  } else {\n    // В базе есть — проверяем, не сменилось ли имя\n    const existing = dbMap.get(jid);\n    if (existing.name !== name) {\n      toUpdate.push({ rowId: existing.rowId, jid, name, type });\n    }\n  }\n});\n\n// Возвращаем ДВА выхода: \n// Выход 0 -> Только новые записи\n// Выход 1 -> Только записи на обновление\nreturn [\n  toInsert.map(i => ({ json: i })),\n  toUpdate.map(u => ({ json: u }))\n];"
             },
             "id": "6",
             "name": "Bulk Sync Logic",
@@ -139,7 +140,7 @@
             "id": "10",
             "name": "BULK Insert",
             "type": "n8n-nodes-base.dataTable",
-            "typeVersion": 1,
+            "typeVersion": 1.1,
             "position": [
                 1100,
                 200
@@ -177,7 +178,7 @@
             "id": "12",
             "name": "Update Name",
             "type": "n8n-nodes-base.dataTable",
-            "typeVersion": 1,
+            "typeVersion": 1.1,
             "position": [
                 1350,
                 400
