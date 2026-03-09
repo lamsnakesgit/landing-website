@@ -1,5 +1,5 @@
 {
-    "name": "WhatsApp: SIMPLE SEQUENTIAL Sync (API -> Loop -> DB Check)",
+    "name": "WhatsApp: SMART SEQUENTIAL Sync (Insert or Update)",
     "nodes": [
         {
             "parameters": {
@@ -116,33 +116,43 @@
         },
         {
             "parameters": {
-                "conditions": {
-                    "options": {
-                        "caseSensitive": true,
-                        "leftValue": "",
-                        "type": "string"
-                    },
-                    "conditions": [
-                        {
-                            "id": "found-check",
-                            "leftValue": "={{ $json.jid }}",
-                            "rightValue": "",
-                            "operator": {
-                                "type": "string",
-                                "operation": "isEmpty"
-                            }
-                        }
-                    ],
-                    "combinator": "and"
-                },
-                "options": {}
+                "jsCode": "// Логика: решаем что делать (Insert, Update или Skip)\nconst apiChat = $node[\"Split into Loop\"].json;\nconst dbChat = $json;\n\nconst apiJid = apiChat.id || apiChat.remoteJid || apiChat.jid;\nconst apiName = apiChat.pushName || apiChat.name || \"Unknown\";\nconst apiType = (apiJid || \"\").endsWith('@g.us') ? 'Group' : 'Private';\n\nif (!dbChat.jid) {\n  return { action: 'insert', jid: apiJid, name: apiName, type: apiType };\n}\n\nif (dbChat.name !== apiName) {\n  return { action: 'update', rowId: dbChat.rowId, jid: apiJid, name: apiName, type: apiType };\n}\n\nreturn { action: 'skip' };"
             },
             "id": "6",
-            "name": "Is it NEW?",
-            "type": "n8n-nodes-base.if",
+            "name": "Upsert Logic",
+            "type": "n8n-nodes-base.code",
             "typeVersion": 2,
             "position": [
                 1050,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "rules": {
+                    "values": [
+                        {
+                            "value": "insert",
+                            "output": 0
+                        },
+                        {
+                            "value": "update",
+                            "output": 1
+                        },
+                        {
+                            "value": "skip",
+                            "output": 2
+                        }
+                    ]
+                },
+                "value": "={{ $json.action }}"
+            },
+            "id": "7",
+            "name": "Action Switch",
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 3,
+            "position": [
+                1300,
                 200
             ]
         },
@@ -155,26 +165,50 @@
                     "value": [
                         {
                             "columnName": "jid",
-                            "field": "={{ $node[\"Split into Loop\"].json.id || $node[\"Split into Loop\"].json.remoteJid || $node[\"Split into Loop\"].json.jid }}"
+                            "field": "jid"
                         },
                         {
                             "columnName": "name",
-                            "field": "={{ $node[\"Split into Loop\"].json.pushName || $node[\"Split into Loop\"].json.name || \"Unknown\" }}"
+                            "field": "name"
                         },
                         {
                             "columnName": "type",
-                            "field": "={{ ($node[\"Split into Loop\"].json.id || \"\").endsWith('@g.us') ? 'Group' : 'Private' }}"
+                            "field": "type"
                         }
                     ]
                 }
             },
-            "id": "7",
-            "name": "Insert NEW Chat",
+            "id": "10",
+            "name": "Insert NEW",
             "type": "n8n-nodes-base.dataTable",
             "typeVersion": 1,
             "position": [
-                1300,
+                1550,
                 100
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "dataTableId": "whatsapp_chats_db",
+                "rowId": "={{ $json.rowId }}",
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": [
+                        {
+                            "columnName": "name",
+                            "field": "name"
+                        }
+                    ]
+                }
+            },
+            "id": "11",
+            "name": "Update Existing",
+            "type": "n8n-nodes-base.dataTable",
+            "typeVersion": 1,
+            "position": [
+                1550,
+                300
             ]
         },
         {
@@ -182,13 +216,13 @@
                 "amount": 1,
                 "unit": "seconds"
             },
-            "id": "8",
-            "name": "Batch Finisher",
+            "id": "12",
+            "name": "Loop Linker",
             "type": "n8n-nodes-base.wait",
             "typeVersion": 1.1,
             "position": [
-                1550,
-                250
+                1850,
+                200
             ]
         }
     ],
@@ -241,43 +275,72 @@
             "main": [
                 [
                     {
-                        "node": "Is it NEW?",
+                        "node": "Upsert Logic",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Is it NEW?": {
+        "Upsert Logic": {
             "main": [
                 [
                     {
-                        "node": "Insert NEW Chat",
+                        "node": "Action Switch",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Action Switch": {
+            "main": [
+                [
+                    {
+                        "node": "Insert NEW",
                         "type": "main",
                         "index": 0
                     }
                 ],
                 [
                     {
-                        "node": "Batch Finisher",
+                        "node": "Update Existing",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Loop Linker",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Insert NEW Chat": {
+        "Insert NEW": {
             "main": [
                 [
                     {
-                        "node": "Batch Finisher",
+                        "node": "Loop Linker",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Batch Finisher": {
+        "Update Existing": {
+            "main": [
+                [
+                    {
+                        "node": "Loop Linker",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop Linker": {
             "main": [
                 [
                     {
