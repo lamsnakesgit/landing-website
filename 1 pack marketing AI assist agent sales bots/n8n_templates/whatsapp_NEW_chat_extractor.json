@@ -1,59 +1,39 @@
 {
-    "name": "WhatsApp: Export to n8n Data Table (No Google Sheets)",
+    "name": "WhatsApp: NEW Chat Extractor & Saver",
     "nodes": [
-        {
-            "parameters": {
-                "rule": {
-                    "interval": [
-                        {
-                            "field": "hours",
-                            "expression": "={{ 24 }}"
-                        }
-                    ]
-                }
-            },
-            "id": "1",
-            "name": "Schedule Trigger",
-            "type": "n8n-nodes-base.scheduleTrigger",
-            "typeVersion": 1.1,
-            "position": [
-                0,
-                300
-            ]
-        },
         {
             "parameters": {
                 "assignments": {
                     "assignments": [
                         {
-                            "id": "a-key",
-                            "name": "api_key",
-                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
-                            "type": "string"
-                        },
-                        {
                             "id": "inst",
                             "name": "instance",
                             "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        },
+                        {
+                            "id": "api",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
                             "type": "string"
                         }
                     ]
                 },
                 "options": {}
             },
-            "id": "2",
+            "id": "1",
             "name": "Config",
             "type": "n8n-nodes-base.set",
             "typeVersion": 3.4,
             "position": [
-                200,
-                300
+                0,
+                0
             ]
         },
         {
             "parameters": {
                 "method": "POST",
-                "url": "=http://localhost:8081/chat/findChats/{{ $json.instance }}?getParticipants=true",
+                "url": "=http://localhost:8081/chat/findChats/{{ encodeURIComponent($json.instance) }}",
                 "sendHeaders": true,
                 "headerParameters": {
                     "parameters": [
@@ -62,34 +42,50 @@
                             "value": "={{ $json.api_key }}"
                         }
                     ]
-                }
+                },
+                "options": {}
             },
-            "id": "3",
-            "name": "Fetch Chats (Evolution)",
+            "id": "2",
+            "name": "Fetch API Chats",
             "type": "n8n-nodes-base.httpRequest",
             "typeVersion": 4.1,
             "position": [
-                400,
-                300
+                250,
+                -100
             ]
         },
         {
             "parameters": {
-                "jsCode": "// Классифицируем чаты (Группы, ЛС, Каналы)\nconst chat = $json;\nconst jid = chat.id || chat.remoteJid || chat.jid;\n\nif (!jid) return [];\n\nlet type = 'Private';\nif (jid.endsWith('@g.us')) type = 'Group';\nelse if (jid.endsWith('@newsletter')) type = 'Channel';\n\nreturn {\n  jid: jid,\n  name: chat.pushName || chat.name || 'Unknown',\n  type: type,\n  participants_count: (chat.participants && Array.isArray(chat.participants)) ? chat.participants.length : 0,\n  last_message_date: chat.messageTimestamp ? new Date(chat.messageTimestamp * 1000).toISOString() : null\n};"
+                "operation": "get",
+                "dataTableId": "whatsapp_chats_db",
+                "returnAll": true
+            },
+            "id": "3",
+            "name": "Get DB Chats",
+            "type": "n8n-nodes-base.dataTable",
+            "typeVersion": 1,
+            "position": [
+                250,
+                150
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Фильтрация: оставляем только те чаты, которых нет в таблице\nconst apiChats = Array.isArray($items(\"Fetch API Chats\")[0].json) ? $items(\"Fetch API Chats\")[0].json : [$items(\"Fetch API Chats\")[0].json];\nconst dbChats = $items(\"Get DB Chats\").map(i => i.json.jid || i.json.chat_id);\n\nreturn apiChats.filter(chat => {\n  const jid = chat.id || chat.remoteJid || chat.jid;\n  return !dbChats.includes(jid);\n}).map(chat => ({\n  jid: chat.id || chat.remoteJid || chat.jid,\n  name: chat.pushName || chat.name || \"Unknown\",\n  type: (chat.id || \"\").endsWith('@g.us') ? 'Group' : 'Private',\n  created_at: new Date().toISOString()\n}));"
             },
             "id": "4",
-            "name": "Process & Classify",
+            "name": "Extract ONLY New",
             "type": "n8n-nodes-base.code",
             "typeVersion": 2,
             "position": [
-                600,
-                300
+                500,
+                0
             ]
         },
         {
             "parameters": {
-                "operation": "appendOrUpdate",
-                "tableId": "whatsapp_chats_db",
+                "operation": "insert",
+                "dataTableId": "whatsapp_chats_db",
                 "columns": {
                     "mappingMode": "defineBelow",
                     "value": [
@@ -104,70 +100,64 @@
                         {
                             "columnName": "type",
                             "field": "type"
-                        },
-                        {
-                            "columnName": "participants_count",
-                            "field": "participants_count"
-                        },
-                        {
-                            "columnName": "gender",
-                            "field": "gender"
                         }
                     ]
-                },
-                "options": {
-                    "primaryKey": "jid"
                 }
             },
             "id": "5",
-            "name": "Save to n8n Data Table",
+            "name": "Save New to DB",
             "type": "n8n-nodes-base.dataTable",
             "typeVersion": 1,
             "position": [
-                800,
-                300
+                750,
+                0
             ]
         }
     ],
     "connections": {
-        "Schedule Trigger": {
-            "main": [
-                [
-                    {
-                        "node": "Config",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
         "Config": {
             "main": [
                 [
                     {
-                        "node": "Fetch Chats (Evolution)",
+                        "node": "Fetch API Chats",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Get DB Chats",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Fetch Chats (Evolution)": {
+        "Fetch API Chats": {
             "main": [
                 [
                     {
-                        "node": "Process & Classify",
+                        "node": "Extract ONLY New",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Process & Classify": {
+        "Get DB Chats": {
             "main": [
                 [
                     {
-                        "node": "Save to n8n Data Table",
+                        "node": "Extract ONLY New",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Extract ONLY New": {
+            "main": [
+                [
+                    {
+                        "node": "Save New to DB",
                         "type": "main",
                         "index": 0
                     }

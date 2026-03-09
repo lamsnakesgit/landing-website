@@ -1,0 +1,246 @@
+{
+    "name": "Smart Quick Sender (With Blacklist & Security)",
+    "nodes": [
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "img",
+                            "name": "image_url",
+                            "value": "ВСТАВЬ_ССЫЛКУ_НА_ФОТО_ИЗ_ХЕЛПЕРА",
+                            "type": "string"
+                        },
+                        {
+                            "id": "cap",
+                            "name": "caption",
+                            "value": "Поздравляю всех с Международным женским днем",
+                            "type": "string"
+                        },
+                        {
+                            "id": "jids",
+                            "name": "target_jids",
+                            "value": "jid1@g.us, jid2@g.us",
+                            "type": "string"
+                        },
+                        {
+                            "id": "forbidden_ids",
+                            "name": "forbidden_participant_jid",
+                            "value": "",
+                            "type": "string"
+                        },
+                        {
+                            "id": "forbidden_names",
+                            "name": "exclude_chats_by_name",
+                            "value": "Реклама и Бизнес, LOVE ДВИЖ, Вакансии и резюме",
+                            "type": "string"
+                        },
+                        {
+                            "id": "inst",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        },
+                        {
+                            "id": "api",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "1",
+            "name": "Config Campaign",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                0,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/chat/findChats/{{ encodeURIComponent($json.instance) }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $json.api_key }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "2",
+            "name": "Fetch All Chats",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                200,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "method": "GET",
+                "url": "=http://localhost:8081/group/fetchAllGroups/{{ encodeURIComponent($node[\"Config Campaign\"].json.instance) }}?getParticipants=true",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config Campaign\"].json.api_key }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "3",
+            "name": "Fetch Groups Security",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                200,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// ГУРУ-ФИЛЬТР: Валидация JID + Черный список имен + Черный список участников\nconst config = $node[\"Config Campaign\"].json;\nconst inputJids = config.target_jids.split(',').map(j => j.trim());\n\n// Настройки исключений\nconst forbiddenJid = config.forbidden_participant_jid ? config.forbidden_participant_jid.trim() : null;\nconst excludedNames = config.exclude_chats_by_name ? config.exclude_chats_by_name.split(',').map(n => n.trim().toLowerCase()) : [];\n\n// Данные от API\nconst allChats = Array.isArray($items(\"Fetch All Chats\").map(i => i.json)[0]) ? $items(\"Fetch All Chats\").map(i => i.json)[0] : $items(\"Fetch All Chats\").map(i => i.json);\nconst allGroups = $items(\"Fetch Groups Security\")[0].json;\n\nconst finalQueue = [];\n\nfor (const targetJid of inputJids) {\n  // Находим данные об этом чате\n  const chat = Array.isArray(allChats) ? allChats.find(c => (c.id === targetJid || c.remoteJid === targetJid || c.jid === targetJid)) : null;\n  \n  if (!chat) {\n    console.log(`Пропуск: JID ${targetJid} не найден.`);\n    continue;\n  }\n\n  const chatName = (chat.pushName || chat.name || \"\").toLowerCase();\n\n  // 1. ПРОВЕРКА ПО ИМЕНИ (Черный список)\n  const isNameExcluded = excludedNames.some(forbiddenPart => chatName.includes(forbiddenPart));\n  if (isNameExcluded) {\n    console.log(`ИСКЛЮЧЕНО ПО ИМЕНИ: ${chatName} (${targetJid})`);\n    continue;\n  }\n\n  // 2. ПРОВЕРКА ПО УЧАСТНИКАМ (для групп)\n  if (targetJid.endsWith('@g.us')) {\n    const groupInfo = Array.isArray(allGroups) ? allGroups.find(g => (g.id === targetJid || g.jid === targetJid)) : null;\n    \n    if (groupInfo && forbiddenJid) {\n      const participants = groupInfo.participants || [];\n      const isForbiddenPresent = participants.some(p => (p.id === forbiddenJid || p.jid === forbiddenJid));\n      \n      if (isForbiddenPresent) {\n        console.log(`БЛОКИРОВКА УЧАСТНИКОМ: В ${chatName} сидит ${forbiddenJid}`);\n        continue;\n      }\n    }\n  }\n\n  finalQueue.push({\n    jid: targetJid,\n    chat_name: chatName,\n    image_url: config.image_url,\n    caption: config.caption,\n    instance: config.instance,\n    api_key: config.api_key\n  });\n}\n\nreturn finalQueue;"
+            },
+            "id": "4",
+            "name": "Hyper-Safe Filter",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                500,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "amount": 2,
+                "unit": "seconds"
+            },
+            "id": "5",
+            "name": "Wait between msgs",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.1,
+            "position": [
+                750,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendMedia/{{ encodeURIComponent($json.instance) }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $json.api_key }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $json.jid }}"
+                        },
+                        {
+                            "name": "media",
+                            "value": "={{ $json.image_url }}"
+                        },
+                        {
+                            "name": "mediatype",
+                            "value": "image"
+                        },
+                        {
+                            "name": "caption",
+                            "value": "={{ $json.caption }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "6",
+            "name": "Send Media",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1000,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Config Campaign": {
+            "main": [
+                [
+                    {
+                        "node": "Fetch All Chats",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Fetch Groups Security",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch All Chats": {
+            "main": [
+                [
+                    {
+                        "node": "Hyper-Safe Filter",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch Groups Security": {
+            "main": [
+                [
+                    {
+                        "node": "Hyper-Safe Filter",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Hyper-Safe Filter": {
+            "main": [
+                [
+                    {
+                        "node": "Wait between msgs",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Wait between msgs": {
+            "main": [
+                [
+                    {
+                        "node": "Send Media",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
