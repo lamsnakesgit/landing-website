@@ -1,5 +1,5 @@
 {
-    "name": "WhatsApp: SMART SEQUENTIAL Sync (Insert or Update)",
+    "name": "WhatsApp: BULK SMART Sync (High Performance)",
     "nodes": [
         {
             "parameters": {
@@ -37,8 +37,7 @@
                             "type": "string"
                         }
                     ]
-                },
-                "options": {}
+                }
             },
             "id": "2",
             "name": "Sync Config",
@@ -61,8 +60,7 @@
                             "value": "={{ $json.api_key }}"
                         }
                     ]
-                },
-                "options": {}
+                }
             },
             "id": "3",
             "name": "Fetch API All",
@@ -75,85 +73,45 @@
         },
         {
             "parameters": {
-                "batchSize": 1,
+                "operation": "getMany",
+                "dataTableId": "whatsapp_chats_db",
+                "limit": 5000,
                 "options": {}
             },
             "id": "4",
-            "name": "Split into Loop",
-            "type": "n8n-nodes-base.splitInBatches",
-            "typeVersion": 1,
-            "position": [
-                550,
-                200
-            ]
-        },
-        {
-            "parameters": {
-                "operation": "get",
-                "dataTableId": "whatsapp_chats_db",
-                "filters": {
-                    "conditions": [
-                        {
-                            "columnName": "jid",
-                            "operator": "equal",
-                            "value": "={{ $json.id || $json.remoteJid || $json.jid }}"
-                        }
-                    ]
-                },
-                "returnAll": false,
-                "options": {
-                    "ignoreNoData": true
-                }
-            },
-            "id": "5",
-            "name": "Check in DB (Search JID)",
+            "name": "Fetch DB All",
             "type": "n8n-nodes-base.dataTable",
             "typeVersion": 1,
             "position": [
-                800,
-                200
+                300,
+                400
             ]
         },
         {
             "parameters": {
-                "jsCode": "// Логика: решаем что делать (Insert, Update или Skip)\nconst apiChat = $node[\"Split into Loop\"].json;\nconst dbChat = $json;\n\nconst apiJid = apiChat.id || apiChat.remoteJid || apiChat.jid;\nconst apiName = apiChat.pushName || apiChat.name || \"Unknown\";\nconst apiType = (apiJid || \"\").endsWith('@g.us') ? 'Group' : 'Private';\n\nif (!dbChat.jid) {\n  return { action: 'insert', jid: apiJid, name: apiName, type: apiType };\n}\n\nif (dbChat.name !== apiName) {\n  return { action: 'update', rowId: dbChat.rowId, jid: apiJid, name: apiName, type: apiType };\n}\n\nreturn { action: 'skip' };"
+                "mode": "chooseBranch",
+                "outputType": "both"
+            },
+            "id": "5",
+            "name": "Wait for Data",
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3,
+            "position": [
+                550,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// ЭФФЕКТИВНАЯ МАССОВАЯ СВЕРКА (Bulk Compare)\nconst apiChats = $node[\"Fetch API All\"].json || [];\n// В n8n узел DataTable при getMany возвращает массив в $input.all()\nconst dbRows = $node[\"Fetch DB All\"].all().map(r => r.json);\n\nconst dbMap = new Map();\ndbRows.forEach(row => {\n  if (row.jid) dbMap.set(row.jid, row);\n});\n\nconst toInsert = [];\nconst toUpdate = [];\n\napiChats.forEach(chat => {\n  const jid = chat.remoteJid || chat.jid || chat.id;\n  const name = chat.pushName || chat.name || \"Unknown\";\n  const type = (jid || \"\").endsWith('@g.us') ? 'Group' : 'Private';\n  \n  if (!dbMap.has(jid)) {\n    toInsert.push({ jid, name, type });\n  } else {\n    const existing = dbMap.get(jid);\n    if (existing.name !== name) {\n      toUpdate.push({ rowId: existing.rowId, jid, name, type });\n    }\n  }\n});\n\n// Возвращаем два списка: новые и обновленные\nreturn [\n  toInsert.map(i => ({ json: i })),\n  toUpdate.map(u => ({ json: u }))\n];"
             },
             "id": "6",
-            "name": "Upsert Logic",
+            "name": "Bulk Sync Logic",
             "type": "n8n-nodes-base.code",
             "typeVersion": 2,
             "position": [
-                1050,
-                200
-            ]
-        },
-        {
-            "parameters": {
-                "rules": {
-                    "values": [
-                        {
-                            "value": "insert",
-                            "output": 0
-                        },
-                        {
-                            "value": "update",
-                            "output": 1
-                        },
-                        {
-                            "value": "skip",
-                            "output": 2
-                        }
-                    ]
-                },
-                "value": "={{ $json.action }}"
-            },
-            "id": "7",
-            "name": "Action Switch",
-            "type": "n8n-nodes-base.switch",
-            "typeVersion": 3,
-            "position": [
-                1300,
-                200
+                800,
+                300
             ]
         },
         {
@@ -179,12 +137,26 @@
                 }
             },
             "id": "10",
-            "name": "Insert NEW",
+            "name": "BULK Insert",
             "type": "n8n-nodes-base.dataTable",
             "typeVersion": 1,
             "position": [
-                1550,
-                100
+                1100,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "batchSize": 1,
+                "options": {}
+            },
+            "id": "11",
+            "name": "Loop for Updates",
+            "type": "n8n-nodes-base.splitInBatches",
+            "typeVersion": 1,
+            "position": [
+                1100,
+                400
             ]
         },
         {
@@ -202,27 +174,13 @@
                     ]
                 }
             },
-            "id": "11",
-            "name": "Update Existing",
+            "id": "12",
+            "name": "Update Name",
             "type": "n8n-nodes-base.dataTable",
             "typeVersion": 1,
             "position": [
-                1550,
-                300
-            ]
-        },
-        {
-            "parameters": {
-                "amount": 1,
-                "unit": "seconds"
-            },
-            "id": "12",
-            "name": "Loop Linker",
-            "type": "n8n-nodes-base.wait",
-            "typeVersion": 1.1,
-            "position": [
-                1850,
-                200
+                1350,
+                400
             ]
         }
     ],
@@ -253,98 +211,74 @@
             "main": [
                 [
                     {
-                        "node": "Split into Loop",
+                        "node": "Wait for Data",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Fetch DB All",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Split into Loop": {
+        "Fetch DB All": {
             "main": [
                 [
                     {
-                        "node": "Check in DB (Search JID)",
+                        "node": "Wait for Data",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Wait for Data": {
+            "main": [
+                [
+                    {
+                        "node": "Bulk Sync Logic",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Check in DB (Search JID)": {
+        "Bulk Sync Logic": {
             "main": [
                 [
                     {
-                        "node": "Upsert Logic",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Upsert Logic": {
-            "main": [
-                [
-                    {
-                        "node": "Action Switch",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Action Switch": {
-            "main": [
-                [
-                    {
-                        "node": "Insert NEW",
+                        "node": "BULK Insert",
                         "type": "main",
                         "index": 0
                     }
                 ],
                 [
                     {
-                        "node": "Update Existing",
-                        "type": "main",
-                        "index": 0
-                    }
-                ],
-                [
-                    {
-                        "node": "Loop Linker",
+                        "node": "Loop for Updates",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Insert NEW": {
+        "Loop for Updates": {
             "main": [
                 [
                     {
-                        "node": "Loop Linker",
+                        "node": "Update Name",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Update Existing": {
+        "Update Name": {
             "main": [
                 [
                     {
-                        "node": "Loop Linker",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Loop Linker": {
-            "main": [
-                [
-                    {
-                        "node": "Split into Loop",
+                        "node": "Loop for Updates",
                         "type": "main",
                         "index": 0
                     }
