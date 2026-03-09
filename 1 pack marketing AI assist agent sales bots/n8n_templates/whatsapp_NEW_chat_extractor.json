@@ -71,7 +71,7 @@
         },
         {
             "parameters": {
-                "jsCode": "// Фильтрация: оставляем только те чаты, которых нет в таблице\nconst apiChats = Array.isArray($items(\"Fetch API Chats\")[0].json) ? $items(\"Fetch API Chats\")[0].json : [$items(\"Fetch API Chats\")[0].json];\nconst dbChats = $items(\"Get DB Chats\").map(i => i.json.jid || i.json.chat_id);\n\nreturn apiChats.filter(chat => {\n  const jid = chat.id || chat.remoteJid || chat.jid;\n  return !dbChats.includes(jid);\n}).map(chat => ({\n  jid: chat.id || chat.remoteJid || chat.jid,\n  name: chat.pushName || chat.name || \"Unknown\",\n  type: (chat.id || \"\").endsWith('@g.us') ? 'Group' : 'Private',\n  created_at: new Date().toISOString()\n}));"
+                "jsCode": "// Фильтрация: оставляем только те чаты, которых нет в таблице\nconst apiItems = $items(\"Fetch API Chats\");\nconst dbItems = $items(\"Get DB Chats\");\n\nconst apiChats = (apiItems.length > 0 && Array.isArray(apiItems[0].json)) ? apiItems[0].json : apiItems.map(i => i.json);\nconst dbChats = dbItems.length > 0 ? dbItems.map(i => i.json.jid || i.json.chat_id) : [];\n\n// Если база пуста — берем всё. Если нет — фильтруем.\nconst filtered = apiChats.filter(chat => {\n  const jid = chat.id || chat.remoteJid || chat.jid;\n  if (!jid) return false;\n  return !dbChats.includes(jid);\n});\n\nreturn filtered.map(chat => ({\n  jid: chat.id || chat.remoteJid || chat.jid,\n  name: chat.pushName || chat.name || \"Unknown\",\n  type: (chat.id || \"\").endsWith('@g.us') ? 'Group' : 'Private',\n  created_at: new Date().toISOString()\n}));"
             },
             "id": "4",
             "name": "Extract ONLY New",
