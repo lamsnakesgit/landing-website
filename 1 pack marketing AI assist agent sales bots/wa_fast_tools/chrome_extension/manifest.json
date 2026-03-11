@@ -1,0 +1,16 @@
+{
+    "manifest_version": 3,
+    "name": "WA Fast Sender",
+    "version": "1.0",
+    "description": "Быстрая рассылка для WhatsApp Web",
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "permissions": [
+        "activeTab",
+        "scripting"
+    ],
+    "host_permissions": [
+        "*://web.whatsapp.com/*"
+    ]
+}
