@@ -1,237 +1,129 @@
 /**
- * =============================================
- * WhatsApp РАССЫЛЬЩИК v1 — Google Apps Script + Evolution API
- * =============================================
- * 
- * ИНСТРУКЦИЯ:
- * 1. Создай Google Sheets таблицу с колонками: phone | name | company | status
- * 2. Заполни номера (любой формат: +7 999 123 45 67, 89991234567, 7999... — скрипт сам приведёт к формату WhatsApp)
- * 3. Открой: Расширения → Apps Script, вставь этот код
- * 4. Замени VPS_URL на реальный IP твоего ВПС
- * 5. Запусти функцию startSending()
- * 
- * ФОРМАТ ТАБЛИЦЫ (Google Sheets):
- * ┌─────────────────┬──────────────┬──────────────────┬─────────┐
- * │     phone       │    name      │    company       │ status  │
- * ├─────────────────┼──────────────┼──────────────────┼─────────┤
- * │ +7 999 123 4567 │ Анна         │ ООО "Логистик"   │         │
- * │ 89991234567     │ Иван         │ ИП Петров        │         │
- * │ 998901234567    │ Алишер       │ Cargo Express    │         │
- * └─────────────────┴──────────────┴──────────────────┴─────────┘
- * 
- * Колонка "status" заполняется АВТОМАТИЧЕСКИ: "✅ Отправлено" или "❌ Ошибка"
+ * WhatsApp Рассыльщик — Google Apps Script + Evolution API
+ * Колонки: A=phone, B=name, C=company, D=status
+ * Запуск: Меню "🚀 Рассылка" в таблице
  */
 
-// ========== НАСТРОЙКИ (ЗАМЕНИ!) ==========
-const CONFIG = {
-  // URL твоего ВПС (НЕ localhost!)
-  // Найди IP в панели Hetzner/Railway/DigitalOcean
-  VPS_URL: 'http://ВСТАВЬ_IP_ТВОЕГО_ВПС:8081',
-  
-  API_KEY: 'b5485840231d596018f5d67b50b4a05ffaaa792cec60595f',
-  INSTANCE: '8326 301 n8n wa 1',
-  
-  // Безопасность
-  MIN_DELAY_SEC: 10,  // Мин. пауза между сообщениями (секунды)
-  MAX_DELAY_SEC: 20,  // Макс. пауза
-  TYPING_DELAY: 3000, // Имитация набора текста (мс)
-  
-  // Имя листа в таблице
-  SHEET_NAME: 'Лист1',
-  
-  // С какой строки начинать (2 = пропускаем заголовок)
-  START_ROW: 2,
-};
+var SERVER_URL = "https://evolutionapi.aiconicvibe.store";
+var API_KEY = "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f";
+var INSTANCE = "8326 301 n8n wa 1";
 
-// ========== ШАБЛОН СООБЩЕНИЯ ==========
-// Используй {name} и {company} — они подставятся автоматически
-const MESSAGE_TEMPLATE = 
-  'Здравствуйте, {name}!\n\n' +
-  'Занимаемся перевозками грузов из Китая и Европы (авто, авиа, ж/д) от 15 тонн.\n\n' +
-  'Если вашей компании {company} актуально — могу прислать актуальные тарифы?';
+// === КОЛОНКИ (меняй под свою таблицу) ===
+var COL_PHONE = 1;   // A
+var COL_NAME = 2;    // B
+var COL_COMPANY = 3; // C
+var COL_STATUS = 4;  // D
 
-
-// ========== НОРМАЛИЗАЦИЯ НОМЕРОВ ==========
-
-/**
- * Приводит ЛЮБОЙ формат номера к формату WhatsApp: 79991234567
- * Примеры:
- *   "+7 (999) 123-45-67" → "79991234567"
- *   "8-999-123-45-67"    → "79991234567"
- *   "89991234567"         → "79991234567"
- *   "998901234567"        → "998901234567" (Узбекистан, без изменений)
- *   "7999 123 4567"       → "79991234567"
- */
-function normalizePhone(raw) {
-  // Убираем всё кроме цифр
-  let digits = raw.replace(/\D/g, '');
+function sendWhatsAppMessages() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var lastRow = sheet.getLastRow();
+  var sent = 0, errors = 0;
   
-  // Если начинается с 8 и длина 11 → Россия, меняем 8 на 7
-  if (digits.length === 11 && digits.startsWith('8')) {
-    digits = '7' + digits.substring(1);
-  }
-  
-  // Если начинается с + (уже убрали), проверяем длину
-  // Для большинства стран номер 10-15 цифр
-  if (digits.length < 10 || digits.length > 15) {
-    return null; // Невалидный номер
-  }
-  
-  return digits;
-}
-
-
-// ========== ОСНОВНОЙ КОД ==========
-
-function startSending() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEET_NAME);
-  if (!sheet) {
-    SpreadsheetApp.getUi().alert('Лист "' + CONFIG.SHEET_NAME + '" не найден!');
-    return;
-  }
-  
-  const lastRow = sheet.getLastRow();
-  const data = sheet.getRange(CONFIG.START_ROW, 1, lastRow - 1, 4).getValues();
-  // Колонки: [0]=phone, [1]=name, [2]=company, [3]=status
-  
-  let sent = 0;
-  let errors = 0;
-  
-  for (let i = 0; i < data.length; i++) {
-    const row = data[i];
-    const rawPhone = String(row[0]).trim();
-    const name = String(row[1]).trim() || '';
-    const company = String(row[2]).trim() || '';
-    const existingStatus = String(row[3]).trim();
+  for (var i = 2; i <= lastRow; i++) {
+    var rawPhone = String(sheet.getRange(i, COL_PHONE).getValue()).trim();
+    var name = String(sheet.getRange(i, COL_NAME).getValue()).trim();
+    var status = String(sheet.getRange(i, COL_STATUS).getValue()).trim();
     
-    // Пропускаем уже отправленные
-    if (existingStatus.includes('✅')) {
-      continue;
+    // Пропуск уже отправленных и пустых
+    if (status.indexOf("✅") !== -1) continue;
+    if (!rawPhone || rawPhone.length < 5) continue;
+    
+    // Нормализация: убираем всё кроме цифр, 8→7
+    var phone = rawPhone.replace(/\D/g, '');
+    if (phone.length === 11 && phone.charAt(0) === '8') {
+      phone = '7' + phone.substring(1);
     }
     
-    // Нормализуем номер
-    const phone = normalizePhone(rawPhone);
-    if (!phone) {
-      sheet.getRange(CONFIG.START_ROW + i, 4).setValue('❌ Неверный номер');
-      errors++;
-      continue;
-    }
+    var message = "Привет, " + (name || "") + "! \n\n" +
+              "Занимаюсь автоматизацией продаж через ИИ и WhatsApp рассылки.\n\n" +
+              "Помогаю находить клиентов на автопилоте - без холодных звонков и ручных переписок.\n\n" +
+              "Интересно узнать как это работает?\n\n" +
+              "Ответьте на это сообщение если интересно";
+
+    var url = SERVER_URL + "/message/sendText/" + encodeURIComponent(INSTANCE);
     
-    // Подставляем переменные в шаблон
-    let message = MESSAGE_TEMPLATE
-      .replace(/\{name\}/gi, name || 'уважаемый клиент')
-      .replace(/\{company\}/gi, company || 'вашей компании');
-    
-    Logger.log('Отправка на: ' + phone + ' (' + name + ')');
+    var options = {
+      "method": "POST",
+      "headers": { "Content-Type": "application/json", "apikey": API_KEY },
+      "payload": JSON.stringify({ "number": phone, "text": message }),
+      "muteHttpExceptions": true
+    };
     
     try {
-      // 1. Имитация набора текста
-      sendPresence_(phone);
-      Utilities.sleep(CONFIG.TYPING_DELAY);
-      
-      // 2. Отправка текста
-      const result = sendText_(phone, message);
-      
-      if (result && !result.error) {
-        sheet.getRange(CONFIG.START_ROW + i, 4).setValue('✅ Отправлено ' + new Date().toLocaleString());
+      var response = UrlFetchApp.fetch(url, options);
+      var code = response.getResponseCode();
+      if (code === 200 || code === 201) {
+        sheet.getRange(i, COL_STATUS).setValue("✅ Отправлено");
         sent++;
       } else {
-        sheet.getRange(CONFIG.START_ROW + i, 4).setValue('❌ Ошибка: ' + JSON.stringify(result));
+        var body = response.getContentText().substring(0, 80);
+        sheet.getRange(i, COL_STATUS).setValue("❌ " + code + ": " + body);
         errors++;
       }
-    } catch (e) {
-      sheet.getRange(CONFIG.START_ROW + i, 4).setValue('❌ Сбой: ' + e.message);
+    } catch(e) {
+      sheet.getRange(i, COL_STATUS).setValue("❌ " + e.message);
       errors++;
     }
     
-    // 3. Безопасная пауза
-    if (i < data.length - 1) {
-      const delaySec = Math.floor(Math.random() * (CONFIG.MAX_DELAY_SEC - CONFIG.MIN_DELAY_SEC) + CONFIG.MIN_DELAY_SEC);
-      Logger.log('Пауза: ' + delaySec + ' сек...');
-      Utilities.sleep(delaySec * 1000);
-    }
+    Utilities.sleep(10000); // 10 сек пауза
   }
   
-  // Итоговый отчёт
-  SpreadsheetApp.getUi().alert(
-    '🎉 Рассылка завершена!\n\n' +
-    '✅ Отправлено: ' + sent + '\n' +
-    '❌ Ошибок: ' + errors + '\n' +
-    '📊 Всего строк: ' + data.length
-  );
+  Logger.log("Готово! ✅ " + sent + " отправлено, ❌ " + errors + " ошибок");
 }
 
-
-// ========== API ФУНКЦИИ ==========
-
-function sendPresence_(number) {
-  const url = CONFIG.VPS_URL + '/chat/sendPresence/' + encodeURIComponent(CONFIG.INSTANCE);
+// === СОЗДАТЬ ШАБЛОН ТАБЛИЦЫ ===
+function createTemplate() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getActiveSheet();
   
-  const options = {
-    method: 'post',
-    contentType: 'application/json',
-    headers: { 'apikey': CONFIG.API_KEY },
-    payload: JSON.stringify({
-      number: number,
-      presence: 'composing',
-      delay: CONFIG.TYPING_DELAY
-    }),
-    muteHttpExceptions: true
+  // Заголовки
+  var headers = [["📱 Телефон", "👤 Имя", "🏢 Компания", "📊 Статус"]];
+  sheet.getRange(1, 1, 1, 4).setValues(headers);
+  sheet.getRange(1, 1, 1, 4).setFontWeight("bold");
+  sheet.getRange(1, 1, 1, 4).setBackground("#4285f4");
+  sheet.getRange(1, 1, 1, 4).setFontColor("white");
+  
+  // Примеры
+  var examples = [
+    ["+7 999 123 4567", "Анна", "ООО Логистик", ""],
+    ["89991234567", "Иван", "ИП Петров", ""],
+    ["8 705 739 6014", "Валерий", "", ""],
+  ];
+  sheet.getRange(2, 1, examples.length, 4).setValues(examples);
+  
+  // Ширина колонок
+  sheet.setColumnWidth(1, 180);
+  sheet.setColumnWidth(2, 150);
+  sheet.setColumnWidth(3, 200);
+  sheet.setColumnWidth(4, 200);
+  
+  Logger.log("✅ Шаблон создан!");
+}
+
+// === ТЕСТ 1 НОМЕРА ===
+function testOne() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var phone = String(sheet.getRange(2, COL_PHONE).getValue()).replace(/\D/g, '');
+  if (phone.length === 11 && phone.charAt(0) === '8') phone = '7' + phone.substring(1);
+  
+  var url = SERVER_URL + "/message/sendText/" + encodeURIComponent(INSTANCE);
+  var options = {
+    "method": "POST",
+    "headers": { "Content-Type": "application/json", "apikey": API_KEY },
+    "payload": JSON.stringify({ "number": phone, "text": "Тест рассылки ✅" }),
+    "muteHttpExceptions": true
   };
   
-  try {
-    UrlFetchApp.fetch(url, options);
-  } catch (e) {
-    Logger.log('Presence warning: ' + e.message);
-  }
+  var resp = UrlFetchApp.fetch(url, options);
+  Logger.log("Код: " + resp.getResponseCode() + "\n" + resp.getContentText().substring(0, 300));
 }
 
-function sendText_(number, text) {
-  const url = CONFIG.VPS_URL + '/message/sendText/' + encodeURIComponent(CONFIG.INSTANCE);
-  
-  const options = {
-    method: 'post',
-    contentType: 'application/json',
-    headers: { 'apikey': CONFIG.API_KEY },
-    payload: JSON.stringify({
-      number: number,
-      text: text,
-      delay: 1000
-    }),
-    muteHttpExceptions: true
-  };
-  
-  const response = UrlFetchApp.fetch(url, options);
-  return JSON.parse(response.getContentText());
-}
-
-
-// ========== МЕНЮ В GOOGLE SHEETS ==========
-// Добавляет кнопку "🚀 Рассылка" в меню таблицы
+// === МЕНЮ ===
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('🚀 Рассылка')
-    .addItem('▶️ Запустить рассылку', 'startSending')
-    .addItem('📊 Тест одного номера', 'testSingleNumber')
+    .addItem('▶️ Запустить', 'sendWhatsAppMessages')
+    .addItem('🧪 Тест 1 номера', 'testOne')
+    .addItem('📋 Создать шаблон таблицы', 'createTemplate')
     .addToUi();
-}
-
-// Тест отправки на первый номер в таблице
-function testSingleNumber() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEET_NAME);
-  const phone = normalizePhone(String(sheet.getRange(2, 1).getValue()));
-  
-  if (!phone) {
-    SpreadsheetApp.getUi().alert('Неверный номер в ячейке A2!');
-    return;
-  }
-  
-  try {
-    sendPresence_(phone);
-    Utilities.sleep(2000);
-    const result = sendText_(phone, 'Тест рассылки. Если видите это — всё работает! ✅');
-    SpreadsheetApp.getUi().alert('Результат:\n' + JSON.stringify(result, null, 2));
-  } catch (e) {
-    SpreadsheetApp.getUi().alert('❌ Ошибка:\n' + e.message + '\n\nПроверь VPS_URL в CONFIG!');
-  }
 }
