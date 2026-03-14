@@ -42,12 +42,11 @@
     },
     {
       "parameters": {
-        "fieldToSplitOut": "body.data.participants",
-        "options": {}
+        "jsCode": "const participants = $input.item.json.body.data.participants || [];\nreturn participants.map(p => ({ json: { phone: p } }));"
       },
       "id": "f5e4d3c2-1b0a-4f9e-8d7c-6b5a4f3e2d1",
-      "name": "Split In Batches",
-      "type": "n8n-nodes-base.itemLists",
+      "name": "Split Participants",
+      "type": "n8n-nodes-base.code",
       "typeVersion": 1,
       "position": [
         650,
@@ -57,7 +56,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://evolutionapi.aiconicvibe.store/message/sendText/8326%20301%20n8n%20wa%201",
+        "url": "=https://evolutionapi.aiconicvibe.store/message/sendText/{{ $json.body.instance || '8326 301 n8n wa 1' }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -76,11 +75,11 @@
           "parameters": [
             {
               "name": "number",
-              "value": "={{ $json[\"body\"][\"data\"][\"participants\"][0] }}"
+              "value": "={{ $json.phone }}"
             },
             {
               "name": "text",
-              "value": "Привет! 👋 Очень рад(а) видеть тебя в нашей группе!\n\nЗавтра в 13:00 мы проводим крутой эфир по ИИ-агентам и автоматизации маркетинга, который заменяет целый отдел.\n\nПодскажи, в какой нише ты работаешь/какой у тебя бизнес? \n\nЯ постараюсь персонализировать завтрашний контент и разобрать решения прямо под твою ситуацию! 🔥"
+              "value": "Привет! 👋 Очень рад(а) видеть тебя в нашей группе!\n\nПодскажи, в какой нише ты работаешь/какой у тебя бизнес?\nЯ помогаю с ИИ-автоматизацией и лидогенерацией. 🔥"
             }
           ]
         },
@@ -112,14 +111,14 @@
       "main": [
         [
           {
-            "node": "Split In Batches",
+            "node": "Split Participants",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Split In Batches": {
+    "Split Participants": {
       "main": [
         [
           {
