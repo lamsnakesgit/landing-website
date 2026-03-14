@@ -1,0 +1,135 @@
+{
+  "name": "WA Auto Welcome (Group Join)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "evolution-group-events",
+        "options": {}
+      },
+      "id": "e4f8d29a-2d4e-4b6c-8a1a-3e8c7d6b5f1",
+      "name": "Evolution Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.data.action }}",
+              "value2": "add"
+            },
+            {
+              "value1": "={{ $json.body.event }}",
+              "value2": "group.participants.update"
+            }
+          ]
+        }
+      },
+      "id": "b7c6d5f4-3e2a-4c1b-9d8a-7c6b5a4f3e2",
+      "name": "If Action = Add",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.data.participants",
+        "options": {}
+      },
+      "id": "f5e4d3c2-1b0a-4f9e-8d7c-6b5a4f3e2d1",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        650,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://evolutionapi.aiconicvibe.store/message/sendText/8326%20301%20n8n%20wa%201",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $json[\"body\"][\"data\"][\"participants\"][0] }}"
+            },
+            {
+              "name": "text",
+              "value": "Привет! 👋 Очень рад(а) видеть тебя в нашей группе!\n\nЗавтра в 13:00 мы проводим крутой эфир по ИИ-агентам и автоматизации маркетинга, который заменяет целый отдел.\n\nПодскажи, в какой нише ты работаешь/какой у тебя бизнес? \n\nЯ постараюсь персонализировать завтрашний контент и разобрать решения прямо под твою ситуацию! 🔥"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d3c2b1a0-9f8e-7d6c-5b4a-3e2d1c0f9e8",
+      "name": "Send Welcome Message to DM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        850,
+        280
+      ]
+    }
+  ],
+  "connections": {
+    "Evolution Webhook": {
+      "main": [
+        [
+          {
+            "node": "If Action = Add",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Action = Add": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Message to DM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {}
+}
