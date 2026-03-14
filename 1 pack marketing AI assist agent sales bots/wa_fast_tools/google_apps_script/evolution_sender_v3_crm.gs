@@ -50,6 +50,9 @@ function sendWhatsAppMessages() {
   var lastRow = sheet.getLastRow();
   var sent = 0, errors = 0, skipped = 0;
 
+  Logger.log("🚀 СТАРТ ОСНОВНОЙ РАССЫЛКИ: " + new Date().toLocaleString());
+  Logger.log("📊 Всего строк для проверки: " + (lastRow - 1));
+
   for (var i = 2; i <= lastRow; i++) {
     var rawPhone = String(sheet.getRange(i, COL.PHONE).getValue()).trim();
     var name = String(sheet.getRange(i, COL.NAME).getValue()).trim();
@@ -60,7 +63,17 @@ function sendWhatsAppMessages() {
     if (!rawPhone || rawPhone.length < 5) continue;
 
     var phone = normalizePhone(rawPhone);
-    if (!phone) { sheet.getRange(i, COL.STATUS).setValue("ошибка ❌"); errors++; continue; }
+    if (!phone) { 
+      sheet.getRange(i, COL.STATUS).setValue("ошибка ❌"); 
+      errors++; 
+      Logger.log("⚠️ Строка " + i + " пропущена: неверный формат номера (" + rawPhone + ")");
+      continue; 
+    }
+
+    if (typeof MESSAGE_FIRST === 'undefined') {
+      Logger.log("❌ КРИТИЧЕСКАЯ ОШИБКА: Переменная MESSAGE_FIRST не найдена. Рассылка прервана!");
+      return;
+    }
 
     // Spintax: каждое сообщение уникальное
     var message = spintax(MESSAGE_FIRST).replace(/\{name\}/g, name || "");
@@ -80,15 +93,18 @@ function sendWhatsAppMessages() {
       sheet.getRange(i, COL.PIPELINE).setValue("отправлено");
       sheet.getRange(i, COL.LAST_SENT).setValue(new Date().toLocaleString());
       sent++;
+      Logger.log("✅ Отправлено (строка " + i + "): " + phone);
     } else {
       sheet.getRange(i, COL.STATUS).setValue("ошибка ❌");
       errors++;
+      Logger.log("❌ Ошибка отправки (строка " + i + "): " + phone);
     }
 
     Utilities.sleep(8000 + Math.floor(Math.random() * 7000)); // 8-15 сек рандомная пауза
   }
 
-  Logger.log("РАССЫЛКА: ✅ " + sent + " | ❌ " + errors + " | ⏭ " + skipped);
+  Logger.log("🏁 ФИНАЛ. РАССЫЛКА ЗАВЕРШЕНА: " + new Date().toLocaleString());
+  Logger.log("ИТОГО: ✅ Успешно: " + sent + " | ❌ Ошибок: " + errors + " | ⏭ Пропущено: " + skipped);
 }
 
 
@@ -152,7 +168,10 @@ function sendByTag() {
     var rawPhone = String(sheet.getRange(i, COL.PHONE).getValue()).trim();
     var name = String(sheet.getRange(i, COL.NAME).getValue()).trim();
     var phone = normalizePhone(rawPhone);
-    if (!phone) continue;
+    if (!phone) {
+      Logger.log("⚠️ Строка " + i + " пропущена: неверный формат номера (" + rawPhone + ")");
+      continue;
+    }
 
     var message = spintax(MESSAGE_FIRST).replace(/\{name\}/g, name || "");
     
