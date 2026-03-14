@@ -16,7 +16,7 @@ var API_KEY = "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f";
 var INSTANCE = "8326 301 n8n wa 1";
 
 // === КОЛОНКИ ===
-var COL = { PHONE: 1, NAME: 2, COMPANY: 3, STATUS: 4, TAG: 5, SEGMENT: 6, PIPELINE: 7, NOTES: 8, LAST_SENT: 9 };
+var COL = { PHONE: 1, NAME: 2, COMPANY: 3, STATUS: 4, TAG: 5, SEGMENT: 6, PIPELINE: 7, NOTES: 8, LAST_SENT: 9, MEDIA: 10 };
 
 
 // ==========================================
@@ -64,8 +64,16 @@ function sendWhatsAppMessages() {
 
     // Spintax: каждое сообщение уникальное
     var message = spintax(MESSAGE_FIRST).replace(/\{name\}/g, name || "");
+    var mediaUrl = String(sheet.getRange(i, COL.MEDIA).getValue()).trim();
 
-    var success = sendText(phone, message);
+    var success = false;
+    if (mediaUrl && mediaUrl.length > 5) {
+      // Если есть ссылка на медиа - отправляем медиа с подписью
+      success = sendMedia(phone, message, mediaUrl);
+    } else {
+      // Иначе обычный текст
+      success = sendText(phone, message);
+    }
     
     if (success) {
       sheet.getRange(i, COL.STATUS).setValue("отправлено ✅");
@@ -168,20 +176,20 @@ function createCRMTemplate() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   
   // Заголовки
-  var headers = [["📱 Телефон", "👤 Имя", "🏢 Компания", "📊 Статус", "🏷 Теги", "🎯 Сегмент", "📈 Воронка", "📝 Заметки", "🕐 Последняя отправка"]];
-  sheet.getRange(1, 1, 1, 9).setValues(headers);
-  sheet.getRange(1, 1, 1, 9).setFontWeight("bold").setBackground("#1a73e8").setFontColor("white");
+  var headers = [["📱 Телефон", "👤 Имя", "🏢 Компания", "📊 Статус", "🏷 Теги", "🎯 Сегмент", "📈 Воронка", "📝 Заметки", "🕐 Последняя отправка", "🖼 Ссылка на Картинку (URL)"]];
+  sheet.getRange(1, 1, 1, 10).setValues(headers);
+  sheet.getRange(1, 1, 1, 10).setFontWeight("bold").setBackground("#1a73e8").setFontColor("white");
 
   // Примеры
   var examples = [
-    ["+7 999 123 4567", "Анна", "ООО Логистик", "отправить", "клиент", "рассылки", "новый", "", ""],
-    ["89991234567", "Иван", "ИП Петров", "отправить", "клиент, партнёр", "ии-бот", "новый", "Знакомый по конференции", ""],
-    ["8 705 739 6014", "Валерий", "Cargo LTD", "пропустить", "нетворкинг", "автоматизация", "новый", "", ""],
+    ["+7 999 123 4567", "Анна", "ООО Логистик", "отправить", "клиент", "рассылки", "новый", "", "", "https://i.imgur.com/example.jpg"],
+    ["89991234567", "Иван", "ИП Петров", "отправить", "клиент, партнёр", "ии-бот", "новый", "Знакомый по конференции", "", ""],
+    ["8 705 739 6014", "Валерий", "Cargo LTD", "пропустить", "нетворкинг", "автоматизация", "новый", "", "", ""],
   ];
-  sheet.getRange(2, 1, examples.length, 9).setValues(examples);
+  sheet.getRange(2, 1, examples.length, 10).setValues(examples);
 
   // Ширина колонок
-  var widths = [160, 130, 180, 130, 160, 140, 150, 200, 170];
+  var widths = [160, 130, 180, 130, 160, 140, 150, 200, 170, 250];
   widths.forEach(function(w, idx) { sheet.setColumnWidth(idx + 1, w); });
 
   // Валидация статуса (колонка D)
@@ -243,6 +251,37 @@ function sendText(phone, text) {
     return (code === 200 || code === 201);
   } catch(e) {
     Logger.log("Ошибка отправки: " + e.message);
+    return false;
+  }
+}
+
+function sendMedia(phone, caption, mediaUrl) {
+  var url = SERVER_URL + "/message/sendMedia/" + encodeURIComponent(INSTANCE);
+  var mediatype = "image"; 
+  var mimetype = "image/jpeg";
+  
+  if (mediaUrl.indexOf(".png") > -1) mimetype = "image/png";
+  if (mediaUrl.indexOf(".pdf") > -1) { mediatype = "document"; mimetype = "application/pdf"; }
+  if (mediaUrl.indexOf(".mp4") > -1) { mediatype = "video"; mimetype = "video/mp4"; }
+
+  var options = {
+    "method": "POST",
+    "headers": { "Content-Type": "application/json", "apikey": API_KEY },
+    "payload": JSON.stringify({ 
+      "number": phone, 
+      "mediatype": mediatype,
+      "mimetype": mimetype,
+      "caption": caption,
+      "media": mediaUrl
+    }),
+    "muteHttpExceptions": true
+  };
+  try {
+    var resp = UrlFetchApp.fetch(url, options);
+    var code = resp.getResponseCode();
+    return (code === 200 || code === 201);
+  } catch(e) {
+    Logger.log("Ошибка отправки медиа: " + e.message);
     return false;
   }
 }
