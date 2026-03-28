@@ -1,0 +1,99 @@
+{
+    "name": "WhatsApp Data: Export Chats & History (Local Fix)",
+    "nodes": [
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/chat/findChats/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": []
+                },
+                "options": {}
+            },
+            "id": "1",
+            "name": "Fetch All Chats",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "a1b2c3d4-e5f6-4a5b-b6c7-d8e9f0a1b2c3",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        },
+                        {
+                            "id": "f0e9d8c7-b6a5-4f3e-a2d1-c0b9a8f7e6d5",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "2",
+            "name": "Config",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                200,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Фильтруем и подготавливаем данные для таблицы\nconst chats = $input.all();\nreturn chats.map(item => ({\n  json: {\n    id: item.json.remoteJid || item.json.id,\n    name: item.json.pushName || item.json.name || item.json.remoteJid?.split('@')[0] || 'Unknown',\n    type: (item.json.remoteJid || '').endsWith('@g.us') ? 'Group' : 'Private',\n    last_message: item.json.message?.conversation || item.json.lastMessage?.message?.conversation || 'None'\n  }\n}));"
+            },
+            "id": "3",
+            "name": "Format Data",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                700,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Config": {
+            "main": [
+                [
+                    {
+                        "node": "Fetch All Chats",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch All Chats": {
+            "main": [
+                [
+                    {
+                        "node": "Format Data",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

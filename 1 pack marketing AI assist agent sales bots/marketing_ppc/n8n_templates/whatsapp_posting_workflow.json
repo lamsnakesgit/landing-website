@@ -1,0 +1,110 @@
+{
+    "name": "WhatsApp Manager: Posting & Outreach (Local Fix)",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "whatsapp-post",
+                "options": {}
+            },
+            "id": "1",
+            "name": "Webhook: Receive Post Data",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendText/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $json[\"chat_id\"] }}"
+                        },
+                        {
+                            "name": "text",
+                            "value": "={{ $json[\"message\"] }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "2",
+            "name": "Evolution API: Send Message",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                700,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "67b9d1e5-8a21-4f3d-a4e9-15822b3c4d5e",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        },
+                        {
+                            "id": "21a3c5e7-9b4d-4e2b-8c1f-5822b3c4d5e1",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "3",
+            "name": "Config",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                450,
+                100
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook: Receive Post Data": {
+            "main": [
+                [
+                    {
+                        "node": "Evolution API: Send Message",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Config": {
+            "main": [
+                [
+                    {
+                        "node": "Evolution API: Send Message",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

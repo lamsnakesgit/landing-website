@@ -1,0 +1,369 @@
+{
+    "name": "Telegram to WhatsApp: Media Bridge",
+    "nodes": [
+        {
+            "parameters": {
+                "updates": [
+                    "message"
+                ],
+                "additionalFields": {}
+            },
+            "id": "1",
+            "name": "Telegram Trigger",
+            "type": "n8n-nodes-base.telegramTrigger",
+            "typeVersion": 1,
+            "position": [
+                0,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict"
+                    },
+                    "conditions": [
+                        {
+                            "id": "has-photo",
+                            "leftHandSide": "={{ $json.message.photo ? 'yes' : 'no' }}",
+                            "operator": "equal",
+                            "rightHandSide": "yes"
+                        }
+                    ],
+                    "combinator": "or"
+                },
+                "options": {}
+            },
+            "id": "2",
+            "name": "Is Photo?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2,
+            "position": [
+                250,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "getFile",
+                "fileId": "={{ $node[\"Telegram Trigger\"].json.message.photo.reverse()[0].file_id }} "
+            },
+            "id": "3",
+            "name": "Get TG Photo",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.1,
+            "position": [
+                450,
+                100
+            ],
+            "credentials": {
+                "telegramApi": {
+                    "id": "ВСТАВЬ_TG_BOT_CREDENTIALS_ID",
+                    "name": "Telegram Bot"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendMedia/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $node[\"Config\"].json[\"target_group_id\"] }}"
+                        },
+                        {
+                            "name": "mediatype",
+                            "value": "image"
+                        },
+                        {
+                            "name": "caption",
+                            "value": "={{ $node[\"Telegram Trigger\"].json.message.caption || '' }}"
+                        }
+                    ]
+                },
+                "sendBodyData": "binaryData",
+                "bodyParametersBinary": [
+                    {
+                        "parameterName": "media",
+                        "inputDataFieldName": "data"
+                    }
+                ]
+            },
+            "id": "4",
+            "name": "Forward Photo to WA",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                700,
+                100
+            ]
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "api-key-id",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        },
+                        {
+                            "id": "instance-id",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        },
+                        {
+                            "id": "target-id",
+                            "name": "target_group_id",
+                            "value": "ВСТАВИ_ID_ГРУППЫ",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "5",
+            "name": "Config",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                450,
+                450
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict"
+                    },
+                    "conditions": [
+                        {
+                            "id": "has-audio",
+                            "leftHandSide": "={{ $json.message.audio || $json.message.voice ? 'yes' : 'no' }}",
+                            "operator": "equal",
+                            "rightHandSide": "yes"
+                        }
+                    ],
+                    "combinator": "or"
+                },
+                "options": {}
+            },
+            "id": "6",
+            "name": "Is Audio?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2,
+            "position": [
+                250,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "getFile",
+                "fileId": "={{ $json.message.audio ? $json.message.audio.file_id : $json.message.voice.file_id }}"
+            },
+            "id": "7",
+            "name": "Get TG Audio",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.1,
+            "position": [
+                450,
+                350
+            ],
+            "credentials": {
+                "telegramApi": {
+                    "id": "ВСТАВЬ_TG_BOT_CREDENTIALS_ID",
+                    "name": "Telegram Bot"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendWhatsAppAudio/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $node[\"Config\"].json[\"target_group_id\"] }}"
+                        }
+                    ]
+                },
+                "sendBodyData": "binaryData",
+                "bodyParametersBinary": [
+                    {
+                        "parameterName": "audio",
+                        "inputDataFieldName": "data"
+                    }
+                ]
+            },
+            "id": "8",
+            "name": "Forward Audio to WA",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                700,
+                350
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendText/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $node[\"Config\"].json[\"target_group_id\"] }}"
+                        },
+                        {
+                            "name": "text",
+                            "value": "={{ $json.message.text }}"
+                        }
+                    ]
+                }
+            },
+            "id": "9",
+            "name": "Forward Text to WA",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                450,
+                600
+            ]
+        }
+    ],
+    "connections": {
+        "Telegram Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Is Photo?",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Is Audio?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Is Photo?": {
+            "main": [
+                [
+                    {
+                        "node": "Get TG Photo",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        },
+        "Get TG Photo": {
+            "main": [
+                [
+                    {
+                        "node": "Forward Photo to WA",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Is Audio?": {
+            "main": [
+                [
+                    {
+                        "node": "Get TG Audio",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Forward Text to WA",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get TG Audio": {
+            "main": [
+                [
+                    {
+                        "node": "Forward Audio to WA",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Config": {
+            "main": [
+                [
+                    {
+                        "node": "Forward Photo to WA",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Forward Audio to WA",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Forward Text to WA",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

@@ -1,0 +1,224 @@
+{
+    "name": "WhatsApp: Mass Image Blaster",
+    "nodes": [
+        {
+            "parameters": {},
+            "id": "1",
+            "name": "When clicking \"Execute Workflow\"",
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [
+                0,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "inst",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        },
+                        {
+                            "id": "api-key",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        },
+                        {
+                            "id": "image-url",
+                            "name": "image_url",
+                            "value": "https://example.com/image.jpg",
+                            "type": "string"
+                        },
+                        {
+                            "id": "caption",
+                            "name": "caption",
+                            "value": "Привет! Это наша новая акция 🚀",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "2",
+            "name": "Config Campaign",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                200,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "get",
+                "dataTableId": "whatsapp_chats_db",
+                "returnAll": true,
+                "filters": {
+                    "conditions": [
+                        {
+                            "key": "type",
+                            "operator": "notEqual",
+                            "value": "Channel"
+                        }
+                    ]
+                }
+            },
+            "id": "3",
+            "name": "Get Targets from Table",
+            "type": "n8n-nodes-base.dataTable",
+            "typeVersion": 1,
+            "position": [
+                400,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "batchSize": 1,
+                "options": {
+                    "reset": false
+                }
+            },
+            "id": "4",
+            "name": "Split In Batches",
+            "type": "n8n-nodes-base.splitInBatches",
+            "typeVersion": 3,
+            "position": [
+                600,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendMedia/{{ $node[\"Config Campaign\"].json.instance }}",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $json.jid }}"
+                        },
+                        {
+                            "name": "media",
+                            "value": "={{ $node[\"Config Campaign\"].json.image_url }}"
+                        },
+                        {
+                            "name": "mediatype",
+                            "value": "image"
+                        },
+                        {
+                            "name": "caption",
+                            "value": "={{ $node[\"Config Campaign\"].json.caption }}"
+                        }
+                    ]
+                },
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config Campaign\"].json.api_key }}"
+                        }
+                    ]
+                }
+            },
+            "id": "5",
+            "name": "Send Image (Evolution)",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                800,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "amount": 2,
+                "unit": "seconds"
+            },
+            "id": "6",
+            "name": "Anti-Ban Wait",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.1,
+            "position": [
+                1000,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "When clicking \"Execute Workflow\"": {
+            "main": [
+                [
+                    {
+                        "node": "Config Campaign",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Config Campaign": {
+            "main": [
+                [
+                    {
+                        "node": "Get Targets from Table",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Targets from Table": {
+            "main": [
+                [
+                    {
+                        "node": "Split In Batches",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Split In Batches": {
+            "main": [
+                [
+                    {
+                        "node": "Send Image (Evolution)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        },
+        "Send Image (Evolution)": {
+            "main": [
+                [
+                    {
+                        "node": "Anti-Ban Wait",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Anti-Ban Wait": {
+            "main": [
+                [
+                    {
+                        "node": "Split In Batches",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

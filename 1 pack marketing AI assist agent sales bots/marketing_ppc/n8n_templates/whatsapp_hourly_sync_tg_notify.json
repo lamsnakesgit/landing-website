@@ -1,0 +1,295 @@
+{
+    "name": "WhatsApp Hourly Sync + TG Notify",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours"
+                        }
+                    ]
+                }
+            },
+            "id": "1",
+            "name": "Schedule Trigger",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                0,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "inst",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        },
+                        {
+                            "id": "api-key",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        },
+                        {
+                            "id": "tg-token",
+                            "name": "tg_bot_token",
+                            "value": "YOUR_TG_BOT_TOKEN",
+                            "type": "string"
+                        },
+                        {
+                            "id": "tg-chat",
+                            "name": "tg_chat_id",
+                            "value": "YOUR_TG_CHAT_ID",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "2",
+            "name": "Config",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                200,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/chat/findChats/{{ $json.instance }}?getParticipants=true",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $json.api_key }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "3",
+            "name": "Fetch Chats (Evolution)",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                400,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Обработка чатов и классификация\nconst chats = Array.isArray($json) ? $json : [$json];\nreturn chats.map(chat => {\n  const jid = chat.id || chat.remoteJid || chat.jid;\n  if (!jid) return null;\n\n  const pCount = chat.participantCount || (Array.isArray(chat.participants) ? chat.participants.length : 0);\n  \n  let type = 'Private';\n  if (jid.endsWith('@newsletter')) type = 'Channel';\n  else if (jid.endsWith('@g.us') || pCount > 0) type = 'Group';\n\n  return {\n    jid: jid,\n    name: chat.pushName || chat.name || 'Unknown',\n    type: type,\n    parent_jid: chat.parentJid || '',\n    participants_count: pCount,\n    created_at: chat.createdAt ? new Date(chat.createdAt).toISOString() : new Date().toISOString()\n  };\n}).filter(c => c !== null);"
+            },
+            "id": "4",
+            "name": "Process & Classify",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                600,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "get",
+                "dataTableId": "whatsapp_chats_db",
+                "returnAll": true
+            },
+            "id": "5",
+            "name": "Get Existing Chats",
+            "type": "n8n-nodes-base.dataTable",
+            "typeVersion": 1,
+            "position": [
+                800,
+                150
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Фильтрация новых чатов\nconst allIncoming = $items(\"Process & Classify\").map(i => i.json);\nconst existingData = $items(\"Get Existing Chats\").map(i => i.json.jid || i.json.chat_id);\nreturn allIncoming.filter(incoming => !existingData.includes(incoming.jid));"
+            },
+            "id": "6",
+            "name": "Filter New Chats",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1000,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "insert",
+                "dataTableId": "whatsapp_chats_db",
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": [
+                        {
+                            "columnName": "jid",
+                            "field": "jid"
+                        },
+                        {
+                            "columnName": "name",
+                            "field": "name"
+                        },
+                        {
+                            "columnName": "type",
+                            "field": "type"
+                        },
+                        {
+                            "columnName": "parent_jid",
+                            "field": "parent_jid"
+                        },
+                        {
+                            "columnName": "participants_count",
+                            "field": "participants_count"
+                        }
+                    ]
+                }
+            },
+            "id": "7",
+            "name": "Save New to Table",
+            "type": "n8n-nodes-base.dataTable",
+            "typeVersion": 1,
+            "position": [
+                1200,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "aggregateBy": "allIncomingItems",
+                "options": {}
+            },
+            "id": "8",
+            "name": "Aggregate New",
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [
+                1400,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "chatId": "={{$node[\"Config\"].json.tg_chat_id}}",
+                "text": "=📊 <b>Отчет по WhatsApp чатам</b>\n\n✅ Всего чатов в аккаунте: {{ $node[\"Fetch Chats (Evolution)\"].json.length }}\n🆕 Обнаружено новых: {{ $items(\"Filter New Chats\").length }}\n\n<b>Список новых:</b>\n{{ $items(\"Filter New Chats\").map(c => `• ${c.json.name} (${c.json.type}, ${c.json.participants_count} чел)`).join('\\n') }}",
+                "additionalFields": {
+                    "parse_mode": "HTML"
+                }
+            },
+            "id": "9",
+            "name": "Telegram Notify",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.2,
+            "position": [
+                1600,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Schedule Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Config",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Config": {
+            "main": [
+                [
+                    {
+                        "node": "Fetch Chats (Evolution)",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Get Existing Chats",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch Chats (Evolution)": {
+            "main": [
+                [
+                    {
+                        "node": "Process & Classify",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Process & Classify": {
+            "main": [
+                [
+                    {
+                        "node": "Filter New Chats",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Existing Chats": {
+            "main": [
+                [
+                    {
+                        "node": "Filter New Chats",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Filter New Chats": {
+            "main": [
+                [
+                    {
+                        "node": "Save New to Table",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Save New to Table": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate New",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate New": {
+            "main": [
+                [
+                    {
+                        "node": "Telegram Notify",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

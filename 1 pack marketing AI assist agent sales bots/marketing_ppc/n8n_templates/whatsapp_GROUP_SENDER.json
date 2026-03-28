@@ -1,0 +1,159 @@
+{
+    "name": "WhatsApp: Simple GROUP Sender",
+    "nodes": [
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "img",
+                            "name": "image_url",
+                            "value": "ВСТАВЬ_ССЫЛКУ_НА_ФОТО_ИЗ_ХЕЛПЕРА",
+                            "type": "string"
+                        },
+                        {
+                            "id": "cap",
+                            "name": "caption",
+                            "value": "Поздравляю всех с Международным женским днем",
+                            "type": "string"
+                        },
+                        {
+                            "id": "jids",
+                            "name": "target_group_jids",
+                            "value": "1203630234567@g.us, 1203630789012@g.us",
+                            "type": "string"
+                        },
+                        {
+                            "id": "inst",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        },
+                        {
+                            "id": "api",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "1",
+            "name": "Config Groups",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                0,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Просто разбиваем список JID на отдельные задачи\nconst config = $json;\nconst jids = config.target_group_jids.split(',').map(j => j.trim()).filter(j => j.includes('@g.us'));\n\nreturn jids.map(jid => ({\n  jid: jid,\n  image_url: config.image_url,\n  caption: config.caption,\n  instance: config.instance,\n  api_key: config.api_key\n}));"
+            },
+            "id": "2",
+            "name": "Create Queue",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                250,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "amount": 3,
+                "unit": "seconds"
+            },
+            "id": "3",
+            "name": "Delay (Anti-Ban)",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.1,
+            "position": [
+                500,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendMedia/{{ encodeURIComponent($json.instance) }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $json.api_key }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $json.jid }}"
+                        },
+                        {
+                            "name": "media",
+                            "value": "={{ $json.image_url }}"
+                        },
+                        {
+                            "name": "mediatype",
+                            "value": "image"
+                        },
+                        {
+                            "name": "caption",
+                            "value": "={{ $json.caption }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "4",
+            "name": "Send Media to Group",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                750,
+                0
+            ]
+        }
+    ],
+    "connections": {
+        "Config Groups": {
+            "main": [
+                [
+                    {
+                        "node": "Create Queue",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Create Queue": {
+            "main": [
+                [
+                    {
+                        "node": "Delay (Anti-Ban)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Delay (Anti-Ban)": {
+            "main": [
+                [
+                    {
+                        "node": "Send Media to Group",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

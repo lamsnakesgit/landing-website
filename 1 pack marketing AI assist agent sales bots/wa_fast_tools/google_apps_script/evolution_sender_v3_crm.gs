@@ -58,9 +58,14 @@ function sendWhatsAppMessages() {
     var name = String(sheet.getRange(i, COL.NAME).getValue()).trim();
     var status = String(sheet.getRange(i, COL.STATUS).getValue()).trim();
 
-    // Отправляем только "отправить"
-    if (status !== "отправить") { skipped++; continue; }
-    if (!rawPhone || rawPhone.length < 5) continue;
+    // Отправляем только "отправить" (любым регистром)
+    if (status.toLowerCase() !== "отправить") { skipped++; continue; }
+    
+    if (!rawPhone || rawPhone.length < 5) {
+      Logger.log("⚠️ Строка " + i + " пропущена: пустой номер телефона");
+      skipped++;
+      continue;
+    }
 
     var phone = normalizePhone(rawPhone);
     if (!phone) { 
@@ -114,33 +119,53 @@ function sendWhatsAppMessages() {
 function sendFollowUp() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var lastRow = sheet.getLastRow();
-  var sent = 0, skipped = 0;
+  var sent = 0, skipped = 0, errors = 0;
+
+  Logger.log("🔄 СТАРТ ДОЖИМА (FOLLOW-UP): " + new Date().toLocaleString());
+  Logger.log("📊 Проверяем кто не ответил...");
 
   for (var i = 2; i <= lastRow; i++) {
     var rawPhone = String(sheet.getRange(i, COL.PHONE).getValue()).trim();
     var name = String(sheet.getRange(i, COL.NAME).getValue()).trim();
     var status = String(sheet.getRange(i, COL.STATUS).getValue()).trim();
 
-    // Дожимаем только тех кто "отправлено ✅" (не ответили)
-    if (status !== "отправлено ✅") { skipped++; continue; }
+    // Дожимаем только тех кто "отправлено ✅" (любым регистром)
+    if (status.toLowerCase() !== "отправлено ✅" && status.toLowerCase() !== "отправлено") {
+      skipped++; 
+      continue; 
+    }
 
     var phone = normalizePhone(rawPhone);
-    if (!phone) continue;
+    if (!phone) {
+      Logger.log("⚠️ Строка " + i + " пропущена: неверный формат номера");
+      continue;
+    }
+
+    if (typeof MESSAGE_FOLLOWUP === 'undefined') {
+      Logger.log("❌ ОШИБКА: Переменная MESSAGE_FOLLOWUP не найдена!");
+      return;
+    }
 
     var message = spintax(MESSAGE_FOLLOWUP).replace(/\{name\}/g, name || "");
 
+    Logger.log("📤 Отправляем дожим на " + phone + "...");
     var success = sendText(phone, message);
     
     if (success) {
-      sheet.getRange(i, COL.STATUS).setValue("дожим");
+      sheet.getRange(i, COL.STATUS).setValue("дожим ✅");
       sheet.getRange(i, COL.LAST_SENT).setValue(new Date().toLocaleString());
       sent++;
+      Logger.log("✅ Дожим отправлен (строка " + i + ")");
+    } else {
+      errors++;
+      Logger.log("❌ Ошибка при дожиме (строка " + i + ")");
     }
 
-    Utilities.sleep(10000 + Math.floor(Math.random() * 10000)); // 10-20 сек
+    Utilities.sleep(10000 + Math.floor(Math.random() * 8000)); // 10-18 сек
   }
 
-  Logger.log("ДОЖИМ: ✅ " + sent + " | ⏭ " + skipped);
+  Logger.log("🏁 ФИНАЛ ДОЖИМА: " + new Date().toLocaleString());
+  Logger.log("ИТОГО: ✅ Успешно: " + sent + " | ❌ Ошибок: " + errors + " | ⏭ Пропущено: " + skipped);
 }
 
 

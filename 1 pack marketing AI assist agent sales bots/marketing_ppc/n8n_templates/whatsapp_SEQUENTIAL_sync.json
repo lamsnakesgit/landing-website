@@ -1,0 +1,290 @@
+{
+    "name": "WhatsApp: BULK SMART Sync (High Performance)",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours"
+                        }
+                    ]
+                }
+            },
+            "id": "1",
+            "name": "Timer Trigger",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                -200,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "inst",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        },
+                        {
+                            "id": "api",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        }
+                    ]
+                }
+            },
+            "id": "2",
+            "name": "Sync Config",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                50,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/chat/findChats/{{ encodeURIComponent($json.instance) }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $json.api_key }}"
+                        }
+                    ]
+                }
+            },
+            "id": "3",
+            "name": "Fetch API All",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                300,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "get",
+                "dataTableId": "whatsapp_chats_db",
+                "returnAll": true,
+                "options": {}
+            },
+            "id": "4",
+            "name": "Fetch DB All",
+            "type": "n8n-nodes-base.dataTable",
+            "typeVersion": 1,
+            "position": [
+                300,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "combine",
+                "combinationMode": "multiplex",
+                "options": {}
+            },
+            "id": "5",
+            "name": "Wait for Data",
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3,
+            "position": [
+                550,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// ЭФФЕКТИВНАЯ МАССОВАЯ СВЕРКА (Bulk Compare)\n// Используем .all(), чтобы гарантированно получить весь массив входных данных\nconst apiChats = $node[\"Fetch API All\"].all().map(r => r.json);\nconst dbRows = $node[\"Fetch DB All\"].all().map(r => r.json);\n\n// Создаем карту (Map) для мгновенного поиска по JID\nconst dbMap = new Map();\ndbRows.forEach(row => {\n  if (row.jid) dbMap.set(row.jid, row);\n});\n\nconst toInsert = [];\nconst toUpdate = [];\n\napiChats.forEach(chat => {\n  const jid = chat.remoteJid || chat.jid || chat.id;\n  const name = chat.pushName || chat.name || \"Unknown\";\n  const type = (jid || \"\").endsWith('@g.us') ? 'Group' : 'Private';\n  \n  if (!dbMap.has(jid)) {\n    // В базе такого нет — записываем в очередь на вставку\n    toInsert.push({ jid, name, type });\n  } else {\n    // В базе есть — проверяем, не сменилось ли имя\n    const existing = dbMap.get(jid);\n    if (existing.name !== name) {\n      toUpdate.push({ rowId: existing.rowId, jid, name, type });\n    }\n  }\n});\n\n// Возвращаем ДВА выхода: \n// Выход 0 -> Только новые записи\n// Выход 1 -> Только записи на обновление\nreturn [\n  toInsert.map(i => ({ json: i })),\n  toUpdate.map(u => ({ json: u }))\n];"
+            },
+            "id": "6",
+            "name": "Bulk Sync Logic",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                800,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "insert",
+                "dataTableId": "whatsapp_chats_db",
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": [
+                        {
+                            "columnName": "jid",
+                            "field": "jid"
+                        },
+                        {
+                            "columnName": "name",
+                            "field": "name"
+                        },
+                        {
+                            "columnName": "type",
+                            "field": "type"
+                        }
+                    ]
+                }
+            },
+            "id": "10",
+            "name": "BULK Insert",
+            "type": "n8n-nodes-base.dataTable",
+            "typeVersion": 1.1,
+            "position": [
+                1100,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "batchSize": 1,
+                "options": {}
+            },
+            "id": "11",
+            "name": "Loop for Updates",
+            "type": "n8n-nodes-base.splitInBatches",
+            "typeVersion": 1,
+            "position": [
+                1100,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "dataTableId": "whatsapp_chats_db",
+                "rowId": "={{ $json.rowId }}",
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": [
+                        {
+                            "columnName": "name",
+                            "field": "name"
+                        }
+                    ]
+                }
+            },
+            "id": "12",
+            "name": "Update Name",
+            "type": "n8n-nodes-base.dataTable",
+            "typeVersion": 1.1,
+            "position": [
+                1350,
+                400
+            ]
+        }
+    ],
+    "connections": {
+        "Timer Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Sync Config",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Sync Config": {
+            "main": [
+                [
+                    {
+                        "node": "Fetch API All",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch API All": {
+            "main": [
+                [
+                    {
+                        "node": "Wait for Data",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Fetch DB All",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch DB All": {
+            "main": [
+                [
+                    {
+                        "node": "Wait for Data",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Wait for Data": {
+            "main": [
+                [
+                    {
+                        "node": "Bulk Sync Logic",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Bulk Sync Logic": {
+            "main": [
+                [
+                    {
+                        "node": "BULK Insert",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Loop for Updates",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop for Updates": {
+            "main": [
+                [
+                    {
+                        "node": "Update Name",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Update Name": {
+            "main": [
+                [
+                    {
+                        "node": "Loop for Updates",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

@@ -1,0 +1,304 @@
+{
+  "name": "WhatsApp Summary Agent (Evolution API)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 1. Webhook (\u0422\u0440\u0438\u0433\u0433\u0435\u0440)\\n\u041b\u043e\u0432\u0438\u0442 \u0432\u0441\u0435 \u0441\u043e\u0431\u044b\u0442\u0438\u044f \u0438\u0437 Evolution API. \\n**\u0412\u0430\u0436\u043d\u043e:** \u0412 \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430\u0445 \u0438\u043d\u0441\u0442\u0430\u043d\u0441\u0430 Evolution \u043d\u0443\u0436\u043d\u043e \u0432\u043a\u043b\u044e\u0447\u0438\u0442\u044c \u043e\u0442\u043f\u0440\u0430\u0432\u043a\u0443 base64 \u0434\u043b\u044f \u043c\u0435\u0434\u0438\u0430!",
+        "height": 180,
+        "width": 250,
+        "color": 6
+      },
+      "id": "s1",
+      "name": "Sticky Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -50,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 2. \u0424\u0438\u043b\u044c\u0442\u0440 \u0438 \u041a\u043e\u043d\u0432\u0435\u0440\u0442\u0430\u0446\u0438\u044f\\n\u041f\u0440\u043e\u043f\u0443\u0441\u043a\u0430\u0435\u043c \u0442\u043e\u043b\u044c\u043a\u043e `audioMessage` (\u0433\u043e\u043b\u043e\u0441\u043e\u0432\u044b\u0435). \\n\u0414\u0430\u043b\u0435\u0435 Code-\u043d\u043e\u0434\u0430 \u043f\u0440\u0435\u0432\u0440\u0430\u0449\u0430\u0435\u0442 \u043f\u0440\u0438\u0448\u0435\u0434\u0448\u0438\u0439 base64 \u0441\u0442\u0440\u043e\u043a\u0443 \u0432 \u0440\u0435\u0430\u043b\u044c\u043d\u044b\u0439 \u0431\u0438\u043d\u0430\u0440\u043d\u044b\u0439 \u0444\u0430\u0439\u043b `audio/ogg`, \u0447\u0442\u043e\u0431\u044b \u043e\u0442\u0434\u0430\u0442\u044c \u0435\u0433\u043e \u0432 Whisper.",
+        "height": 180,
+        "width": 380,
+        "color": 5
+      },
+      "id": "s2",
+      "name": "Sticky Note 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -130
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 3. \u0422\u0440\u0430\u043d\u0441\u043a\u0440\u0438\u0431\u0430\u0446\u0438\u044f \u0438 \u0418\u0418\\nWhisper \u0440\u0430\u0441\u043f\u043e\u0437\u043d\u0430\u0435\u0442 \u0442\u0435\u043a\u0441\u0442, \u0430 Gemini (\u0447\u0435\u0440\u0435\u0437 \u0418\u0418-\u0410\u0433\u0435\u043d\u0442\u0430) \u0434\u0435\u043b\u0430\u0435\u0442 \u043a\u0440\u0430\u0442\u043a\u0443\u044e \u0432\u044b\u0436\u0438\u043c\u043a\u0443 (\u0421\u0430\u043c\u043c\u0430\u0440\u0438).\\n**\u0412\u0430\u0436\u043d\u043e:** \u041f\u0440\u043e\u043c\u043f\u0442 \u043d\u0430\u0441\u0442\u0440\u043e\u0435\u043d \u0442\u0430\u043a, \u0447\u0442\u043e\u0431\u044b \u0432\u044b\u0434\u0430\u0432\u0430\u0442\u044c \u0442\u043e\u043b\u044c\u043a\u043e _WhatsApp Markdown_ (\u0431\u0435\u0437 HTML).",
+        "height": 180,
+        "width": 420,
+        "color": 4
+      },
+      "id": "s3",
+      "name": "Sticky Note 3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        620,
+        -130
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 4. \u041e\u0442\u043f\u0440\u0430\u0432\u043a\u0430 \u0432 WhatsApp\\n\u0423\u0445\u043e\u0434\u0438\u0442 POST \u0437\u0430\u043f\u0440\u043e\u0441 \u043e\u0431\u0440\u0430\u0442\u043d\u043e \u0432 Evolution API.\\n- \u041e\u0442\u0432\u0435\u0447\u0430\u0435\u0442 \u0432 \u0442\u0443 \u0436\u0435 \u0433\u0440\u0443\u043f\u043f\u0443 (`remoteJid`)\\n- \u0422\u0435\u0433\u0430\u0435\u0442 \u043e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u0435\u043b\u044f \u0433\u043e\u043b\u043e\u0441\u043e\u0432\u043e\u0433\u043e (`mentions`)",
+        "height": 180,
+        "width": 300,
+        "color": 3
+      },
+      "id": "s4",
+      "name": "Sticky Note 4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        -130
+      ]
+    },
+    {
+      "parameters": {
+        "path": "whatsapp-summary",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Evolution Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.data.messageType }}",
+              "value2": "audioMessage"
+            }
+          ]
+        }
+      },
+      "id": "2",
+      "name": "Is Audio?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "/*\\n\u0412 Evolution API, \u0435\u0441\u043b\u0438 \u0432\u043a\u043b\u044e\u0447\u0438\u0442\u044c \u043e\u043f\u0446\u0438\u044e base64 \u0432 \u0432\u0435\u0431\u0445\u0443\u043a\u0430\u0445 \u0434\u043b\u044f \u043c\u0435\u0434\u0438\u0430,\\n\u0441\u0430\u043c\u043e \u0430\u0443\u0434\u0438\u043e \u043f\u0440\u0438\u0445\u043e\u0434\u0438\u0442 \u0432 body.data.message.base64.\\n\u041d\u043e\u0434\u0430 \u0431\u0435\u0440\u0435\u0442 \u044d\u0442\u043e\u0442 base64 \u0438 \u0434\u0435\u043b\u0430\u0435\u0442 \u0438\u0437 \u043d\u0435\u0433\u043e \u043d\u0430\u0441\u0442\u043e\u044f\u0449\u0438\u0439 \u0444\u0430\u0439\u043b n8n (binary).\\n*/\\nconst item = $input.first().json;\\nconst base64Data = item.body?.data?.message?.base64;\\n\\nif (!base64Data) {\\n  throw new Error(\"\u041d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d base64 \u0432 \u0432\u0435\u0431\u0445\u0443\u043a\u0435! \u0423\u0431\u0435\u0434\u0438\u0442\u0435\u0441\u044c, \u0447\u0442\u043e \u0432 Evolution API \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u0430 \u043e\u043f\u0446\u0438\u044f \u043e\u0442\u043f\u0440\u0430\u0432\u043a\u0438 base64 \u0434\u043b\u044f \u043c\u0435\u0434\u0438\u0430 \u0432 \u0432\u0435\u0431\u0445\u0443\u043a\u0430\u0445.\");\\n}\\n\\nconst buffer = Buffer.from(base64Data, 'base64');\\n\\nreturn {\\n  json: item,\\n  binary: {\\n    data: {\\n      data: buffer.toString('base64'),\\n      mimeType: 'audio/ogg',\\n      fileName: 'voice.ogg'\\n    }\\n  }\\n};"
+      },
+      "id": "3",
+      "name": "Convert base64 to File",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openai-whisper-asr-webservice-production.up.railway.app/asr",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "task",
+              "value": "transcribe"
+            },
+            {
+              "name": "output",
+              "value": "json"
+            },
+            {
+              "name": "encode",
+              "value": "true"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "audio_file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4",
+      "name": "Whisper Transcribe",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        620,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "\u0422\u044b \u2014 \u0418\u0418-\u0430\u0433\u0435\u043d\u0442, \u0441\u043f\u0435\u0446\u0438\u0430\u043b\u0438\u0437\u0438\u0440\u0443\u044e\u0449\u0438\u0439\u0441\u044f \u043d\u0430 \u0441\u0443\u043c\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0438 \u0433\u043e\u043b\u043e\u0441\u043e\u0432\u044b\u0445 \u0442\u0440\u0430\u043d\u0441\u043a\u0440\u0438\u043f\u0446\u0438\u0439 \u0438\u0437 WhatsApp. \\n\u041d\u0430 \u0432\u0445\u043e\u0434 \u043f\u043e\u0441\u0442\u0443\u043f\u0430\u0435\u0442 \u0442\u0435\u043a\u0441\u0442 \u2014 \u0442\u0440\u0430\u043d\u0441\u043a\u0440\u0438\u043f\u0446\u0438\u044f \u0433\u043e\u043b\u043e\u0441\u043e\u0432\u043e\u0433\u043e \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u044f.\\n\\n**\u0422\u0432\u043e\u044f \u0437\u0430\u0434\u0430\u0447\u0430:**\\n\u041f\u0440\u043e\u0430\u043d\u0430\u043b\u0438\u0437\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0442\u0440\u0430\u043d\u0441\u043a\u0440\u0438\u043f\u0446\u0438\u044e, \u0432\u044b\u044f\u0432\u0438\u0442\u044c \u043e\u0441\u043d\u043e\u0432\u043d\u044b\u0435 \u0438\u0434\u0435\u0438 \u0438 \u0441\u043e\u0437\u0434\u0430\u0442\u044c \u043a\u0440\u0430\u0442\u043a\u043e\u0435 \u0441\u0442\u0440\u0443\u043a\u0442\u0443\u0440\u043d\u043e\u0435 \u0441\u0430\u043c\u043c\u0430\u0440\u0438.\\n\\n**\u041e\u0433\u0440\u0430\u043d\u0438\u0447\u0435\u043d\u0438\u044f \u0444\u043e\u0440\u043c\u0430\u0442\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u044f WhatsApp:**\\n- \u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439 \u0442\u043e\u043b\u044c\u043a\u043e WhatsApp Markdown: *\u0436\u0438\u0440\u043d\u044b\u0439*, _\u043a\u0443\u0440\u0441\u0438\u0432_, ~\u0437\u0430\u0447\u0435\u0440\u043a\u043d\u0443\u0442\u044b\u0439~.\\n- \u0421\u0442\u0440\u043e\u0433\u043e \u0437\u0430\u043f\u0440\u0435\u0449\u0435\u043d\u044b HTML \u0442\u0435\u0433\u0438 (<b>, <i>, <br> \u0438 \u0442.\u0434.).\\n- \u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439 \u044d\u043c\u043e\u0434\u0437\u0438 \u0434\u043b\u044f \u0430\u043a\u0446\u0435\u043d\u0442\u043e\u0432.\\n- \u0414\u0435\u043b\u0430\u0439 \u0441\u043f\u0438\u0441\u043a\u0438 \u0441 \u043f\u043e\u043c\u043e\u0449\u044c\u044e \u0442\u0438\u0440\u0435 (-) \u0438\u043b\u0438 \u0437\u0432\u0435\u0437\u0434\u043e\u0447\u0435\u043a (*).\\n\\n**\u041f\u0440\u0438\u043c\u0435\u0440 \u043e\u0442\u0432\u0435\u0442\u0430:**\\n*\u0421\u0430\u043c\u043c\u0430\u0440\u0438 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u044f \u043e\u0442 \u043a\u043e\u043b\u043b\u0435\u0433\u0438:*\\n- \u041e\u0431\u0441\u0443\u0434\u0438\u043b\u0438 \u043f\u0440\u043e\u0435\u043a\u0442 \u0425 \ud83d\ude80\\n- \u041d\u0443\u0436\u043d\u043e \u043f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u0438\u0442\u044c \u043e\u0442\u0447\u0435\u0442 \u043a \u043f\u044f\u0442\u043d\u0438\u0446\u0435 \u23f3\\n- \u0412\u0441\u0442\u0440\u0435\u0447\u0430 \u043f\u0435\u0440\u0435\u043d\u043e\u0441\u0438\u0442\u0441\u044f \u043d\u0430 15:00 \ud83d\udcc5"
+        }
+      },
+      "id": "5",
+      "name": "Summary AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [
+        840,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "id": "6",
+      "name": "Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        840,
+        180
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://151.241.100.226:8080/message/sendText/{{ $('Evolution Webhook').item.json.body.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_EVOLUTION_GLOBAL_API_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\\n  \"number\": \"{{ $('Evolution Webhook').item.json.body.data.key.remoteJid }}\",\\n  \"text\": \"*\ud83e\udd16 \u0421\u0430\u043c\u043c\u0430\u0440\u0438 \u0433\u043e\u043b\u043e\u0441\u043e\u0432\u043e\u0433\u043e \u043e\u0442 @{{ $('Evolution Webhook').item.json.body.data.key.participant ? $('Evolution Webhook').item.json.body.data.key.participant.replace('@s.whatsapp.net', '') : $('Evolution Webhook').item.json.body.data.key.remoteJid.replace('@s.whatsapp.net', '') }}*: \\n\\n{{ $json.output }}\",\\n  \"mentions\": [\\n    \"{{ $('Evolution Webhook').item.json.body.data.key.participant || $('Evolution Webhook').item.json.body.data.key.remoteJid }}\"\\n  ]\\n}"
+      },
+      "id": "7",
+      "name": "Send back to WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1100,
+        -20
+      ]
+    }
+  ],
+  "connections": {
+    "Evolution Webhook": {
+      "main": [
+        [
+          {
+            "node": "Is Audio?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Audio?": {
+      "main": [
+        [
+          {
+            "node": "Convert base64 to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert base64 to File": {
+      "main": [
+        [
+          {
+            "node": "Whisper Transcribe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Whisper Transcribe": {
+      "main": [
+        [
+          {
+            "node": "Summary AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summary AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send back to WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summary AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

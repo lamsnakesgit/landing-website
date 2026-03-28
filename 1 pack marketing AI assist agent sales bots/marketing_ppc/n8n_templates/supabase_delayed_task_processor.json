@@ -1,0 +1,204 @@
+{
+    "name": "Supabase: Delayed Task Processor",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "minutes",
+                            "expression": "={{ 5 }}"
+                        }
+                    ]
+                }
+            },
+            "id": "1",
+            "name": "Schedule Trigger (5m)",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                0,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "supabase-url",
+                            "name": "supabase_url",
+                            "value": "YOUR_SUPABASE_URL",
+                            "type": "string"
+                        },
+                        {
+                            "id": "supabase-key",
+                            "name": "supabase_service_role_key",
+                            "value": "YOUR_SUPABASE_SERVICE_ROLE_KEY",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "2",
+            "name": "Config Supabase",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                200,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "GET",
+                "url": "={{$json.supabase_url}}/rest/v1/delayed_tasks?status=eq.pending&execute_at=lte.{{ new Date().toISOString() }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $json.supabase_service_role_key }}"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "=Bearer {{ $json.supabase_service_role_key }}"
+                        }
+                    ]
+                }
+            },
+            "id": "3",
+            "name": "Fetch Due Tasks",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                400,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "fieldToSplitOut": "data",
+                "options": {}
+            },
+            "id": "4",
+            "name": "Split Out Tasks",
+            "type": "n8n-nodes-base.splitOut",
+            "typeVersion": 1,
+            "position": [
+                600,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Здесь логика выполнения задачи на основе payload\n// Например, отправка сообщения или запуск другого воркфлоу\nconst payload = JSON.parse($json.payload || '{}');\nreturn {\n  ...$json,\n  processed_payload: payload\n};"
+            },
+            "id": "5",
+            "name": "Execute Task Logic",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                800,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "PATCH",
+                "url": "={{$node[\"Config Supabase\"].json.supabase_url}}/rest/v1/delayed_tasks?id=eq.{{ $json.id }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config Supabase\"].json.supabase_service_role_key }}"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "=Bearer {{ $node[\"Config Supabase\"].json.supabase_service_role_key }}"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "status",
+                            "value": "completed"
+                        }
+                    ]
+                }
+            },
+            "id": "6",
+            "name": "Mark Completed",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1000,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Schedule Trigger (5m)": {
+            "main": [
+                [
+                    {
+                        "node": "Config Supabase",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Config Supabase": {
+            "main": [
+                [
+                    {
+                        "node": "Fetch Due Tasks",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch Due Tasks": {
+            "main": [
+                [
+                    {
+                        "node": "Split Out Tasks",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Split Out Tasks": {
+            "main": [
+                [
+                    {
+                        "node": "Execute Task Logic",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Execute Task Logic": {
+            "main": [
+                [
+                    {
+                        "node": "Mark Completed",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
