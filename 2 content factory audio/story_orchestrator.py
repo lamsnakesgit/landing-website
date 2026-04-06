@@ -10,6 +10,14 @@ from google_content_factory.vids_automation import create_google_vid
 
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
+DEFAULT_MODEL_CANDIDATES = [
+    "models/gemini-2.5-flash",
+    "models/gemini-2.5-pro",
+    "models/gemini-flash-latest",
+    "models/gemini-pro-latest",
+    "models/gemini-2.0-flash-001",
+    "models/gemini-2.0-flash-lite",
+]
 
 # Configuration
 # Ensure you have GOOGLE_API_KEY set in your environment variables
@@ -20,9 +28,10 @@ else:
     genai.configure(api_key=API_KEY)
 
 class StoryOrchestrator:
-    def __init__(self, model_name="gemini-1.5-pro"):
-        self.model_name = model_name
-        self.model = genai.GenerativeModel(model_name) if API_KEY else None
+    def __init__(self, model_name=None):
+        self.requested_model_name = model_name or os.environ.get("GEMINI_MODEL") or DEFAULT_MODEL_CANDIDATES[0]
+        self.model_name = self._normalize_model_name(self.requested_model_name)
+        self.model = genai.GenerativeModel(self.model_name) if API_KEY else None
         self.system_prompt = self._load_system_prompt()
 
     def _load_system_prompt(self):
@@ -38,6 +47,107 @@ class StoryOrchestrator:
             raise RuntimeError(
                 "GOOGLE_API_KEY не найден. Добавьте ключ в .env или переменные окружения."
             )
+
+    @staticmethod
+    def _normalize_model_name(model_name):
+        if not model_name:
+            return model_name
+        if model_name.startswith("models/"):
+            return model_name
+        return f"models/{model_name}"
+
+    @staticmethod
+    def _is_general_text_model(model_name):
+        excluded_keywords = (
+            "image",
+            "tts",
+            "robotics",
+            "computer-use",
+            "deep-research",
+            "customtools",
+        )
+        return model_name.startswith("models/gemini") and not any(
+            keyword in model_name for keyword in excluded_keywords
+        )
+
+    def _list_available_generate_models(self):
+        try:
+            available_models = []
+            for model in genai.list_models():
+                methods = getattr(model, "supported_generation_methods", []) or []
+                if "generateContent" in methods:
+                    available_models.append(model.name)
+            return available_models
+        except Exception as error:
+            print(f"Warning: failed to list Gemini models dynamically: {error}")
+            return []
+
+    def _build_model_candidates(self):
+        unique_candidates = []
+        requested_candidate = self._normalize_model_name(self.requested_model_name)
+        default_candidates = [self._normalize_model_name(candidate) for candidate in DEFAULT_MODEL_CANDIDATES]
+        available_models = self._list_available_generate_models()
+
+        if available_models:
+            prioritized_candidates = [
+                candidate for candidate in [requested_candidate, *default_candidates]
+                if candidate in available_models
+            ]
+            general_fallback_candidates = [
+                model_name
+                for model_name in available_models
+                if self._is_general_text_model(model_name)
+            ]
+            candidate_pool = [*prioritized_candidates, *general_fallback_candidates]
+        else:
+            candidate_pool = [requested_candidate, *default_candidates]
+
+        for candidate in candidate_pool:
+            if candidate and candidate not in unique_candidates:
+                unique_candidates.append(candidate)
+        return unique_candidates
+
+    @staticmethod
+    def _is_missing_or_unsupported_model_error(error):
+        message = str(error).lower()
+        return any(
+            signature in message
+            for signature in (
+                "404",
+                "not found",
+                "not supported for generatecontent",
+                "unsupported for generatecontent",
+                "is not supported",
+                "model",
+            )
+        ) and "api key" not in message
+
+    def _generate_with_model_fallback(self, prompt):
+        last_error = None
+
+        for candidate in self._build_model_candidates():
+            try:
+                print(f"Trying Gemini model: {candidate}")
+                model = genai.GenerativeModel(candidate)
+                response = model.generate_content(
+                    prompt,
+                    generation_config={"response_mime_type": "application/json"}
+                )
+                self.model = model
+                self.model_name = candidate
+                return response
+            except Exception as error:
+                last_error = error
+                if self._is_missing_or_unsupported_model_error(error):
+                    print(f"Model {candidate} unavailable, trying fallback...")
+                    continue
+                raise
+
+        tried_models = ", ".join(self._build_model_candidates())
+        raise RuntimeError(
+            f"Не удалось найти рабочую Gemini-модель. Попробовал: {tried_models}. "
+            f"Последняя ошибка: {last_error}"
+        )
 
     @staticmethod
     def _parse_json_response(raw_text):
@@ -70,10 +180,8 @@ Generate the story sequence in the requested JSON format.
         # Combine system prompt with user input
         full_prompt = f"{self.system_prompt}\n\n{prompt}"
         
-        response = self.model.generate_content(
-            full_prompt,
-            generation_config={"response_mime_type": "application/json"}
-        )
+        response = self._generate_with_model_fallback(full_prompt)
+        print(f"Using Gemini model: {self.model_name}")
         
         try:
             plan = self._parse_json_response(response.text)

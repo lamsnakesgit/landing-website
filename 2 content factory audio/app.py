@@ -238,7 +238,7 @@ if generate_plan:
             st.error("Gemini вернул пустой или некорректный план.")
         else:
             st.session_state["story_plan"] = apply_media_defaults(plan, visual_mode, saved_upload_paths)
-            st.success("План сторис готов. Ниже можно всё отредактировать.")
+            st.success(f"План сторис готов. Использована модель: {orchestrator.model_name}")
     except Exception as error:
         st.error(f"Не удалось сгенерировать план: {error}")
 
