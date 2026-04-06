@@ -7,6 +7,7 @@ from pathlib import Path
 
 import streamlit as st
 
+from story_renderer import export_story_pngs
 from story_orchestrator import StoryOrchestrator
 
 APP_DIR = Path(__file__).resolve().parent
@@ -35,6 +36,7 @@ def init_session_state():
     st.session_state.setdefault("story_plan", None)
     st.session_state.setdefault("saved_upload_paths", [])
     st.session_state.setdefault("upload_registry", {})
+    st.session_state.setdefault("render_export", None)
 
 
 def persist_uploaded_files(uploaded_files):
@@ -177,6 +179,12 @@ st.caption(
     "Gemini генерирует структуру Hook → Context → Value → CTA, а Google Vids / fallback-пайплайн обрабатывают визуалы."
 )
 
+st.info(
+    "Важно: кнопка **«Сгенерировать план сторис»** делает только сценарий. "
+    "Чтобы получить готовые картинки сторис 1080×1920, ниже нажми **«Создать PNG сторис»**. "
+    "Если хочешь прогон через Google Vids/автоматизацию, используй отдельную кнопку внешнего пайплайна."
+)
+
 with st.sidebar:
     st.header("Статус")
     if os.environ.get("GOOGLE_API_KEY"):
@@ -238,6 +246,7 @@ if generate_plan:
             st.error("Gemini вернул пустой или некорректный план.")
         else:
             st.session_state["story_plan"] = apply_media_defaults(plan, visual_mode, saved_upload_paths)
+            st.session_state["render_export"] = None
             st.success(f"План сторис готов. Использована модель: {orchestrator.model_name}")
     except Exception as error:
         st.error(f"Не удалось сгенерировать план: {error}")
@@ -270,15 +279,28 @@ if st.session_state.get("story_plan"):
         st.session_state["story_plan"] = edited_plan
         st.success("Правки сохранены.")
 
-    action_left, action_right, action_third = st.columns(3)
+    action_left, action_center, action_right, action_fourth = st.columns(4)
 
     with action_left:
-        if st.button("▶️ Запустить обработку", use_container_width=True):
+        if st.button("🖼️ Создать PNG сторис", use_container_width=True):
+            try:
+                with st.spinner("Собираю готовые статичные сторис в PNG..."):
+                    export_result = export_story_pngs(
+                        st.session_state["story_plan"],
+                        project_name=goal,
+                    )
+                st.session_state["render_export"] = export_result
+                st.success(f"PNG-сторис готовы: {export_result['output_dir']}")
+            except Exception as error:
+                st.error(f"Не удалось создать PNG сторис: {error}")
+
+    with action_center:
+        if st.button("🎞️ Внешний пайплайн / Google Vids", use_container_width=True):
             try:
                 orchestrator = StoryOrchestrator()
-                with st.spinner("Обрабатываю сторис и запускаю нужные шаги..."):
+                with st.spinner("Запускаю внешний пайплайн по слайдам..."):
                     run_async(orchestrator.process_story_plan(st.session_state["story_plan"]))
-                st.success("Обработка завершена. Проверь терминал и итоговые файлы.")
+                st.success("Внешний пайплайн завершен. Проверь терминал и итоговые файлы.")
             except Exception as error:
                 st.error(f"Ошибка во время обработки: {error}")
 
@@ -291,10 +313,37 @@ if st.session_state.get("story_plan"):
             use_container_width=True,
         )
 
-    with action_third:
+    with action_fourth:
         if st.button("🧹 Очистить план", use_container_width=True):
             st.session_state["story_plan"] = None
+            st.session_state["render_export"] = None
             st.rerun()
+
+    if st.session_state.get("render_export"):
+        render_export = st.session_state["render_export"]
+        st.subheader("Готовые PNG сторис")
+        st.success(
+            "Теперь у тебя не только план, а уже реальные сторис-картинки 1080×1920. "
+            f"Папка: {render_export['output_dir']}"
+        )
+
+        with open(render_export["zip_path"], "rb") as archive_file:
+            st.download_button(
+                "⬇️ Скачать все PNG одним ZIP",
+                data=archive_file.read(),
+                file_name=Path(render_export["zip_path"]).name,
+                mime="application/zip",
+                use_container_width=True,
+            )
+
+        preview_files = render_export.get("files", [])[:6]
+        preview_columns = st.columns(min(3, len(preview_files)) or 1)
+        for index, preview_file in enumerate(preview_files):
+            preview_columns[index % len(preview_columns)].image(
+                preview_file,
+                caption=Path(preview_file).name,
+                use_container_width=True,
+            )
 
     st.subheader("JSON-предпросмотр")
     st.json(st.session_state["story_plan"])
