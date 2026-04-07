@@ -4,10 +4,10 @@ Welcome to your centralized AI Automation workspace. This hub contains three spe
 
 ## 📂 Project Structure
 
-### 1. [Google Content Factory](./google_content_factory/)
+### 1. [Google Content Factory](./docs/GOOGLE_STRATEGY.md)
 - **Goal**: Maximize your 190€ Google Cloud budget.
 - **Strategy**: Use Gemini 1.5 Flash and Imagen 3 to produce 300+ videos.
-- **Key Files**: `GOOGLE_STRATEGY.md`, `google_templates.json`.
+- **Key Files**: `docs/GOOGLE_STRATEGY.md`, `templates/google_templates.json`.
 
 ### 2. [YouTube Automation](./youtube_automation_project/)
 - **Goal**: General faceless YouTube channel automation.

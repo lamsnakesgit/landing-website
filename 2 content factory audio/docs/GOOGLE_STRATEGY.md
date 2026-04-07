@@ -79,7 +79,7 @@ If you try to generate 300 videos (approx. 4,500 images and 300 scripts) using t
 
 ### Пошаговый план проверки качества:
 1.  **Тест Сценария (1-3 шт)**:
-    *   Запусти промпт из `google_templates.json` в консоли Vertex AI.
+    *   Запусти промпт из `templates/google_templates.json` в консоли Vertex AI.
     *   Проверь: Логичен ли текст? Не слишком ли он "роботизированный"?
     *   Если плохо — меняй `system_prompt`.
 2.  **Тест Визуала (5-10 картинок)**:

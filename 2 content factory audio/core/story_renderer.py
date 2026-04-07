@@ -6,7 +6,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_OUTPUT_ROOT = BASE_DIR / "outputs" / "story_png_exports"
 STORY_SIZE = (1080, 1920)
 STAGE_PALETTES = {

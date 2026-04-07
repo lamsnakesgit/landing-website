@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")

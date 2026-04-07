@@ -7,17 +7,17 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 
-from google_content_factory.vids_automation import create_google_vid
-from nano_banana_generator import generate_story_image
+from core.vids_automation import create_google_vid
+from core.nano_banana_generator import generate_story_image
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 DEFAULT_MODEL_CANDIDATES = [
-    "gemini-2.0-flash-001",
-    "gemini-2.0-flash-lite-preview-02-05",
-    "gemini-1.5-flash-002",
-    "gemini-1.5-pro-002",
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-lite",
+    "gemini-flash-latest",
+    "gemini-pro-latest",
 ]
 
 API_KEY = os.environ.get("GOOGLE_API_KEY")
@@ -35,7 +35,7 @@ class StoryOrchestrator:
 
     def _load_system_prompt(self):
         try:
-            with open(BASE_DIR / "GEMINI_STORY_ENGINE.md", "r", encoding="utf-8") as f:
+            with open(BASE_DIR / "core" / "GEMINI_STORY_ENGINE.md", "r", encoding="utf-8") as f:
                 return f.read()
         except FileNotFoundError:
             print("Error: GEMINI_STORY_ENGINE.md not found.")

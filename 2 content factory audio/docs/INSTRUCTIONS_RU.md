@@ -239,12 +239,12 @@ GEMINI_MODEL=models/gemini-2.5-flash
 
 ### 3. Сохрани авторизацию Google для Vids
 ```bash
-python3 google_content_factory/save_auth.py
+python3 scripts/save_auth.py
 ```
 
 Откроется браузер. Войди в нужный Google-аккаунт и сохрани сессию.
 
-После этого должен появиться файл `google_auth.json`.
+После этого должен появиться файл `templates/google_auth.json`.
 
 ---
 
@@ -273,7 +273,7 @@ python3 -m streamlit run app.py
 Если нужен быстрый CLI-запуск, можно использовать:
 
 ```bash
-python3 story_orchestrator.py
+python3 core/story_orchestrator.py
 ```
 
 Это удобно для тестов, но основной сценарий работы теперь — через Streamlit.
@@ -294,6 +294,14 @@ python3 story_orchestrator.py
 - файл `.env` лежит в корне проекта,
 - в нем есть `GOOGLE_API_KEY=...`,
 - ключ рабочий.
+
+### 4. Структура проекта
+Для удобства работы файлы разделены по папкам:
+- `core/` — основная логика (генератор, рендерер, оркестратор).
+- `templates/` — шаблоны и файлы авторизации.
+- `docs/` — документация и инструкции.
+- `outputs/` — результаты генерации.
+- `app.py` — главный файл запуска интерфейса.
 
 ### 4. Если Gemini пишет, что модель не найдена
 Некоторые старые названия моделей Gemini больше не поддерживаются в текущем API.

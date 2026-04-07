@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path
 from playwright.async_api import async_playwright
 
 async def save_auth():
@@ -33,8 +34,10 @@ async def save_auth():
         input("\nPress Enter after you have logged in...")
         
         # Save storage state to a file
-        await context.storage_state(path="google_auth.json")
-        print("\nSuccess! Session saved to 'google_auth.json'.")
+        auth_path = Path(__file__).resolve().parent.parent / "templates" / "google_auth.json"
+        auth_path.parent.mkdir(parents=True, exist_ok=True)
+        await context.storage_state(path=str(auth_path))
+        print(f"\nSuccess! Session saved to '{auth_path}'.")
         
         await browser.close()
 

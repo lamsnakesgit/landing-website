@@ -8,9 +8,9 @@ from pathlib import Path
 
 import streamlit as st
 
-from nano_banana_generator import export_nano_banana_story_set
-from story_renderer import export_story_pngs
-from story_orchestrator import StoryOrchestrator
+from core.nano_banana_generator import export_nano_banana_story_set
+from core.story_renderer import export_story_pngs
+from core.story_orchestrator import StoryOrchestrator
 
 APP_DIR = Path(__file__).resolve().parent
 UPLOAD_DIR = APP_DIR / "uploads" / "story_inputs"
@@ -44,7 +44,7 @@ def init_session_state():
     
     if "system_prompt" not in st.session_state:
         try:
-            with open(APP_DIR / "GEMINI_STORY_ENGINE.md", "r", encoding="utf-8") as f:
+            with open(APP_DIR / "core" / "GEMINI_STORY_ENGINE.md", "r", encoding="utf-8") as f:
                 st.session_state["system_prompt"] = f.read()
         except Exception:
             st.session_state["system_prompt"] = ""
@@ -180,7 +180,7 @@ def build_editor_plan(image_options, goal="", strategy="", audience="", style=""
             # Regenerate Slide Button
             if st.button(f"🎨 Перегенерировать визуал слайда {idx+1}", key=f"regen_btn_{idx}"):
                 try:
-                    from nano_banana_generator import generate_story_image
+                    from core.nano_banana_generator import generate_story_image
                     
                     # Use current values from session state for the prompt
                     temp_slide = updated_slide.copy()
@@ -234,10 +234,10 @@ with st.sidebar:
     else:
         st.warning("GOOGLE_API_KEY не найден. Проверь .env")
 
-    if (APP_DIR / "google_auth.json").exists():
+    if (APP_DIR / "templates" / "google_auth.json").exists():
         st.success("google_auth.json найден")
     else:
-        st.info("Для Google Vids сначала запусти python google_content_factory/save_auth.py")
+        st.info("Для Google Vids сначала запусти python scripts/save_auth.py")
 
     st.markdown("**Запуск приложения**")
     st.code("python3 -m streamlit run app.py")

@@ -1,8 +1,15 @@
 import asyncio
 import os
+from pathlib import Path
 from playwright.async_api import async_playwright
 
-async def create_google_vid(prompt, output_auth="google_auth.json"):
+BASE_DIR = Path(__file__).resolve().parent.parent
+DEFAULT_AUTH = BASE_DIR / "templates" / "google_auth.json"
+
+async def create_google_vid(prompt, output_auth=None):
+    if output_auth is None:
+        output_auth = DEFAULT_AUTH
+    
     if not os.path.exists(output_auth):
         print(f"Error: {output_auth} not found. Please run save_auth.py first.")
         return
