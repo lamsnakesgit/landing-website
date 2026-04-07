@@ -298,6 +298,14 @@ if st.session_state.get("story_plan"):
     with action_left:
         if st.button("🍌 Создать AI сторис (Nano Banana Pro)", use_container_width=True):
             try:
+                progress_bar = st.progress(0)
+                status_text = st.empty()
+
+                def update_progress(current, total, stage):
+                    percent = int((current / total) * 100)
+                    progress_bar.progress(percent)
+                    status_text.text(f"Генерация слайда {current} из {total} ({stage})...")
+
                 with st.spinner("Генерирую реальные AI-сторис через Nano Banana Pro..."):
                     export_result = export_nano_banana_story_set(
                         st.session_state["story_plan"],
@@ -307,8 +315,11 @@ if st.session_state.get("story_plan"):
                             "audience": audience,
                             "style": style,
                         },
+                        progress_callback=update_progress,
                     )
                 st.session_state["render_export"] = export_result
+                progress_bar.empty()
+                status_text.empty()
                 st.session_state["render_mode"] = "nano_banana_pro"
                 st.success(f"AI-сторис готовы через {export_result['model']}: {export_result['output_dir']}")
             except Exception as error:

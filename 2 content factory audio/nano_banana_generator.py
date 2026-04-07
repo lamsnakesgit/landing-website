@@ -134,15 +134,21 @@ def generate_story_image(slide, output_path, story_context=None):
     }
 
 
-def export_nano_banana_story_set(plan, project_name="story_factory", story_context=None, output_root=None):
+def export_nano_banana_story_set(plan, project_name="story_factory", story_context=None, output_root=None, progress_callback=None):
     import json
     output_root = Path(output_root or DEFAULT_OUTPUT_ROOT)
     output_dir = output_root / f"{_slugify(project_name)[:40]}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    stories = plan.get("stories", [])
+    total = len(stories)
     files = []
     prompts = []
-    for index, slide in enumerate(plan.get("stories", []), start=1):
+    
+    for index, slide in enumerate(stories, start=1):
+        if progress_callback:
+            progress_callback(index, total, slide.get("stage", "slide"))
+            
         file_stub = output_dir / f"{index:02d}_{_slugify(slide.get('stage', 'slide'))}_{_slugify(slide.get('type', 'photo'))}"
         try:
             result = generate_story_image(slide, file_stub, story_context=story_context)
