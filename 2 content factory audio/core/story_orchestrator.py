@@ -14,12 +14,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 DEFAULT_MODEL_CANDIDATES = [
-    "gemini-2.5-flash",
-    "gemini-2.5-flash-lite",
     "gemini-2.0-flash",
-    "gemini-2.0-flash-lite",
-    "gemini-flash-latest",
-    "gemini-pro-latest",
+    "gemini-2.0-flash-lite-preview-02-05",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-8b",
+    "gemini-1.5-pro",
 ]
 
 API_KEY = os.environ.get("GOOGLE_API_KEY")
@@ -56,7 +55,13 @@ class StoryOrchestrator:
         # Try requested model first, then candidates
         candidates = [self.requested_model_name] + [c for c in DEFAULT_MODEL_CANDIDATES if c != self.requested_model_name]
         
+        import time
+        
         for candidate in candidates:
+            # Skip empty or invalid model names
+            if not candidate or not isinstance(candidate, str):
+                continue
+                
             try:
                 print(f"Trying Gemini model: {candidate}")
                 response = self.client.models.generate_content(
@@ -71,8 +76,20 @@ class StoryOrchestrator:
                 return response
             except Exception as error:
                 last_error = error
-                print(f"Model {candidate} failed: {error}")
-                continue
+                err_msg = str(error).lower()
+                
+                # Handle specific errors with a small delay and fallback
+                if any(code in err_msg for code in ["503", "unavailable", "404", "not_found", "429", "resource_exhausted"]):
+                    print(f"Model {candidate} issue: {err_msg}. Waiting 2s and trying next candidate...")
+                    time.sleep(2)
+                    continue
+                else:
+                    print(f"Model {candidate} failed with unexpected error: {error}. Trying next...")
+                    continue
+
+        raise RuntimeError(
+            f"Не удалось найти рабочую Gemini-модель после перебора всех вариантов. Последняя ошибка: {last_error}"
+        )
 
         raise RuntimeError(
             f"Не удалось найти рабочую Gemini-модель. Последняя ошибка: {last_error}"

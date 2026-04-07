@@ -77,9 +77,9 @@ def persist_uploaded_files(uploaded_files):
 
 def build_style_prompt(base_style, visual_mode):
     mode_hint = {
-        "ai": "Опирайся на AI-визуалы и кинематографичные сцены.",
-        "user_photos": "Опирайся на реальные пользовательские фото и делай сценарий удобным для наложения текста.",
-        "mixed": "Сочетай реальные фото пользователя и AI-визуалы там, где это усиливает сторителлинг.",
+        "ai": "Опирайся на реалистичные AI-визуалы (стиль 'снято на iPhone', живые кадры, естественный свет).",
+        "user_photos": "Опирайся на реальные пользовательские фото и делай сценарий максимально разговорным и живым.",
+        "mixed": "Сочетай реальные фото пользователя и живые AI-визуалы, сохраняя единый реалистичный стиль.",
     }[visual_mode]
 
     base_style = base_style.strip()
@@ -316,7 +316,7 @@ if generate_plan:
             )
 
         if not plan:
-            st.error("Gemini вернул пустой или некорректный план.")
+            st.error("Gemini вернул пустой или некорректный план. Попробуйте еще раз или проверьте настройки промпта.")
         else:
             st.session_state["story_plan"] = apply_media_defaults(plan, visual_mode, saved_upload_paths)
             st.session_state["story_goal"] = goal
@@ -327,7 +327,15 @@ if generate_plan:
             st.session_state["realtime_images"] = []
             st.success(f"План сторис готов. Использована модель: {orchestrator.model_name}")
     except Exception as error:
-        st.error(f"Не удалось сгенерировать план: {error}")
+        err_msg = str(error).lower()
+        if "503" in err_msg or "unavailable" in err_msg:
+            st.error("❌ Сервис Gemini временно недоступен (Ошибка 503). Мы попробовали все доступные модели, но Google сейчас перегружен. Пожалуйста, подождите пару минут и попробуйте снова.")
+        elif "429" in err_msg or "resource_exhausted" in err_msg:
+            st.error("⚠️ Превышен лимит запросов (Ошибка 429). Пожалуйста, подождите немного перед следующей попыткой.")
+        elif "404" in err_msg or "not_found" in err_msg:
+            st.error("🔍 Модель Gemini не найдена (Ошибка 404). Проверьте настройки GEMINI_MODEL в .env.")
+        else:
+            st.error(f"❌ Ошибка при генерации плана: {error}")
 
 if uploaded_files:
     st.subheader("Загруженные фото")

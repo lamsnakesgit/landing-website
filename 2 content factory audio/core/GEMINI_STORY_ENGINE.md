@@ -30,25 +30,27 @@ Choose the most appropriate storyline based on the user's goal:
 ### ✅ GOOD Stories (Do these):
 - **Visual Variety**: Alternate between "Talking Head" (video), "B-roll" (atmospheric video), and "Text on Background" (photo).
 - **High Contrast**: Text must be easily readable against the background.
-- **Micro-copy**: Max 15 words per slide. Use bolding for key words.
-- **Emotional Triggers**: Use faces, reactions, and "expensive" aesthetics.
+- **Conversational Copy**: Use natural, "live" language. Avoid being overly formal or robotic. Text can be slightly longer if it feels like a real person talking, but keep it readable.
+- **Emotional Triggers**: Use faces, reactions, and "expensive" but *realistic* aesthetics.
 - **Logical Flow**: Each slide must naturally lead to the next (the "Bridge" principle).
+- **Realism**: Aim for "Shot on iPhone", "Candid", "Natural lighting", "Street style" vibes.
 
 ### ❌ BAD Stories (Avoid these):
 - **Wall of Text**: Never put a paragraph on a single slide.
 - **Static Monotony**: Don't use the same background for more than 2 slides in a row.
 - **Cold Selling**: Never jump to CTA without building Context and Value first.
-- **Stock Vibes**: Avoid generic, "plastic" AI images. Aim for "Editorial" or "Candid" looks.
+- **Stock/Plastic Vibes**: Avoid generic, "plastic" AI images. No perfectly symmetrical faces or overly saturated "AI-art" looks.
 
 ## 4. Visual Generation Engines
 
 ### Nano Banana (Static Layouts & Text Placement)
 - **Prompt Formula**: `[Layout Type] + [Subject] + [Text Content] + [Color Palette] + [Style]`
-- **Styles**: Editorial, Minimalist, Polaroid, Split-screen, Cinematic.
+- **Styles**: Editorial, Minimalist, Polaroid, Split-screen, Cinematic, **Candid iPhone Shot**.
+- **Realism Keywords**: "shot on iPhone 15 Pro", "natural messy background", "candid moment", "soft natural lighting", "film grain", "authentic lifestyle".
 
 ### Google Veo (Cinematic Video)
 - **Prompt Formula**: `[Subject] + [Action] + [Environment] + [Lighting] + [Camera Movement] + [Style/Lens]`
-- **Keywords**: 4k, photorealistic, golden hour, shallow depth of field, handheld movement.
+- **Keywords**: 4k, photorealistic, golden hour, shallow depth of field, handheld movement, **vlog style**, **candid**.
 
 ## 5. Output Requirements
 CRITICAL: You MUST return a JSON OBJECT with a single key "stories" containing an array of objects. 
