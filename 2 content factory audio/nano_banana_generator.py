@@ -146,13 +146,13 @@ def export_nano_banana_story_set(plan, project_name="story_factory", story_conte
     prompts = []
     
     for index, slide in enumerate(stories, start=1):
-        if progress_callback:
-            progress_callback(index, total, slide.get("stage", "slide"))
-            
         file_stub = output_dir / f"{index:02d}_{_slugify(slide.get('stage', 'slide'))}_{_slugify(slide.get('type', 'photo'))}"
         try:
             result = generate_story_image(slide, file_stub, story_context=story_context)
             files.append(result["file_path"])
+            
+            if progress_callback:
+                progress_callback(index, total, slide.get("stage", "slide"), file_path=result["file_path"])
             prompts.append(
                 {
                     "slide_number": slide.get("slide_number", index),

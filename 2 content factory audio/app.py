@@ -3,6 +3,7 @@ import concurrent.futures
 import hashlib
 import json
 import os
+from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
@@ -39,6 +40,14 @@ def init_session_state():
     st.session_state.setdefault("upload_registry", {})
     st.session_state.setdefault("render_export", None)
     st.session_state.setdefault("render_mode", None)
+    st.session_state.setdefault("realtime_images", [])
+    
+    if "system_prompt" not in st.session_state:
+        try:
+            with open(APP_DIR / "GEMINI_STORY_ENGINE.md", "r", encoding="utf-8") as f:
+                st.session_state["system_prompt"] = f.read()
+        except Exception:
+            st.session_state["system_prompt"] = ""
 
 
 def persist_uploaded_files(uploaded_files):
@@ -99,7 +108,7 @@ def apply_media_defaults(plan, visual_mode, saved_upload_paths):
     return plan
 
 
-def build_editor_plan(image_options):
+def build_editor_plan(image_options, goal="", audience="", style=""):
     stories = []
     current_plan = st.session_state.get("story_plan") or {"stories": []}
 
@@ -168,6 +177,36 @@ def build_editor_plan(image_options):
             if source_image != "AI / не использовать":
                 updated_slide["source_image_path"] = source_image
 
+            # Regenerate Slide Button
+            if st.button(f"🎨 Перегенерировать визуал слайда {idx+1}", key=f"regen_btn_{idx}"):
+                try:
+                    from nano_banana_generator import generate_story_image
+                    
+                    # Use current values from session state for the prompt
+                    temp_slide = updated_slide.copy()
+                    
+                    with st.spinner(f"Генерирую новый визуал для слайда {idx+1}..."):
+                        refresh_dir = APP_DIR / "outputs" / "refreshes"
+                        refresh_dir.mkdir(parents=True, exist_ok=True)
+                        
+                        timestamp = datetime.now().strftime("%H%M%S")
+                        file_stub = refresh_dir / f"slide_{idx+1}_{timestamp}"
+                        
+                        result = generate_story_image(
+                            temp_slide, 
+                            file_stub, 
+                            story_context={
+                                "goal": goal,
+                                "audience": audience,
+                                "style": style,
+                            }
+                        )
+                        
+                        st.success(f"Визуал для слайда {idx+1} обновлен!")
+                        st.image(result["file_path"], caption=f"Новый вариант слайда {idx+1}", use_container_width=True)
+                except Exception as e:
+                    st.error(f"Ошибка при регенерации слайда: {e}")
+
             stories.append(updated_slide)
 
     return {"stories": stories}
@@ -216,6 +255,15 @@ with st.form("story_generation_form"):
         "Стиль",
         value="Современный, профессиональный, технологичный, но доступный",
     )
+    
+    with st.expander("⚙️ Настройка системного промпта (Engine Rules)"):
+        custom_system_prompt = st.text_area(
+            "System Instruction",
+            value=st.session_state["system_prompt"],
+            height=300,
+        )
+        st.session_state["system_prompt"] = custom_system_prompt
+
     visual_mode_label = st.radio(
         "Режим визуалов",
         options=list(VISUAL_MODE_LABELS.keys()),
@@ -241,6 +289,7 @@ if generate_plan:
                     goal,
                     audience,
                     build_style_prompt(style, visual_mode),
+                    custom_system_prompt=st.session_state["system_prompt"]
                 )
             )
 
@@ -248,7 +297,11 @@ if generate_plan:
             st.error("Gemini вернул пустой или некорректный план.")
         else:
             st.session_state["story_plan"] = apply_media_defaults(plan, visual_mode, saved_upload_paths)
+            st.session_state["story_goal"] = goal
+            st.session_state["story_audience"] = audience
+            st.session_state["story_style"] = style
             st.session_state["render_export"] = None
+            st.session_state["realtime_images"] = []
             st.success(f"План сторис готов. Использована модель: {orchestrator.model_name}")
     except Exception as error:
         st.error(f"Не удалось сгенерировать план: {error}")
@@ -270,6 +323,31 @@ if st.session_state.get("story_plan"):
     metric_b.metric("Видео", video_count)
     metric_c.metric("Фото / статичных", photo_count)
 
+    # Rework Plan Section
+    with st.expander("🔄 Доработать план (Feedback loop)", expanded=False):
+        st.markdown("Если сценарий не идеален, напиши что исправить, и Gemini переделает весь план целиком.")
+        rework_feedback = st.text_area("Твой фидбек", placeholder="Например: сделай более дерзко, добавь больше юмора или измени CTA на подписку", key="rework_feedback_input")
+        if st.button("🚀 Переделать план", use_container_width=True):
+            if rework_feedback:
+                try:
+                    orchestrator = StoryOrchestrator()
+                    with st.spinner("Gemini переделывает план с учетом фидбека..."):
+                        new_plan = run_async(orchestrator.rework_story_plan(
+                            st.session_state["story_plan"],
+                            rework_feedback,
+                            custom_system_prompt=st.session_state["system_prompt"]
+                        ))
+                    if new_plan:
+                        st.session_state["story_plan"] = new_plan
+                        st.success("План успешно обновлен!")
+                        st.rerun()
+                    else:
+                        st.error("Не удалось получить обновленный план.")
+                except Exception as e:
+                    st.error(f"Ошибка при доработке: {e}")
+            else:
+                st.warning("Пожалуйста, введите текст фидбека.")
+
     st.subheader("Редактор сценария")
     image_options = ["AI / не использовать", *st.session_state.get("saved_upload_paths", [])]
 
@@ -285,11 +363,15 @@ if st.session_state.get("story_plan"):
         else:
             st.info("Meta-информация по prompt пока не найдена в плане.")
 
-    with st.form("story_editor_form"):
-        edited_plan = build_editor_plan(image_options)
-        save_plan = st.form_submit_button("Сохранить правки")
-
-    if save_plan:
+    # Editor Section
+    edited_plan = build_editor_plan(
+        image_options, 
+        goal=st.session_state.get("story_goal", ""), 
+        audience=st.session_state.get("story_audience", ""), 
+        style=st.session_state.get("story_style", "")
+    )
+    
+    if st.button("💾 Сохранить все текстовые правки", use_container_width=True):
         st.session_state["story_plan"] = edited_plan
         st.success("Правки сохранены.")
 
@@ -300,13 +382,36 @@ if st.session_state.get("story_plan"):
             try:
                 progress_bar = st.progress(0)
                 status_text = st.empty()
+                image_grid_placeholder = st.empty()
+                st.session_state["realtime_images"] = []
 
                 def update_progress(current, total, stage):
                     percent = int((current / total) * 100)
                     progress_bar.progress(percent)
                     status_text.text(f"Генерация слайда {current} из {total} ({stage})...")
+                    
+                    # Update image grid in real-time
+                    # We need to find the latest generated file. 
+                    # Since export_nano_banana_story_set doesn't return partial results easily,
+                    # we'll rely on the fact that it saves files to a predictable directory.
+                    # However, a better way is to modify export_nano_banana_story_set to pass back the new file path.
+                    # For now, let's just show the progress and we'll handle the grid update after each slide.
+                    pass
+
+                # To support real-time display, we'll modify the callback to also receive the file path
+                def progress_with_image(current, total, stage, file_path=None):
+                    percent = int((current / total) * 100)
+                    progress_bar.progress(percent)
+                    status_text.text(f"Генерация слайда {current} из {total} ({stage})...")
+                    if file_path:
+                        st.session_state["realtime_images"].append(file_path)
+                        with image_grid_placeholder.container():
+                            cols = st.columns(3)
+                            for i, img_path in enumerate(st.session_state["realtime_images"]):
+                                cols[i % 3].image(img_path, caption=f"Слайд {i+1}", use_container_width=True)
 
                 with st.spinner("Генерирую реальные AI-сторис через Nano Banana Pro..."):
+                    # We need to update export_nano_banana_story_set to support this new callback signature
                     export_result = export_nano_banana_story_set(
                         st.session_state["story_plan"],
                         project_name=goal,
@@ -315,7 +420,7 @@ if st.session_state.get("story_plan"):
                             "audience": audience,
                             "style": style,
                         },
-                        progress_callback=update_progress,
+                        progress_callback=progress_with_image,
                     )
                 st.session_state["render_export"] = export_result
                 progress_bar.empty()
