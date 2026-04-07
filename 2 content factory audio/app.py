@@ -255,6 +255,14 @@ with st.form("story_generation_form"):
         "Стиль",
         value="Современный, профессиональный, технологичный, но доступный",
     )
+
+    storyline_type = st.radio(
+        "Тип сюжетной линии (по Тимочко)",
+        options=["Expert", "Personal", "Lifestyle"],
+        index=0,
+        horizontal=True,
+        help="Expert: авторитет и кейсы. Personal: уязвимость и ценности. Lifestyle: эстетика и 'мечта'.",
+    )
     
     with st.expander("⚙️ Настройка системного промпта (Engine Rules)"):
         custom_system_prompt = st.text_area(
@@ -289,6 +297,7 @@ if generate_plan:
                     goal,
                     audience,
                     build_style_prompt(style, visual_mode),
+                    storyline_type=storyline_type,
                     custom_system_prompt=st.session_state["system_prompt"]
                 )
             )

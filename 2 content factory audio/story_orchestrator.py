@@ -90,11 +90,17 @@ class StoryOrchestrator:
                 cleaned = cleaned[4:].strip()
         return json.loads(cleaned)
 
-    async def generate_story_plan(self, user_goal, audience="", style="", custom_system_prompt=None):
+    async def generate_story_plan(self, user_goal, audience="", style="", storyline_type="Expert", custom_system_prompt=None):
         self._ensure_client()
         
         system_prompt = custom_system_prompt or self.system_prompt
-        user_prompt = f"User Input: {user_goal}\nTarget Audience: {audience}\nVisual Style: {style}\n\nGenerate the story sequence in the requested JSON format."
+        user_prompt = (
+            f"User Input: {user_goal}\n"
+            f"Target Audience: {audience}\n"
+            f"Visual Style: {style}\n"
+            f"Storyline Type: {storyline_type}\n\n"
+            "Generate the story sequence in the requested JSON format."
+        )
         
         self.last_user_prompt = user_prompt
         self.last_full_prompt = f"SYSTEM:\n{system_prompt}\n\nUSER:\n{user_prompt}"
@@ -190,8 +196,8 @@ class StoryOrchestrator:
         print("\nAll slides processed successfully!")
         return plan
 
-    async def run(self, user_goal, audience="", style=""):
-        plan = await self.generate_story_plan(user_goal, audience, style)
+    async def run(self, user_goal, audience="", style="", storyline_type="Expert"):
+        plan = await self.generate_story_plan(user_goal, audience, style, storyline_type)
         if not plan or "stories" not in plan:
             print("Failed to generate a valid story plan.")
             return
