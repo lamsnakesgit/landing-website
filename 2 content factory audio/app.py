@@ -87,7 +87,13 @@ def build_style_prompt(base_style, visual_mode):
 
 
 def apply_media_defaults(plan, visual_mode, saved_upload_paths):
+    if not isinstance(plan, dict):
+        return {"stories": []}
+    
     stories = plan.get("stories", [])
+    if not isinstance(stories, list):
+        stories = []
+        plan["stories"] = stories
 
     for slide in stories:
         slide["generation_mode"] = visual_mode
@@ -331,8 +337,16 @@ if uploaded_files:
 
 if st.session_state.get("story_plan"):
     plan = st.session_state["story_plan"]
+    if not isinstance(plan, dict):
+        plan = {"stories": []}
+        st.session_state["story_plan"] = plan
+        
     stories = plan.get("stories", [])
-    video_count = sum(1 for slide in stories if slide.get("type") == "video")
+    if not isinstance(stories, list):
+        stories = []
+        plan["stories"] = stories
+        
+    video_count = sum(1 for slide in stories if isinstance(slide, dict) and slide.get("type") == "video")
     photo_count = len(stories) - video_count
 
     metric_a, metric_b, metric_c = st.columns(3)

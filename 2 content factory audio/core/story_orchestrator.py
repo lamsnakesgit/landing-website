@@ -14,6 +14,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 DEFAULT_MODEL_CANDIDATES = [
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
     "gemini-2.0-flash",
     "gemini-2.0-flash-lite",
     "gemini-flash-latest",
@@ -110,19 +112,37 @@ class StoryOrchestrator:
         
         try:
             plan = self._parse_json_response(response.text)
-            if isinstance(plan, dict):
-                plan.setdefault("_meta", {})
-                plan["_meta"].update({
-                    "story_engine_model": self.model_name,
-                    "story_engine_user_prompt": self.last_user_prompt,
-                    "story_engine_system_prompt": system_prompt,
-                    "story_engine_full_prompt": self.last_full_prompt,
-                    "goal": user_goal,
-                    "strategy": strategy,
-                    "audience": audience,
-                    "style": style,
-                    "storyline_type": storyline_type,
-                })
+            
+            # Normalize plan structure: ensure it's a dict with "stories" key
+            if isinstance(plan, list):
+                plan = {"stories": plan}
+            elif not isinstance(plan, dict):
+                plan = {"stories": []}
+            
+            if "stories" not in plan:
+                # If it's a dict but missing "stories", maybe the LLM used a different key
+                # or just returned the slides directly in the dict (unlikely but possible)
+                if any(isinstance(v, list) for v in plan.values()):
+                    # Try to find the first list and assume it's the stories
+                    for k, v in plan.items():
+                        if isinstance(v, list):
+                            plan["stories"] = v
+                            break
+                else:
+                    plan["stories"] = []
+
+            plan.setdefault("_meta", {})
+            plan["_meta"].update({
+                "story_engine_model": self.model_name,
+                "story_engine_user_prompt": self.last_user_prompt,
+                "story_engine_system_prompt": system_prompt,
+                "story_engine_full_prompt": self.last_full_prompt,
+                "goal": user_goal,
+                "strategy": strategy,
+                "audience": audience,
+                "style": style,
+                "storyline_type": storyline_type,
+            })
             return plan
         except Exception as e:
             print(f"Error parsing JSON: {e}")
@@ -134,7 +154,10 @@ class StoryOrchestrator:
         system_prompt = custom_system_prompt or self.system_prompt
         
         # Remove meta to keep context clean
-        clean_plan = {k: v for k, v in current_plan.items() if k != "_meta"}
+        if isinstance(current_plan, dict):
+            clean_plan = {k: v for k, v in current_plan.items() if k != "_meta"}
+        else:
+            clean_plan = current_plan
         
         user_prompt = (
             f"Current Story Plan (JSON):\n{json.dumps(clean_plan, ensure_ascii=False)}\n\n"
@@ -150,15 +173,30 @@ class StoryOrchestrator:
         
         try:
             plan = self._parse_json_response(response.text)
-            if isinstance(plan, dict):
-                plan.setdefault("_meta", {})
-                plan["_meta"].update({
-                    "story_engine_model": self.model_name,
-                    "story_engine_user_prompt": self.last_user_prompt,
-                    "story_engine_system_prompt": system_prompt,
-                    "story_engine_full_prompt": self.last_full_prompt,
-                    "rework_feedback": feedback
-                })
+            
+            # Normalize plan structure
+            if isinstance(plan, list):
+                plan = {"stories": plan}
+            elif not isinstance(plan, dict):
+                plan = {"stories": []}
+            
+            if "stories" not in plan:
+                if any(isinstance(v, list) for v in plan.values()):
+                    for k, v in plan.items():
+                        if isinstance(v, list):
+                            plan["stories"] = v
+                            break
+                else:
+                    plan["stories"] = []
+
+            plan.setdefault("_meta", {})
+            plan["_meta"].update({
+                "story_engine_model": self.model_name,
+                "story_engine_user_prompt": self.last_user_prompt,
+                "story_engine_system_prompt": system_prompt,
+                "story_engine_full_prompt": self.last_full_prompt,
+                "rework_feedback": feedback
+            })
             return plan
         except Exception as e:
             print(f"Error parsing JSON: {e}")

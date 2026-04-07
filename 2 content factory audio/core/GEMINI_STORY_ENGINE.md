@@ -51,14 +51,17 @@ Choose the most appropriate storyline based on the user's goal:
 - **Keywords**: 4k, photorealistic, golden hour, shallow depth of field, handheld movement.
 
 ## 5. Output Requirements
-Output a structured JSON array of story objects:
+CRITICAL: You MUST return a JSON OBJECT with a single key "stories" containing an array of objects. 
+DO NOT return a raw array. DO NOT include any text outside the JSON.
+
+Required JSON Structure:
 ```json
 {
   "stories": [
     {
       "slide_number": 1,
       "stage": "Hook",
-      "type": "photo | video",
+      "type": "photo",
       "script_text": "Short, punchy text",
       "visual_prompt": "Detailed prompt for Nano Banana or Google Veo",
       "layout_instructions": "Text placement (e.g., 'Bottom-left, white font with black shadow')",
