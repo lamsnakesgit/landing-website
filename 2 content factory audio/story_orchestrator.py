@@ -117,6 +117,11 @@ class StoryOrchestrator:
                     "story_engine_user_prompt": self.last_user_prompt,
                     "story_engine_system_prompt": system_prompt,
                     "story_engine_full_prompt": self.last_full_prompt,
+                    "goal": user_goal,
+                    "strategy": strategy,
+                    "audience": audience,
+                    "style": style,
+                    "storyline_type": storyline_type,
                 })
             return plan
         except Exception as e:
@@ -160,7 +165,7 @@ class StoryOrchestrator:
             print("Raw response:", response.text)
             return None
 
-    async def process_slide(self, slide):
+    async def process_slide(self, slide, story_context=None):
         slide_num = slide.get("slide_number")
         stage = slide.get("stage")
         slide_type = slide.get("type", "photo")
@@ -180,7 +185,7 @@ class StoryOrchestrator:
             print(f"Static slide detected. Generating image via Nano Banana Pro...")
             output_path = BASE_DIR / "outputs" / "orchestrator_exports" / f"slide_{slide_num}.png"
             try:
-                result = generate_story_image(slide, output_path)
+                result = generate_story_image(slide, output_path, story_context=story_context)
                 print(f"Successfully generated image: {result['file_path']}")
             except Exception as e:
                 print(f"Error generating image for slide {slide_num}: {e}")
@@ -190,9 +195,17 @@ class StoryOrchestrator:
             raise ValueError("Invalid plan: missing 'stories' key.")
 
         print(f"Plan generated with {len(plan['stories'])} slides.")
+        
+        meta = plan.get("_meta", {})
+        story_context = {
+            "goal": meta.get("goal", ""),
+            "strategy": meta.get("strategy", ""),
+            "audience": meta.get("audience", ""),
+            "style": meta.get("style", ""),
+        }
 
         for slide in plan["stories"]:
-            await self.process_slide(slide)
+            await self.process_slide(slide, story_context=story_context)
 
         print("\nAll slides processed successfully!")
         return plan

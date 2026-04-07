@@ -41,6 +41,7 @@ def build_nano_banana_prompt(slide, story_context=None):
     stage = slide.get("stage", "Value")
     slide_type = slide.get("type", "photo")
     goal = (story_context.get("goal") or "").strip()
+    strategy = (story_context.get("strategy") or "").strip()
     audience = (story_context.get("audience") or "").strip()
     style = (story_context.get("style") or "").strip()
 
@@ -48,6 +49,7 @@ def build_nano_banana_prompt(slide, story_context=None):
         "Create one premium Instagram Story slide in vertical 9:16 format. "
         "This must look like a polished social media story, not a plain poster.\n\n"
         f"Goal of the story set: {goal or 'Not specified'}\n"
+        f"Overall Strategy: {strategy or 'Not specified'}\n"
         f"Target audience: {audience or 'Not specified'}\n"
         f"Stage in the funnel: {stage}\n"
         f"Original slide type: {slide_type}\n"

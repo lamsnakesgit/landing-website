@@ -108,7 +108,7 @@ def apply_media_defaults(plan, visual_mode, saved_upload_paths):
     return plan
 
 
-def build_editor_plan(image_options, goal="", audience="", style=""):
+def build_editor_plan(image_options, goal="", strategy="", audience="", style=""):
     stories = []
     current_plan = st.session_state.get("story_plan") or {"stories": []}
 
@@ -197,6 +197,7 @@ def build_editor_plan(image_options, goal="", audience="", style=""):
                             file_stub, 
                             story_context={
                                 "goal": goal,
+                                "strategy": strategy,
                                 "audience": audience,
                                 "style": style,
                             }
@@ -383,6 +384,7 @@ if st.session_state.get("story_plan"):
     edited_plan = build_editor_plan(
         image_options, 
         goal=st.session_state.get("story_goal", ""), 
+        strategy=st.session_state.get("story_strategy", ""),
         audience=st.session_state.get("story_audience", ""), 
         style=st.session_state.get("story_style", "")
     )
