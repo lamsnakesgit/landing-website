@@ -7,6 +7,7 @@ from pathlib import Path
 
 import streamlit as st
 
+from nano_banana_generator import export_nano_banana_story_set
 from story_renderer import export_story_pngs
 from story_orchestrator import StoryOrchestrator
 
@@ -37,6 +38,7 @@ def init_session_state():
     st.session_state.setdefault("saved_upload_paths", [])
     st.session_state.setdefault("upload_registry", {})
     st.session_state.setdefault("render_export", None)
+    st.session_state.setdefault("render_mode", None)
 
 
 def persist_uploaded_files(uploaded_files):
@@ -181,8 +183,8 @@ st.caption(
 
 st.info(
     "Важно: кнопка **«Сгенерировать план сторис»** делает только сценарий. "
-    "Чтобы получить готовые картинки сторис 1080×1920, ниже нажми **«Создать PNG сторис»**. "
-    "Если хочешь прогон через Google Vids/автоматизацию, используй отдельную кнопку внешнего пайплайна."
+    "Чтобы получить реальные AI-картинки, ниже нажми **«🍌 Создать AI сторис (Nano Banana Pro)»**. "
+    "Локальный PNG-рендер оставлен как fallback. Если хочешь прогон через Google Vids/автоматизацию, используй отдельную кнопку внешнего пайплайна."
 )
 
 with st.sidebar:
@@ -271,6 +273,18 @@ if st.session_state.get("story_plan"):
     st.subheader("Редактор сценария")
     image_options = ["AI / не использовать", *st.session_state.get("saved_upload_paths", [])]
 
+    with st.expander("🔎 По какому промпту сейчас генерируется текст и ТЗ сторис"):
+        meta = plan.get("_meta", {})
+        if meta:
+            st.markdown("**Системный промпт (правила движка сторис):**")
+            st.code(meta.get("story_engine_system_prompt", ""), language="markdown")
+            st.markdown("**Пользовательский prompt, который подставляется в Gemini:**")
+            st.code(meta.get("story_engine_user_prompt", ""), language="text")
+            st.markdown("**Полный prompt (system + user), который идёт в Gemini:**")
+            st.code(meta.get("story_engine_full_prompt", ""), language="text")
+        else:
+            st.info("Meta-информация по prompt пока не найдена в плане.")
+
     with st.form("story_editor_form"):
         edited_plan = build_editor_plan(image_options)
         save_plan = st.form_submit_button("Сохранить правки")
@@ -279,10 +293,29 @@ if st.session_state.get("story_plan"):
         st.session_state["story_plan"] = edited_plan
         st.success("Правки сохранены.")
 
-    action_left, action_center, action_right, action_fourth = st.columns(4)
+    action_left, action_mid_left, action_mid_right, action_right, action_fifth = st.columns(5)
 
     with action_left:
-        if st.button("🖼️ Создать PNG сторис", use_container_width=True):
+        if st.button("🍌 Создать AI сторис (Nano Banana Pro)", use_container_width=True):
+            try:
+                with st.spinner("Генерирую реальные AI-сторис через Nano Banana Pro..."):
+                    export_result = export_nano_banana_story_set(
+                        st.session_state["story_plan"],
+                        project_name=goal,
+                        story_context={
+                            "goal": goal,
+                            "audience": audience,
+                            "style": style,
+                        },
+                    )
+                st.session_state["render_export"] = export_result
+                st.session_state["render_mode"] = "nano_banana_pro"
+                st.success(f"AI-сторис готовы через {export_result['model']}: {export_result['output_dir']}")
+            except Exception as error:
+                st.error(f"Не удалось создать AI-сторис через Nano Banana Pro: {error}")
+
+    with action_mid_left:
+        if st.button("🧩 Локальный fallback PNG", use_container_width=True):
             try:
                 with st.spinner("Собираю готовые статичные сторис в PNG..."):
                     export_result = export_story_pngs(
@@ -290,11 +323,12 @@ if st.session_state.get("story_plan"):
                         project_name=goal,
                     )
                 st.session_state["render_export"] = export_result
+                st.session_state["render_mode"] = "local_png"
                 st.success(f"PNG-сторис готовы: {export_result['output_dir']}")
             except Exception as error:
                 st.error(f"Не удалось создать PNG сторис: {error}")
 
-    with action_center:
+    with action_mid_right:
         if st.button("🎞️ Внешний пайплайн / Google Vids", use_container_width=True):
             try:
                 orchestrator = StoryOrchestrator()
@@ -313,19 +347,29 @@ if st.session_state.get("story_plan"):
             use_container_width=True,
         )
 
-    with action_fourth:
+    with action_fifth:
         if st.button("🧹 Очистить план", use_container_width=True):
             st.session_state["story_plan"] = None
             st.session_state["render_export"] = None
+            st.session_state["render_mode"] = None
             st.rerun()
 
     if st.session_state.get("render_export"):
         render_export = st.session_state["render_export"]
-        st.subheader("Готовые PNG сторис")
-        st.success(
-            "Теперь у тебя не только план, а уже реальные сторис-картинки 1080×1920. "
-            f"Папка: {render_export['output_dir']}"
-        )
+        render_mode = st.session_state.get("render_mode") or render_export.get("generator") or "local_png"
+
+        if render_mode == "nano_banana_pro":
+            st.subheader("Готовые AI сторис — Nano Banana Pro")
+            st.success(
+                f"Это уже не PIL-макет, а AI-рендер через {render_export.get('model', 'Nano Banana Pro')}. "
+                f"Папка: {render_export['output_dir']}"
+            )
+        else:
+            st.subheader("Готовые PNG сторис")
+            st.success(
+                "Это локальный fallback-рендер. Теперь у тебя не только план, а уже реальные сторис-картинки 1080×1920. "
+                f"Папка: {render_export['output_dir']}"
+            )
 
         with open(render_export["zip_path"], "rb") as archive_file:
             st.download_button(
@@ -336,14 +380,45 @@ if st.session_state.get("story_plan"):
                 use_container_width=True,
             )
 
-        preview_files = render_export.get("files", [])[:6]
-        preview_columns = st.columns(min(3, len(preview_files)) or 1)
-        for index, preview_file in enumerate(preview_files):
-            preview_columns[index % len(preview_columns)].image(
-                preview_file,
-                caption=Path(preview_file).name,
-                use_container_width=True,
+        preview_files = render_export.get("files", [])
+
+        if preview_files:
+            st.subheader("Результат прямо на сайте")
+            selected_index = st.selectbox(
+                "Выбери сторис для крупного просмотра",
+                options=list(range(len(preview_files))),
+                format_func=lambda index: f"Слайд {index + 1} · {Path(preview_files[index]).stem}",
+                key="selected_render_preview_index",
             )
+
+            preview_left, preview_center, preview_right = st.columns([1, 2, 1])
+            with preview_center:
+                st.image(
+                    preview_files[selected_index],
+                    caption=f"Крупный просмотр: {Path(preview_files[selected_index]).name}",
+                    use_container_width=True,
+                )
+
+            st.caption(
+                "Ниже показана вся серия сторис. То есть результат можно смотреть прямо на сайте, "
+                "не только скачивать ZIP."
+            )
+
+            if render_export.get("prompts"):
+                with st.expander("🧠 Промпты Nano Banana Pro по каждому слайду"):
+                    for prompt_item in render_export["prompts"]:
+                        st.markdown(
+                            f"**Слайд {prompt_item['slide_number']} · {prompt_item['stage']}**  \\n+Текст: `{prompt_item['script_text']}`"
+                        )
+                        st.code(prompt_item["prompt"], language="text")
+
+            gallery_columns = st.columns(min(3, len(preview_files)) or 1)
+            for index, preview_file in enumerate(preview_files):
+                gallery_columns[index % len(gallery_columns)].image(
+                    preview_file,
+                    caption=f"Слайд {index + 1}",
+                    use_container_width=True,
+                )
 
     st.subheader("JSON-предпросмотр")
     st.json(st.session_state["story_plan"])

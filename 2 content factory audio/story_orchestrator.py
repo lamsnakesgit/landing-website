@@ -7,6 +7,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 
 from google_content_factory.vids_automation import create_google_vid
+from nano_banana_generator import generate_story_image
 
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
@@ -33,6 +34,8 @@ class StoryOrchestrator:
         self.model_name = self._normalize_model_name(self.requested_model_name)
         self.model = genai.GenerativeModel(self.model_name) if API_KEY else None
         self.system_prompt = self._load_system_prompt()
+        self.last_user_prompt = ""
+        self.last_full_prompt = ""
 
     def _load_system_prompt(self):
         try:
@@ -165,26 +168,42 @@ class StoryOrchestrator:
 
         return json.loads(cleaned)
 
-    async def generate_story_plan(self, user_goal, audience="", style=""):
-        self._ensure_model()
-
-        prompt = f"""
+    @staticmethod
+    def _build_user_prompt(user_goal, audience="", style=""):
+        return f"""
 User Input: {user_goal}
 Target Audience: {audience}
 Visual Style: {style}
 
 Generate the story sequence in the requested JSON format.
 """
+
+    async def generate_story_plan(self, user_goal, audience="", style=""):
+        self._ensure_model()
+
+        prompt = self._build_user_prompt(user_goal, audience, style)
         print(f"Generating story plan for: {user_goal}...")
         
         # Combine system prompt with user input
         full_prompt = f"{self.system_prompt}\n\n{prompt}"
+        self.last_user_prompt = prompt.strip()
+        self.last_full_prompt = full_prompt.strip()
         
         response = self._generate_with_model_fallback(full_prompt)
         print(f"Using Gemini model: {self.model_name}")
         
         try:
             plan = self._parse_json_response(response.text)
+            if isinstance(plan, dict):
+                plan.setdefault("_meta", {})
+                plan["_meta"].update(
+                    {
+                        "story_engine_model": self.model_name,
+                        "story_engine_user_prompt": self.last_user_prompt,
+                        "story_engine_system_prompt": self.system_prompt,
+                        "story_engine_full_prompt": self.last_full_prompt,
+                    }
+                )
             return plan
         except json.JSONDecodeError:
             print("Error: Failed to parse JSON from Gemini response.")
@@ -211,20 +230,15 @@ Generate the story sequence in the requested JSON format.
             full_vids_prompt = f"{visual_prompt}. Include text overlay: '{script_text}'"
             await create_google_vid(full_vids_prompt)
         else:
-            # Fallback to Fal.ai (Nano Banana) placeholder
-            print(f"Static slide detected. Fallback to Fal.ai (Nano Banana) would happen here.")
-            print(f"Prompt: {visual_prompt}")
-            # TODO: Implement Fal.ai integration when needed
-            await self._mock_fal_ai_call(slide)
-
-    async def _mock_fal_ai_call(self, slide):
-        # Placeholder for Fal.ai integration
-        await asyncio.sleep(1)
-        if slide.get("source_image_path") or slide.get("source_image"):
-            print(
-                f"Using uploaded image as base asset for slide {slide.get('slide_number')}"
-            )
-        print(f"Fal.ai placeholder: Generated static layout for slide {slide.get('slide_number')}")
+            print(f"Static slide detected. Generating image via Nano Banana Pro...")
+            output_path = BASE_DIR / "outputs" / "orchestrator_exports" / f"slide_{slide_num}.png"
+            try:
+                # generate_story_image is synchronous, but we can run it in a thread if needed.
+                # For simplicity in this orchestrator, we'll call it directly.
+                result = generate_story_image(slide, output_path)
+                print(f"Successfully generated image: {result['file_path']}")
+            except Exception as e:
+                print(f"Error generating image for slide {slide_num}: {e}")
 
     async def process_story_plan(self, plan):
         if not plan or "stories" not in plan:
