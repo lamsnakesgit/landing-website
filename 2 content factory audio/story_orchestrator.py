@@ -14,10 +14,10 @@ BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
 
 DEFAULT_MODEL_CANDIDATES = [
-    "gemini-2.0-flash",
+    "gemini-2.0-flash-001",
     "gemini-2.0-flash-lite-preview-02-05",
-    "gemini-1.5-flash",
-    "gemini-1.5-pro",
+    "gemini-1.5-flash-002",
+    "gemini-1.5-pro-002",
 ]
 
 API_KEY = os.environ.get("GOOGLE_API_KEY")
@@ -90,7 +90,7 @@ class StoryOrchestrator:
                 cleaned = cleaned[4:].strip()
         return json.loads(cleaned)
 
-    async def generate_story_plan(self, user_goal, audience="", style="", storyline_type="Expert", custom_system_prompt=None):
+    async def generate_story_plan(self, user_goal, audience="", style="", storyline_type="Expert", strategy="", custom_system_prompt=None):
         self._ensure_client()
         
         system_prompt = custom_system_prompt or self.system_prompt
@@ -98,7 +98,8 @@ class StoryOrchestrator:
             f"User Input: {user_goal}\n"
             f"Target Audience: {audience}\n"
             f"Visual Style: {style}\n"
-            f"Storyline Type: {storyline_type}\n\n"
+            f"Storyline Type: {storyline_type}\n"
+            f"Overall Strategy/Goal: {strategy}\n\n"
             "Generate the story sequence in the requested JSON format."
         )
         

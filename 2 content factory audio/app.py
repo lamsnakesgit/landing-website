@@ -243,9 +243,14 @@ with st.sidebar:
 
 with st.form("story_generation_form"):
     goal = st.text_area(
-        "Что нужно продать / донести?",
+        "Что нужно продать / донести? (Цель конкретной серии сторис)",
         value="Продать курс по ИИ-автоматизации для новичков",
-        height=120,
+        height=100,
+    )
+    strategy = st.text_area(
+        "Зачем тебе вести блог? (Глобальная стратегия / Твоя миссия)",
+        value="Помогаю экспертам внедрять ИИ, чтобы они работали меньше, а зарабатывали больше. Строю личный бренд как топ-эксперта в автоматизации.",
+        height=100,
     )
     audience = st.text_input(
         "Целевая аудитория",
@@ -298,6 +303,7 @@ if generate_plan:
                     audience,
                     build_style_prompt(style, visual_mode),
                     storyline_type=storyline_type,
+                    strategy=strategy,
                     custom_system_prompt=st.session_state["system_prompt"]
                 )
             )
@@ -307,6 +313,7 @@ if generate_plan:
         else:
             st.session_state["story_plan"] = apply_media_defaults(plan, visual_mode, saved_upload_paths)
             st.session_state["story_goal"] = goal
+            st.session_state["story_strategy"] = strategy
             st.session_state["story_audience"] = audience
             st.session_state["story_style"] = style
             st.session_state["render_export"] = None
@@ -426,6 +433,7 @@ if st.session_state.get("story_plan"):
                         project_name=goal,
                         story_context={
                             "goal": goal,
+                            "strategy": st.session_state.get("story_strategy", ""),
                             "audience": audience,
                             "style": style,
                         },
