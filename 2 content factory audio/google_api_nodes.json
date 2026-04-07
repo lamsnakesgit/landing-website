@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "instanceId": "dbead77ebecf4be2b0ccab3bb52fc7da"
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://texttospeech.googleapis.com/v1/text:synthesize?key=YOUR_API_KEY",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"input\": {\n    \"text\": \"{{ $('Get data from Google Sheet').item.json['Quote (Thai)'] }}\"\n  },\n  \"voice\": {\n    \"languageCode\": \"ru-RU\",\n    \"name\": \"ru-RU-Standard-D\"\n  },\n  \"audioConfig\": {\n    \"audioEncoding\": \"MP3\",\n    \"speakingRate\": 1.0\n  }\n}"
+      },
+      "id": "50bc129c-851f-4f64-9277-google-tts-node",
+      "name": "Google TTS (Voice)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://us-central1-aiplatform.googleapis.com/v1/projects/YOUR_PROJECT_ID/locations/us-central1/publishers/google/models/imagen-3.0-generate-001:predict",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"instances\": [\n    {\n      \"prompt\": \"{{ $('Get data from Google Sheet').item.json['Prompt (EN)'] }}\"\n    }\n  ],\n  \"parameters\": {\n    \"sampleCount\": 1,\n    \"aspectRatio\": \"9:16\"\n  }\n}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_OAUTH_ACCESS_TOKEN"
+            }
+          ]
+        }
+      },
+      "id": "a98402ab-2bd2-4bcd-88c9-google-imagen-node",
+      "name": "Google Imagen 3 (Image)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        0,
+        0
+      ]
+    }
+  ],
+  "connections": {}
+}

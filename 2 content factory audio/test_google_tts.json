@@ -1,0 +1,152 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "tts-trigger",
+      "name": "Запустить вручную",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-400, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "tts-apikey",
+              "name": "API_KEY",
+              "value": "ВСТАВЬ_СВОЙ_GOOGLE_CLOUD_API_KEY",
+              "type": "string"
+            },
+            {
+              "id": "tts-text",
+              "name": "TEXT",
+              "value": "Привет! Я голосовой ИИ-ассистент Ланы — Aiconic. Я умею создавать контент, музыку, делать озвучку, писать посты и офферы, вести календарь и многое другое. Хочешь записаться на тест-драйв?",
+              "type": "string"
+            },
+            {
+              "id": "tts-voice",
+              "name": "VOICE",
+              "value": "ru-RU-Chirp3-HD-Aoede",
+              "type": "string"
+            },
+            {
+              "id": "tts-lang",
+              "name": "LANG",
+              "value": "ru-RU",
+              "type": "string"
+            },
+            {
+              "id": "tts-rate",
+              "name": "SPEAKING_RATE",
+              "value": "0.92",
+              "type": "number"
+            },
+            {
+              "id": "tts-pitch",
+              "name": "PITCH",
+              "value": "-2.0",
+              "type": "number"
+            },
+            {
+              "id": "tts-profile",
+              "name": "EFFECTS_PROFILE",
+              "value": "headphone-class-device",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "tts-config",
+      "name": "Конфиг",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-160, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://texttospeech.googleapis.com/v1beta1/text:synthesize?key={{ $json.API_KEY }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"input\": {\n    \"text\": \"{{ $json.TEXT }}\"\n  },\n  \"voice\": {\n    \"languageCode\": \"{{ $json.LANG }}\",\n    \"name\": \"{{ $json.VOICE }}\"\n  },\n  \"audioConfig\": {\n    \"audioEncoding\": \"MP3\",\n    \"speakingRate\": {{ $json.SPEAKING_RATE }},\n    \"effectsProfileId\": [\"{{ $json.EFFECTS_PROFILE }}\"]\n  }\n}",
+        "options": {}
+      },
+      "id": "tts-request",
+      "name": "POST → Google TTS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [80, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Google TTS возвращает audioContent в base64 (MP3)\nconst audioBase64 = $input.item.json.audioContent;\n\nif (!audioBase64) {\n  return [{\n    json: {\n      error: '❌ audioContent не найден',\n      fullResponse: $input.item.json\n    }\n  }];\n}\n\nconsole.log('✅ MP3 получен! Размер:', Math.round(audioBase64.length * 0.75 / 1024), 'KB');\n\nreturn [\n  {\n    json: {\n      _status: '✅ УСПЕХ! MP3 готов',\n      sizeKB: Math.round(audioBase64.length * 0.75 / 1024)\n    },\n    binary: {\n      data: {\n        data: audioBase64,\n        mimeType: 'audio/mpeg',\n        fileName: 'tts_aiconic.mp3',\n        fileExtension: 'mp3'\n      }\n    }\n  }\n];\n"
+      },
+      "id": "tts-extract",
+      "name": "Извлечь MP3",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [320, 0]
+    },
+    {
+      "parameters": {
+        "content": "## 🔊 Google TTS — Настройки\n\n### Все параметры в ноде «Конфиг»:\n\n| Параметр | Описание |\n|--|--|\n| `API_KEY` | Ключ Google Cloud Console |\n| `TEXT` | Текст для озвучки |\n| `VOICE` | Название голоса |\n| `LANG` | Язык (ru-RU) |\n| `SPEAKING_RATE` | Скорость (0.5–2.0, норм=1.0) |\n| `PITCH` | Тон (-20 до +20, норм=0) |\n| `EFFECTS_PROFILE` | Профиль звука |\n\n### Доступные русские голоса (Chirp3-HD):\n```\nru-RU-Chirp3-HD-Aoede  ← Женский ★★★★★\nru-RU-Chirp3-HD-Leda   ← Женский\nru-RU-Chirp3-HD-Kore   ← Женский\nru-RU-Chirp3-HD-Charon ← Мужской\nru-RU-Chirp3-HD-Fenrir ← Мужской\nru-RU-Chirp3-HD-Orus   ← Мужской\n```\n\n### Профили звука (EFFECTS_PROFILE):\n```\nheadphone-class-device     ← наушники\nsmall-bluetooth-speaker-class-device ← колонка\ntelephony-class-application ← телефон\n```\n\n### Рекомендуемые настройки для приятного голоса:\n- `SPEAKING_RATE`: 0.90–0.95\n- `PITCH`: -2.0 до -4.0 (ниже = мягче)\n- `EFFECTS_PROFILE`: headphone-class-device",
+        "height": 680,
+        "width": 620,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-400, 280],
+      "typeVersion": 1,
+      "id": "tts-note",
+      "name": "Инструкция"
+    },
+    {
+      "parameters": {
+        "content": "⬅️ Меняй здесь:\n• API_KEY\n• VOICE (голос)\n• SPEAKING_RATE (скорость)\n• PITCH (тон)\n• EFFECTS_PROFILE",
+        "color": 3,
+        "width": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-190, 160],
+      "typeVersion": 1,
+      "id": "tts-config-note",
+      "name": "Note Config"
+    },
+    {
+      "parameters": {
+        "content": "✅ MP3 здесь!\nВкладка Binary",
+        "color": 4,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [310, 160],
+      "typeVersion": 1,
+      "id": "tts-result-note",
+      "name": "Note Result"
+    }
+  ],
+  "connections": {
+    "Запустить вручную": {
+      "main": [[{ "node": "Конфиг", "type": "main", "index": 0 }]]
+    },
+    "Конфиг": {
+      "main": [[{ "node": "POST → Google TTS", "type": "main", "index": 0 }]]
+    },
+    "POST → Google TTS": {
+      "main": [[{ "node": "Извлечь MP3", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {}
+}

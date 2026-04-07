@@ -1,0 +1,196 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-1",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e21b8f04-874b-4b13-8a3e-4638703a8915",
+              "name": "API_KEY",
+              "value": "ВСТАВЬТЕ_ВАШ_GEMINI_API_KEY",
+              "type": "string"
+            },
+            {
+              "id": "18f910ab-2e3d-4c3e-8c65-6b582522c0da",
+              "name": "PROMPT",
+              "value": "Modern Russian Pop-Folk Ballad, Female Vocal. [Intro] Матушка-земля... [Куплет 1] Что за диво...",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-1",
+      "name": "Set Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [200, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/lyria-3-pro:generateAudio?key={{$json.API_KEY}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "prompt",
+              "value": "={{$json.PROMPT}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-1",
+      "name": "Generate Lyria Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [400, 0]
+    },
+    {
+      "parameters": {
+        "url": "=https://generativelanguage.googleapis.com/v1beta/{{$('Generate Lyria Audio').item.json.name}}?key={{$('Set Config').item.json.API_KEY}}",
+        "options": {}
+      },
+      "id": "http-2",
+      "name": "Check Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [620, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.done}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-1",
+      "name": "Is Done?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [840, 0]
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "id": "wait-1",
+      "name": "Wait 15s",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [840, 220]
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "response.audio.data",
+        "options": {
+          "fileName": "lyria_track.wav",
+          "mimeType": "audio/wav"
+        }
+      },
+      "id": "convert-1",
+      "name": "Convert Base64 to WAV",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [1080, -20]
+    }
+  ],
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Set Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Config": {
+      "main": [
+        [
+          {
+            "node": "Generate Lyria Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Lyria Audio": {
+      "main": [
+        [
+          {
+            "node": "Check Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Status": {
+      "main": [
+        [
+          {
+            "node": "Is Done?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Done?": {
+      "main": [
+        [
+          {
+            "node": "Convert Base64 to WAV",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 15s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 15s": {
+      "main": [
+        [
+          {
+            "node": "Check Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

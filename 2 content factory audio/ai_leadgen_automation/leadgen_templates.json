@@ -1,0 +1,47 @@
+{
+  "templates": [
+    {
+      "name": "AI Qualification Agent Prompt",
+      "type": "agent_prompt",
+      "description": "Used to determine if a lead is worth reaching out to.",
+      "structure": {
+        "role": "You are a Lead Qualification Specialist.",
+        "input_data": "[Company Website Content / LinkedIn Profile]",
+        "criteria": [
+          "Does the company have more than 10 employees?",
+          "Do they mention 'AI' or 'Automation' on their homepage?",
+          "Are they in the [Target Industry] sector?"
+        ],
+        "output_format": {
+          "is_qualified": "boolean",
+          "reasoning": "string",
+          "personalization_hook": "A specific fact found about the company to use in outreach."
+        }
+      }
+    },
+    {
+      "name": "Personalized Outreach Template",
+      "type": "outreach",
+      "structure": {
+        "subject_lines": [
+          "Question about [Company Name]'s [Topic] strategy",
+          "Loved your post on [Topic], [Name]!",
+          "Quick idea for [Company Name]"
+        ],
+        "body_template": "Hi [Name],\n\nI was just looking at [Company Name] and noticed [Personalization Hook]. \n\nGiven your focus on [Topic], I thought you might be interested in how we're using AI Agents to [Value Proposition].\n\nDo you have 5 minutes to chat next Tuesday?\n\nBest,\n[Your Name]"
+      }
+    },
+    {
+      "name": "n8n AI Agent Node Config",
+      "type": "workflow_config",
+      "json_example": {
+        "node": "n8n-nodes-base.aiAgent",
+        "parameters": {
+          "agentType": "conversational",
+          "tools": ["Google Search", "Web Scraper", "LinkedIn API"],
+          "systemPrompt": "You are an expert at finding high-quality leads for [Your Service]. Use your tools to research the company and decide if they are a fit."
+        }
+      }
+    }
+  ]
+}

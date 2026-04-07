@@ -1,0 +1,752 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Chat_ID"
+            },
+            {
+              "name": "Caption"
+            },
+            {
+              "name": "Title"
+            },
+            {
+              "name": "taskId"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2192,
+        304
+      ],
+      "id": "852c213d-3b77-4630-9c74-04a5743f4c66",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('SET').item.json.Chat_ID }}",
+        "file": "={{ $json.audioUrl }}",
+        "additionalFields": {
+          "caption": "={{ $('SET').item.json.Caption }}",
+          "parse_mode": "HTML",
+          "title": "={{ $('SET').item.json.Title }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        144
+      ],
+      "id": "debb8192-0305-41fa-ab13-d95717a62c8e",
+      "name": "Send an audio file",
+      "webhookId": "07ce45cd-92a4-484d-b823-2f7138435980"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ba93f320-4e97-41a3-b0d6-059e71289628",
+              "name": "Chat_ID",
+              "value": "={{ $('When Executed by Another Workflow').item.json.Chat_ID }}",
+              "type": "string"
+            },
+            {
+              "id": "fde7bf59-56ce-422a-9415-0491457f3759",
+              "name": "Caption",
+              "value": "={{ $('When Executed by Another Workflow').item.json.Caption }}",
+              "type": "string"
+            },
+            {
+              "id": "d08438bc-7f52-40d6-98eb-b7a39b96802b",
+              "name": "Title",
+              "value": "={{ $('When Executed by Another Workflow').item.json.Title }}",
+              "type": "string"
+            },
+            {
+              "id": "d2b2e81d-0861-478a-b85c-efc88fc928e0",
+              "name": "taskId",
+              "value": "={{ $('When Executed by Another Workflow').item.json.taskId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1888,
+        304
+      ],
+      "id": "44f3e63d-b0b9-4b3d-9fa4-96753294d3e3",
+      "name": "SET"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.result.audio.file_id }}",
+        "additionalFields": {
+          "mimeType": "={{ $json.result.audio.mime_type }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        512,
+        144
+      ],
+      "id": "e2faec4a-cac9-4ef1-bffb-d9c4476d0462",
+      "name": "Get a file",
+      "webhookId": "83060b83-05cf-4413-abd3-7f999c0d24f3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileBinary = $input.item.binary.data;\n// Получаем Title из ноды SET независимо от входящих данных\nconst title = $('SET').first().json.Title || \"AI-агент\";\n\nreturn [\n  {\n    json: $input.item.json,\n    binary: {\n      data: {\n        ...fileBinary,\n        fileName: title + \".mp3\",\n        mimeType: \"audio/mpeg\",\n        fileExtension: \"mp3\"\n      }\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        144
+      ],
+      "id": "3a190952-806d-45d7-a60f-3801e807b6f3",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('SET').item.json.Chat_ID }}",
+        "binaryData": true,
+        "binaryPropertyName": "=data",
+        "additionalFields": {
+          "caption": "={{ $('SET').item.json.Caption }}_1",
+          "parse_mode": "HTML",
+          "title": "={{ $('SET').item.json.Title }}_1"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1376,
+        144
+      ],
+      "id": "ce96e4fc-3b60-478f-bbc4-51d95587ce37",
+      "name": "Send an audio file1",
+      "webhookId": "0d86aa34-e8cc-4a55-8cfd-311d328e1ed7"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/generate/record-info",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $json.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer a0af38613ae41fbcad4a5efb279b45c3"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1632,
+        304
+      ],
+      "id": "5670ac35-a8a6-47d9-8311-303fe46b067a",
+      "name": "Get Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7e4837cf-42fd-42c7-bcc2-9cb74d718702",
+              "leftValue": "={{ $json.data.response.sunoData[1].sourceAudioUrl }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "37b194b0-5cd3-4db6-acca-459c1f86b6b3",
+              "leftValue": "={{ $json.data.response.sunoData[0].sourceAudioUrl }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1408,
+        304
+      ],
+      "id": "f05bc2b4-b01f-4d00-a939-c1dfe1664ce8",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1392,
+        576
+      ],
+      "id": "94ff3612-42bb-49f8-8570-886b7794ed81",
+      "name": "Wait",
+      "webhookId": "154006a4-eef6-4753-9d12-07560a896289"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5022a1e9-4a10-4047-8d19-6cdc0ddd4c93",
+              "name": "audioUrl",
+              "value": "={{ $json.data.response.sunoData[0].sourceAudioUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -592,
+        144
+      ],
+      "id": "81b88fce-1d4b-424b-bdea-67a29dac4400",
+      "name": "Set"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage",
+        "chatId": "={{ $('SET').item.json.Chat_ID }}",
+        "messageId": "={{ $('Send an audio file').item.json.result.message_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1616,
+        144
+      ],
+      "id": "e3849d45-af78-4f64-8c1d-f64c5eb4dae7",
+      "name": "Delete a chat message",
+      "webhookId": "645adc82-d4e1-4011-b1ee-04212ce932a0"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "73c2156a-f78b-4a67-bf4b-dd938af52328",
+              "name": "audioUrl1",
+              "value": "={{ $json.data.response.sunoData[1].sourceAudioUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -592,
+        320
+      ],
+      "id": "a79cc131-3c48-4cf7-8143-5c672992f5b9",
+      "name": "Set1"
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('SET').item.json.Chat_ID }}",
+        "file": "={{ $json.audioUrl1 }}",
+        "additionalFields": {
+          "caption": "={{ $('SET').item.json.Caption }}",
+          "parse_mode": "HTML",
+          "title": "={{ $('SET').item.json.Title }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        432
+      ],
+      "id": "bd8b6030-62e9-4fb2-87cb-b57adfe450ab",
+      "name": "Send an audio file2",
+      "webhookId": "483c4937-8da7-4dcb-8292-da54172d490f"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.result.audio.file_id }}",
+        "additionalFields": {
+          "mimeType": "={{ $json.result.audio.mime_type }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        512,
+        432
+      ],
+      "id": "36a9a1c2-7b73-4837-96eb-10478ef4ab85",
+      "name": "Get a file1",
+      "webhookId": "569a8fbc-2413-411e-8099-1b7866e0d48e"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileBinary = $input.item.binary.data;\n// Получаем Title из ноды SET независимо от входящих данных\nconst title = $('SET').first().json.Title || \"AI-агент\";\n\nreturn [\n  {\n    json: $input.item.json,\n    binary: {\n      data: {\n        ...fileBinary,\n        fileName: title + \".mp3\",\n        mimeType: \"audio/mpeg\",\n        fileExtension: \"mp3\"\n      }\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        432
+      ],
+      "id": "88a37b08-ba68-4dce-891c-8bceaf302b39",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('SET').item.json.Chat_ID }}",
+        "binaryData": true,
+        "binaryPropertyName": "=data",
+        "additionalFields": {
+          "caption": "={{ $('SET').item.json.Caption }}_2",
+          "parse_mode": "HTML",
+          "title": "={{ $('SET').item.json.Title }}_2"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1376,
+        432
+      ],
+      "id": "f73c4ab1-fbb2-450c-9f01-d0db25127e80",
+      "name": "Send an audio file3",
+      "webhookId": "a13a5de0-11a0-4142-b5ec-ec79687bc724"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage",
+        "chatId": "={{ $('SET').item.json.Chat_ID }}",
+        "messageId": "={{ $('Send an audio file2').item.json.result.message_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1616,
+        432
+      ],
+      "id": "6aefabde-dad7-4cde-a9c4-8a6882b8e7fd",
+      "name": "Delete a chat message1",
+      "webhookId": "793e308c-d28a-4eb7-b459-48c853ebc683"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1920,
+        288
+      ],
+      "id": "4d23a00c-b1df-4d1f-9026-d989f7eb6e47",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c99e458f-a919-4383-8c30-b7b2a633f14e",
+              "name": "output",
+              "value": "=✅ Ваши треки успешно загружены и отправлены! \n\nТвои ссылки на файлы:\n1.) {{ $('Get Request').item.json.data.response.sunoData[0].sourceAudioUrl }}\n2.) {{ $('Get Request').item.json.data.response.sunoData[1].sourceAudioUrl }}\n\n(Системное сообщение: Нужно зашить ссылки в \"Title\" в название трека для формата Телеграмм)",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2160,
+        288
+      ],
+      "id": "303c57c7-6a3c-4107-b376-b9d01692749c",
+      "name": "Finish"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e0903406-ce98-4aee-b62f-a1b70d47b062",
+              "leftValue": "={{ $json.data }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1184,
+        576
+      ],
+      "id": "2d322172-dc21-4677-b3eb-b44481eadc48",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "063fa4a6-863b-4add-a8a0-ac7b6b3711e3",
+              "name": "output",
+              "value": "=Данный трек не был отправлен на генерацию или не существет, повторите попытку создания: Taskid {{ $('SET').item.json.taskId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -592,
+        624
+      ],
+      "id": "29a2bf11-0643-4596-902f-496ab1e758b6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "Замените свой API : \nПример \nBearer a0af38613ae41fbcad4a5efb279b45c3"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1712,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "a7648b15-f1af-4699-b290-772786039828",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Во всех нодах телеграмма замените свой Credential\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "2b0b0dd3-f101-4792-815a-bb79cf007de1",
+      "name": "Sticky Note1"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "SET",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an audio file": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SET": {
+      "main": [
+        [
+          {
+            "node": "Get Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send an audio file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an audio file1": {
+      "main": [
+        [
+          {
+            "node": "Delete a chat message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Set1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Send an audio file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a chat message": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set1": {
+      "main": [
+        [
+          {
+            "node": "Send an audio file2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an audio file2": {
+      "main": [
+        [
+          {
+            "node": "Get a file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Send an audio file3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an audio file3": {
+      "main": [
+        [
+          {
+            "node": "Delete a chat message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a chat message1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Finish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SET",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "365e513d6b01f93d0383cf44bf2fcf223de171db2824e74853d3f013f7c037de"
+  }
+}

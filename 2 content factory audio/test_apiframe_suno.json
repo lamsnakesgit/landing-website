@@ -1,0 +1,379 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "af-trigger",
+      "name": "Запустить вручную",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-600, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "af-apikey",
+              "name": "APIFRAME_KEY",
+              "value": "ВСТАВЬ_СВОЙ_APIFRAME_KEY",
+              "type": "string"
+            },
+            {
+              "id": "af-prompt",
+              "name": "PROMPT",
+              "value": "Modern Russian Folk Ballad, Female Vocal, Balalaika, Accordion, Uplifting, Patriotic, 120 BPM",
+              "type": "string"
+            },
+            {
+              "id": "af-title",
+              "name": "TITLE",
+              "value": "Русская душа",
+              "type": "string"
+            },
+            {
+              "id": "af-model",
+              "name": "MODEL",
+              "value": "V5",
+              "type": "string"
+            },
+            {
+              "id": "af-chat",
+              "name": "CHAT_ID",
+              "value": "ВСТАВЬ_СВОЙ_TELEGRAM_CHAT_ID",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "af-config",
+      "name": "Конфиг",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-360, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apiframe.pro/suno-imagine",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ $json.APIFRAME_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"prompt\": \"{{ $json.PROMPT }}\",\n  \"title\": \"{{ $json.TITLE }}\",\n  \"model\": \"{{ $json.MODEL }}\",\n  \"make_instrumental\": false\n}",
+        "options": {}
+      },
+      "id": "af-generate",
+      "name": "POST → Suno Generate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [-120, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "af-save-taskid",
+              "name": "task_id",
+              "value": "={{ $json.task_id }}",
+              "type": "string"
+            },
+            {
+              "id": "af-save-apikey",
+              "name": "APIFRAME_KEY",
+              "value": "={{ $('Конфиг').item.json.APIFRAME_KEY }}",
+              "type": "string"
+            },
+            {
+              "id": "af-save-chat",
+              "name": "CHAT_ID",
+              "value": "={{ $('Конфиг').item.json.CHAT_ID }}",
+              "type": "string"
+            },
+            {
+              "id": "af-save-title",
+              "name": "TITLE",
+              "value": "={{ $('Конфиг').item.json.TITLE }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "af-save-task",
+      "name": "Сохранить task_id",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [120, 0]
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "id": "af-wait",
+      "name": "Ждём 20 сек",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [360, 0],
+      "webhookId": "af-wait-webhook"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.apiframe.pro/fetch/{{ $json.task_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $json.APIFRAME_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "af-fetch",
+      "name": "GET → Проверить статус",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [600, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "af-if-done",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "finished",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "af-if-done",
+      "name": "Готово?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [840, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "af-urls",
+              "name": "audio_url_1",
+              "value": "={{ $json.songs[0].audio_url }}",
+              "type": "string"
+            },
+            {
+              "id": "af-urls2",
+              "name": "audio_url_2",
+              "value": "={{ $json.songs[1].audio_url }}",
+              "type": "string"
+            },
+            {
+              "id": "af-task-ref",
+              "name": "task_id",
+              "value": "={{ $json.task_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "af-extract-urls",
+      "name": "Извлечь URL треков",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1080, -80]
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('Конфиг').item.json.CHAT_ID }}",
+        "file": "={{ $json.audio_url_1 }}",
+        "additionalFields": {
+          "caption": "=🎵 <b>{{ $('Конфиг').item.json.TITLE }}</b> — версия 1\n\n<i>Сгенерировано через APIFrame + Suno V5</i>",
+          "parse_mode": "HTML",
+          "title": "={{ $('Конфиг').item.json.TITLE }} v1"
+        }
+      },
+      "id": "af-send-tg-1",
+      "name": "Отправить трек 1 в TG",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1320, -80],
+      "webhookId": "af-tg-1-webhook"
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('Конфиг').item.json.CHAT_ID }}",
+        "file": "={{ $('Извлечь URL треков').item.json.audio_url_2 }}",
+        "additionalFields": {
+          "caption": "=🎵 <b>{{ $('Конфиг').item.json.TITLE }}</b> — версия 2",
+          "parse_mode": "HTML",
+          "title": "={{ $('Конфиг').item.json.TITLE }} v2"
+        }
+      },
+      "id": "af-send-tg-2",
+      "name": "Отправить трек 2 в TG",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1560, -80],
+      "webhookId": "af-tg-2-webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "af-still-waiting",
+              "name": "task_id",
+              "value": "={{ $('Сохранить task_id').item.json.task_id }}",
+              "type": "string"
+            },
+            {
+              "id": "af-still-apikey",
+              "name": "APIFRAME_KEY",
+              "value": "={{ $('Сохранить task_id').item.json.APIFRAME_KEY }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "af-loop-back",
+      "name": "Ещё не готово → повтор",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [840, 200]
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "id": "af-wait-retry",
+      "name": "Ждём ещё 15 сек",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [600, 200],
+      "webhookId": "af-wait-retry-webhook"
+    },
+    {
+      "parameters": {
+        "content": "## 🎵 ТЕСТ APIFrame → Suno V5 → Telegram\n\n### Настройка:\n1. **APIFRAME_KEY** → ключ с https://apiframe.pro\n   - Регистрация → My Account → API Key\n\n2. **CHAT_ID** → твой Telegram Chat ID\n   - Отправь /start боту @userinfobot\n\n3. **PROMPT** → описание музыки ИЛИ текст песни\n   - Если текст песни → используй поле `lyrics` вместо `prompt`\n   - Если стиль → поле `prompt`\n\n4. **MODEL** → версия Suno:\n   - `V5` — Suno v5 (лучшее качество)\n   - `V4_5` — Suno v4.5\n   - `V4` — Suno v4\n\n5. В нодах **Telegram** замени credential на свой аккаунт\n\n### Как работает:\n1. POST → `api.apiframe.pro/suno-imagine` → получаем `task_id`\n2. Ждём 20 сек → GET → `api.apiframe.pro/fetch/{task_id}`\n3. Если `status: finished` → извлекаем 2 MP3 URL\n4. Отправляем оба трека в Telegram\n5. Если ещё не готово → ждём 15 сек → повтор\n\n### Результат:\n2 трека Suno в Telegram!\n`songs[0].audio_url` и `songs[1].audio_url`",
+        "height": 620,
+        "width": 640,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-600, 320],
+      "typeVersion": 1,
+      "id": "af-note",
+      "name": "Инструкция"
+    },
+    {
+      "parameters": {
+        "content": "⬅️ Замени:\n• APIFRAME_KEY\n• CHAT_ID\n• PROMPT / TITLE",
+        "color": 3,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-390, 160],
+      "typeVersion": 1,
+      "id": "af-config-note",
+      "name": "Note Config"
+    },
+    {
+      "parameters": {
+        "content": "⚙️ Замени Telegram\ncredential на свой!",
+        "color": 3,
+        "width": 200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1300, -220],
+      "typeVersion": 1,
+      "id": "af-tg-note",
+      "name": "Note TG"
+    },
+    {
+      "parameters": {
+        "content": "🔄 Polling loop\nПока status != finished",
+        "color": 4,
+        "width": 200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [580, 320],
+      "typeVersion": 1,
+      "id": "af-poll-note",
+      "name": "Note Poll"
+    }
+  ],
+  "connections": {
+    "Запустить вручную": {
+      "main": [[{ "node": "Конфиг", "type": "main", "index": 0 }]]
+    },
+    "Конфиг": {
+      "main": [[{ "node": "POST → Suno Generate", "type": "main", "index": 0 }]]
+    },
+    "POST → Suno Generate": {
+      "main": [[{ "node": "Сохранить task_id", "type": "main", "index": 0 }]]
+    },
+    "Сохранить task_id": {
+      "main": [[{ "node": "Ждём 20 сек", "type": "main", "index": 0 }]]
+    },
+    "Ждём 20 сек": {
+      "main": [[{ "node": "GET → Проверить статус", "type": "main", "index": 0 }]]
+    },
+    "GET → Проверить статус": {
+      "main": [[{ "node": "Готово?", "type": "main", "index": 0 }]]
+    },
+    "Готово?": {
+      "main": [
+        [{ "node": "Извлечь URL треков", "type": "main", "index": 0 }],
+        [{ "node": "Ещё не готово → повтор", "type": "main", "index": 0 }]
+      ]
+    },
+    "Извлечь URL треков": {
+      "main": [[{ "node": "Отправить трек 1 в TG", "type": "main", "index": 0 }]]
+    },
+    "Отправить трек 1 в TG": {
+      "main": [[{ "node": "Отправить трек 2 в TG", "type": "main", "index": 0 }]]
+    },
+    "Ещё не готово → повтор": {
+      "main": [[{ "node": "Ждём ещё 15 сек", "type": "main", "index": 0 }]]
+    },
+    "Ждём ещё 15 сек": {
+      "main": [[{ "node": "GET → Проверить статус", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {}
+}

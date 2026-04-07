@@ -1,0 +1,181 @@
+{
+  "name": "PhotoSession Branch v1.6 — Portrait & Product (Fixed Versions)",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300],
+      "parameters": {
+        "updates": ["*"],
+        "additionalFields": {}
+      }
+    },
+    {
+      "id": "config",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [400, 300],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "api-key", "name": "apiKey", "value": "ВСТАВЬ_GOOGLE_AI_STUDIO_KEY", "type": "string" },
+            { "id": "bot-token", "name": "botToken", "value": "ВСТАВЬ_TELEGRAM_BOT_TOKEN", "type": "string" },
+            { "id": "channel-required", "name": "channelRequired", "value": "-1003806252342", "type": "string" },
+            { "id": "model-vision", "name": "analyzeModel", "value": "gemini-1.5-flash", "type": "string" },
+            { "id": "model-image", "name": "imageGenModel", "value": "imagen-3", "type": "string" }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "switch-main",
+      "name": "Тип сообщения?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [620, 300],
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.message ? ($json.message.photo ? 'photo' : ($json.callback_query ? 'callback' : 'other')) : ($json.callback_query ? 'callback' : 'other') }}",
+        "rules": {
+          "rules": [
+            { "value2": "photo", "operation": "equal" },
+            { "value2": "callback", "operation": "equal" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "process-photo",
+      "name": "Загрузка фото",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 200],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.telegram.org/bot{{ $('Config').item.json.botToken }}/getFile",
+        "queryParameters": { "parameters": [{ "name": "file_id", "value": "={{ $('Telegram Trigger').item.json.message.photo.slice(-1)[0].file_id }}" }] },
+        "options": {}
+      }
+    },
+    {
+      "id": "download",
+      "name": "Download",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1080, 200],
+      "parameters": { 
+        "url": "=https://api.telegram.org/file/bot{{ $('Config').item.json.botToken }}/{{ $json.result.file_path }}", 
+        "responseFormat": "file",
+        "options": {}
+      }
+    },
+    {
+      "id": "b64",
+      "name": "B64",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [1300, 200],
+      "parameters": { 
+        "operation": "binaryToPropery"
+      }
+    },
+    {
+      "id": "ai-classify",
+      "name": "Gemini: Анализ (Портрет/Товар)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1520, 200],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $('Config').item.json.analyzeModel }}:generateContent",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "x-goog-api-key", "value": "={{ $('Config').item.json.apiKey }}" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [\n      { \"inline_data\": { \"mime_type\": \"image/jpeg\", \"data\": \"{{ $json.data }}\" } },\n      { \"text\": \"Analyze this photo. Is it a Person (Portrait) or an Object (Product)? Suggest 3 artistic styles based on its nature. Reply ONLY JSON: {\\\"type\\\":\\\"portrait|product\\\", \\\"suggested_styles\\\": [{\\\"name\\\":\\\"Style\\\", \\\"reason\\\":\\\"Why in Russian\\\"}]} \" }\n    ]\n  }],\n  \"generationConfig\": { \"responseMimeType\": \"application/json\" }\n}",
+        "options": {}
+      }
+    },
+    {
+      "id": "offer-styles",
+      "name": "Предложить стили",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1740, 200],
+      "parameters": {
+        "jsCode": "const res = JSON.parse($input.first().json.candidates[0].content.parts[0].text);\nconst type = res.type;\nconst styles = res.suggested_styles;\nconst chatId = $('Telegram Trigger').first().json.message.chat.id;\n\n// Базовые кнопки для выбора\nconst buttons = styles.map(s => ([{ text: `✨ ${s.name}`, callbackData: `style:::${type}:::${s.name}` }]));\n\nreturn [{ json: { chatId, type, styles, buttons, text: `🕵️‍♂️ Я вижу, это *${type === 'portrait' ? 'Портрет' : 'Товар'}*!\n\n${styles.map(s => `🔹 *${s.name}*: ${s.reason}`).join('\\n')}` } }];"
+      }
+    },
+    {
+      "id": "send-choice",
+      "name": "TG: Выбор стиля",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1960, 200],
+      "parameters": {
+        "operation": "sendMessage",
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.text }}\n\nВыбери вариант фотосессии:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": { "rows": "={{ $json.buttons.map(b => ({ buttons: b })) }}" },
+        "additionalFields": { "parse_mode": "Markdown" }
+      }
+    },
+    {
+      "id": "callback-logic",
+      "name": "Логика генерации",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 500],
+      "parameters": {
+        "jsCode": "const callback = $('Telegram Trigger').first().json.callback_query;\nconst [mark, type, styleName] = callback.data.split(':::');\nconst chatId = callback.message.chat.id;\n\nconst prompts = {\n  'portrait': `Detailed photographic portrait of the person, style: ${styleName}. Professional lighting, 8k, sharp focus, magazine quality.`,\n  'product': `Professional advertising product photography of the item, style: ${styleName}. Studio lighting, clean background, commercial quality.`\n};\n\nreturn [{ json: { chatId, type, styleName, prompt: prompts[type] || prompts['portrait'] } }];"
+      }
+    },
+    {
+      "id": "gen-image",
+      "name": "Gemini: Генерация (Imagen 3)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1080, 500],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/imagen-3:predict",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "x-goog-api-key", "value": "={{ $('Config').item.json.apiKey }}" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"instances\": [{ \"prompt\": \"{{ $json.prompt }}\" }],\n  \"parameters\": { \"sampleCount\": 1, \"aspectRatio\": \"1:1\" }\n}",
+        "options": {}
+      }
+    },
+    {
+      "id": "send-final",
+      "name": "TG: Готово",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1300, 500],
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Логика генерации').item.json.chatId }}",
+        "photo": "={{ $json.predictions[0].bytesBase64Encoded }}",
+        "additionalFields": { "caption": "=✨ Фотосессия готова! Стиль: {{ $('Логика генерации').item.json.styleName }}" }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": { "main": [[{ "node": "Config", "type": "main", "index": 0 }]] },
+    "Config": { "main": [[{ "node": "switch-main", "type": "main", "index": 0 }]] },
+    "switch-main": { "main": [[{ "node": "process-photo", "type": "main", "index": 0 }], [{ "node": "callback-logic", "type": "main", "index": 0 }]] },
+    "process-photo": { "main": [[{ "node": "download", "type": "main", "index": 0 }]] },
+    "download": { "main": [[{ "node": "b64", "type": "main", "index": 0 }]] },
+    "b64": { "main": [[{ "node": "ai-classify", "type": "main", "index": 0 }]] },
+    "ai-classify": { "main": [[{ "node": "offer-styles", "type": "main", "index": 0 }]] },
+    "offer-styles": { "main": [[{ "node": "send-choice", "type": "main", "index": 0 }]] },
+    "callback-logic": { "main": [[{ "node": "gen-image", "type": "main", "index": 0 }]] },
+    "gen-image": { "main": [[{ "node": "send-final", "type": "main", "index": 0 }]] }
+  }
+}

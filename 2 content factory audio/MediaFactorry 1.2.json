@@ -1,0 +1,1533 @@
+{
+  "name": "MediaFactorry 1.2",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "*"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        -96
+      ],
+      "id": "14d5e699-7307-4aec-86d2-2cde6229bc84",
+      "name": "Telegram Trigger",
+      "webhookId": "e361f936-d9a9-4ee1-b0b0-f81e16684f7d",
+      "credentials": {
+        "telegramApi": {
+          "id": "AsHjDxiOpZT1IUxH",
+          "name": "MediaFactorry"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1840,
+        -560
+      ],
+      "id": "ed6e00d9-8af3-4a0e-b203-56d0764e3951",
+      "name": "Get a file",
+      "webhookId": "be23c94c-c171-4adf-aad2-50aa22ee16d7",
+      "credentials": {
+        "telegramApi": {
+          "id": "AsHjDxiOpZT1IUxH",
+          "name": "MediaFactorry"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2032,
+        -560
+      ],
+      "id": "6c217d1b-443d-45ca-a00e-6027e261dc34",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "eg7PsGXJ5wGIHUZ2",
+          "name": "new key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2656,
+        -320
+      ],
+      "id": "e2803527-e57a-44ba-bdf9-3b1d0bac49c8",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "eg7PsGXJ5wGIHUZ2",
+          "name": "new key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendVideo",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "binaryData": true,
+        "replyMarkup": "inlineKeyboard",
+        "additionalFields": {
+          "caption": "=Видео готово ✅"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4144,
+        -208
+      ],
+      "id": "a750109f-f151-489c-980a-e9437ca3b670",
+      "name": "Send a video",
+      "webhookId": "d95c0309-9687-46ea-940a-5f7535d9c43a",
+      "alwaysOutputData": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "AsHjDxiOpZT1IUxH",
+          "name": "MediaFactorry"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data.response.resultUrls[0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3888,
+        -128
+      ],
+      "id": "de8c3aad-59bb-43ae-8544-08aa2a064a46",
+      "name": "Get Video data",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are a professional prompt engineer for Veo-3 text-to-video generation.  \nYour job is to take a simple user idea or sentence and expand it into a cinematic, ad-style 8-second scene description.  \n\nRULES:  \n- Do not add on-screen text, captions, subtitles, watermarks, or titles.  \n- If the user explicitly includes speech:  \n   • If the speaker is present in the scene → the character must visibly speak the line on screen with synchronized lip movement.  \n   • The line must be reproduced **exactly as written by the user, word-for-word, without paraphrasing or altering any words**.  \n   • The delivery must be **spoken naturally, not sung**. Add: “spoken in a normal conversational tone, not singing.”  \n   • Only if the input explicitly says “voiceover”, “за кадром”, or “narrator” → then generate an off-screen narration.  \n- Voiceover language rule:  \n   • If the user input contains Cyrillic → the speech/narration is in Russian.  \n   • Otherwise → the speech/narration is in English.  \n- Never output Russian written text. Russian is only for audio narration.  \n- Avoid explicit brand names. Always describe products generically (e.g., “chocolate cereal box,” “sneakers,” “coffee mug”).  \n- Do not use em dashes (—). Use commas or periods instead.  \n- Speech/narration must be **one short sentence maximum**.  \n- If children are present, narration must be by an off-camera adult.  \n- Do not add background music unless the user explicitly requested it. Use only natural ambience (waves, wind, city sounds, etc.) when not specified.  \n\nOUTPUT FORMAT (always return exactly these 7 labeled lines, nothing else):  \nScene: [location, time of day, atmosphere, lighting, environment]  \nCharacters: [who is present, appearance, clothing, emotions, actions]  \nProduct Focus: [describe the product or main subject, or “none”]  \nSpeech: \"[exact user line]\" spoken by [character/on-screen] in [language], normal conversational tone, not singing  \nStyle & Sound: [camera type, movement, ambience/natural sounds/music if requested]  \nEnding: [how the scene finishes, e.g., camera pans out, fade to black]  \nDuration: 8 seconds.  \n\nNow take the user’s input and generate the complete structured prompt in this format."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        2736,
+        -560
+      ],
+      "id": "09530c3b-fd46-4076-aa0f-58fc43842f47",
+      "name": "Prompt-Engineer"
+    },
+    {
+      "parameters": {
+        "amount": 60
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3088,
+        -432
+      ],
+      "id": "63d92eb0-0348-44bf-aed7-9410af1dee41",
+      "name": "Wait 60 sec",
+      "webhookId": "11cc847c-b94c-4f24-b384-282707d712fb"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5486168c-af50-4388-9578-5b0457770964",
+              "name": "text",
+              "value": "={{ $('Telegram Trigger').item.json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2032,
+        -368
+      ],
+      "id": "5bfe27b5-425f-4e98-86d3-cc725384c53f",
+      "name": "Text"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo[$json.message.photo.length - 1].file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1840,
+        96
+      ],
+      "id": "fb0cea1e-ebf7-4f7e-ac4f-18bdf2ffc2da",
+      "name": "Get a file1",
+      "webhookId": "143ffc3a-347c-4c31-9252-cb0b1410336c",
+      "credentials": {
+        "telegramApi": {
+          "id": "AsHjDxiOpZT1IUxH",
+          "name": "MediaFactorry"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2400,
+        528
+      ],
+      "id": "32c393ca-3719-4907-8ddc-ae46b364132a",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "eg7PsGXJ5wGIHUZ2",
+          "name": "new key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2784,
+        128
+      ],
+      "id": "f3f7720f-4895-42cf-af86-24780ac4c159",
+      "name": "Merge",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a48407e5-c637-439c-b68f-8a5d4c62f32f",
+              "leftValue": "={{ $json.data.successFlag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "b3ba2b64-068c-4884-bef1-4fbdcd6ab1f9",
+              "leftValue": "={{ $json.data.errorMessage }}",
+              "rightValue": "Image fetch failed. Check access settings or use our File Upload API instead.",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3120,
+        352
+      ],
+      "id": "e4435223-2322-42c1-a376-4140d4c9da2f",
+      "name": "Completed?1"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/chat/credit",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 2490f6eb9524927001f6a293af1f07eb"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1840,
+        -128
+      ],
+      "id": "c1df6769-39d1-4f01-89ee-c181561840e7",
+      "name": "Get Balance"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=На балансе {{ $json.data }} кредитов.\n\nХватит на {{ Math.floor($json.data / 80) }} видео.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2032,
+        -128
+      ],
+      "id": "2db22596-64ec-47ba-bd40-5d7dc16d3ff1",
+      "name": "Balance message",
+      "webhookId": "3edf233c-f2c6-46ee-a327-39e213c86704",
+      "credentials": {
+        "telegramApi": {
+          "id": "AsHjDxiOpZT1IUxH",
+          "name": "MediaFactorry"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 45
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2784,
+        352
+      ],
+      "id": "b355f4bd-b827-4368-a1d9-b68f143b99e7",
+      "name": "Wait 45 sec",
+      "webhookId": "11cc847c-b94c-4f24-b384-282707d712fb"
+    },
+    {
+      "parameters": {
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1zkgQ_yHEpzviX30cK0dLKjvB9XqN5A0r",
+          "mode": "list",
+          "cachedResultName": "Бот уроки",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1zkgQ_yHEpzviX30cK0dLKjvB9XqN5A0r"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4144,
+        -48
+      ],
+      "id": "7f073e44-e80b-495a-b4ce-e62437249132",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "XRfhOcUeNEq2cD2r",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6372f84f-b0b9-46f9-83bf-12b12b17bf10",
+                    "leftValue": "={{ $json.message.voice }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1b9115a7-fd9c-41d7-9a31-2fc0677c697d",
+                    "leftValue": "={{ $json.message.photo }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "photo"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "46196f05-90a0-40f5-80a7-c64025ce5110",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/balance",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "balance"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/balance",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    },
+                    "id": "d3d81b04-8079-4488-ad80-2ee08f304a96"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1344,
+        -128
+      ],
+      "id": "9b9b82ac-4d28-4c23-ad9e-9c2a3020428e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6f0a4de2-5889-4653-932f-de05f10652af",
+              "leftValue": "={{ $json.data.errorMessage }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3344,
+        128
+      ],
+      "id": "13146777-5377-4b29-97ea-aab890d35de0",
+      "name": "error?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "03dd15b0-4f4d-4a61-8c2f-e6db45b1b594",
+              "name": "text",
+              "value": "=Content: {{ $json.content }} \nCaption: {{ $('me?').item.json.message.caption }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2032,
+        320
+      ],
+      "id": "68ab29d4-2d1b-4d51-be04-9118664e1daf",
+      "name": "content+caption"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1840,
+        320
+      ],
+      "id": "fe84ec7e-631d-4564-996c-82b650df4d27",
+      "name": "analyze image",
+      "credentials": {
+        "openAiApi": {
+          "id": "00Nb01kJJ9NppVSI",
+          "name": "moi n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.imgbb.com/1/upload",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "expiration",
+              "value": "600"
+            },
+            {
+              "name": "key",
+              "value": "e296ceb1c4d357537391f9f1d2f70346"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2032,
+        96
+      ],
+      "id": "17c88d4a-bc3a-4611-9e30-4ac5a82d0332",
+      "name": "upload image"
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "messageId": "={{ $items(\"prompting\")[0].json.result.message_id }}",
+        "text": "Генерирую видео ~3 минуты...",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2944,
+        128
+      ],
+      "id": "02150f13-b7ac-47e2-a242-ea8ecebbbf35",
+      "name": "start generating",
+      "webhookId": "04da21be-58bd-4e7b-a1b0-6ecf7f5bb201",
+      "retryOnFail": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "AsHjDxiOpZT1IUxH",
+          "name": "MediaFactorry"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Генерирую промпт...",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2192,
+        320
+      ],
+      "id": "7e05826a-27ba-4ad9-a8d1-fd2243fe0c52",
+      "name": "prompting",
+      "webhookId": "3edf233c-f2c6-46ee-a327-39e213c86704",
+      "credentials": {
+        "telegramApi": {
+          "id": "AsHjDxiOpZT1IUxH",
+          "name": "MediaFactorry"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('content+caption').item.json.text }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are a Veo-3 image-to-video assistant.  \nYou receive:  \n- caption: user’s instruction (may include speech or cinematic ideas)  \n- content: what is visible in the image  \n\nRULES:  \n- If caption contains instructions about speech, actions, people, or cinematic elements → build a full cinematic ad scene.  \n- If caption is simple (e.g. “animate,” “make it move,” “bring to life”) → keep the original image as-is and only animate natural motions (camera pan, slight object movement, particles, lighting, reflections).  \n- Never add people, characters, or extra elements that are not in the original image, unless explicitly requested in caption.  \n- Do not add subtitles, text, or logos on screen.  \n- Voiceover only if explicitly requested in caption. If no speech mentioned → Speech: none.  \n- Voiceover language: Cyrillic input = Russian voiceover; otherwise = English.  \n- Never output Russian text. Russian is only for audio narration.  \n- Do not use em dashes (—); use commas or periods.  \n\nOUTPUT FORMAT (exactly these 7 lines):  \nScene: [describe environment, atmosphere, and lighting]  \nCharacters: [describe only if present in original image or caption, else write “none”]  \nProduct Focus: [describe the main object or subject of the image]  \nSpeech: \"[short line]\" out loud in [language], [tone]; OR Speech: none  \nStyle & Sound: [camera type, movement, ambience/music if cinematic; “subtle natural sounds” if simple animation]  \nEnding: [how the scene ends, e.g. camera pans out, fade to black]  \nDuration: 8 seconds"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        2432,
+        320
+      ],
+      "id": "34546dd5-fff0-47fa-8869-57dbcaeab3bd",
+      "name": "Prompt-Engineer (Image to Video)"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/veo/record-info",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $json.data.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 2490f6eb9524927001f6a293af1f07eb"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3232,
+        -432
+      ],
+      "id": "488c81b6-bf2e-4835-9702-b2894900974f",
+      "name": "get video status"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/veo/record-info",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $json.data.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 2490f6eb9524927001f6a293af1f07eb"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2944,
+        352
+      ],
+      "id": "df04d517-36e9-4550-bb81-90d610c9f636",
+      "name": "get video status1"
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "messageId": "={{ $items(\"prompting message\")[0].json.result.message_id }}",
+        "text": "Генерирую видео ~3 минуты...",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3184,
+        -672
+      ],
+      "id": "968d2bb4-3c68-407b-948d-a269d1cf25fb",
+      "name": "start generating1",
+      "webhookId": "04da21be-58bd-4e7b-a1b0-6ecf7f5bb201",
+      "retryOnFail": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "AsHjDxiOpZT1IUxH",
+          "name": "MediaFactorry"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/veo/generate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 2490f6eb9524927001f6a293af1f07eb"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "prompt",
+              "value": "={{ $('Merge').item.json.text }}"
+            },
+            {
+              "name": "imageUrls",
+              "value": "={{ $('Merge').item.json.data.url }}"
+            },
+            {
+              "name": "model",
+              "value": "veo3_fast"
+            },
+            {
+              "name": "aspectRatio",
+              "value": "16:9"
+            },
+            {
+              "name": "enableFallback",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3120,
+        128
+      ],
+      "id": "d1e46918-ef94-46ec-ba04-b8dfbfe5937f",
+      "name": "generate video"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/veo/generate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 2490f6eb9524927001f6a293af1f07eb"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "prompt",
+              "value": "={{ $('Prompt-Engineer').item.json.text }}"
+            },
+            {
+              "name": "model",
+              "value": "veo3_fast"
+            },
+            {
+              "name": "aspectRatio",
+              "value": "16:9"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3344,
+        -672
+      ],
+      "id": "3edf0483-a07a-40e2-a6c2-fbeb03aa24e9",
+      "name": "create video"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a48407e5-c637-439c-b68f-8a5d4c62f32f",
+              "leftValue": "={{ $json.msg }}",
+              "rightValue": "success",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "6d21f993-0d91-4a02-bc8f-91aa8bf5737c",
+              "leftValue": "={{ $json.data.response.resultUrls }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3360,
+        -432
+      ],
+      "id": "b8bd49ea-d39d-4c99-bf36-50c813d9d40a",
+      "name": "completed?"
+    },
+    {
+      "parameters": {
+        "content": "## баланс токенов kie.ai",
+        "height": 224,
+        "width": 480,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1776,
+        -192
+      ],
+      "id": "f1c42ac5-e524-470d-934a-ef4ff2a62f1a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Из картинки в видео (VEO 3)",
+        "height": 608,
+        "width": 1744,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1776,
+        48
+      ],
+      "id": "ab249b1a-ba49-45a8-ace8-38c14de88eb6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Генерация видео по голосу/тексту (VEO 3)",
+        "height": 608,
+        "width": 1744,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1776,
+        -816
+      ],
+      "id": "d4ab6a3b-b3a9-484d-87f0-b0aae2858c69",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Отправка видео в Telegram + Загрузка в Google Drive",
+        "height": 448,
+        "width": 448
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3808,
+        -304
+      ],
+      "id": "0ae85c27-c669-4277-94d7-921c7e65b1ac",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Генерирую промпт...",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1840,
+        -368
+      ],
+      "id": "72609c48-d89e-40e9-8e76-bff5d1525eb8",
+      "name": "prompting message",
+      "webhookId": "3d2bc6dc-e688-41e1-89df-c97ed7a98322",
+      "credentials": {
+        "telegramApi": {
+          "id": "AsHjDxiOpZT1IUxH",
+          "name": "MediaFactorry"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Генерирую промпт...",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2240,
+        -560
+      ],
+      "id": "811d1ffe-f671-44ef-89ab-d2651c8d63d3",
+      "name": "prompting message1",
+      "webhookId": "3d2bc6dc-e688-41e1-89df-c97ed7a98322",
+      "credentials": {
+        "telegramApi": {
+          "id": "AsHjDxiOpZT1IUxH",
+          "name": "MediaFactorry"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bbd2cdc4-8c8e-4286-969d-f0ec4745f42e",
+              "leftValue": "={{ $json.message.chat.username }}",
+              "rightValue": "generalov_ai",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1104,
+        -96
+      ],
+      "id": "85a3e8a2-20e8-4c23-91d4-52cbc25c79b7",
+      "name": "me?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Ошибка генерации: {{ $json.data.errorMessage }}, код {{ $json.data.errorCode }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3344,
+        352
+      ],
+      "id": "de58c9ad-10d1-48e8-8b48-782dcf5fd90c",
+      "name": "error message1",
+      "webhookId": "4fc2c75a-8565-4296-aab7-5915569715e7",
+      "credentials": {
+        "telegramApi": {
+          "id": "AsHjDxiOpZT1IUxH",
+          "name": "MediaFactorry"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "me?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "prompting message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Prompt-Engineer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a video": {
+      "main": [
+        []
+      ]
+    },
+    "Get Video data": {
+      "main": [
+        [
+          {
+            "node": "Send a video",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt-Engineer": {
+      "main": [
+        [
+          {
+            "node": "start generating1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 60 sec": {
+      "main": [
+        [
+          {
+            "node": "get video status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text": {
+      "main": [
+        [
+          {
+            "node": "Prompt-Engineer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file1": {
+      "main": [
+        [
+          {
+            "node": "analyze image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "upload image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Prompt-Engineer (Image to Video)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "start generating",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Completed?1": {
+      "main": [
+        [
+          {
+            "node": "error?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 45 sec",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Balance": {
+      "main": [
+        [
+          {
+            "node": "Balance message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 45 sec": {
+      "main": [
+        [
+          {
+            "node": "get video status1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Balance",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "prompting message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "error?": {
+      "main": [
+        [
+          {
+            "node": "Get Video data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "error message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "content+caption": {
+      "main": [
+        [
+          {
+            "node": "prompting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "analyze image": {
+      "main": [
+        [
+          {
+            "node": "content+caption",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "upload image": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "start generating": {
+      "main": [
+        [
+          {
+            "node": "generate video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prompting": {
+      "main": [
+        [
+          {
+            "node": "Prompt-Engineer (Image to Video)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt-Engineer (Image to Video)": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "get video status": {
+      "main": [
+        [
+          {
+            "node": "completed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get video status1": {
+      "main": [
+        [
+          {
+            "node": "Completed?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "start generating1": {
+      "main": [
+        [
+          {
+            "node": "create video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate video": {
+      "main": [
+        [
+          {
+            "node": "Wait 45 sec",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create video": {
+      "main": [
+        [
+          {
+            "node": "Wait 60 sec",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "completed?": {
+      "main": [
+        [
+          {
+            "node": "Get Video data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 60 sec",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prompting message": {
+      "main": [
+        [
+          {
+            "node": "Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prompting message1": {
+      "main": [
+        [
+          {
+            "node": "Prompt-Engineer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "me?": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "69b328cf-d3f6-4b36-8520-2007351abd87",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e4855933bae6682b2d9940b98a50920a5d2d0a1e9dc828b7d051076b1f4b491f"
+  },
+  "id": "EhsMTBdHnLw8TcFa",
+  "tags": [
+    {
+      "createdAt": "2025-08-18T16:57:14.103Z",
+      "updatedAt": "2025-08-18T16:57:14.103Z",
+      "id": "4HhWtuN91Y3f4PbL",
+      "name": "MediaFactorry"
+    },
+    {
+      "createdAt": "2025-08-18T16:57:17.397Z",
+      "updatedAt": "2025-08-18T16:57:17.397Z",
+      "id": "B3cS8Yv6IqYOExUP",
+      "name": "GeneralovAI"
+    }
+  ]
+}

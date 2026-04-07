@@ -1,0 +1,261 @@
+{
+  "name": "MediaFactorry Vertex AI (Gemini & Veo)",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "*"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        -96
+      ],
+      "id": "14d5e699-7307-4aec-86d2-2cde6229bc84",
+      "name": "Telegram Trigger"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1840,
+        -560
+      ],
+      "id": "ed6e00d9-8af3-4a0e-b203-56d0764e3951",
+      "name": "Get Voice File"
+    },
+    {
+      "parameters": {
+        "model": "gemini-1.5-pro",
+        "promptType": "define",
+        "text": "Transcribe this audio. Use Russian language.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatGoogleVertexAi",
+      "typeVersion": 1,
+      "position": [
+        2032,
+        -560
+      ],
+      "id": "6c217d1b-443d-45ca-a00e-6027e261dc34",
+      "name": "Gemini Transcribe (Multimodal)"
+    },
+    {
+      "parameters": {
+        "modelName": "gemini-1.5-pro-001",
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertexAi",
+      "typeVersion": 1,
+      "position": [
+        2656,
+        -320
+      ],
+      "id": "e2803527-e57a-44ba-bdf9-3b1d0bac49c8",
+      "name": "Gemini 1.5 Pro Architect"
+    },
+    {
+      "parameters": {
+        "operation": "sendVideo",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "=Видео готово ✅ (Vertex Veo 3.1)"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4300,
+        -200
+      ],
+      "id": "a750109f-f151-489c-980a-e9437ca3b670",
+      "name": "Send Final Video"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $node[\"Config\"].json.region }}-aiplatform.googleapis.com/v1/projects/{{ $node[\"Config\"].json.projectId }}/locations/{{ $node[\"Config\"].json.region }}/publishers/google/models/veo-001:predictLongRunning",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"instances\": [\n    {\n      \"prompt\": \"{{ $json.prompt }}\"\n    }\n  ],\n  \"parameters\": {\n    \"aspectRatio\": \"16:9\",\n    \"durationSeconds\": 8,\n    \"sampleCount\": 1\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3100,
+        -200
+      ],
+      "id": "veo-gen",
+      "name": "Vertex AI Veo 3.1 Start"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3300,
+        -200
+      ],
+      "id": "wait-lro",
+      "name": "Wait 30s for LRO"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $node[\"Config\"].json.region }}-aiplatform.googleapis.com/v1/{{ $node[\"Vertex AI Veo 3.1 Start\"].json.name }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3500,
+        -200
+      ],
+      "id": "check-lro",
+      "name": "Check Operation Status"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.done }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        3700,
+        -200
+      ],
+      "id": "is-done",
+      "name": "Is Video Ready?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "def-config",
+              "name": "projectId",
+              "value": "YOUR_PROJECT_ID",
+              "type": "string"
+            },
+            {
+              "id": "def-region",
+              "name": "region",
+              "value": "us-central1",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        1100,
+        -100
+      ],
+      "id": "Config",
+      "name": "Config (Vertex AI Data)"
+    }
+  ],
+  "connections": {
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Gemini 1.5 Pro Architect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vertex AI Veo 3.1 Start": {
+      "main": [
+        [
+          {
+            "node": "Wait 30s for LRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 30s for LRO": {
+      "main": [
+        [
+          {
+            "node": "Check Operation Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Operation Status": {
+      "main": [
+        [
+          {
+            "node": "Is Video Ready?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Video Ready?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait 30s for LRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "stickyNotes": [
+    {
+      "id": "note-1",
+      "name": "Note 1",
+      "content": "### 🏗️ MediaFactory Vertex AI Adaptation\n\nЭтот шаблон переведен с OpenAI на **Google Vertex AI**.\n\n1. **Vertex AI Data**: Укажи свой Project ID здесь.\n2. **Gemini 1.5 Pro**: Заменил GPT-5 для генерации промптов.\n3. **Veo 3.1**: Используется нативный HTTP запрос к Google Cloud LRO.\n4. **Polling**: Добавлен цикл ожидания готовности видео.\n\n**Важно**: Нужны Google Cloud Credentials в n8n.",
+      "height": 300,
+      "width": 400,
+      "position": [
+        500,
+        -100
+      ]
+    }
+  ]
+}

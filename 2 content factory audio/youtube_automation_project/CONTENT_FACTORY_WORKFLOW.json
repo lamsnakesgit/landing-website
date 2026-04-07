@@ -1,0 +1,478 @@
+{
+  "name": "Content Factory: Kamchatka & AI Agents (Native)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "google_project_id",
+              "value": "YOUR_PROJECT_ID"
+            },
+            {
+              "name": "google_region",
+              "value": "us-central1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "config-node",
+      "name": "Config: Google Cloud",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{$json.niche}}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "kamchatka",
+              "output": 0
+            },
+            {
+              "value2": "ai_agents",
+              "output": 1
+            }
+          ]
+        }
+      },
+      "id": "switch-niche",
+      "name": "Switch Niche",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        300,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.format}}",
+              "value2": "shorts"
+            }
+          ]
+        }
+      },
+      "id": "is-short-kamchatka",
+      "name": "Is Short? (Kamchatka)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        500,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.format}}",
+              "value2": "shorts"
+            }
+          ]
+        }
+      },
+      "id": "is-short-ai-agents",
+      "name": "Is Short? (AI Agents)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        500,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "prompt": "Generate a viral 60s vertical script about Kamchatka. Hook: You are looking at the most dangerous beauty on Earth. Use fast pacing and cinematic descriptions. Output JSON with 'scenes' array, each scene having 'text' and 'image_prompt'."
+      },
+      "id": "kamchatka-gen",
+      "name": "Kamchatka Short Generator",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        750,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "prompt": "Generate a viral B2B short about AI Agents. Hook: Stop hiring humans for repetitive tasks. Focus on ROI and automation. Output JSON with 'scenes' array, each scene having 'text' and 'image_prompt'. Include a 'character_prompt' for a consistent speaker."
+      },
+      "id": "ai-agents-gen",
+      "name": "AI Agents Short Generator",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        750,
+        350
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "scene-splitter",
+      "name": "Split into Scenes",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        950,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{$node[\"Config: Google Cloud\"].json.google_region}}-aiplatform.googleapis.com/v1/projects/{{$node[\"Config: Google Cloud\"].json.google_project_id}}/locations/{{$node[\"Config: Google Cloud\"].json.google_region}}/publishers/google/models/imagen-3.0-generate-001:predict",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleCloudServiceAccount",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "instances",
+              "value": "=[{ \"prompt\": \"{{$json.image_prompt}}\" }]"
+            },
+            {
+              "name": "parameters",
+              "value": "={ \"sampleCount\": 1, \"aspectRatio\": \"9:16\" }"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "imagen-http",
+      "name": "HTTP: Imagen 3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1150,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const base64Image = items[0].json.predictions[0].bytesBase64;\nreturn [{\n  json: {},\n  binary: {\n    data: {\n      data: base64Image,\n      mimeType: 'image/png',\n      fileName: 'bg.png'\n    }\n  }\n}];"
+      },
+      "id": "base64-to-binary-img",
+      "name": "Base64 to Image",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "fileName": "=scene_{{$node[\"Split into Scenes\"].context[\"currentRunIndex\"]}}_bg.png",
+        "dataPropertyName": "data",
+        "options": {}
+      },
+      "id": "write-bg-file",
+      "name": "Write BG File",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        1450,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://texttospeech.googleapis.com/v1/text:synthesize",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleCloudServiceAccount",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "input",
+              "value": "={ \"text\": \"{{$json.text}}\" }"
+            },
+            {
+              "name": "voice",
+              "value": "={ \"languageCode\": \"en-US\", \"name\": \"en-US-Studio-O\" }"
+            },
+            {
+              "name": "audioConfig",
+              "value": "={ \"audioEncoding\": \"MP3\" }"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "tts-http",
+      "name": "HTTP: Google TTS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1150,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const base64Audio = items[0].json.audioContent;\nreturn [{\n  json: {},\n  binary: {\n    data: {\n      data: base64Audio,\n      mimeType: 'audio/mpeg',\n      fileName: 'voice.mp3'\n    }\n  }\n}];"
+      },
+      "id": "base64-to-binary-audio",
+      "name": "Base64 to Audio",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "fileName": "=scene_{{$node[\"Split into Scenes\"].context[\"currentRunIndex\"]}}_voice.mp3",
+        "dataPropertyName": "data",
+        "options": {}
+      },
+      "id": "write-voice-file",
+      "name": "Write Voice File",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        1450,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=ffmpeg -loop 1 -i scene_{{$node[\"Split into Scenes\"].context[\"currentRunIndex\"]}}_bg.png -i scene_{{$node[\"Split into Scenes\"].context[\"currentRunIndex\"]}}_voice.mp3 -vf \"drawtext=text='{{$json.text}}':fontcolor=white:fontsize=24:x=(w-text_w)/2:y=(h-text_h)-50:box=1:boxcolor=black@0.5\" -c:v libx264 -shortest -pix_fmt yuv420p scene_{{$node[\"Split into Scenes\"].context[\"currentRunIndex\"]}}.mp4"
+      },
+      "id": "ffmpeg-render",
+      "name": "FFmpeg: Render Scene",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "ls scene_*.mp4 | sort -V | sed \"s/^/file '/;s/$/'/\" > list.txt && ffmpeg -f concat -safe 0 -i list.txt -i music.mp3 -filter_complex \"[1:a]volume=0.15[bg];[0:a][bg]amix=inputs=2:duration=first\" -c:v libx264 -pix_fmt yuv420p final_video.mp4 && rm scene_*.mp4 scene_*_bg.png scene_*_voice.mp3 list.txt"
+      },
+      "id": "ffmpeg-concat",
+      "name": "FFmpeg: Concatenate & Cleanup",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1850,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Config: Google Cloud",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config: Google Cloud": {
+      "main": [
+        [
+          {
+            "node": "Switch Niche",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Niche": {
+      "main": [
+        [
+          {
+            "node": "Is Short? (Kamchatka)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Short? (AI Agents)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Short? (Kamchatka)": {
+      "main": [
+        [
+          {
+            "node": "Kamchatka Short Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Short? (AI Agents)": {
+      "main": [
+        [
+          {
+            "node": "AI Agents Short Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kamchatka Short Generator": {
+      "main": [
+        [
+          {
+            "node": "Split into Scenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agents Short Generator": {
+      "main": [
+        [
+          {
+            "node": "Split into Scenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split into Scenes": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Imagen 3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FFmpeg: Concatenate & Cleanup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Imagen 3": {
+      "main": [
+        [
+          {
+            "node": "Base64 to Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Base64 to Image": {
+      "main": [
+        [
+          {
+            "node": "Write BG File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write BG File": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Google TTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Google TTS": {
+      "main": [
+        [
+          {
+            "node": "Base64 to Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Base64 to Audio": {
+      "main": [
+        [
+          {
+            "node": "Write Voice File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Voice File": {
+      "main": [
+        [
+          {
+            "node": "FFmpeg: Render Scene",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FFmpeg: Render Scene": {
+      "main": [
+        [
+          {
+            "node": "Split into Scenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

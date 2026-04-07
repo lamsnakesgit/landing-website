@@ -1,0 +1,125 @@
+{
+  "templates": [
+    {
+      "name": "Nature/Kamchatka Script (Long-form)",
+      "type": "script",
+      "description": "10+ minute deep dive into nature/volcanoes. Structured by chapters for consistency.",
+      "structure": {
+        "hook": {
+          "duration": "0:00-0:30",
+          "content": "Imagine a land where the earth breathes fire and the water boils beneath your feet. Welcome to Kamchatka."
+        },
+        "chapters": [
+          {
+            "title": "The Valley of Geysers",
+            "content": "Detailed exploration of the geothermal activity and unique ecosystem."
+          },
+          {
+            "title": "The Giants: Klyuchevskaya Sopka",
+            "content": "Focus on the highest active volcano in Eurasia."
+          },
+          {
+            "title": "Wildlife: The Brown Bears",
+            "content": "Observing the salmon run and bear behavior at Kurile Lake."
+          }
+        ],
+        "outro": {
+          "duration": "Last 45s",
+          "content": "Kamchatka is a reminder of our planet's raw power. Subscribe to explore more hidden corners of the world."
+        }
+      }
+    },
+    {
+      "name": "Viral Kamchatka Short (9:16)",
+      "type": "script_short",
+      "description": "50-60 second high-retention vertical video about Kamchatka's extreme nature.",
+      "structure": {
+        "hook": "You are looking at the most dangerous beauty on Earth. This is Kamchatka.",
+        "pacing": "Fast cuts every 1.5-2 seconds. High-energy background music.",
+        "body": [
+          "Fact 1: 300 volcanoes, 30 of them are active right now.",
+          "Fact 2: The Valley of Geysers is the second largest concentration in the world.",
+          "Fact 3: Giant brown bears are everywhere, and they aren't friendly."
+        ],
+        "visual_style": "Cinematic FPV drone shots mixed with close-up lava flows.",
+        "cta": "Subscribe to see the full expedition!"
+      }
+    },
+    {
+      "name": "AI Agents: Viral Sales Script (Short-form)",
+      "type": "script_short",
+      "description": "Selling, informative, and viral short for B2B/Tech niche. Focus on ROI and automation.",
+      "structure": {
+        "hook": "Stop hiring humans for repetitive tasks. AI Agents are taking over in 2024.",
+        "problem": "You're wasting 20 hours a week on emails and data entry. It's killing your business.",
+        "solution": "Meet the 'Content Factory' agent. It researches, writes, and posts while you sleep.",
+        "proof": "We scaled a channel to 100k subs in 30 days using this exact workflow.",
+        "cta": "Comment 'AGENT' to get the n8n blueprint for free!"
+      },
+      "character_prompt": "A professional young male tech entrepreneur, wearing a modern hoodie, standing in a high-tech minimalist office, looking directly at the camera, realistic, 8k, cinematic lighting."
+    },
+    {
+      "name": "AI Agents: The Future of Work (Long-form)",
+      "type": "script",
+      "description": "Informative deep dive into AI Agent architecture and business applications.",
+      "structure": {
+        "hook": "The era of 'Chatbots' is over. The era of 'Autonomous Agents' has begun.",
+        "chapters": [
+          {
+            "title": "What is an AI Agent?",
+            "content": "Explaining the difference between LLMs and Agents (Reasoning + Tools)."
+          },
+          {
+            "title": "The Tech Stack: n8n, LangChain, and OpenAI",
+            "content": "How to build your first autonomous workforce."
+          },
+          {
+            "title": "Real World Use Cases",
+            "content": "Customer support, lead gen, and content creation at scale."
+          }
+        ],
+        "outro": "The question isn't IF AI will replace tasks, but WHEN you will start using it. Join our community to stay ahead."
+      }
+    },
+    {
+      "name": "Video Metadata Template (Nature Niche)",
+      "type": "metadata",
+      "structure": {
+        "title_formulas": [
+          "Kamchatka: The Land of Fire and Ice (Full Documentary)",
+          "Why You Should NEVER Visit [Volcano Name] Alone",
+          "10 Minutes of Pure Kamchatka Nature (4K)"
+        ],
+        "description_template": "Exploring the wild heart of Kamchatka. \n\nChapters:\n0:00 Intro\n[Timestamps]\n\nWatch the Shorts version: [Link]",
+        "tags": ["Kamchatka", "Nature Documentary", "Volcanoes", "Wildlife", "Travel Russia", "4K Nature"]
+      }
+    },
+    {
+      "name": "n8n Branching Workflow (Longs & Shorts)",
+      "type": "workflow",
+      "json_example": {
+        "nodes": [
+          {
+            "name": "Format_Switch",
+            "type": "n8n-nodes-base.if",
+            "parameters": {
+              "conditions": {
+                "string": [{ "value1": "={{$json.format}}", "value2": "shorts" }]
+              }
+            }
+          },
+          {
+            "name": "Long_Form_Generator",
+            "type": "n8n-nodes-base.openAi",
+            "parameters": { "prompt": "Generate a 10-minute script about [Topic] with 5 chapters." }
+          },
+          {
+            "name": "Shorts_Clipper",
+            "type": "n8n-nodes-base.openAi",
+            "parameters": { "prompt": "Extract a viral 50s short from this chapter: [Chapter Text]." }
+          }
+        ]
+      }
+    }
+  ]
+}

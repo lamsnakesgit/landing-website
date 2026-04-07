@@ -1,0 +1,502 @@
+{
+  "name": "🤖 AI Media Bot — Фото + Старт + Баланс",
+  "nodes": [
+    {
+      "id": "trigger-tg",
+      "name": "📱 Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [0, 300],
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      }
+    },
+    {
+      "id": "parse-message",
+      "name": "🔍 Разобрать сообщение",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "parameters": {
+        "jsCode": "// Разбираем входящее Telegram сообщение\nconst msg = $input.item.json.message || {};\nconst user = msg.from || {};\nconst text = (msg.text || '').trim();\nconst chatId = msg.chat?.id;\n\nlet command = '';\nlet args = '';\nlet refParam = '';\n\nif (text.startsWith('/')) {\n  const parts = text.split(' ');\n  command = parts[0].replace('/', '').toLowerCase().split('@')[0];\n  args = parts.slice(1).join(' ');\n  if (command === 'start' && parts[1]) {\n    refParam = parts[1];\n  }\n}\n\nconst hasPhoto = !!(msg.photo && msg.photo.length > 0);\nconst photoFileId = hasPhoto ? msg.photo[msg.photo.length - 1].file_id : null;\n\nreturn [{\n  json: {\n    chatId,\n    userId: user.id,\n    username: user.username || '',\n    firstName: user.first_name || 'User',\n    text,\n    command,\n    args,\n    refParam,\n    hasPhoto,\n    photoFileId,\n    messageId: msg.message_id\n  }\n}];"
+      }
+    },
+    {
+      "id": "route-commands",
+      "name": "🔀 Роутер команд",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [440, 300],
+      "parameters": {
+        "mode": "rules",
+        "fallbackOutput": "extra",
+        "options": {},
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [{"leftValue": "={{ $json.command }}", "operator": {"operation": "equals", "type": "string"}, "rightValue": "start"}],
+                "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "strict"}
+              },
+              "outputKey": "start",
+              "renameOutput": true
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [{"leftValue": "={{ $json.command }}", "operator": {"operation": "equals", "type": "string"}, "rightValue": "фото"}],
+                "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "strict"}
+              },
+              "outputKey": "фото",
+              "renameOutput": true
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [{"leftValue": "={{ $json.command }}", "operator": {"operation": "equals", "type": "string"}, "rightValue": "баланс"}],
+                "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "strict"}
+              },
+              "outputKey": "баланс",
+              "renameOutput": true
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [{"leftValue": "={{ $json.command }}", "operator": {"operation": "equals", "type": "string"}, "rightValue": "реферал"}],
+                "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "strict"}
+              },
+              "outputKey": "реферал",
+              "renameOutput": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "sticky-overview",
+      "name": "📌 Обзор воркфлоу",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-250, 80],
+      "parameters": {
+        "color": 4,
+        "width": 200,
+        "height": 280,
+        "content": "## 🤖 AI Media Bot\n\n### Настроить:\n1. **Telegram** credentials\n2. **Supabase** credentials\n3. В Imagen 3 URL: `YOUR_PROJECT_ID`\n4. В реф-ссылке: `BOT_USERNAME`\n\n### Команды:\n- /start — регистрация\n- /фото — Imagen 3\n- /баланс — кредиты\n- /реферал — реф. ссылка"
+      }
+    },
+    {
+      "id": "check-user-db",
+      "name": "🗄️ Проверить юзера в БД",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [680, 100],
+      "parameters": {
+        "operation": "get",
+        "tableId": "users",
+        "filters": {
+          "conditions": [{"keyName": "telegram_id", "keyValue": "={{ $json.userId }}"}]
+        }
+      }
+    },
+    {
+      "id": "is-new-user",
+      "name": "❓ Новый юзер?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 100],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [{"leftValue": "={{ $json.id }}", "operator": {"operation": "empty", "type": "string"}, "rightValue": ""}],
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"}
+        }
+      }
+    },
+    {
+      "id": "generate-ref-code",
+      "name": "🎲 Генерировать реф-код",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 40],
+      "parameters": {
+        "jsCode": "// Генерируем уникальный реферальный код (6 символов)\nconst chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';\nlet code = '';\nfor (let i = 0; i < 6; i++) {\n  code += chars[Math.floor(Math.random() * chars.length)];\n}\nconst prevData = $('🔍 Разобрать сообщение').item.json;\nreturn [{ json: { ...prevData, referralCode: code } }];"
+      }
+    },
+    {
+      "id": "insert-new-user",
+      "name": "💾 Создать юзера",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1340, 40],
+      "parameters": {
+        "operation": "create",
+        "tableId": "users",
+        "fieldsUi": {
+          "fieldValues": [
+            {"fieldId": "telegram_id", "fieldValue": "={{ $('🔍 Разобрать сообщение').item.json.userId }}"},
+            {"fieldId": "username",    "fieldValue": "={{ $('🔍 Разобрать сообщение').item.json.username }}"},
+            {"fieldId": "first_name",  "fieldValue": "={{ $('🔍 Разобрать сообщение').item.json.firstName }}"},
+            {"fieldId": "referral_code","fieldValue": "={{ $json.referralCode }}"},
+            {"fieldId": "referred_by", "fieldValue": "={{ $('🔍 Разобрать сообщение').item.json.refParam }}"},
+            {"fieldId": "credits_photos","fieldValue": "10"},
+            {"fieldId": "credits_videos","fieldValue": "2"}
+          ]
+        }
+      }
+    },
+    {
+      "id": "prepare-welcome-new",
+      "name": "🎁 Подготовить данные",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 40],
+      "parameters": {
+        "jsCode": "const ref = $('🔍 Разобрать сообщение').item.json;\nconst userData = $json;\nreturn [{ json: {\n  chatId: ref.chatId,\n  firstName: ref.firstName,\n  refCode: userData.referral_code,\n  hasRef: !!ref.refParam\n}}];"
+      }
+    },
+    {
+      "id": "send-welcome-new",
+      "name": "👋 Приветствие (новый)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1780, 40],
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "=🎉 *Добро пожаловать, {{ $json.firstName }}!*\n\n🎁 *Тебе начислено:* 10 фото + 2 видео кредита\n\n📋 *Команды:*\n• `/фото закат над горами` — сгенерировать фото\n• `/видео [описание]` — скоро!\n• `/баланс` — кредиты\n• `/реферал` — пригласить друга\n\nНачни: `/фото закат над горами`",
+        "additionalFields": {"parse_mode": "Markdown"}
+      }
+    },
+    {
+      "id": "send-welcome-existing",
+      "name": "👋 Приветствие (существующий)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1120, 160],
+      "parameters": {
+        "chatId": "={{ $('🔍 Разобрать сообщение').item.json.chatId }}",
+        "text": "=👋 С возвращением, *{{ $('🔍 Разобрать сообщение').item.json.firstName }}*!\nИспользуй `/баланс` или `/фото [описание]`",
+        "additionalFields": {"parse_mode": "Markdown"}
+      }
+    },
+    {
+      "id": "get-user-for-photo",
+      "name": "🗄️ Получить юзера (фото)",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [680, 300],
+      "parameters": {
+        "operation": "get",
+        "tableId": "users",
+        "filters": {
+          "conditions": [{"keyName": "telegram_id", "keyValue": "={{ $json.userId }}"}]
+        }
+      }
+    },
+    {
+      "id": "check-photo-credits",
+      "name": "💳 Есть кредиты на фото?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [{"leftValue": "={{ $json.credits_photos }}", "operator": {"operation": "gt", "type": "number"}, "rightValue": "0"}],
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"}
+        }
+      }
+    },
+    {
+      "id": "no-credits-msg",
+      "name": "❌ Нет кредитов",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1340, 400],
+      "parameters": {
+        "chatId": "={{ $('🔍 Разобрать сообщение').item.json.chatId }}",
+        "text": "😔 *Кредиты на фото закончились!*\n\n🎁 Пригласи друга → `/реферал` (+3 фото)\n💎 Купить тариф → скоро",
+        "additionalFields": {"parse_mode": "Markdown"}
+      }
+    },
+    {
+      "id": "check-prompt",
+      "name": "📝 Проверить промпт",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1120, 300],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [{"leftValue": "={{ $('🔍 Разобрать сообщение').item.json.args }}", "operator": {"operation": "notEmpty", "type": "string"}, "rightValue": ""}],
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"}
+        }
+      }
+    },
+    {
+      "id": "no-prompt-msg",
+      "name": "💬 Нет промпта",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1120, 420],
+      "parameters": {
+        "chatId": "={{ $('🔍 Разобрать сообщение').item.json.chatId }}",
+        "text": "📝 Укажи описание изображения:\n\n`/фото закат над горами`\n`/фото портрет кота в стиле аниме`\n`/фото футуристический город ночью`",
+        "additionalFields": {"parse_mode": "Markdown"}
+      }
+    },
+    {
+      "id": "send-generating-msg",
+      "name": "⏳ Сообщение: генерирую...",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1340, 280],
+      "parameters": {
+        "chatId": "={{ $('🔍 Разобрать сообщение').item.json.chatId }}",
+        "text": "=🎨 *Генерирую...*\n📝 _{{ $('🔍 Разобрать сообщение').item.json.args }}_\n⏳ 10-30 секунд...",
+        "additionalFields": {"parse_mode": "Markdown"}
+      }
+    },
+    {
+      "id": "sticky-imagen",
+      "name": "📌 Imagen 3 настройка",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1560, 160],
+      "parameters": {
+        "color": 5,
+        "width": 380,
+        "height": 110,
+        "content": "## 🎨 Imagen 3 API\n\n**Auth**: Google OAuth2 (тот же что для TTS)\n**Заменить**: `YOUR_PROJECT_ID` → реальный project ID из GCP Console\n**Цена**: $0.03 за изображение\n**Ответ**: base64 в поле `predictions[0].bytesBase64Encoded`"
+      }
+    },
+    {
+      "id": "imagen3-request",
+      "name": "🎨 Imagen 3 — генерация",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1560, 280],
+      "parameters": {
+        "method": "POST",
+        "url": "https://us-central1-aiplatform.googleapis.com/v1/projects/YOUR_PROJECT_ID/locations/us-central1/publishers/google/models/imagen-3.0-generate-002:predict",
+        "authentication": "oAuth2",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"instances\": [{\n    \"prompt\": \"{{ $('🔍 Разобрать сообщение').item.json.args }}, high quality, photorealistic\"\n  }],\n  \"parameters\": {\n    \"sampleCount\": 1,\n    \"aspectRatio\": \"1:1\",\n    \"safetyFilterLevel\": \"BLOCK_SOME\",\n    \"personGeneration\": \"ALLOW_ADULT\"\n  }\n}",
+        "options": {}
+      }
+    },
+    {
+      "id": "decode-image",
+      "name": "🖼️ Декодировать Base64",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1780, 280],
+      "parameters": {
+        "jsCode": "// Imagen 3 возвращает base64 изображение\nconst predictions = $json.predictions;\nif (!predictions || predictions.length === 0) {\n  throw new Error('Imagen 3: нет результата');\n}\nconst base64Image = predictions[0].bytesBase64Encoded;\nconst mimeType = predictions[0].mimeType || 'image/png';\nconst chatId = $('🔍 Разобрать сообщение').item.json.chatId;\nconst userId = $('🔍 Разобрать сообщение').item.json.userId;\nconst prompt = $('🔍 Разобрать сообщение').item.json.args;\n\nreturn [{\n  json: { chatId, userId, prompt, mimeType },\n  binary: {\n    data: {\n      data: base64Image,\n      mimeType,\n      fileName: 'generated_image.png'\n    }\n  }\n}];"
+      }
+    },
+    {
+      "id": "send-photo-tg",
+      "name": "📤 Отправить фото в TG",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [2000, 280],
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "binaryData": true,
+        "binaryProperty": "data",
+        "additionalFields": {
+          "caption": "=✅ _{{ $json.prompt }}_\n🎨 Imagen 3 · -1 фото кредит",
+          "parse_mode": "Markdown"
+        }
+      }
+    },
+    {
+      "id": "update-credits",
+      "name": "💳 Списать кредит",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [2220, 280],
+      "parameters": {
+        "operation": "update",
+        "tableId": "users",
+        "filters": {
+          "conditions": [{"keyName": "telegram_id", "keyValue": "={{ $('🔍 Разобрать сообщение').item.json.userId }}"}]
+        },
+        "updateFields": {
+          "fieldValues": [
+            {"fieldId": "credits_photos", "fieldValue": "={{ $('🗄️ Получить юзера (фото)').item.json.credits_photos - 1 }}"},
+            {"fieldId": "total_photos",   "fieldValue": "={{ ($('🗄️ Получить юзера (фото)').item.json.total_photos || 0) + 1 }}"},
+            {"fieldId": "last_activity",  "fieldValue": "={{ $now }}"}
+          ]
+        }
+      }
+    },
+    {
+      "id": "log-generation",
+      "name": "📊 Логировать генерацию",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [2440, 280],
+      "parameters": {
+        "operation": "create",
+        "tableId": "generations",
+        "fieldsUi": {
+          "fieldValues": [
+            {"fieldId": "user_id",     "fieldValue": "={{ $('🔍 Разобрать сообщение').item.json.userId }}"},
+            {"fieldId": "type",        "fieldValue": "photo"},
+            {"fieldId": "prompt",      "fieldValue": "={{ $('🔍 Разобрать сообщение').item.json.args }}"},
+            {"fieldId": "status",      "fieldValue": "done"},
+            {"fieldId": "cost_usd",    "fieldValue": "0.03"},
+            {"fieldId": "model_used",  "fieldValue": "imagen-3.0-generate-002"},
+            {"fieldId": "completed_at","fieldValue": "={{ $now }}"}
+          ]
+        }
+      }
+    },
+    {
+      "id": "get-user-balance",
+      "name": "🗄️ Получить баланс",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [680, 500],
+      "parameters": {
+        "operation": "get",
+        "tableId": "users",
+        "filters": {
+          "conditions": [{"keyName": "telegram_id", "keyValue": "={{ $json.userId }}"}]
+        }
+      }
+    },
+    {
+      "id": "send-balance",
+      "name": "💰 Отправить баланс",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [900, 500],
+      "parameters": {
+        "chatId": "={{ $('🔍 Разобрать сообщение').item.json.chatId }}",
+        "text": "=💳 *Твой баланс*\n\n📸 Фото: *{{ $json.credits_photos }}* кредитов\n🎬 Видео: *{{ $json.credits_videos }}* кредитов\n\n📊 Всего сгенерировано:\n• Фото: {{ $json.total_photos || 0 }}\n• Видео: {{ $json.total_videos || 0 }}\n\n🎁 `/реферал` — получить +3 фото",
+        "additionalFields": {"parse_mode": "Markdown"}
+      }
+    },
+    {
+      "id": "get-referral-stats",
+      "name": "🗄️ Статистика рефералов",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [680, 680],
+      "parameters": {
+        "operation": "get",
+        "tableId": "users",
+        "filters": {
+          "conditions": [{"keyName": "telegram_id", "keyValue": "={{ $json.userId }}"}]
+        }
+      }
+    },
+    {
+      "id": "send-referral-info",
+      "name": "🎁 Отправить реф-ссылку",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [900, 680],
+      "parameters": {
+        "chatId": "={{ $('🔍 Разобрать сообщение').item.json.chatId }}",
+        "text": "=🎁 *Реферальная программа*\n\n🔗 *Твоя ссылка:*\n`https://t.me/BOT_USERNAME?start={{ $json.referral_code }}`\n\n💰 *Бонусы:*\n• За каждого друга: *+3 фото*\n• Если друг купит тариф: *20% тебе*\n\n_Поделись ссылкой и зарабатывай кредиты!_",
+        "additionalFields": {"parse_mode": "Markdown"}
+      }
+    },
+    {
+      "id": "unknown-command",
+      "name": "❓ Неизвестная команда",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [680, 860],
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "❓ Не понял команду.\n\n• `/фото [описание]` — генерация фото\n• `/баланс` — кредиты\n• `/реферал` — бонусы",
+        "additionalFields": {"parse_mode": "Markdown"}
+      }
+    }
+  ],
+  "connections": {
+    "📱 Telegram Trigger": {
+      "main": [[{"node": "🔍 Разобрать сообщение", "type": "main", "index": 0}]]
+    },
+    "🔍 Разобрать сообщение": {
+      "main": [[{"node": "🔀 Роутер команд", "type": "main", "index": 0}]]
+    },
+    "🔀 Роутер команд": {
+      "main": [
+        [{"node": "🗄️ Проверить юзера в БД",    "type": "main", "index": 0}],
+        [{"node": "🗄️ Получить юзера (фото)",     "type": "main", "index": 0}],
+        [{"node": "🗄️ Получить баланс",           "type": "main", "index": 0}],
+        [{"node": "🗄️ Статистика рефералов",      "type": "main", "index": 0}],
+        [{"node": "❓ Неизвестная команда",         "type": "main", "index": 0}]
+      ]
+    },
+    "🗄️ Проверить юзера в БД": {
+      "main": [[{"node": "❓ Новый юзер?", "type": "main", "index": 0}]]
+    },
+    "❓ Новый юзер?": {
+      "main": [
+        [{"node": "🎲 Генерировать реф-код",         "type": "main", "index": 0}],
+        [{"node": "👋 Приветствие (существующий)",    "type": "main", "index": 0}]
+      ]
+    },
+    "🎲 Генерировать реф-код": {
+      "main": [[{"node": "💾 Создать юзера", "type": "main", "index": 0}]]
+    },
+    "💾 Создать юзера": {
+      "main": [[{"node": "🎁 Подготовить данные", "type": "main", "index": 0}]]
+    },
+    "🎁 Подготовить данные": {
+      "main": [[{"node": "👋 Приветствие (новый)", "type": "main", "index": 0}]]
+    },
+    "🗄️ Получить юзера (фото)": {
+      "main": [[{"node": "💳 Есть кредиты на фото?", "type": "main", "index": 0}]]
+    },
+    "💳 Есть кредиты на фото?": {
+      "main": [
+        [{"node": "📝 Проверить промпт",  "type": "main", "index": 0}],
+        [{"node": "❌ Нет кредитов",      "type": "main", "index": 0}]
+      ]
+    },
+    "📝 Проверить промпт": {
+      "main": [
+        [{"node": "⏳ Сообщение: генерирую...", "type": "main", "index": 0}],
+        [{"node": "💬 Нет промпта",             "type": "main", "index": 0}]
+      ]
+    },
+    "⏳ Сообщение: генерирую...": {
+      "main": [[{"node": "🎨 Imagen 3 — генерация", "type": "main", "index": 0}]]
+    },
+    "🎨 Imagen 3 — генерация": {
+      "main": [[{"node": "🖼️ Декодировать Base64", "type": "main", "index": 0}]]
+    },
+    "🖼️ Декодировать Base64": {
+      "main": [[{"node": "📤 Отправить фото в TG", "type": "main", "index": 0}]]
+    },
+    "📤 Отправить фото в TG": {
+      "main": [[{"node": "💳 Списать кредит", "type": "main", "index": 0}]]
+    },
+    "💳 Списать кредит": {
+      "main": [[{"node": "📊 Логировать генерацию", "type": "main", "index": 0}]]
+    },
+    "🗄️ Получить баланс": {
+      "main": [[{"node": "💰 Отправить баланс", "type": "main", "index": 0}]]
+    },
+    "🗄️ Статистика рефералов": {
+      "main": [[{"node": "🎁 Отправить реф-ссылку", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}

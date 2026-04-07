@@ -1,0 +1,94 @@
+{
+  "templates": [
+    {
+      "name": "Gemini Scene Generator Prompt",
+      "type": "script_to_scenes",
+      "description": "Converts a topic into a structured list of scenes for video generation.",
+      "structure": {
+        "system_prompt": "You are a YouTube Content Factory Agent. Your goal is to write a script and split it into scenes. For each scene, provide the text to be spoken and a detailed image prompt for Imagen 3.",
+        "user_prompt": "Topic: [Topic]. Style: [Style]. Length: [Length]. Output a JSON list of scenes.",
+        "output_format": [
+          {
+            "scene_number": 1,
+            "audio_text": "The voiceover text for this scene.",
+            "image_prompt": "A detailed description of the visual for this scene. Include style keywords like 'Cinematic, 4k, Pixar style'."
+          }
+        ]
+      }
+    },
+    {
+      "name": "Imagen 3 Style Prompt (Nature/Kamchatka)",
+      "type": "image_gen",
+      "structure": {
+        "base_style": "Cinematic aerial shot, 8k, National Geographic style, realistic textures, soft morning light, wide angle lens.",
+        "negative_prompt": "text, blurry, low quality, distorted faces, watermark, cartoonish, oversaturated.",
+        "aspect_ratios": {
+          "long_form": "16:9",
+          "shorts": "9:16"
+        }
+      }
+    },
+    {
+      "name": "Imagen 3 Style Prompt (AI Agents/Tech)",
+      "type": "image_gen",
+      "structure": {
+        "base_style": "Futuristic workspace, holographic interfaces, clean minimalist tech aesthetic, high-quality 3D renders, neon accents, professional studio lighting, 8k resolution, depth of field.",
+        "negative_prompt": "messy, low resolution, old technology, dark, cluttered, text, watermark.",
+        "aspect_ratios": {
+          "long_form": "16:9",
+          "shorts": "9:16"
+        }
+      }
+    },
+    {
+      "name": "Google TTS Studio Voice Config",
+      "type": "audio_gen",
+      "structure": {
+        "voice_name": "en-US-Studio-O",
+        "speaking_rate": 1.0,
+        "pitch": 0.0,
+        "audio_encoding": "MP3"
+      }
+    },
+    {
+      "name": "n8n Branching Logic (Longs to Shorts)",
+      "type": "workflow",
+      "description": "Logic for splitting a long script into viral shorts.",
+      "json_example": {
+        "nodes": [
+          {
+            "name": "Branch_Selector",
+            "type": "n8n-nodes-base.if",
+            "parameters": {
+              "conditions": {
+                "string": [
+                  {
+                    "value1": "={{$json.format}}",
+                    "value2": "shorts"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Shorts_Summarizer",
+            "type": "n8n-nodes-base.openAi",
+            "parameters": {
+              "prompt": "Take this chapter from the long script: [Chapter Text]. Rewrite it as a 50-second viral YouTube Short script. Focus on a strong hook and fast pacing."
+            }
+          },
+          {
+            "name": "Imagen_Batch_Generator",
+            "type": "n8n-nodes-base.googleVertexAi",
+            "parameters": {
+              "resource": "image",
+              "operation": "generate",
+              "prompt": "={{$json.image_prompt}}",
+              "aspectRatio": "={{$json.format == 'shorts' ? '9:16' : '16:9'}}"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

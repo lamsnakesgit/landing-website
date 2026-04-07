@@ -1,0 +1,357 @@
+{
+  "name": "Content Factory: Kamchatka & AI Agents",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "6e8e8e8e-8e8e-8e8e-8e8e-8e8e8e8e8e8e",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{$json.niche}}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "kamchatka",
+              "output": 0
+            },
+            {
+              "value2": "ai_agents",
+              "output": 1
+            }
+          ]
+        }
+      },
+      "id": "7e8e8e8e-8e8e-8e8e-8e8e-8e8e8e8e8e8e",
+      "name": "Switch Niche",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        300,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.format}}",
+              "value2": "shorts"
+            }
+          ]
+        }
+      },
+      "id": "8e8e8e8e-8e8e-8e8e-8e8e-8e8e8e8e8e8e",
+      "name": "Is Short? (Kamchatka)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        500,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.format}}",
+              "value2": "shorts"
+            }
+          ]
+        }
+      },
+      "id": "9e8e8e8e-8e8e-8e8e-8e8e-8e8e8e8e8e8e",
+      "name": "Is Short? (AI Agents)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        500,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "prompt": "Generate a viral 60s vertical script about Kamchatka. Hook: You are looking at the most dangerous beauty on Earth. Use fast pacing and cinematic descriptions. Output JSON with 'scenes' array, each scene having 'text' and 'image_prompt'."
+      },
+      "id": "ae8e8e8e-8e8e-8e8e-8e8e-8e8e8e8e8e8e",
+      "name": "Kamchatka Short Generator",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        750,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "prompt": "Generate a viral B2B short about AI Agents. Hook: Stop hiring humans for repetitive tasks. Focus on ROI and automation. Output JSON with 'scenes' array, each scene having 'text' and 'image_prompt'. Include a 'character_prompt' for a consistent speaker."
+      },
+      "id": "ce8e8e8e-8e8e-8e8e-8e8e-8e8e8e8e8e8e",
+      "name": "AI Agents Short Generator",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        750,
+        350
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "scene-splitter",
+      "name": "Split into Scenes",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        950,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{$json.image_prompt}}",
+        "aspectRatio": "9:16"
+      },
+      "id": "ee8e8e8e-8e8e-8e8e-8e8e-8e8e8e8e8e8e",
+      "name": "Imagen 3: Background",
+      "type": "n8n-nodes-base.googleVertexAi",
+      "typeVersion": 2,
+      "position": [
+        1150,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "fileName": "=scene_{{$node[\"Split into Scenes\"].context[\"currentRunIndex\"]}}_bg.png",
+        "dataPropertyName": "data",
+        "options": {}
+      },
+      "id": "write-bg-file",
+      "name": "Write BG File",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "text": "={{$json.text}}",
+        "voiceName": "en-US-Studio-O"
+      },
+      "id": "tts-node",
+      "name": "Google Cloud TTS",
+      "type": "n8n-nodes-base.googleCloudTextToSpeech",
+      "typeVersion": 2,
+      "position": [
+        1150,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "fileName": "=scene_{{$node[\"Split into Scenes\"].context[\"currentRunIndex\"]}}_voice.mp3",
+        "dataPropertyName": "data",
+        "options": {}
+      },
+      "id": "write-voice-file",
+      "name": "Write Voice File",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=ffmpeg -loop 1 -i scene_{{$node[\"Split into Scenes\"].context[\"currentRunIndex\"]}}_bg.png -i scene_{{$node[\"Split into Scenes\"].context[\"currentRunIndex\"]}}_voice.mp3 -vf \"drawtext=text='{{$json.text}}':fontcolor=white:fontsize=24:x=(w-text_w)/2:y=(h-text_h)-50:box=1:boxcolor=black@0.5\" -c:v libx264 -shortest -pix_fmt yuv420p scene_{{$node[\"Split into Scenes\"].context[\"currentRunIndex\"]}}.mp4"
+      },
+      "id": "ff8e8e8e-8e8e-8e8e-8e8e-8e8e8e8e8e8e",
+      "name": "FFmpeg: Render Scene",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "ls scene_*.mp4 | sort -V | sed \"s/^/file '/;s/$/'/\" > list.txt && ffmpeg -f concat -safe 0 -i list.txt -i music.mp3 -filter_complex \"[1:a]volume=0.15[bg];[0:a][bg]amix=inputs=2:duration=first\" -c:v libx264 -pix_fmt yuv420p final_video.mp4 && rm scene_*.mp4 scene_*_bg.png scene_*_voice.mp3 list.txt"
+      },
+      "id": "0f8e8e8e-8e8e-8e8e-8e8e-8e8e8e8e8e8e",
+      "name": "FFmpeg: Concatenate & Cleanup",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Switch Niche",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Niche": {
+      "main": [
+        [
+          {
+            "node": "Is Short? (Kamchatka)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Short? (AI Agents)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Short? (Kamchatka)": {
+      "main": [
+        [
+          {
+            "node": "Kamchatka Short Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Short? (AI Agents)": {
+      "main": [
+        [
+          {
+            "node": "AI Agents Short Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kamchatka Short Generator": {
+      "main": [
+        [
+          {
+            "node": "Split into Scenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agents Short Generator": {
+      "main": [
+        [
+          {
+            "node": "Split into Scenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split into Scenes": {
+      "main": [
+        [
+          {
+            "node": "Imagen 3: Background",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FFmpeg: Concatenate & Cleanup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Imagen 3: Background": {
+      "main": [
+        [
+          {
+            "node": "Write BG File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write BG File": {
+      "main": [
+        [
+          {
+            "node": "Google Cloud TTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Cloud TTS": {
+      "main": [
+        [
+          {
+            "node": "Write Voice File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Voice File": {
+      "main": [
+        [
+          {
+            "node": "FFmpeg: Render Scene",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FFmpeg: Render Scene": {
+      "main": [
+        [
+          {
+            "node": "Split into Scenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
