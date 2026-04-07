@@ -67,8 +67,18 @@ def generate_veo_clip(prompt, output_path="outputs/veo_clip_1.mp4"):
                 try:
                     if file_id:
                         print(f"Using SDK to download file: {file_id}")
-                        # The new SDK might have a direct download method
-                        file_content = client.files.download(name=file_id)
+                        # The SDK download method might expect the name as a positional argument or 'file_name'
+                        try:
+                            file_content = client.files.download(file_id)
+                        except:
+                            # Fallback to urllib if SDK fails
+                            print("SDK download failed, falling back to urllib...")
+                            import urllib.request
+                            req = urllib.request.Request(uri)
+                            req.add_header('X-Goog-Api-Key', api_key)
+                            with urllib.request.urlopen(req) as response:
+                                file_content = response.read()
+                        
                         with open(output_path, "wb") as f:
                             f.write(file_content)
                     else:
