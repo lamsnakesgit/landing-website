@@ -1,0 +1,74 @@
+# Cline Project Rules — AI Outreach & Sales System
+
+## 📋 Kanban Workflow (ОБЯЗАТЕЛЬНО)
+1. Перед началом работы открой `KANBAN.md`
+2. Выбери ОДНУ задачу из Backlog (приоритет: 🔴 > 🟠 > 🟡 > 🟢)
+3. Перенеси задачу в `In Progress` с датой начала
+4. Выполни задачу полностью (или зафиксируй прогресс)
+5. По завершении перенеси в `Done` с датой
+6. НЕ БЕРИ следующую задачу пока текущая не в Done
+7. После завершения — обнови `docs/PROGRESS.md` и `docs/log_file.md`
+
+## Language
+You MUST always respond in Russian.
+All code comments must be in Russian.
+All messages to the user must be in Russian.
+
+## Code Style
+- Variable names: English (camelCase or snake_case)
+- Function names: English
+- Comments and docstrings: Russian
+- Class names: English
+- File names: English
+- Max 50 lines per function. Break into sub-components
+- Use modern ES2022+ syntax
+- Prefer explicit code, no magic
+
+## Logging (Логирование)
+- Python: использовать `loguru` (проще pino/winston)
+- Node.js: использовать `pino` (быстрый, JSON логи)
+- Логи пишутся в файл `logs/{script_name}.log`
+- Формат: `{ timestamp, level, action, data }`
+- Критические ошибки → отправлять в Telegram бот
+
+## n8n Workflows
+- НЕ выдумывать ноды и параметры
+- Сначала схема → потом поля → потом JSON
+- binary property name = data
+- НЕ использовать raw base64, если нода ждёт binary
+- Проверять connections
+- НЕ оставлять disconnected nodes
+- Sticky Notes на каждый блок: что делает + как настроить
+- Если не хватает данных — сначала задать вопрос
+
+## WhatsApp / Evolution API
+- Задержки между сообщениями: рандом 30-120 сек
+- MAX 50 уникальных контактов/день с одного номера
+- Всегда уникализировать текст (AI генерация или spintax)
+- При ошибке disconnect → СТОП → пометить номер
+- Обязательно кнопка "СТОП" / отписка в каждом сообщении
+
+## Context Management
+- When context exceeds 50%, create a handoff summary
+- Preserve: current file state, next steps, blockers
+- Use /new automatically when hitting 70%
+
+## Task Breakdown Rules
+- Break tasks into 15-30 minute chunks
+- Complete one file at a time
+- Always commit after completing a subtask
+
+## Memory Bank
+- Document completed features in `docs/PROGRESS.md`
+- Update architecture decisions in `docs/ARCHITECTURE.md`
+- Track blockers in `docs/BLOCKERS.md`
+- Log all changes in `docs/log_file.md`
+
+## Auto-decisions
+- "Would you like to use React Compiler?" → "No"
+- "Would you like to use TypeScript?" → "Yes"
+- Dependency installation prompts → "Yes"
+
+## Documentation Search
+- Если не знаешь — ищи в web перед тем как выдумывать
+- Приоритет: официальная документация → руководства → форумы
