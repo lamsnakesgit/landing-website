@@ -14,11 +14,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 DEFAULT_MODEL_CANDIDATES = [
-    "gemini-2.0-flash",
-    "gemini-2.0-flash-lite-preview-02-05",
-    "gemini-1.5-flash",
-    "gemini-1.5-flash-8b",
-    "gemini-1.5-pro",
+    "gemini-2.5-flash",
+    "gemini-2.5-pro",
+    "gemini-flash-latest",
+    "gemini-2.0-flash-001",
+    "gemini-2.0-flash-lite-001",
 ]
 
 API_KEY = os.environ.get("GOOGLE_API_KEY")

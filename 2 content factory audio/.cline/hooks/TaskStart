@@ -1,0 +1,14 @@
+#!/bin/bash
+# Cline TaskStart Hook
+# Автоматически подгружает содержимое docs/log.md в контекст задачи.
+
+LOG_FILE="docs/log.md"
+
+if [ -f "$LOG_FILE" ]; then
+    LOG_CONTENT=$(cat "$LOG_FILE")
+    # Экранируем содержимое для JSON
+    ESCAPED_LOG=$(printf '%s' "$LOG_CONTENT" | python3 -c 'import json, sys; print(json.dumps(sys.stdin.read()))')
+    echo "{\"cancel\":false,\"contextModification\":\"[AUTO-CONTEXT] Содержимое docs/log.md:\n\n${ESCAPED_LOG}\"}"
+else
+    echo "{\"cancel\":false,\"contextModification\":\"[AUTO-CONTEXT] docs/log.md не найден. Пожалуйста, создай его для отслеживания прогресса.\"}"
+fi

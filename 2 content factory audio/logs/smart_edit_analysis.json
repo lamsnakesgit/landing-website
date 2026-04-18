@@ -1,0 +1,19 @@
+{
+  "selected_clips": [
+    "scene_1_hook.mp4",
+    "scene_2_context.mp4",
+    "scene_3_value_fixed.mp4",
+    "scene_4_cta_fixed.mp4"
+  ],
+  "analysis": {
+    "scene_1_hook.mp4": "Единственный доступный вариант для вступления, задает тон видео.",
+    "scene_2_context.mp4": "Единственный доступный вариант для контекстной части.",
+    "scene_3_value_fixed.mp4": "Выбрано, так как в этом дубле ударение в слове 'поспевать' поставлено верно на последний слог.",
+    "scene_4_cta_fixed.mp4": "Выбрано, так как персонаж правильно использует женский род ('Я подготовила'), что соответствует визуальному образу."
+  },
+  "montage_plan": {
+    "transition": "fade",
+    "duration": 0.5,
+    "background_music_vibe": "corporate/serious/techno"
+  }
+}

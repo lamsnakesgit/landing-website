@@ -1,0 +1,35 @@
+# Project Rules: Content Factory Audio
+
+## 1. Core Communication & Style
+- **Language:** Communicate with the user in Russian. Write code, comments, and documentation in English.
+- **Tone:** Concise, technical, and result-oriented.
+- **Verification:** After every significant change, verify the result using `execute_command` or `browser_action`. Do not just say "done".
+
+## 2. Tech Stack & Quality
+- **Python:** Follow PEP 8. Use type hints where possible.
+- **Streamlit:** Keep `app.py` clean. Move logic to `core/`.
+- **AI APIs:** Always use `.env` for keys. Never hardcode `<API_KEY>`.
+- **n8n:** When editing templates in `templates/`, ensure JSON structure is valid.
+
+## 3. Context & Memory Management
+- **Logging:** Always check `docs/log.md` at the start of a task to understand the current state.
+- **Updates:** Update `docs/log.md` after completing a task with a brief summary of changes.
+- **Structure:** Respect the existing directory structure:
+  - `core/`: Business logic and engines.
+  - `scripts/`: Utility and automation scripts.
+  - `docs/`: Documentation and logs.
+  - `templates/`: n8n and other templates.
+
+## 4. Safety & Security
+- **Secrets:** Never commit `.env` or expose keys in logs.
+- **Placeholders:** Use `<PLACEHOLDER>` for values the user must provide manually.
+- **Commands:** Before running potentially destructive commands, explain what they do.
+
+## 5. Task Progress
+- Use the `task_progress` parameter in tool calls to maintain a checklist of steps.
+- Keep the checklist updated and focused on meaningful milestones.
+
+## 6. Model Strategy
+- **Claude 3.5 Sonnet:** Основная модель для написания кода, рефакторинга и архитектурных решений.
+- **Gemini 1.5 Pro / 2.5 Flash:** Используется для глубокого анализа больших файлов, анализа видео/изображений и задач с длинным контекстом.
+- **Verification:** Всегда сверяйтесь со списком "Working Models" в `docs/log.md` перед переключением моделей.

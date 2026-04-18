@@ -45,9 +45,13 @@ def build_nano_banana_prompt(slide, story_context=None):
     audience = (story_context.get("audience") or "").strip()
     style = (story_context.get("style") or "").strip()
 
+    aspect_ratio_str = "vertical 9:16 format"
+    if "1:1" in style or "1:1" in layout_instructions or "square" in style.lower() or "square" in layout_instructions.lower():
+        aspect_ratio_str = "square 1:1 format"
+
     return (
-        "Create one premium Instagram Story slide in vertical 9:16 format. "
-        "This must look like a realistic, candid social media story, not a plastic AI poster.\n\n"
+        f"Create one premium image in {aspect_ratio_str}. "
+        "This must look like a realistic, candid shot, not a plastic AI poster.\n\n"
         f"Goal of the story set: {goal or 'Not specified'}\n"
         f"Overall Strategy: {strategy or 'Not specified'}\n"
         f"Target audience: {audience or 'Not specified'}\n"

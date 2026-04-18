@@ -1,0 +1,41 @@
+{
+  "project": "Fired Programmers - Native Russian (Gender & Stress Fix)",
+  "scenes": [
+    {
+      "id": "scene_1_hook",
+      "duration": 8,
+      "text": "Вчера уволили 20% программистов топовой компании. И дело не в кризисе.",
+      "prompt": "Cinematic close-up of the professional person from reference photo, looking at camera. The subject says exactly in Russian: 'Вчера уволили двадцать процентов программистов топовой компании. И дело не в кризисе.' Serious tone, natural mouth movement, high-quality lip-sync. Strictly no text, no subtitles, no words written in frame. Clean corporate background, 4k."
+    },
+    {
+      "id": "scene_2_context",
+      "duration": 8,
+      "text": "Их заменили на тех, кто вовремя перешёл на нейросети. Время ханжей и зануд прошло.",
+      "prompt": "Medium shot of the person from reference photo, explaining something. The subject says in Russian: 'Их заменили на тех, кто вовремя перешёл на нейросети. Время ханжей и зануд прошло.' Natural gestures, professional lighting. Strictly no text overlays, no captions, no subtitles. Clear facial features, 4k resolution."
+    },
+    {
+      "id": "scene_3_value",
+      "duration": 8,
+      "text": "Технологии заменяют тех, кто перестал за ними поспевать. Либо ты настраиваешь систему, либо она выбрасывает тебя.",
+      "prompt": "Close-up of the subject from reference photo, speaking directly to viewer. The person says in Russian: 'Технологии заменяют тех, кто перестал за ними поспевать. Либо ты настраиваешь систему, либо она выбрасывает тебя.' High resolution lip articulation, confident expression. No text in the frame, no graphics. Realistic skin and lighting, 4k."
+    },
+    {
+      "id": "scene_3_value_fixed",
+      "duration": 8,
+      "text": "Технологии заменяют тех, кто перестал за ними поспевать. Либо ты настраиваешь систему, либо она выбрасывает тебя.",
+      "prompt": "Close-up of the subject from reference photo, speaking directly to viewer. The person says in Russian with phonetic emphasis on the last syllable: 'Технологии заменяют тех, кто перестал за ними поспевАть. Либо ты настраиваешь систему, либо она выбрасывает тебя.' Clear mouth movements. Strictly no text in the frame, no graphics. Realistic 4k."
+    },
+    {
+      "id": "scene_4_cta",
+      "duration": 8,
+      "text": "Я подготовил гайд, как запустить автономного агента 24/7. Пиши кодовое слово АГЕНТ в директ.",
+      "prompt": "Cinematic close-up of the subject smiling slightly. The person says in Russian: 'Я подготовил гайд, как запустить автономного агента двадцать четыре на семь. Пиши кодовое слово АГЕНТ в директ.' Clear pronunciation, perfect lip-sync. Strictly no text, no captions, no overlays. Modern office background, crisp 4k textures."
+    },
+    {
+      "id": "scene_4_cta_fixed",
+      "duration": 8,
+      "text": "Я подготовила гайд, как запустить автономного агента 24/7. Пиши кодовое слово АГЕНТ в директ.",
+      "prompt": "Cinematic close-up of the subject smiling slightly. The person says clearly in Russian: 'Я подготовИла гайд, как запустить автономного агента двадцать четыре на семь. Пиши кодовое слово АГЕНТ в директ.' Feminine gender ending, perfect lip-sync. Strictly no text, no captions. Modern minimalist background, 4k."
+    }
+  ]
+}
