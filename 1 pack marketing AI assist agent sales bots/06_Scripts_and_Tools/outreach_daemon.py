@@ -4,13 +4,18 @@ import requests
 from loguru import logger
 from supabase import create_client, Client
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # =====================================================================
-# КОНФИГУРАЦИЯ (Сюда нужно вставить ключи после того как настроишь)
+# КОНФИГУРАЦИЯ
 # =====================================================================
-SUPABASE_URL = "https://твоя-база.supabase.co"
-SUPABASE_KEY = "ТВОЙ_КЛЮЧ"
-EVOLUTION_BASE_URL = "https://evolutionapi.aiconicvibe.store"
-EVOLUTION_API_KEY = "ТВОЙ_GLOBAL_API_KEY"
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://твоя-база.supabase.co")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "ТВОЙ_КЛЮЧ")
+EVOLUTION_BASE_URL = os.getenv("EVOLUTION_BASE_URL", "https://evolutionapi.aiconicvibe.store")
+EVOLUTION_API_KEY = os.getenv("EVOLUTION_API_KEY", "ТВОЙ_GLOBAL_API_KEY")
 
 # Пул твоих инстансов (номеров). 
 # Скрипт будет по кругу переключать номера, чтобы не словить спам-блок.
@@ -82,9 +87,9 @@ def run_outreach_cycle():
     """Главный цикл рассылки"""
     logger.info("Проверка новых enriched лидов...")
     
-    # Для теста без реального Supabase обрываем здесь
-    if SUPABASE_URL == "https://твоя-база.supabase.co":
-        logger.info("КЛЮЧИ ПОКА НЕ ВВЕДЕНЫ. Жду когда хозяин пропишет инфу.")
+    # Для теста без реального Supabase или Evolution API обрываем здесь
+    if "твоя-база" in SUPABASE_URL or not SUPABASE_KEY:
+        logger.info("КЛЮЧИ ПОКА СТОЯТ ДЕФОЛТНЫЕ. Жду когда в .env пропишут инфу.")
         return
         
     leads = get_pending_leads()
