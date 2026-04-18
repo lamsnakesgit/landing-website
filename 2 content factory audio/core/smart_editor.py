@@ -1,4 +1,5 @@
 import os
+import shutil
 from PIL import Image, ImageDraw, ImageFont
 from pathlib import Path
 import json
@@ -115,6 +116,55 @@ class SmartEditor:
         output_path = self.overlay_dir / "nick_plate.png"
         img.save(output_path)
         return output_path
+    def create_karaoke_sequence(self, clip_name, words, width=720, height=1280):
+        """
+        Генерирует серию PNG для караоке-эффекта.
+        Каждое слово - отдельный файл с подсветкой.
+        """
+        clip_overlay_dir = self.overlay_dir / "karaoke" / clip_name.replace(".mp4", "")
+        if clip_overlay_dir.exists():
+            shutil.rmtree(clip_overlay_dir)
+        clip_overlay_dir.mkdir(parents=True, exist_ok=True)
+        
+        font_size = 75 # Делаем крупнее для акцента на 1 слово
+        try:
+            font = ImageFont.truetype(self.font_path, font_size)
+        except:
+            font = ImageFont.load_default()
+            
+        generated_files = []
+        
+        for i, word_data in enumerate(words):
+            text = word_data["word"].upper()
+            img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+            draw = ImageDraw.Draw(img)
+            
+            # Позиция (Центр-Низ-Средне, чтобы не на лице и не в кнопках)
+            bbox = draw.textbbox((0, 0), text, font=font)
+            w = bbox[2] - bbox[0]
+            x = (width - w) // 2
+            y = height - 450 # Чуть выше ника, но ниже лица
+            
+            # Стиль: Черная подложка + Желтый текст
+            draw.rounded_rectangle(
+                [x - 15, y - 5, x + w + 15, y + font_size + 10],
+                radius=10,
+                fill=(0, 0, 0, 230)
+            )
+            
+            draw.text((x, y), text, font=font, fill=(255, 204, 0, 255)) # Желтый акцент
+            
+            filename = f"word_{i:03d}.png"
+            path = clip_overlay_dir / filename
+            img.save(path)
+            generated_files.append({
+                "path": path,
+                "start": word_data["start"],
+                "end": word_data["end"]
+            })
+            
+        return generated_files
+
 
 if __name__ == "__main__":
     # Тест

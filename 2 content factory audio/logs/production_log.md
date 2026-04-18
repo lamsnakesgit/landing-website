@@ -14,3 +14,7 @@
 [2026-04-19 02:22:56] ✅ Успех! Скачивание видео https://generativelanguage.googleapis.com/v1beta/files/2w4tp140buz3:download?alt=media...
 [2026-04-19 02:22:57] 💾 СОХРАНЕНО: scene_4_cta_fixed.mp4
 [2026-04-19 02:22:57] 🏁 Все сцены обработаны.
+# Production Log
+
+- [V7] Dynamic Render: Done. Found issue with 'single-word' style vs 'highlight phrase' style.
+- [V7] Speedup: 1.15x verified. High quality audio pitch preservation.

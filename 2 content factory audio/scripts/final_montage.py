@@ -1,12 +1,24 @@
 import os
+import json
 from pathlib import Path
 from core.video_editor import VideoEditor
+from core.smart_editor import SmartEditor
 
 def main():
     base_dir = Path(os.getcwd())
     editor = VideoEditor()
+    smart = SmartEditor(base_dir)
     
-    # 1. Выбираем лучшие дубли (согласно анализу Gemini)
+    # 1. Загружаем тайминги от Gemini
+    timings_path = base_dir / "outputs" / "word_timings.json"
+    if not timings_path.exists():
+        print("❌ Тайминги не найдены! Сначала запусти scripts/transcribe_reels.py")
+        return
+        
+    with open(timings_path, "r", encoding="utf-8") as f:
+        timings_data = json.load(f)
+    
+    # 2. Список клипов (отборные дубли)
     clips_dir = base_dir / "outputs" / "clips_v3"
     clips = [
         clips_dir / "scene_1_hook.mp4",
@@ -15,39 +27,36 @@ def main():
         clips_dir / "scene_4_cta_fixed.mp4"
     ]
     
-    # 2. Оверлеи (Premium Стиль)
-    overlay_dir = base_dir / "outputs" / "overlays"
-    from core.smart_editor import SmartEditor
-    smart = SmartEditor(base_dir)
-    
-    print("🎨 Генерация премиум-графики...")
-    overlays = [
-        smart.create_text_overlay("Вчера уволили 20% программистов топовой компании. И дело не в кризисе.", "p_scene_1.png"),
-        smart.create_text_overlay("Их заменили на тех, кто вовремя перешёл на нейросети. Время ханжей и зануд прошло.", "p_scene_2.png"),
-        smart.create_text_overlay("Технологии заменяют тех, кто перестал за ними поспевать. Либо ты настраиваешь систему, либо она выбрасывает тебя.", "p_scene_3.png"),
-        smart.create_text_overlay("Я подготовила гайд, как запустить автономного агента 24/7. Пиши кодовое слово АГЕНТ в директ.", "p_scene_4.png")
-    ]
+    # 3. Генерируем караоке-оверлеи для каждого клипа
+    print("🎨 Генерация динамических караоке-титров...")
+    karaoke_data = {}
+    for clip_name, words in timings_data.items():
+        if words:
+            generated_sequence = smart.create_karaoke_sequence(clip_name, words)
+            karaoke_data[clip_name] = generated_sequence
+            
+    # 4. Вотермарк и музыка
     watermark = smart.create_nick_plate("t.me/nnsvt")
-    
-    # 3. Музыка
     music = base_dir / "assets" / "music" / "background_techno.mp3"
     
-    # 4. Выходной файл
-    output = base_dir / "outputs" / "FINAL_REEL_PREMIUM_v1.mp4"
+    # 5. Итоговый файл
+    output = base_dir / "outputs" / "FINAL_REEL_DYNAMIC_V7.mp4"
     
-    print("🚀 Запуск финальной PREMIUM сборки Smart Montage...")
-    success = editor.compose_final_reel(
-        clip_paths=clips,
-        overlay_paths=overlays,
+    print("🚀 Запуск финальной динамической сборки (V7)...")
+    success = editor.compose_dynamic_insta_reel(
+        clips=clips,
+        karaoke_data=karaoke_data,
         watermark_path=watermark,
         music_path=music,
-        output_path=output
+        output_path=output,
+        speed=1.15 # Ускорение 15%
     )
     
     if success:
-        print(f"✨ ШЕДЕВР ГОТОВ! Premium v1: {output}")
+        print(f"✨ ШЕДЕВР ГОТОВ! Dynamic V7: {output}")
+        print("Это видео ускорено на 15%, голос сохранен, титры - слово за словом.")
     else:
-        print("❌ Ошибка при монтаже.")
+        print("❌ Ошибка при динамическом монтаже.")
 
 if __name__ == "__main__":
     main()

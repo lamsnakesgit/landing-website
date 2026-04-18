@@ -75,42 +75,76 @@ class VideoEditor:
             print(f"❌ Ошибка FFmpeg: {result.stderr}")
             return False
 
-    def compose_final_reel(self, clip_paths, overlay_paths, watermark_path, music_path, output_path):
+    def compose_dynamic_insta_reel(self, clips, karaoke_data, watermark_path, music_path, output_path, speed=1.15):
         """
-        Финальная сборка: склейка + музыка + титры + вотермарк.
+        Финальный монтаж в стиле Insta/Hormozi:
+        - Склейка
+        - Ускорение (1.15x)
+        - Динамические титры по таймингу
+        - Музыка
         """
-        # 1. Сначала склеиваем клипы
+        # 1. Склеиваем клипы
         temp_concat = "outputs/temp/temp_concat.mp4"
-        if not self.concatenate_clips(clip_paths, temp_concat):
+        if not self.concatenate_clips(clips, temp_concat):
             return False
             
-        # 2. Накладываем музыку и графику одним сложным фильтром
-        # Тайминги для титров (8 сек каждый клип)
-        filter_complex = (
-            f"[0:v][2:v]overlay=0:0:enable='between(t,0,8)'[v1];"
-            f"[v1][3:v]overlay=0:0:enable='between(t,8,16)'[v2];"
-            f"[v2][4:v]overlay=0:0:enable='between(t,16,24)'[v3];"
-            f"[v3][5:v]overlay=0:0:enable='between(t,24,32)'[v4];"
-            f"[v4][1:v]overlay=0:0[vout];" # Вотермарк всегда
-            f"[6:a]volume=0.1[bg];[0:a][bg]amix=inputs=2:duration=first[aout]"
-        )
+        print(f"⚡️ Применение ускорения {speed}x и наложение титров...")
         
-        cmd = [
-            self.ffmpeg_path, "-y",
-            "-i", temp_concat,          # [0] Склеенное видео
-            "-i", str(watermark_path),  # [1] Вотермарк
-            "-i", str(overlay_paths[0]), # [2] Титры 1
-            "-i", str(overlay_paths[1]), # [3] Титры 2
-            "-i", str(overlay_paths[2]), # [4] Титры 3
-            "-i", str(overlay_paths[3]), # [5] Титры 4
-            "-i", str(music_path),      # [6] Музыка
-            "-filter_complex", filter_complex,
-            "-map", "[vout]", "-map", "[aout]",
-            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-preset", "fast", "-crf", "20",
+        # Строим фильтры для титров
+        # Мы должны учитывать, что склеенное видео длинное, а тайминги в данных - для каждого клипа отдельно.
+        # Поэтому нам нужно высчитать смещение для каждой сцены (8 сек на сцену)
+        
+        filter_parts = []
+        input_index = 2 # 0: video, 1: watermark, 2+: words
+        
+        # Базовое ускорение видео и аудио
+        # [0:v]setpts=PTS/1.15[v_speed]; [0:a]atempo=1.15[a_speed]
+        
+        overlay_chain = "[0:v]"
+        
+        # Сцены идут по 8 сек. С учетом xfade (0.5с), каждая следующая сцена начинается на 7.5с позже.
+        scene_offsets = [0.0, 7.5, 15.0, 22.5]
+        
+        inputs = [self.ffmpeg_path, "-y", "-i", temp_concat, "-i", str(watermark_path)]
+        
+        for scene_idx, (clip_name, words) in enumerate(karaoke_data.items()):
+            offset = scene_offsets[scene_idx]
+            for word_data in words:
+                word_path = word_data["path"]
+                # Пересчитываем время с учетом ускорения
+                start = (offset + word_data["start"]) / speed
+                end = (offset + word_data["end"]) / speed
+                
+                inputs.extend(["-i", str(word_path)])
+                next_chain = f"[v{input_index}]"
+                filter_parts.append(f"{overlay_chain}[{input_index}:v]overlay=0:0:enable='between(t,{start:.3f},{end:.3f})'{next_chain}")
+                overlay_chain = next_chain
+                input_index += 1
+                
+        # Добавляем вотермарк в конце цепочки
+        final_v_chain = f"{overlay_chain}[1:v]overlay=0:0[v_branded]"
+        filter_parts.append(final_v_chain)
+        
+        # Ускорение и микс аудио
+        # Сначала ускоряем оригинал, потом миксуем с музыкой
+        # Индекс музыки - это последний добавленный вход (input_index)
+        music_input_idx = input_index 
+        audio_filter = f"[0:a]atempo={speed}[a_fast]; [{music_input_idx}:a]volume=0.1[bg]; [a_fast][bg]amix=inputs=2:duration=first[aout]"
+        inputs.extend(["-i", str(music_path)]) # Музыка будет последним вводом
+        
+        # Собираем всё в один запуск
+        full_filter = "; ".join(filter_parts) + f"; {audio_filter}"
+        
+        cmd = inputs + [
+            "-filter_complex", full_filter,
+            "-map", "[v_branded]", "-map", "[aout]",
+            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-preset", "fast", "-crf", "22",
             "-c:a", "aac", "-b:a", "192k",
             str(output_path)
         ]
         
-        print("🎬 Финальный рендеринг: наложение графики и музыки...")
+        print(f"🎬 Рендеринг финального ролика (всего слоев: {input_index})...")
         result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            print(f"❌ Ошибка рендеринга: {result.stderr}")
         return result.returncode == 0
