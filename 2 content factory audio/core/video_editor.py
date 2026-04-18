@@ -75,18 +75,42 @@ class VideoEditor:
             print(f"❌ Ошибка FFmpeg: {result.stderr}")
             return False
 
-    def add_background_music(self, video_path, music_path, output_path, music_volume=0.15):
+    def compose_final_reel(self, clip_paths, overlay_paths, watermark_path, music_path, output_path):
         """
-        Накладывает фоновую музыку.
+        Финальная сборка: склейка + музыка + титры + вотермарк.
         """
+        # 1. Сначала склеиваем клипы
+        temp_concat = "outputs/temp/temp_concat.mp4"
+        if not self.concatenate_clips(clip_paths, temp_concat):
+            return False
+            
+        # 2. Накладываем музыку и графику одним сложным фильтром
+        # Тайминги для титров (8 сек каждый клип)
+        filter_complex = (
+            f"[0:v][2:v]overlay=0:0:enable='between(t,0,8)'[v1];"
+            f"[v1][3:v]overlay=0:0:enable='between(t,8,16)'[v2];"
+            f"[v2][4:v]overlay=0:0:enable='between(t,16,24)'[v3];"
+            f"[v3][5:v]overlay=0:0:enable='between(t,24,32)'[v4];"
+            f"[v4][1:v]overlay=0:0[vout];" # Вотермарк всегда
+            f"[6:a]volume=0.1[bg];[0:a][bg]amix=inputs=2:duration=first[aout]"
+        )
+        
         cmd = [
             self.ffmpeg_path, "-y",
-            "-i", str(video_path),
-            "-i", str(music_path),
-            "-filter_complex", f"[1:a]volume={music_volume}[bg];[0:a][bg]amix=inputs=2:duration=first[a]",
-            "-map", "0:v", "-map", "[a]",
-            "-c:v", "copy", "-c:a", "aac",
+            "-i", temp_concat,          # [0] Склеенное видео
+            "-i", str(watermark_path),  # [1] Вотермарк
+            "-i", str(overlay_paths[0]), # [2] Титры 1
+            "-i", str(overlay_paths[1]), # [3] Титры 2
+            "-i", str(overlay_paths[2]), # [4] Титры 3
+            "-i", str(overlay_paths[3]), # [5] Титры 4
+            "-i", str(music_path),      # [6] Музыка
+            "-filter_complex", filter_complex,
+            "-map", "[vout]", "-map", "[aout]",
+            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-preset", "fast", "-crf", "20",
+            "-c:a", "aac", "-b:a", "192k",
             str(output_path)
         ]
+        
+        print("🎬 Финальный рендеринг: наложение графики и музыки...")
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.returncode == 0
