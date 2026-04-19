@@ -12,7 +12,7 @@
 - [ ] `INFRA-02` Настроить SSH + tmux на VPS для мобильной работы
 - [ ] `INFRA-03` Установить Cline CLI на VPS
 - [ ] `INFRA-04` Проверить Evolution API инстансы (3 шт), подключённые номера
-- [ ] `INFRA-05` Настроить Supabase: таблицы leads, messages, campaigns + RLS
+- [x] `INFRA-05` Настроить Supabase: таблицы leads, messages, campaigns + RLS — Завершено: 2026-04-19
 
 ### Парсинг лидов
 - [ ] `PARSE-01` Зарегать демо-ключ 2ГИС API (platform.2gis.ru)
@@ -58,6 +58,7 @@
 
 - [/] `N8N-03` Telegram Meeting Assistant MVP workflow (text + voice + audio + m4a) — Начато: 2026-04-15
 - [/] `WA-01/WA-03` Модуль Умной Рассылки Python (Очередь + Ротация) — Начато: 2026-04-18
+- [/] `INFRA-06` Remote Sync & Smart Fortress VPS Setup — Начато: 2026-04-19
 
 ---
 
@@ -70,6 +71,7 @@
 - [x] `STRUCT-01` Реструктуризация проекта на 6 доменов — Завершено: 2026-04-12
 - [x] `N8N-01` tg_to_whatsapp.json workflow — Завершено: 2026-04-12
 - [x] `N8N-02` gemini_carousel_generator.json — Завершено: 2026-04-12
+- [x] `INFRA-05` Настройка Supabase (SQL схемы + Smoke Test) — Завершено: 2026-04-19
 
 ---
 

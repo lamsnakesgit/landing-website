@@ -1,0 +1,102 @@
+{
+  "name": "WA SaaS Control v1.0",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "e7b78913-75c1-4b1a-9c1a-1a2b3c4d5e6f",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "={{ $json.message.text.includes('docs.google.com') ? '✅ Вижу таблицу! Что будем предлагать клиентам?' : '👋 Привет! Скинь ссылку на таблицу Google Sheets, и я помогу запустить рассылку.' }}",
+        "additionalFields": {
+          "reply_markup": "={{ $json.message.text.includes('docs.google.com') ? { 'inline_keyboard': [[{ 'text': '🎨 Сгенерировать офферы', 'callback_data': 'generate_offer' }]] } : {} }}"
+        }
+      },
+      "id": "f8c89024-86d2-5c2b-bd2b-2b3c4d5e6f7a",
+      "name": "Analyze & Reply",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        620,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-pro",
+        "prompt": "Ты — профессиональный копирайтер. Твоя задача — составить 3 варианта сообщения для WhatsApp рассылки на основе запроса: {{ $node[\"Telegram Trigger\"].json[\"message\"][\"text\"] }}. \nИспользуй Spintax {{ Привет|Здравствуйте }}. Используй плейсхолдер [name] для имени. \nОБЯЗАТЕЛЬНО учитывай пол отправителя (женский). Текст должен быть коротким и вовлекающим.",
+        "options": {}
+      },
+      "id": "a1b2c3d4-e5f6-7g8h-i9j0-k1l2m3n4o5p6",
+      "name": "AI Content Generator",
+      "type": "n8n-nodes-base.aiTransform",
+      "typeVersion": 1,
+      "position": [
+        840,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://evolutionapi.aiconicvibe.store/message/sendText/8326 301 n8n wa 1",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $json[\"phone\"] }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json[\"message\"] }}"
+            }
+          ]
+        }
+      },
+      "id": "b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e",
+      "name": "Evolution API Send",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1100,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Analyze & Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

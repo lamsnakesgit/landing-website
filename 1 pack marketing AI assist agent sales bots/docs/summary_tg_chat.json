@@ -1,0 +1,2975 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "*"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -816,
+        368
+      ],
+      "id": "b5017c01-d11a-4d06-9f55-b9527b9179b9",
+      "name": "Telegram Trigger",
+      "webhookId": "271e7db0-a8ab-4ac7-ad81-5f4f86483f03",
+      "credentials": {
+        "telegramApi": {
+          "id": "veUNbqGlVMUJ39go",
+          "name": "Telegram account 3  yt traffic smm"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0b77a46d-bff3-4994-b0d2-78da52578b58",
+              "leftValue": "={{ $json.message.voice.mime_type === 'audio/ogg' }}\n",
+              "rightValue": "=true",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "6d09ffe0-273a-4b65-be04-60444feb37ba",
+              "leftValue": "={{ $json.message.video_note.file_id ? true : false }}\n",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -592,
+        368
+      ],
+      "id": "72d5c239-ea98-4e86-a90a-a775b3dd1315",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "System Message\n - замените промпт на свой!"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1632,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "3aaa1e89-575a-420e-a8c5-a37fcd0104e5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "=Ты — ИИ-агент, специализирующийся на суммировании голосовых транскрипций. На вход поступает текст — транскрипция голосового сообщения пользователя.\n\n**Твоя задача:**\nПроанализировать транскрипцию, выявить основные идеи и создать краткое структурное саммари, сохраняя живость и дух оригинального высказывания.\n\n**Сохранять живость:**\n- Передавай эмоциональный тон (энтузиазм, сомнения, уверенность)\n- Сохраняй ключевые усиления и акценты пользователя\n- Дай понять, насколько важна каждая идея для пользователя\n- Если пользователь волнуется, недоволен, радуется — это должно быть ясно из саммари\n\n**Что игнорировать:**\n- Повторы и переформулировки одной мысли\n- Filler words (эээ, ну, вот, короче, типа, как бы, значит)\n- Незаконченные предложения и обрывки мыслей\n- Вводные конструкции и отступления\n- Ошибки транскрипции и некорректно распознанные слова\n- Бессмысленные звуки и паузы\n\n**Формат вывода:**\nСтруктурированное саммари с использованием Markdown:\n- ## Заголовки для основных тем\n- Bullet points (•) для ключевых пунктов\n- Максимальная краткость, но с энергией\n\n**Что включать:**\n- Основные идеи с сохранением интенсивности\n- Конкретные действия или запросы\n- Проблемы или вопросы (с контекстом важности)\n- Предложения и планы\n- Важные детали (даты, цифры, имена, сроки)\n- Эмоциональный контекст, если он значим\n\n**Стиль изложения:**\n- Пиши динамично и четко\n- Используй глаголы действия (нужно сделать, проверить, обязательно учесть)\n- Избегай сухих бюрократических формулировок\n- Сохраняй \"голос\" пользователя — его манеру выражать идеи\n- Передавай приоритеты через структуру и акценты\n\n**Критерий качества:** Коллега, прочитав саммари, поймет не только ЧТО нужно делать, но и КАК срочно это нужно, насколько это важно, и какой тон установил пользователь.\n\nВывод: только саммари, без введения, комментариев или пояснений.\n",
+          "maxIterations": 5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1664,
+        416
+      ],
+      "id": "1226f50c-3635-4d92-bc50-a4cddffdfac7",
+      "name": "AI Agent1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "needsFallback": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Ты — ИИ-агент, который получает произвольный текст и возвращает тот же текст, но с HTML-тегами по смыслу: <b>, <strong>, <i>, <em>, <u>, <s>, <code>, <pre>, <tg-spoiler>, <a>, <blockquote>. Убирай и меня всякие ### и ## и # на <b>…</b> или <strong>…</strong>.\n\nЦель: добавить уместные теги, сохранив исходные слова, порядок, абзацы и пробелы. Плейн-текст без тегов возвращать запрещено.\n\t1.\tОбязательные требования\n– Каждая непустая строка должна содержать как минимум один тег из списка.\n– Минимум 1 тег на каждое законченное предложение.\n– Если неочевидно, что помечать — делай мягкий акцент <i>…</i> или <em>…</em> на ключевых словах.\n– Заголовки/акцентные строки — <b>…</b> или <strong>…</strong>.\n– Термины/важные фразы — <b> или <i>. Подчёркивание для структурных пометок — <u>.\n– Исправления/отмены — <s>.\n– Короткие фрагменты кода или сам код — <code>…</code>.\n– Многострочные с отступами — <pre><code>…</code></pre> (содержимое не менять).\n– URL превращай в ссылки: <a href=\"https://…\">домен/текст</a>.\n– Цитаты — <blockquote>…</blockquote>.\n\n\t2.\tСохранность формата\n– Не удаляй и не добавляй символы, слова, пустые строки.\n– Сохраняй все пробелы, включая ведущие и множественные.\n– Ничего не переставляй.\n– Внутри <code> и <pre><code> не вставляй другие теги.\n– Вне тегов экранируй спецсимволы: &→&amp;, <→&lt;, >→&gt;.\n– Разделяй текст на абзацы: вставляй пустую строку (\\n\\n) при смене мысли, темы или при длинных перечислениях.\n\t3.\tВывод\n– Отдавай только готовый HTML-текст, без пояснений.\n– Абзацы разделяй пустой строкой \\n\\n.\n– Перед отправкой убедись, что в ответе есть теги; если нет — усили акцентирование.\n\t4.\tПример\nВход:\nПривет! Это пример важного сообщения с кодом: print(‘Hello’). Ссылка: https://example.com.\n\nВывод:\nПривет! Это пример важного сообщения с кодом: print(‘Hello’).\n\nСсылка: example.com.\n\n⸻\n\nПример из Telegram API\n\nbot.send_message(\n    chat_id=chat_id,\n    text=(\n        '<b>Заголовок</b>\\n'\n        '<u>Подчёркнутый текст</u>\\n'\n        '<tg-spoiler>Секретный спойлер</tg-spoiler>\\n'\n        '<code>inline_code()</code>\\n'\n        '<pre><code>def hello():\\n'\n        '    print(\"Hello, world!\")\\n'\n        '</code></pre>\\n'\n        '<a href=\"https://example.com\">Ссылка на example.com</a>\\n'\n        '<blockquote>Цитата из источника</blockquote>'\n    ),\n    parse_mode='HTML'\n)\n\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        2032,
+        416
+      ],
+      "id": "373ac7c8-2062-4ce3-96cd-ef2b380b6108",
+      "name": "LLM HTML"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "id": "0a1e7f39-1083-4c54-9836-aa1246de2767",
+      "name": "Split Out1",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        2816,
+        416
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node — Process Message (pass-through)\n// Берём текст из предыдущей ноды и просто пробрасываем дальше без изменений.\n\ntry {\n  const item = $input.first();\n  const src =\n    item?.json?.output ??\n    item?.json?.text ??\n    item?.json?.message ??\n    item?.json?.cleanedText ??\n    '';\n\n  const raw = typeof src === 'string' ? src : JSON.stringify(src);\n\n  // Небольшая нормализация переносов (без прочей «магии»)\n  const out = raw.replace(/\\r\\n/g, '\\n');\n\n  return [{ json: { output: out } }];\n} catch (e) {\n  return [{ json: { output: `❌ Ошибка: ${e.message}` } }];\n}"
+      },
+      "id": "9e4bcafd-2147-4cf0-a095-d3a97d466e82",
+      "name": "Process Message",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2368,
+        416
+      ],
+      "typeVersion": 2,
+      "notes": "This is used to prevent Markdown issues in Telegram while sending messages."
+    },
+    {
+      "parameters": {
+        "jsCode": "function mdToHtml(text) {\n  let out = text ?? '';\n\n  // ul/li в bullets: \"* \" или \"- \" в начале строки\n  out = out.replace(/^(?:\\*|-) +/gm, '• ');\n\n  // Markdown-ссылки [текст](url) -> <a href=\"url\">текст</a>\n  out = out.replace(/\\[([^\\]]+)\\]\\((https?:\\/\\/[^\\s)]+)\\)/gi, '<a href=\"$2\">$1</a>');\n\n  // ***bold+italic*** -> <em><strong>…</strong></em>\n  out = out.replace(/\\*\\*\\*([^\\*]+?)\\*\\*\\*/g, '<em><strong>$1</strong></em>');\n\n  // **bold** -> <strong>…</strong>\n  out = out.replace(/\\*\\*([^*<>]+?)\\*\\*/g, '<strong>$1</strong>');\n\n  // *italic* -> <em>…</em> (не трогаем внутри тегов)\n  out = out.replace(/(?<![^<]*>)\\*([^*<>]+?)\\*(?![^<]*>)/g, '<em>$1</em>');\n\n  return out;\n}\n\nfunction sanitizeTelegramHtml(html) {\n  // Разрешённые теги Telegram + strong/em\n  const allowed = new Set(['b','strong','i','em','u','s','code','pre','a','tg-spoiler','blockquote']);\n\n  // Никакой нормализации strong/em — оставляем как есть\n\n  // Удаляем все атрибуты у разрешённых тегов, кроме href у <a>\n  html = html.replace(/<(\\/?)([a-z0-9-]+)([^>]*)>/gi, (m, slash, tag, attrs) => {\n    tag = tag.toLowerCase();\n\n    if (!allowed.has(tag)) {\n      return ''; // выкидываем чужие теги полностью\n    }\n    if (slash) return `</${tag}>`;\n\n    if (tag === 'a') {\n      const hrefMatch = attrs.match(/href\\s*=\\s*\"([^\"]+)\"/i) || attrs.match(/href\\s*=\\s*'([^']+)'/i);\n      const href = hrefMatch ? hrefMatch[1].trim() : '';\n      if (!/^https?:\\/\\//i.test(href)) return '<a href=\"#\">';\n      return `<a href=\"${href}\">`;\n    }\n\n    return `<${tag}>`;\n  });\n\n  // Конвертируем <ul><li>…</li></ul> в буллеты\n  html = html.replace(/<ul[\\s\\S]*?>[\\s\\S]*?<\\/ul>/gi, (m) => {\n    const items = m.match(/<li[\\s\\S]*?>([\\s\\S]*?)<\\/li>/gi) || [];\n    const lines = items.map(li => '• ' + li.replace(/<\\/?li[^>]*>/gi, '').trim());\n    return lines.join('\\n');\n  });\n\n  // Чистим лишние пробелы и пустые строки\n  html = html\n    .replace(/[ \\t]+\\n/g, '\\n')\n    .replace(/\\n{3,}/g, '\\n\\n')\n    .trim();\n\n  return html;\n}\n\nfunction splitTelegramMessage(html, maxLen = 4096) {\n  const tagRegex = /<\\/?([a-z0-9-]+)[^>]*>/gi;\n  const openTags = [];\n  const chunks = [];\n  let current = '';\n\n  const pushChunk = () => {\n    let tail = '';\n    for (let i = openTags.length - 1; i >= 0; i--) tail += `</${openTags[i]}>`;\n    chunks.push((current + tail).trim());\n  };\n\n  const reopenForNext = () => {\n    current = openTags.map(t => `<${t}>`).join('');\n  };\n\n  // Разбиваем по безопасным границам\n  const parts = html.split(/(\\n\\n|<\\/blockquote>|<\\/pre>|<\\/code>)/);\n\n  for (const part of parts) {\n    if (!part) continue;\n\n    // Обновляем стек открытых тегов на основании текущей части\n    let temp = part;\n    let m;\n    while ((m = tagRegex.exec(temp))) {\n      const full = m[0];\n      const tag = (m[1] || '').toLowerCase();\n\n      if (!['b','strong','i','em','u','s','code','pre','a','tg-spoiler','blockquote'].includes(tag)) continue;\n\n      if (full.startsWith('</')) {\n        const idx = openTags.lastIndexOf(tag);\n        if (idx !== -1) openTags.splice(idx, 1);\n      } else if (!full.endsWith('/>')) {\n        // Для <a> следим, чтобы был закрывающий </a> в этой же части, иначе считаем открытым\n        if (tag !== 'a' || !(/<\\/a>/i.test(temp))) {\n          openTags.push(tag);\n        }\n      }\n    }\n\n    const closingTail = openTags.slice().reverse().map(t => `</${t}>`).join('');\n    if ((current + part + closingTail).length > maxLen) {\n      if (current) pushChunk();\n      reopenForNext();\n\n      if ((current + part + closingTail).length > maxLen) {\n        // Грубое деление по символам с сохранением открытых тегов\n        let p = part;\n        while (p.length) {\n          const remainClosing = openTags.slice().reverse().map(t => `</${t}>`).join('');\n          const spaceLeft = maxLen - (current.length + remainClosing.length);\n          current += p.slice(0, Math.max(spaceLeft, 0));\n          p = p.slice(Math.max(spaceLeft, 0));\n          pushChunk();\n          reopenForNext();\n        }\n      } else {\n        current += part;\n      }\n    } else {\n      current += part;\n    }\n  }\n\n  if (current.trim()) pushChunk();\n  return chunks.filter(Boolean);\n}\n\ntry {\n  const raw = $input.first().json.output ?? '';\n  const html1 = mdToHtml(raw);\n  const safe = sanitizeTelegramHtml(html1);\n  const parts = splitTelegramMessage(safe, 4096);\n  return parts.map(p => ({ json: { output: p } }));\n} catch (e) {\n  return [{ json: { output: `❌ Ошибка: ${e.message}` } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2592,
+        416
+      ],
+      "id": "a0f2194d-605d-4981-94dc-2e44730e83db",
+      "name": "CleanText"
+    },
+    {
+      "parameters": {
+        "content": "Модуль - Голос в Текст"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "1239386e-72ba-4ea7-aed1-aedfda8656a2",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openai-whisper-asr-webservice-production.up.railway.app/asr",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "task",
+              "value": "transcribe"
+            },
+            {
+              "name": "output",
+              "value": "json"
+            },
+            {
+              "name": "encode",
+              "value": "true"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "audio_file",
+              "inputDataFieldName": "=data"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        64,
+        128
+      ],
+      "id": "7d79ced9-a018-4e8b-83c2-d843ac281fe4",
+      "name": "openai-whisper-transcribe",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        960,
+        480
+      ],
+      "id": "23eb975e-0794-43a7-8e32-509cece641b7",
+      "name": "Transcribe a recording",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.result.file_id }}",
+        "additionalFields": {}
+      },
+      "id": "fc41866e-087c-4827-b110-486422a565f0",
+      "name": "Download File",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        352
+      ],
+      "webhookId": "84b81222-8241-4893-b031-bc46ab102fea",
+      "credentials": {
+        "telegramApi": {
+          "id": "veUNbqGlVMUJ39go",
+          "name": "Telegram account 3  yt traffic smm"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.result.file_path }}",
+                    "rightValue": "voice",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "ed917f72-da52-47dc-85df-229e850945f3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Other"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -144,
+        272
+      ],
+      "id": "0567e493-8bcc-4d56-9451-381e7294a32d",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        608,
+        352
+      ],
+      "id": "700bb2bb-4d27-4a68-bc1e-696f895fa4a7",
+      "name": "Transcribe a recording1",
+      "retryOnFail": false,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.result.file_id }}",
+        "additionalFields": {}
+      },
+      "id": "719812db-f9b3-4f02-b8ee-0d216e58effa",
+      "name": "Download File2",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        768,
+        480
+      ],
+      "webhookId": "1e6ba095-5fd4-450c-af8d-4871f917fe05",
+      "credentials": {
+        "telegramApi": {
+          "id": "veUNbqGlVMUJ39go",
+          "name": "Telegram account 3  yt traffic smm"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fe7ecc99-e1e8-4a5e-bdd6-6fce9757b234",
+              "name": "text",
+              "value": "={{ $json.business_message.caption }}  {{ $json.message.caption }} {{ $json.photo_file_id }}{{ $json.text }}{{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a3b803a6-7f13-42e7-a663-1737f37869f4",
+      "name": "Set Final Text",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1440,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        1088
+      ],
+      "id": "d2ba6422-0336-4176-b1b3-f6242a5802df",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}{{ $json.message.video_note.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -368,
+        272
+      ],
+      "id": "d4ca023f-266f-41a3-8f9f-3eef60964176",
+      "name": "Get a file",
+      "webhookId": "ee81a26a-d6f0-49fb-b7f4-cf8079777c72",
+      "credentials": {
+        "telegramApi": {
+          "id": "veUNbqGlVMUJ39go",
+          "name": "Telegram account 3  yt traffic smm"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "19ea6ef2-1c8f-472e-907b-990810af9629",
+              "name": "text",
+              "value": "={{ $json.content.parts[0].text }}{{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1216,
+        272
+      ],
+      "id": "5865b69e-0074-4ae9-bf09-c00c15110080",
+      "name": "Audio Text"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        1088
+      ],
+      "id": "f0f038dc-4993-467a-9d1e-d5aca73e3dde",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2016,
+        1072
+      ],
+      "id": "e695daaf-5579-41a0-ab2d-7ae03ba036bd",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML",
+          "reply_to_message_id": "={{ $('Telegram Trigger').item.json.message.message_id }}"
+        }
+      },
+      "id": "cfde4f88-c3ca-4505-9734-11198fdcdf2f",
+      "name": "Send a text message1",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        3040,
+        432
+      ],
+      "webhookId": "c6bd2119-b2ac-4f7a-8b37-4ab6267d6579",
+      "typeVersion": 1.2,
+      "alwaysOutputData": false,
+      "retryOnFail": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "veUNbqGlVMUJ39go",
+          "name": "Telegram account 3  yt traffic smm"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e76b29a3-bbf8-4d6a-b094-63e935af7c5d",
+              "name": "username",
+              "value": "={{ $json.message.from.username }}",
+              "type": "string"
+            },
+            {
+              "id": "5bf24223-2fd9-4ebd-9a02-def749edab78",
+              "name": "chat_id",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "number"
+            },
+            {
+              "id": "e50fd250-9a7b-4d2a-a0e3-5370e390f884",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -368,
+        464
+      ],
+      "id": "b171d963-fad2-4496-9b70-dc1b1757324c",
+      "name": "TEXT"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "A4Oj35nKruOS1Dtx",
+          "mode": "list",
+          "cachedResultName": "day_context_summary",
+          "cachedResultUrl": "/projects/geed8Llzh1c3Rpmq/datatables/A4Oj35nKruOS1Dtx"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TEXT": "={{ $json.text }}",
+            "username": "={{ $json.username }}",
+            "chat_id": "={{ $json.chat_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TEXT",
+              "displayName": "TEXT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        464
+      ],
+      "id": "78d96b71-58b1-4593-8e3a-05f4df9c681f",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e76b29a3-bbf8-4d6a-b094-63e935af7c5d",
+              "name": "username",
+              "value": "={{ $('Telegram Trigger').item.json.message.from.username }}",
+              "type": "string"
+            },
+            {
+              "id": "5bf24223-2fd9-4ebd-9a02-def749edab78",
+              "name": "chat_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+              "type": "number"
+            },
+            {
+              "id": "e50fd250-9a7b-4d2a-a0e3-5370e390f884",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1440,
+        128
+      ],
+      "id": "f63dce86-1738-4353-a30e-5e14c03db208",
+      "name": "TEXT1"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "HTMy4PMvWAMbU9KO",
+          "mode": "list",
+          "cachedResultName": "Data table Sammary My 09.12.2025",
+          "cachedResultUrl": "/projects/oPj88g0NwuIjQn8H/datatables/HTMy4PMvWAMbU9KO"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TEXT": "={{ $json.text }}",
+            "username": "={{ $json.username }}",
+            "chat_id": "={{ $json.chat_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TEXT",
+              "displayName": "TEXT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        128
+      ],
+      "id": "3c005bfe-6a58-44d9-a116-fb46a756ff06",
+      "name": "Insert row1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2208,
+        1072
+      ],
+      "id": "f1c69978-47f9-41d0-9dd0-c368c8a66244",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 20
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2080,
+        2608
+      ],
+      "id": "2a90f502-d73c-4304-9f72-52256afa7f7b",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "A4Oj35nKruOS1Dtx",
+          "mode": "list",
+          "cachedResultName": "day_context_summary",
+          "cachedResultUrl": "/projects/geed8Llzh1c3Rpmq/datatables/A4Oj35nKruOS1Dtx"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "createdAt",
+              "condition": "gte",
+              "keyValue": "={{ $now.minus({ hours: 24 }).toISO() }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -1792,
+        2608
+      ],
+      "id": "f8430ff6-25f5-4760-b122-5202e197bf9b",
+      "name": "Get DAY CONTEXT"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -288,
+        2640
+      ],
+      "id": "f16f89ef-322b-4afa-b22e-6a90c06217bc",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "384d263d-2079-4f5f-85a9-bcc472f448c8",
+              "name": "chat_id",
+              "value": "={{ $json.chat_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1440,
+        2608
+      ],
+      "id": "1beb4fbf-1e34-4664-ab3e-66cd15432542",
+      "name": "SET"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        -1168,
+        2608
+      ],
+      "id": "b55821b2-b6c2-4f2d-8b12-25c3ea6f0892",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ec865d5f-7945-4dad-bb8c-6888ddc51057",
+              "name": "chat_id",
+              "value": "={{ $json.chat_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -576,
+        2608
+      ],
+      "id": "83ac8baa-c204-433e-ab59-198dc85db30c",
+      "name": "chat_id"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ec865d5f-7945-4dad-bb8c-6888ddc51057",
+              "name": "chat_id",
+              "value": "={{ $json.chat_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -112,
+        2656
+      ],
+      "id": "ae35c34d-db40-4a33-9304-bfb52bebe372",
+      "name": "chat_id1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "614dcc64-007d-497e-a471-ac64ed1f50fe",
+              "leftValue": "={{ $json.chat_id < 0 }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -880,
+        2608
+      ],
+      "id": "7f98138a-a918-4ba5-9c38-da21a1706a64",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3-pro-image-preview",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3-pro-image-preview (Nano Banana Pro)"
+        },
+        "prompt": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        3120,
+        1440
+      ],
+      "id": "d5a09de0-739e-42ad-ad03-aa1c83909850",
+      "name": "Generate an image1",
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "07mn330Ii1yGriyp",
+          "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('chat_id1').item.json.chat_id }}",
+        "binaryData": true,
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "b1dce2a5-5dd2-4cf6-a99b-eb741d02f60d",
+      "name": "Send a photo message",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        4464,
+        2560
+      ],
+      "webhookId": "323dee28-6b0d-4341-8174-b3bdd427aa82",
+      "typeVersion": 1.2,
+      "alwaysOutputData": true,
+      "retryOnFail": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "veUNbqGlVMUJ39go",
+          "name": "Telegram account 3  yt traffic smm"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Ты — ИИ-агент, который получает на вход текстовое саммари группы и преобразует его в готовый визуальный промпт для нейросети Nano Banana.\n\nТвоя задача — по любому тексту саммари создавать чёткий, конкретный и визуально понятный запрос для генерации изображения.\nНе объясняй, не комментируй, не добавляй лишних слов — просто выдай финальный промпт, с юмором(но не переборщи)!\n\n⸻\n\nФормат вывода (строго соблюдать):\nТолько одна строка — описательный промпт для Nano Banana.\n\n⸻\n\nСтруктура промпта:\n\t1.\tТип кадра — портрет, пейзаж, сцена, макро и т. п.\n\t2.\tГлавные объекты / персонажи — кто или что на изображении.\n\t3.\tДействие / сюжет — что происходит, эмоции, позы, взаимодействие.\n\t4.\tЛокация / фон — где происходит действие, окружение, время суток.\n\t5.\tАтмосфера / стиль — освещение, настроение, цветовая гамма, художественный стиль.\n\t6.\tФормат кадра — соотношение сторон (по умолчанию 1:1).\n7 добавляй цитаты про продажи, успех и дисциплину, майндсет от Хормози, Анар Дримс, Оскар Хартман\n\n⸻\n\nПравила работы:\n\t•\tИспользуй конкретные детали, избегай общих фраз.\n\t•\tНе повторяй слова из саммари дословно — преобразуй смысл в визуальное описание.\n\t•\tНе добавляй вводных фраз, пояснений, метаданных.\n\t•\tНа выходе должна быть только готовая фраза-промпт.\n\n⸻\n\nПример:\nВход:\n«Сообщество маркетологов по ИИ: вебинары, разбор кейсов, поддержка новичков, обмен лайфхаками.»\n\nВыход:\n«Панорамный офисный зал, трое специалистов у большого экрана с графиками, обсуждают стратегию, дневной свет, вдохновляющая атмосфера, тёплая цветовая палитра, кадр 16:9.»\n\n⸻\n\nТекущий ввод:\n{{ $json.output }}\n\nТребуемый ответ:\nТолько финальный промпт для Nano Banana.",
+        "needsFallback": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2608,
+        2576
+      ],
+      "id": "8f023b98-8c6f-4791-b98f-270eb9989928",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2464,
+        3360
+      ],
+      "id": "f77f5c9c-c823-4e5a-a003-434395044e8c",
+      "name": "Google Gemini Chat Model4",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('chat_id1').item.json.chat_id }}",
+        "text": "={{ $('Split Out').item.json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML",
+          "reply_to_message_id": "={{ $json.result.message_id }}"
+        }
+      },
+      "id": "51e2968f-ee1f-45af-ae42-e8335809ddfb",
+      "name": "Send a text message",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        4896,
+        2656
+      ],
+      "webhookId": "ebe51cb5-24ba-437f-8347-e7c01d6643fe",
+      "typeVersion": 1.2,
+      "alwaysOutputData": true,
+      "retryOnFail": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "veUNbqGlVMUJ39go",
+          "name": "Telegram account 3  yt traffic smm"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Get row(s) in Data table — получает строки из выбранной таблицы данных по заданным условиям (фильтрам).\nМожно выбрать все строки, отфильтровать по полям (например, chat_id), а результат использовать дальше в потоке.\n\nВставляй в чат id например: -1002584387235",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "A4Oj35nKruOS1Dtx",
+          "mode": "list",
+          "cachedResultName": "day_context_summary",
+          "cachedResultUrl": "/projects/geed8Llzh1c3Rpmq/datatables/A4Oj35nKruOS1Dtx"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "keyValue": "={{ String($fromAI('conditions0_Value', `Пример: -1002584387235`, 'string')).trim() }}"
+            },
+            {
+              "keyName": "createdAt",
+              "condition": "gte",
+              "keyValue": "={{ $now.minus({ hours: 24 }).toISO() }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1,
+      "position": [
+        288,
+        3056
+      ],
+      "id": "44fe1fa5-e20e-4cda-9c40-5d5f8a63ffd8",
+      "name": "Get row(s) in Data table1"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash-image",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash-image (Nano Banana)"
+        },
+        "prompt": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        3312,
+        1776
+      ],
+      "id": "561833d7-88cb-4dce-a98e-fc1d451a40a4",
+      "name": "Generate an image",
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "07mn330Ii1yGriyp",
+          "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/imagen-4.0-fast-generate-001",
+          "mode": "list",
+          "cachedResultName": "models/imagen-4.0-fast-generate-001"
+        },
+        "prompt": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        3344,
+        2128
+      ],
+      "id": "0322affd-5585-4d7a-b695-28fd7cf8a93f",
+      "name": "Generate an image2",
+      "retryOnFail": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "07mn330Ii1yGriyp",
+          "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9701227c-99b2-4e16-bb77-f4145677e934",
+              "name": "output",
+              "value": "={{ $('AI Agent').item.json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2976,
+        1776
+      ],
+      "id": "860f8311-f9a0-4441-bc8e-8a1d179af55b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9701227c-99b2-4e16-bb77-f4145677e934",
+              "name": "output",
+              "value": "={{ $('AI Agent').item.json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3008,
+        2128
+      ],
+      "id": "247c87d0-39f0-4ef9-805d-cc46e5abb713",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Сделай из этого короткий и живой обзор «новости группы» за последние 24 часа.\nПиши так, будто ты редактор чата, подводишь итоги дня — с лёгким юмором и без воды.\nНе больше 6–8 строк. Без длинных вступлений. Просто суть, настроение и пару ироничных акцентов. Ну вообщем все по инструкции. Чата: {{ $json.chat_id }} через таблицу: Get row(s) in Data table. Никогда не выдавай пустые сообщения!",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "=Ты — ИИ-аналитик и хроникёр Telegram-чата.\nНа входе — переписка за последние 24 часа (с разбивкой по участникам).\nТвоя задача — сделать короткий, живой и немного ироничный обзор дня, будто это внутренние «новости группы».\n\nФормат:\n\t1.\tЗаголовок дня — короткая фраза с настроением дня (можно с лёгким юмором).\n\t2.\tЧто происходило — 3–6 пунктов по сути, без воды, можно вставить короткие комментарии в скобках.\n\t3.\tКто отметился — по именам, что говорил или сделал отмечай через @ (Например: @PavelDumbrao)\n\t4.\tИтог — общее ощущение дня (в духе: «движ есть», «тишина перед бурей», «мозги кипели, но родилось гениальное»).\n\nПравила:\n— Без выдумок, только по фактам.\n— Без занудства и формальностей.\n— Юмор лёгкий, дружеский, как будто рассказываешь друзьям.\n— Если инфы мало — просто напиши короткий забавный обзор вроде:\n«Все молчали, но энергетика подозрительно кипела.»\nИспользуй ЭМОДЗИ\n",
+          "maxIterations": 5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        2656
+      ],
+      "id": "3423c6b0-ec68-4b49-a6c8-953c1f24ef4d",
+      "name": "AI Agent2",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "needsFallback": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Ты — ИИ-агент, который получает произвольный текст и возвращает тот же текст, но с HTML-тегами по смыслу: <b>, <strong>, <i>, <em>, <u>, <s>, <code>, <pre>, <tg-spoiler>, <a>, <blockquote>. Убирай и меня всякие ### и ## и # на <b>…</b> или <strong>…</strong>.\n\nЦель: добавить уместные теги, сохранив исходные слова, порядок, абзацы и пробелы. Плейн-текст без тегов возвращать запрещено.\n\t1.\tОбязательные требования\n– Каждая непустая строка должна содержать как минимум один тег из списка.\n– Минимум 1 тег на каждое законченное предложение.\n– Если неочевидно, что помечать — делай мягкий акцент <i>…</i> или <em>…</em> на ключевых словах.\n– Заголовки/акцентные строки — <b>…</b> или <strong>…</strong>.\n– Термины/важные фразы — <b> или <i>. Подчёркивание для структурных пометок — <u>.\n– Исправления/отмены — <s>.\n– Короткие фрагменты кода или сам код — <code>…</code>.\n– Многострочные с отступами — <pre><code>…</code></pre> (содержимое не менять).\n– URL превращай в ссылки: <a href=\"https://…\">домен/текст</a>.\n– Цитаты — <blockquote>…</blockquote>.\n\n\t2.\tСохранность формата\n– Не удаляй и не добавляй символы, слова, пустые строки.\n– Сохраняй все пробелы, включая ведущие и множественные.\n– Ничего не переставляй.\n– Внутри <code> и <pre><code> не вставляй другие теги.\n– Вне тегов экранируй спецсимволы: &→&amp;, <→&lt;, >→&gt;.\n– Разделяй текст на абзацы: вставляй пустую строку (\\n\\n) при смене мысли, темы или при длинных перечислениях.\n\t3.\tВывод\n– Отдавай только готовый HTML-текст, без пояснений.\n– Абзацы разделяй пустой строкой \\n\\n.\n– Перед отправкой убедись, что в ответе есть теги; если нет — усили акцентирование.\n\t4.\tПример\nВход:\nПривет! Это пример важного сообщения с кодом: print(‘Hello’). Ссылка: https://example.com.\n\nВывод:\nПривет! Это пример важного сообщения с кодом: print(‘Hello’).\n\nСсылка: example.com.\n\n⸻\n\nПример из Telegram API\n\nbot.send_message(\n    chat_id=chat_id,\n    text=(\n        '<b>Заголовок</b>\\n'\n        '<u>Подчёркнутый текст</u>\\n'\n        '<tg-spoiler>Секретный спойлер</tg-spoiler>\\n'\n        '<code>inline_code()</code>\\n'\n        '<pre><code>def hello():\\n'\n        '    print(\"Hello, world!\")\\n'\n        '</code></pre>\\n'\n        '<a href=\"https://example.com\">Ссылка на example.com</a>\\n'\n        '<blockquote>Цитата из источника</blockquote>'\n    ),\n    parse_mode='HTML'\n)\n\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1232,
+        2656
+      ],
+      "id": "9a1559cf-047e-4959-9048-ce349ff85604",
+      "name": "LLM HTML1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "id": "4717a0f9-0c97-4be9-a0bc-77cea59c9b1c",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        2304,
+        2656
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node — Process Message (pass-through)\n// Берём текст из предыдущей ноды и просто пробрасываем дальше без изменений.\n\ntry {\n  const item = $input.first();\n  const src =\n    item?.json?.output ??\n    item?.json?.text ??\n    item?.json?.message ??\n    item?.json?.cleanedText ??\n    '';\n\n  const raw = typeof src === 'string' ? src : JSON.stringify(src);\n\n  // Небольшая нормализация переносов (без прочей «магии»)\n  const out = raw.replace(/\\r\\n/g, '\\n');\n\n  return [{ json: { output: out } }];\n} catch (e) {\n  return [{ json: { output: `❌ Ошибка: ${e.message}` } }];\n}"
+      },
+      "id": "29a02a87-1b71-46c3-bfad-7e8a291719e6",
+      "name": "Process Message1",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1840,
+        2656
+      ],
+      "typeVersion": 2,
+      "notes": "This is used to prevent Markdown issues in Telegram while sending messages."
+    },
+    {
+      "parameters": {
+        "jsCode": "function mdToHtml(text) {\n  let out = text ?? '';\n\n  // ul/li в bullets: \"* \" или \"- \" в начале строки\n  out = out.replace(/^(?:\\*|-) +/gm, '• ');\n\n  // Markdown-ссылки [текст](url) -> <a href=\"url\">текст</a>\n  out = out.replace(/\\[([^\\]]+)\\]\\((https?:\\/\\/[^\\s)]+)\\)/gi, '<a href=\"$2\">$1</a>');\n\n  // ***bold+italic*** -> <em><strong>…</strong></em>\n  out = out.replace(/\\*\\*\\*([^\\*]+?)\\*\\*\\*/g, '<em><strong>$1</strong></em>');\n\n  // **bold** -> <strong>…</strong>\n  out = out.replace(/\\*\\*([^*<>]+?)\\*\\*/g, '<strong>$1</strong>');\n\n  // *italic* -> <em>…</em> (не трогаем внутри тегов)\n  out = out.replace(/(?<![^<]*>)\\*([^*<>]+?)\\*(?![^<]*>)/g, '<em>$1</em>');\n\n  return out;\n}\n\nfunction sanitizeTelegramHtml(html) {\n  // Разрешённые теги Telegram + strong/em\n  const allowed = new Set(['b','strong','i','em','u','s','code','pre','a','tg-spoiler','blockquote']);\n\n  // Никакой нормализации strong/em — оставляем как есть\n\n  // Удаляем все атрибуты у разрешённых тегов, кроме href у <a>\n  html = html.replace(/<(\\/?)([a-z0-9-]+)([^>]*)>/gi, (m, slash, tag, attrs) => {\n    tag = tag.toLowerCase();\n\n    if (!allowed.has(tag)) {\n      return ''; // выкидываем чужие теги полностью\n    }\n    if (slash) return `</${tag}>`;\n\n    if (tag === 'a') {\n      const hrefMatch = attrs.match(/href\\s*=\\s*\"([^\"]+)\"/i) || attrs.match(/href\\s*=\\s*'([^']+)'/i);\n      const href = hrefMatch ? hrefMatch[1].trim() : '';\n      if (!/^https?:\\/\\//i.test(href)) return '<a href=\"#\">';\n      return `<a href=\"${href}\">`;\n    }\n\n    return `<${tag}>`;\n  });\n\n  // Конвертируем <ul><li>…</li></ul> в буллеты\n  html = html.replace(/<ul[\\s\\S]*?>[\\s\\S]*?<\\/ul>/gi, (m) => {\n    const items = m.match(/<li[\\s\\S]*?>([\\s\\S]*?)<\\/li>/gi) || [];\n    const lines = items.map(li => '• ' + li.replace(/<\\/?li[^>]*>/gi, '').trim());\n    return lines.join('\\n');\n  });\n\n  // Чистим лишние пробелы и пустые строки\n  html = html\n    .replace(/[ \\t]+\\n/g, '\\n')\n    .replace(/\\n{3,}/g, '\\n\\n')\n    .trim();\n\n  return html;\n}\n\nfunction splitTelegramMessage(html, maxLen = 4096) {\n  const tagRegex = /<\\/?([a-z0-9-]+)[^>]*>/gi;\n  const openTags = [];\n  const chunks = [];\n  let current = '';\n\n  const pushChunk = () => {\n    let tail = '';\n    for (let i = openTags.length - 1; i >= 0; i--) tail += `</${openTags[i]}>`;\n    chunks.push((current + tail).trim());\n  };\n\n  const reopenForNext = () => {\n    current = openTags.map(t => `<${t}>`).join('');\n  };\n\n  // Разбиваем по безопасным границам\n  const parts = html.split(/(\\n\\n|<\\/blockquote>|<\\/pre>|<\\/code>)/);\n\n  for (const part of parts) {\n    if (!part) continue;\n\n    // Обновляем стек открытых тегов на основании текущей части\n    let temp = part;\n    let m;\n    while ((m = tagRegex.exec(temp))) {\n      const full = m[0];\n      const tag = (m[1] || '').toLowerCase();\n\n      if (!['b','strong','i','em','u','s','code','pre','a','tg-spoiler','blockquote'].includes(tag)) continue;\n\n      if (full.startsWith('</')) {\n        const idx = openTags.lastIndexOf(tag);\n        if (idx !== -1) openTags.splice(idx, 1);\n      } else if (!full.endsWith('/>')) {\n        // Для <a> следим, чтобы был закрывающий </a> в этой же части, иначе считаем открытым\n        if (tag !== 'a' || !(/<\\/a>/i.test(temp))) {\n          openTags.push(tag);\n        }\n      }\n    }\n\n    const closingTail = openTags.slice().reverse().map(t => `</${t}>`).join('');\n    if ((current + part + closingTail).length > maxLen) {\n      if (current) pushChunk();\n      reopenForNext();\n\n      if ((current + part + closingTail).length > maxLen) {\n        // Грубое деление по символам с сохранением открытых тегов\n        let p = part;\n        while (p.length) {\n          const remainClosing = openTags.slice().reverse().map(t => `</${t}>`).join('');\n          const spaceLeft = maxLen - (current.length + remainClosing.length);\n          current += p.slice(0, Math.max(spaceLeft, 0));\n          p = p.slice(Math.max(spaceLeft, 0));\n          pushChunk();\n          reopenForNext();\n        }\n      } else {\n        current += part;\n      }\n    } else {\n      current += part;\n    }\n  }\n\n  if (current.trim()) pushChunk();\n  return chunks.filter(Boolean);\n}\n\ntry {\n  const raw = $input.first().json.output ?? '';\n  const html1 = mdToHtml(raw);\n  const safe = sanitizeTelegramHtml(html1);\n  const parts = splitTelegramMessage(safe, 4096);\n  return parts.map(p => ({ json: { output: p } }));\n} catch (e) {\n  return [{ json: { output: `❌ Ошибка: ${e.message}` } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        2656
+      ],
+      "id": "d1e00848-07ff-483d-84af-30a5a696d336",
+      "name": "CleanText1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.6
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        3344
+      ],
+      "id": "51567ccc-9e1c-4795-8e5a-396a195f1cad",
+      "name": "Google Gemini Chat Model5",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        3344
+      ],
+      "id": "4a0e7801-ecdf-409d-b82d-29beda45e188",
+      "name": "Google Gemini Chat Model6",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        3312
+      ],
+      "id": "652d453c-330f-4239-8fd9-d8a1e7e21d99",
+      "name": "Google Gemini Chat Model7",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1392,
+        3312
+      ],
+      "id": "00ea28f7-c018-4184-bb4c-f2a58f02a92d",
+      "name": "Google Gemini Chat Model8",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2704,
+        3344
+      ],
+      "id": "50269d81-a3a3-4226-b03d-41c9fb9aaf66",
+      "name": "Google Gemini Chat Model9",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = items[0];\nif (item.binary.data) {\n  item.binary.data.mimeType = 'audio/mpeg'; // или audio/ogg\n}\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        480
+      ],
+      "id": "da76ce4a-bee0-41de-9387-23773ce234e1",
+      "name": "Convert video-to-OGG1"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-3-flash-preview",
+        "options": {
+          "temperature": 0.6
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        832
+      ],
+      "id": "0dcec5b7-0d36-4e77-b2d6-e51fb2f8e25d",
+      "name": "OpenRouter Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "reasoningEffort": "medium",
+          "maxRetries": 2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1744,
+        896
+      ],
+      "id": "40a54191-fd2b-464a-b53b-864edc032745",
+      "name": "OpenAI Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-3-flash-preview",
+        "options": {
+          "temperature": 0.6
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1968,
+        720
+      ],
+      "id": "40d21277-fefd-436e-8548-521aa434380a",
+      "name": "OpenRouter Chat Model1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "reasoningEffort": "medium",
+          "maxRetries": 2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2304,
+        704
+      ],
+      "id": "4df2e22b-78b5-400c-a2eb-91a1ba92edcb",
+      "name": "OpenAI Chat Model1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-3-flash-preview",
+        "options": {
+          "temperature": 0.6
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        464,
+        3072
+      ],
+      "id": "63a5a717-2ba5-461c-952f-1660a8009c65",
+      "name": "OpenRouter Chat Model2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "D82I0poMzDXBtdKz",
+          "name": "OpenRouter account n8n gem fb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "reasoningEffort": "medium",
+          "maxRetries": 2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        3216
+      ],
+      "id": "c219fc90-e77a-474b-b379-d387d997d084",
+      "name": "OpenAI Chat Model2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-3-flash-preview",
+        "options": {
+          "temperature": 0.6
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1456,
+        3024
+      ],
+      "id": "04e507a5-67d8-4881-a7ee-78fe11a5fbf5",
+      "name": "OpenRouter Chat Model3",
+      "credentials": {
+        "openRouterApi": {
+          "id": "D82I0poMzDXBtdKz",
+          "name": "OpenRouter account n8n gem fb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "reasoningEffort": "medium",
+          "maxRetries": 2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1600,
+        3040
+      ],
+      "id": "60fc656c-595d-4481-8b44-e43e6042edf4",
+      "name": "OpenAI Chat Model3",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2080,
+        2384
+      ],
+      "id": "a2a1ac91-fb97-4aa8-bec7-4cbd033cf1d5",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-3-flash-preview",
+        "options": {
+          "temperature": 0.6
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2896,
+        2976
+      ],
+      "id": "e5c22099-e959-42d9-a3e7-ae429da389f9",
+      "name": "OpenRouter Chat Model4",
+      "credentials": {
+        "openRouterApi": {
+          "id": "D82I0poMzDXBtdKz",
+          "name": "OpenRouter account n8n gem fb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "reasoningEffort": "medium",
+          "maxRetries": 2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2960,
+        3184
+      ],
+      "id": "1e18d66c-a1d5-43f2-9893-142a81b33fab",
+      "name": "OpenAI Chat Model4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "prompt_var",
+              "name": "prompt",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "aspect_ratio_var",
+              "name": "aspectRatio",
+              "value": "1:1",
+              "type": "string"
+            },
+            {
+              "id": "quality_var",
+              "name": "quality",
+              "value": "high",
+              "type": "string"
+            },
+            {
+              "id": "model_var",
+              "name": "model",
+              "value": "bytedance-seed/seedream-4.5",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fd1a1c92-0f10-43fc-8294-f4b73e5ad86d",
+      "name": "Set Parameters",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3248,
+        2352
+      ],
+      "connections": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request - Seedance",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer ТУТ ПИШЕШЬ СВОЙ АПИ ОУПЕНРОУТЕР"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"bytedance-seed/seedream-4.5\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $node['Set Parameters'].json.prompt }}\"\n    }\n  ],\n  \"modalities\": [\"image\", \"text\"],\n  \"image_config\": {\n    \"aspect_ratio\": \"{{ $node['Set Parameters'].json.aspectRatio }}\",\n    \"quality\": \"{{ $node['Set Parameters'].json.quality }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "id": "64da6620-061b-4e34-8155-0c3f06074e11",
+      "name": "HTTP Request - Seedance",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3456,
+        2432
+      ],
+      "connections": {
+        "main": [
+          [
+            {
+              "node": "Extract Image",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "image_url",
+              "name": "imageUrl",
+              "value": "={{ $node[\"HTTP Request - Seedance\"].json.choices[0].message.images[0].image_url.url }}",
+              "type": "string"
+            },
+            {
+              "id": "content",
+              "name": "content",
+              "value": "={{ $node[\"HTTP Request - Seedance\"].json.choices[0].message.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8e82fb42-08ff-4ff2-84ed-117072846c5c",
+      "name": "Extract Image",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3616,
+        2480
+      ],
+      "connections": {
+        "main": [
+          [
+            {
+              "node": "Output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const imageUrl = $input.all()[0].json.imageUrl;\nconst base64Data = imageUrl.replace(/^data:image\\/\\w+;base64,/, '');\nconst buffer = Buffer.from(base64Data, 'base64');\n\nreturn {\n  json: { success: true },\n  binary: {\n    data: {\n      data: buffer,\n      mimeType: 'image/jpeg',\n      fileName: 'seedance_image.jpg'  // ← ДОБАВЬТЕ ЭТУ СТРОКУ\n    }\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3872,
+        2560
+      ],
+      "id": "20d8d587-587e-4047-b1db-a2132a55965f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9701227c-99b2-4e16-bb77-f4145677e934",
+              "name": "output",
+              "value": "={{ $('AI Agent').item.json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3072,
+        2320
+      ],
+      "id": "39e017f6-f6c9-43a7-bc81-d5985d770aa6",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer ТУТ ПИШЕШЬ СВОЙ АПИ ОУПЕНРОУТЕР"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"bytedance-seed/seedream-4.5\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $node['Set Parameters'].json.prompt }}\"\n    }\n  ],\n  \"modalities\": [\"image\", \"text\"],\n  \"image_config\": {\n    \"aspect_ratio\": \"{{ $node['Set Parameters'].json.aspectRatio }}\",\n    \"quality\": \"{{ $node['Set Parameters'].json.quality }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "id": "dee878d5-0c5d-4ef9-9caa-e4362b77748f",
+      "name": "HTTP Request - Seedance1 VAL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3504,
+        3296
+      ],
+      "connections": {
+        "main": [
+          [
+            {
+              "node": "Extract Image",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HTMy4PMvWAMbU9KO",
+          "mode": "list",
+          "cachedResultName": "Data table Sammary My 09.12.2025",
+          "cachedResultUrl": "/projects/oPj88g0NwuIjQn8H/datatables/HTMy4PMvWAMbU9KO"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "createdAt",
+              "condition": "gte",
+              "keyValue": "={{ $now.minus({ hours: 24 }).toISO() }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -1744,
+        3456
+      ],
+      "id": "e27cc630-cf04-4645-8248-0883cea0eff9",
+      "name": "Get DAY CONTEXT1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        3072
+      ],
+      "id": "01044dae-5898-4e6e-b93e-88d42fa9b65d",
+      "name": "Google Gemini Chat Model10",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "07mn330Ii1yGriyp",
+          "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        3008
+      ],
+      "id": "3129b469-96a1-4c4b-81dd-b4108d79c63b",
+      "name": "Google Gemini Chat Model11",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "07mn330Ii1yGriyp",
+          "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2464,
+        2976
+      ],
+      "id": "df6e0c01-9e4c-457f-97d2-058ec37bd030",
+      "name": "Google Gemini Chat Model12",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "07mn330Ii1yGriyp",
+          "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2656,
+        3024
+      ],
+      "id": "4bf6f82f-d7b6-4d73-b71a-58a6fe1c051a",
+      "name": "Google Gemini Chat Model13",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        3072
+      ],
+      "id": "448063b2-62d0-45a1-91e8-8a99135f3975",
+      "name": "Google Gemini Chat Model14 м v",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        128,
+        3008
+      ],
+      "id": "1ec2901c-8de8-4cf6-9656-2de5a76a5128",
+      "name": "Google Gemini Chat Model14 v",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        720
+      ],
+      "id": "c0438c73-ea62-43bc-8230-26de5709b91e",
+      "name": "Google Gemini Chat Model14",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "07mn330Ii1yGriyp",
+          "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        624
+      ],
+      "id": "f8cb38f0-6cbd-42b7-a8a2-06c3b24e5a90",
+      "name": "Google Gemini Chat Model15",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2064,
+        912
+      ],
+      "id": "31a91571-e518-4ff7-9328-1178097eda74",
+      "name": "Google Gemini Chat Model16",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "07mn330Ii1yGriyp",
+          "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2176,
+        816
+      ],
+      "id": "2bf504c2-8307-45b4-805f-582fcc606eda",
+      "name": "Google Gemini Chat Model17",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "v8Wi53kEBzNbXADn",
+          "name": "Google Gemini(PaLM) 262 303 317 345"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Get row(s) in Data table — получает строки из выбранной таблицы данных по заданным условиям (фильтрам).\nМожно выбрать все строки, отфильтровать по полям (например, chat_id), а результат использовать дальше в потоке.\n\nВставляй в чат id например: -1002584387235",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HTMy4PMvWAMbU9KO",
+          "mode": "list",
+          "cachedResultName": "Data table Sammary My 09.12.2025",
+          "cachedResultUrl": "/projects/oPj88g0NwuIjQn8H/datatables/HTMy4PMvWAMbU9KO"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "keyValue": "={{ String($fromAI('conditions0_Value', `Пример: -1002584387235`, 'string')).trim() }}"
+            },
+            {
+              "keyName": "createdAt",
+              "condition": "gte",
+              "keyValue": "={{ $now.minus({ hours: 24 }).toISO() }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1,
+      "position": [
+        384,
+        3264
+      ],
+      "id": "4e6cabaf-f76a-4512-be60-a757b6fd2d5c",
+      "name": "Get row(s) in Data table"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash-image",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash-image (Nano Banana)"
+        },
+        "prompt": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        3728,
+        1424
+      ],
+      "id": "a35457a7-405d-41e1-9298-79a4ccf432cb",
+      "name": "Generate an image3. 2зкум тщву",
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "07mn330Ii1yGriyp",
+          "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "HTMy4PMvWAMbU9KO",
+          "mode": "list",
+          "cachedResultName": "Data table Sammary My 09.12.2025",
+          "cachedResultUrl": "/projects/oPj88g0NwuIjQn8H/datatables/HTMy4PMvWAMbU9KO"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TEXT": "={{ $json.text }}",
+            "username": "={{ $json.username }}",
+            "chat_id": "={{ $json.chat_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TEXT",
+              "displayName": "TEXT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        368,
+        1104
+      ],
+      "id": "c0be3367-a942-44f3-bc91-27c2e509f61c",
+      "name": "Insert row2"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "HTMy4PMvWAMbU9KO",
+          "mode": "list",
+          "cachedResultName": "Data table Sammary My 09.12.2025",
+          "cachedResultUrl": "/projects/oPj88g0NwuIjQn8H/datatables/HTMy4PMvWAMbU9KO"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TEXT": "={{ $json.text }}",
+            "username": "={{ $json.username }}",
+            "chat_id": "={{ $json.chat_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TEXT",
+              "displayName": "TEXT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        16,
+        1040
+      ],
+      "id": "4bb6c74a-636d-48db-9b23-24b5e966a9d2",
+      "name": "Insert row3"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "TEXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "LLM HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM HTML": {
+      "main": [
+        [
+          {
+            "node": "Process Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Message": {
+      "main": [
+        [
+          {
+            "node": "CleanText",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CleanText": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "openai-whisper-transcribe": {
+      "main": [
+        [
+          {
+            "node": "Audio Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Audio Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Convert video-to-OGG1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "openai-whisper-transcribe",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording1": {
+      "main": [
+        [
+          {
+            "node": "Audio Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File2": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Final Text": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio Text": {
+      "main": [
+        [
+          {
+            "node": "Set Final Text",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "TEXT1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TEXT": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TEXT1": {
+      "main": [
+        [
+          {
+            "node": "Insert row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get DAY CONTEXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get DAY CONTEXT": {
+      "main": [
+        [
+          {
+            "node": "SET",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "chat_id1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SET": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chat_id": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chat_id1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "chat_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image1": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a photo message": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Generate an image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in Data table1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image2": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Generate an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Generate an image2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "LLM HTML1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM HTML1": {
+      "main": [
+        [
+          {
+            "node": "Process Message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Message1": {
+      "main": [
+        [
+          {
+            "node": "CleanText1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CleanText1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert video-to-OGG1": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "OpenRouter Chat Model3": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get DAY CONTEXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model4": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Set Parameters": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Seedance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Seedance": {
+      "main": [
+        [
+          {
+            "node": "Extract Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Image": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Set Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model10": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model11": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "LLM HTML1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model12": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model13": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model14 м v": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "LLM HTML1",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model14 v": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model14": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model15": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model16": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "LLM HTML",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model17": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "LLM HTML",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "365e513d6b01f93d0383cf44bf2fcf223de171db2824e74853d3f013f7c037de"
+  }
+}

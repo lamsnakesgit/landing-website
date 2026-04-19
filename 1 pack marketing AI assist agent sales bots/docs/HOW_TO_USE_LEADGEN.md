@@ -6,6 +6,21 @@
 
 ## 🏗 Краткая архитектура (Как это работает)
 
+```mermaid
+graph TD
+    A[Парсер: hh_parser.py] -->|Собирает B2B лидов .csv / DB| B(Supabase: Таблица leads)
+    C[Человек: Ревьюер] -->|Меняет статус new -> enriched| B
+    B -->|Читает enriched лидов| D[Outreach Daemon]
+    D -->|Задержки 45-140 сек| E{Evolution API}
+    E -->|number-1| F[WhatsApp Клиента 1]
+    E -->|number-2| G[WhatsApp Клиента 2]
+    
+    style A fill:#ff9900,stroke:#333,stroke-width:2px
+    style B fill:#3ecf8e,stroke:#333,stroke-width:2px
+    style D fill:#4a90e2,stroke:#333,stroke-width:2px
+    style E fill:#25D366,stroke:#333,stroke-width:2px
+```
+
 1. **`hh_parser.py`** собирает B2B-компании с открытыми вакансиями и складывает их в CSV. (В будущем мы подключим его напрямую в базу).
 2. Вы отсматриваете эти базы и закидываете целевых лидов в **Supabase** со статусом `enriched`.
 3. Умный демон **`outreach_daemon.py`** работает на сервере 24/7, берет лидов со статусом `enriched` и плавно отправляет им WhatsApp-сообщения.

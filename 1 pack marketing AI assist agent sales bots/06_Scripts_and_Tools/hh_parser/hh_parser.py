@@ -86,10 +86,23 @@ def save_to_csv(data, filename="leads_hh.csv"):
         logger.error(f"Ошибка сохранения CSV: {e}")
 
 if __name__ == "__main__":
-    # Запуск для Алматы (Area 160). 
-    # Ищем логистов и продажников, чтобы вытащить логистические компании
-    QUERY = "Менеджер по логистике OR Руководитель отдела продаж"
-    results = get_companies_hiring(text_query=QUERY, area=160, num_pages=2)
+    # ==========================================
+    # ⚙️ НАСТРОЙКИ ПАРСЕРА
+    # ==========================================
+    # Коды популярных городов (Area ID из базы HH.ru):
+    # 1 - Москва
+    # 2 - Санкт-Петербург
+    # 1220 - Екатеринбург
+    # 40 - Весь Казахстан
+    # 160 - Алматы
+    # 71 - Астана
+    # ==========================================
     
-    save_to_csv(results, "hh_logistics_leads.csv")
-    print(f"Парсинг завершен! Найдено лидов: {len(results)}. Логи в logs/hh_parser.log")
+    CITY_CODE = 1220  # <-- МЕНЯЙ ГОРОД ТУТ (например, Екатеринбург)
+    SEARCH_QUERY = "Руководитель отдела продаж OR Коммерческий директор" # <-- МЕНЯЙ ЗАПРОС ТУТ
+    PAGES_TO_PARSE = 2 # Количество страниц для сбора
+    
+    results = get_companies_hiring(text_query=SEARCH_QUERY, area=CITY_CODE, num_pages=PAGES_TO_PARSE)
+    
+    save_to_csv(results, "hh_leads.csv")
+    print(f"Парсинг завершен! Найдено уникальных B2B компаний: {len(results)}. Файл: hh_leads.csv")

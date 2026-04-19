@@ -1,0 +1,147 @@
+{
+  "name": "WhatsApp Pro Sender (Sheet Trigger)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wa-trigger-pro",
+        "options": {}
+      },
+      "id": "webhook-1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": "={{$node[\"Webhook\"].json[\"spreadsheetId\"]}}",
+        "sheetName": "={{$node[\"Webhook\"].json[\"sheetName\"]}}",
+        "options": {}
+      },
+      "id": "gs-read-1",
+      "name": "Google Sheets Read",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = [];\nfor (const item of items) {\n  const row = item.json;\n  const status = (row['Статус'] || row['status'] || '').toString().toLowerCase().trim();\n  \n  if (status === 'отправить') {\n    let rawPhone = (row['Телефон'] || row['phone'] || row['Номер телефона'] || '').toString().replace(/\\D/g, '');\n    \n    // Исправление формата (8 -> 7)\n    if (rawPhone.length === 11 && rawPhone.startsWith('8')) {\n      rawPhone = '7' + rawPhone.substring(1);\n    }\n    \n    // Если ввели 10 цифр (без кода страны) — добавляем 7\n    if (rawPhone.length === 10) {\n      rawPhone = '7' + rawPhone;\n    }\n\n    \n    const spin = (text) => {\n      if (!text) return \"\";\n      return text.replace(/\\{([^}]+)\\}/g, (m, g) => {\n        const opts = g.split('|');\n        return opts[Math.floor(Math.random() * opts.length)];\n      });\n    };\n    \n    const name = row['Имя'] || row['ФИО'] || row['name'] || '';\n    const firstMsg = \"{Привет|Здравствуйте|Добрый день}, {name}! Это профессиональный тест через n8n.\";\n    const finalMsg = spin(firstMsg).replace(/{name}/g, name);\n    \n    results.push({\n      json: {\n        ...row,\n        normalizedPhone: rawPhone,\n        message: finalMsg,\n        spreadsheetId: $node[\"Webhook\"].json[\"spreadsheetId\"],\n        sheetName: $node[\"Webhook\"].json[\"sheetName\"]\n      }\n    });\n  }\n}\nreturn results;"
+      },
+      "id": "code-1",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://evolutionapi.aiconicvibe.store/message/sendText/8326%20301%20n8n%20wa%201",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{$json[\"normalizedPhone\"]}}"
+            },
+            {
+              "name": "text",
+              "value": "={{$json[\"message\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-wa-1",
+      "name": "HTTP Request WA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [800, 300]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": "={{$json[\"spreadsheetId\"]}}",
+        "sheetName": "={{$json[\"sheetName\"]}}",
+        "columnToMatch": "Телефон",
+        "valueToMatch": "={{$json[\"Телефон\"]}}",
+        "valuesToUpdate": {
+          "values": [
+            {
+              "column": "Статус",
+              "value": "отправлено ✅ (n8n)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "gs-update-1",
+      "name": "Google Sheets Update",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1000, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Read": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request WA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request WA": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
