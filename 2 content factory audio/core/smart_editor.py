@@ -116,53 +116,94 @@ class SmartEditor:
         output_path = self.overlay_dir / "nick_plate.png"
         img.save(output_path)
         return output_path
-    def create_karaoke_sequence(self, clip_name, words, width=720, height=1280):
+    def create_karaoke_sequence(self, clip_name, word_data_list, width=720, height=1280):
         """
-        Генерирует серию PNG для караоке-эффекта.
-        Каждое слово - отдельный файл с подсветкой.
+        Генерирует серию PNG для караоке-эффекта (Фраза целиком + Подсветка).
         """
         clip_overlay_dir = self.overlay_dir / "karaoke" / clip_name.replace(".mp4", "")
         if clip_overlay_dir.exists():
             shutil.rmtree(clip_overlay_dir)
         clip_overlay_dir.mkdir(parents=True, exist_ok=True)
         
-        font_size = 75 # Делаем крупнее для акцента на 1 слово
+        font_size = 52 # Оптимальный размер для V9
         try:
-            font = ImageFont.truetype(self.font_path, font_size)
+            # Helvetica Bold на Mac - это обычно индекс 1 в ttc
+            font = ImageFont.truetype(self.font_path, font_size, index=1)
         except:
             font = ImageFont.load_default()
             
         generated_files = []
         
-        for i, word_data in enumerate(words):
-            text = word_data["word"].upper()
-            img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
-            draw = ImageDraw.Draw(img)
+        # 1. Группируем слова в фразы по ширине (Pixel-Perfect Chunking)
+        max_px_width = width - 120
+        phrases = []
+        current_phrase = []
+        current_w = 0
+        
+        # Вспомогательная функция для замера
+        temp_img = Image.new('RGBA', (1, 1))
+        temp_draw = ImageDraw.Draw(temp_img)
+        
+        for w_info in word_data_list:
+            word_txt = w_info["word"].upper()
+            w_px = temp_draw.textlength(word_txt + " ", font=font)
             
-            # Позиция (Центр-Низ-Средне, чтобы не на лице и не в кнопках)
-            bbox = draw.textbbox((0, 0), text, font=font)
-            w = bbox[2] - bbox[0]
-            x = (width - w) // 2
-            y = height - 450 # Чуть выше ника, но ниже лица
+            if current_w + w_px <= max_px_width:
+                current_phrase.append(w_info)
+                current_w += w_px
+            else:
+                phrases.append(current_phrase)
+                current_phrase = [w_info]
+                current_w = w_px
+        if current_phrase:
+            phrases.append(current_phrase)
             
-            # Стиль: Черная подложка + Желтый текст
-            draw.rounded_rectangle(
-                [x - 15, y - 5, x + w + 15, y + font_size + 10],
-                radius=10,
-                fill=(0, 0, 0, 230)
-            )
-            
-            draw.text((x, y), text, font=font, fill=(255, 204, 0, 255)) # Желтый акцент
-            
-            filename = f"word_{i:03d}.png"
-            path = clip_overlay_dir / filename
-            img.save(path)
-            generated_files.append({
-                "path": path,
-                "start": word_data["start"],
-                "end": word_data["end"]
-            })
-            
+        # 2. Рендерим кадры для каждой фразы
+        frame_idx = 0
+        for phrase in phrases:
+            # Для каждого слова в фразе создаем свой PNG (где оно желтое)
+            for active_idx, active_word_info in enumerate(phrase):
+                img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+                draw = ImageDraw.Draw(img)
+                
+                # Текст всей фразы
+                full_text = " ".join([w["word"].upper() for w in phrase])
+                bbox = draw.textbbox((0, 0), full_text, font=font)
+                total_w = bbox[2] - bbox[0]
+                
+                x = (width - total_w) // 2
+                y = height - 420 # Позиция V9
+                
+                # Рисуем подложку
+                draw.rounded_rectangle(
+                    [x - 20, y - 10, x + total_w + 20, y + font_size + 15],
+                    radius=12,
+                    fill=(0, 0, 0, 180)
+                )
+                
+                # Рисуем слова по очереди
+                current_x = x
+                for i, w_info in enumerate(phrase):
+                    txt = w_info["word"].upper()
+                    color = (255, 204, 0, 255) if i == active_idx else (255, 255, 255, 255)
+                    
+                    # Рисуем слово с контуром для четкости
+                    draw.text((current_x, y), txt, font=font, fill=color, stroke_width=2, stroke_fill="black")
+                    
+                    # Сдвиг
+                    current_x += draw.textlength(txt + " ", font=font)
+                
+                filename = f"word_{frame_idx:03d}.png"
+                path = clip_overlay_dir / filename
+                img.save(path)
+                
+                generated_files.append({
+                    "path": path,
+                    "start": active_word_info["start"],
+                    "end": active_word_info["end"]
+                })
+                frame_idx += 1
+                
         return generated_files
 
 

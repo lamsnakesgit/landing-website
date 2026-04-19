@@ -97,10 +97,10 @@ class VideoEditor:
         filter_parts = []
         input_index = 2 # 0: video, 1: watermark, 2+: words
         
-        # Базовое ускорение видео и аудио
-        # [0:v]setpts=PTS/1.15[v_speed]; [0:a]atempo=1.15[a_speed]
-        
-        overlay_chain = "[0:v]"
+        # Базовое ускорение видео
+        # Сначала ускоряем основной поток видео, чтобы губы совпадали с ускоренным звуком
+        filter_parts.append(f"[0:v]setpts=PTS/{speed}[v_fast]")
+        overlay_chain = "[v_fast]"
         
         # Сцены идут по 8 сек. С учетом xfade (0.5с), каждая следующая сцена начинается на 7.5с позже.
         scene_offsets = [0.0, 7.5, 15.0, 22.5]

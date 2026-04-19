@@ -1,10 +1,10 @@
 # AI Video Production Skill (VEO-3.1)
 
 ## Core Learnings
-- Resolution: Always use 720x1280 for Veo 3.1 clips parity.
-- Logic: Hybrid AI Director (Gemini) for word timing + Python Pillow for graphics.
-- Speed: 1.15x is the sweet spot for Reels dynamics.
+- Resolution: 720x1280 is king.
+- Sync: Always apply setpts=PTS/speed for video if atempo is used.
+- Captions: Phrase-based Karaoke with selective yellow highlight = High Engagement.
 
-## Technical Setup
-- Core: core/smart_editor.py (Rendering), core/video_editor.py (Assembly).
-- Scripts: scripts/transcribe_reels.py (AI Timing).
+## Components
+- core/smart_editor.py: Premium Helvetica Bold, Pixel-Perfect Phrasing.
+- core/video_editor.py: Dynamic 1.15x speed assembly.
