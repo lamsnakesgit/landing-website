@@ -44,3 +44,17 @@
 - Started development of Carousel Bot MVP (AI Carousel Generator via Telegram).
 - Created `docs/CAROUSEL_BOT_PLAN.md` with architecture, database strategy (trial, limits) and force-subscribe monetization plan.
 - Initialized `carousel_bot/` structure.
+
+## [2026-05-12] Автоматическое создание клипа из YouTube
+**Wins:**
+- Удалось обойти блокировку YouTube (403 Forbidden) с помощью обновления yt-dlp и использования android-клиента.
+- Gemini API (gemini-flash-latest) успешно проанализировал 5-минутное видео и выбрал эстетичный момент (шпагат).
+- Нарезка через ffmpeg прошла мгновенно.
+
+**Problems:**
+- Начальные попытки скачивания через yt-dlp блокировались YouTube.
+- Gemini 1.5 Pro и 3.1 Flash выдавали 404 (модели не найдены в текущем окружении/пакете), решено использованием gemini-flash-latest.
+- Первая попытка анализа выдала таймкод за пределами длительности видео (галлюцинация), исправлено добавлением четкой длительности в промпт.
+
+**Russian Duplicate:**
+Автоматизирована нарезка клипа. Решены проблемы с 403 ошибкой YouTube и галлюцинациями таймкодов Gemini. Итоговый клип (15 сек) готов.

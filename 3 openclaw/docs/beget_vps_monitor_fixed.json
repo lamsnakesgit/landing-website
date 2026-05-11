@@ -1,0 +1,518 @@
+{
+    "nodes": [
+        {
+            "parameters": {
+                "url": "https://api.beget.com/v1/vps/region",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpBearerAuth",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "=accept ",
+                            "value": "application/json, text/plain, */*"
+                        },
+                        {
+                            "name": "accept-encoding",
+                            "value": "gzip, deflate, br, zstd"
+                        },
+                        {
+                            "name": "accept-language",
+                            "value": " ru"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                640,
+                0
+            ],
+            "id": "65a8b220-58b3-493f-8e8f-b3f6cde8fa8a",
+            "name": "Проверка статуса доступности VPS",
+            "credentials": {
+                "httpBearerAuth": {
+                    "id": "7lnX8XGhTMyETpJm",
+                    "name": "Beget Bearer Auth account 2"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "chatId": "-1002972210160",
+                "text": "=✅ Доступны VPS серверы\n\n{{ $json.regions.map(r => {\n  const flags = { 'KZ': '🇰🇿', 'LV': '🇱🇻' };\n  return `${flags[r.country]} ${r.name}`;\n}).join('\\n') }}\n\n💡 Редкие локации, быстро разбирают\n⏰ {{ $now.toFormat('dd.MM.yyyy HH:mm') }}\n\n👉 [Перейти к аренде](https://cp.beget.com/cloud/servers/create)",
+                "additionalFields": {
+                    "appendAttribution": false,
+                    "parse_mode": "Markdown"
+                }
+            },
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.2,
+            "position": [
+                1456,
+                0
+            ],
+            "id": "e7f19ee9-21be-4c5b-b0b8-96c8559ee7b5",
+            "name": "Сообщение в Канал",
+            "webhookId": "a804bdb6-6d4d-41cc-80b2-1dd819d26ec6",
+            "credentials": {
+                "telegramApi": {
+                    "id": "fwaMBpglEHwG0RoN",
+                    "name": "Unleash assistant Telegram account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "minutes",
+                            "minutesInterval": 60
+                        }
+                    ]
+                }
+            },
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                0,
+                0
+            ],
+            "id": "3858cdc8-4fa6-4a7c-903c-3c74665c71b2",
+            "name": "Таймер каждые 10 мин"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.beget.com/v1/auth",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"login\": \"{{ $json.login }}\",\n  \"password\": \"{{ $json.Pass }}\",\n  \"code\": \"\",\n  \"saveMe\": false\n}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                448,
+                0
+            ],
+            "id": "93b5a75a-8095-48d0-bae2-90e5bc937c92",
+            "name": "Beget Auth",
+            "retryOnFail": true
+        },
+        {
+            "parameters": {
+                "jsCode": "// Получаем все регионы\nconst regions = $input.item.json.regions;\n\n// Фильтруем только Казахстан и Латвию\nconst targetRegions = regions.filter(region => \n  region.country === 'KZ' || region.country === 'LV'\n);\n\n// Возвращаем только ДОСТУПНЫЕ серверы\nconst availableRegions = targetRegions.filter(region => region.available === true);\n\n// Если нет доступных - возвращаем пустой массив\nif (availableRegions.length === 0) {\n  return [];\n}\n\n// Возвращаем каждый регион как отдельный item\nreturn availableRegions.map(region => ({\n  json: {\n    id: region.id,\n    name: region.name,\n    country: region.country,\n    available: region.available\n  }\n}));"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                848,
+                0
+            ],
+            "id": "8aaa6286-d31f-4802-a434-3848d9ffa2d4",
+            "name": "Фильтр KZ и LV"
+        },
+        {
+            "parameters": {
+                "operation": "get",
+                "dataTableId": {
+                    "__rl": true,
+                    "value": "S2c7w5UgIivtlVyg",
+                    "mode": "list",
+                    "cachedResultName": "VPS hunt log",
+                    "cachedResultUrl": "/projects/byEHRIk7uMo1kClK/datatables/S2c7w5UgIivtlVyg"
+                },
+                "returnAll": true,
+                "options": {}
+            },
+            "type": "n8n-nodes-base.dataTable",
+            "typeVersion": 1,
+            "position": [
+                1056,
+                0
+            ],
+            "id": "eac63904-b987-414b-9ceb-c4725857041d",
+            "name": "Получить даты отправки",
+            "alwaysOutputData": true,
+            "executeOnce": true
+        },
+        {
+            "parameters": {
+                "jsCode": "// Получаем ВСЕ регионы из фильтра\nconst regions = $('Фильтр KZ и LV').all().map(item => item.json);\n\n// Получаем записи из таблицы\nconst tableData = $('Получить даты отправки').all();\n\n// Текущая дата\nconst today = new Date().toISOString().split('T')[0];\n\n// Фильтруем регионы, для которых НЕ отправляли сегодня\nconst regionsToNotify = regions.filter(region => {\n  // Находим запись в таблице для этого региона (с защитой от пустого alwaysOutputData)\n  const countryRecord = tableData.find(item => item && item.json && item.json.country === region.country);\n  \n  // Если записи нет или дата не сегодня - добавляем в список\n  return !countryRecord || countryRecord.json.last_sent_date !== today;\n});\n\n// Если есть регионы для уведомления\nif (regionsToNotify.length > 0) {\n  return [{\n    json: {\n      regions: regionsToNotify,\n      shouldSend: true\n    }\n  }];\n}\n\n// Ничего не отправляем\nreturn [];"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1264,
+                0
+            ],
+            "id": "bebeba62-c385-4074-92ea-2f6d512461b3",
+            "name": "Проверка - отправляли сегодня?"
+        },
+        {
+            "parameters": {
+                "dataTableId": {
+                    "__rl": true,
+                    "value": "S2c7w5UgIivtlVyg",
+                    "mode": "list",
+                    "cachedResultName": "VPS hunt log",
+                    "cachedResultUrl": "/projects/byEHRIk7uMo1kClK/datatables/S2c7w5UgIivtlVyg"
+                },
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": {
+                        "country": "={{ $json.country }}",
+                        "last_sent_date": "={{ $now.toISO().split('T')[0] }}"
+                    },
+                    "matchingColumns": [],
+                    "schema": [
+                        {
+                            "id": "country",
+                            "displayName": "country",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "readOnly": false,
+                            "removed": false
+                        },
+                        {
+                            "id": "last_sent_date",
+                            "displayName": "last_sent_date",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "readOnly": false,
+                            "removed": false
+                        }
+                    ],
+                    "attemptToConvertTypes": false,
+                    "convertFieldsToString": false
+                },
+                "options": {
+                    "optimizeBulk": false
+                }
+            },
+            "type": "n8n-nodes-base.dataTable",
+            "typeVersion": 1,
+            "position": [
+                2384,
+                336
+            ],
+            "id": "edd63ece-df09-494d-bfa8-8527263dcfe4",
+            "name": "Insert row"
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "dataTableId": {
+                    "__rl": true,
+                    "value": "S2c7w5UgIivtlVyg",
+                    "mode": "list",
+                    "cachedResultName": "VPS hunt log",
+                    "cachedResultUrl": "/projects/byEHRIk7uMo1kClK/datatables/S2c7w5UgIivtlVyg"
+                },
+                "filters": {
+                    "conditions": [
+                        {
+                            "keyValue": "={{ $json.recordId }}"
+                        }
+                    ]
+                },
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": {
+                        "last_sent_date": "={{ $now.toISO().split('T')[0] }}",
+                        "country": "={{ $json.country }}"
+                    },
+                    "matchingColumns": [],
+                    "schema": [
+                        {
+                            "id": "country",
+                            "displayName": "country",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "readOnly": false,
+                            "removed": false
+                        },
+                        {
+                            "id": "last_sent_date",
+                            "displayName": "last_sent_date",
+                            "required": false,
+                            "defaultMatch": false,
+                            "display": true,
+                            "type": "string",
+                            "readOnly": false,
+                            "removed": false
+                        }
+                    ],
+                    "attemptToConvertTypes": false,
+                    "convertFieldsToString": false
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.dataTable",
+            "typeVersion": 1,
+            "position": [
+                2400,
+                608
+            ],
+            "id": "f8b63610-26de-4966-833a-a862554c4b9f",
+            "name": "Update row(s)"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Новый узел Code после Telegram для подготовки данных\n// Получаем регионы из узла \"Проверка - отправляли сегодня?\" а не из Telegram!\n// Защита от пустого ответа \nconst checkNode = $('Проверка - отправляли сегодня?').item;\nif (!checkNode || !checkNode.json || !checkNode.json.regions) {\n  return [];\n}\n\nconst regions = checkNode.json.regions;\nconst tableData = $('Получить даты отправки').all();\n\nreturn regions.map(region => {\n  const existingRecord = tableData.find(item => item && item.json && item.json.country === region.country);\n  \n  return {\n    json: {\n      country: region.country,\n      recordId: existingRecord ? existingRecord.json.id : null,\n      action: existingRecord ? 'update' : 'insert'\n    }\n  };\n});"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1648,
+                0
+            ],
+            "id": "51773276-c8f5-483e-b5a5-04452b3b36b8",
+            "name": "Code (подготовка данных для обновления таблицы)"
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "n8n-nodes-base.splitInBatches",
+            "typeVersion": 3,
+            "position": [
+                1920,
+                0
+            ],
+            "id": "de8f2424-de51-4986-a40d-f07845a8e2c2",
+            "name": "По штучно"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "8a1b15dc-9415-4f86-93aa-f7266d049f9c",
+                            "leftValue": "={{ $json.action }}",
+                            "rightValue": "update",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals",
+                                "name": "filter.operator.equals"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.2,
+            "position": [
+                2128,
+                240
+            ],
+            "id": "48a9d57a-c627-433a-92f7-7314fa397e47",
+            "name": "Новая запись?"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "a9530e6b-0988-4732-922c-f953705c2de5",
+                            "name": "login",
+                            "value": "serverp9",
+                            "type": "string"
+                        },
+                        {
+                            "id": "04fc4315-d2a5-4f07-ae30-6cfca4817d2a",
+                            "name": "Pass",
+                            "value": "Character-Rocky-Spookily-Batboy-Modify-Capture9",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                208,
+                0
+            ],
+            "id": "9923f1b1-b6de-40df-9f86-5bda756c03c7",
+            "name": "Edit Fields"
+        }
+    ],
+    "connections": {
+        "Проверка статуса доступности VPS": {
+            "main": [
+                [
+                    {
+                        "node": "Фильтр KZ и LV",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Сообщение в Канал": {
+            "main": [
+                [
+                    {
+                        "node": "Code (подготовка данных для обновления таблицы)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Таймер каждые 10 мин": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Beget Auth": {
+            "main": [
+                [
+                    {
+                        "node": "Проверка статуса доступности VPS",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Фильтр KZ и LV": {
+            "main": [
+                [
+                    {
+                        "node": "Получить даты отправки",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Получить даты отправки": {
+            "main": [
+                [
+                    {
+                        "node": "Проверка - отправляли сегодня?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Проверка - отправляли сегодня?": {
+            "main": [
+                [
+                    {
+                        "node": "Сообщение в Канал",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Insert row": {
+            "main": [
+                [
+                    {
+                        "node": "По штучно",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Update row(s)": {
+            "main": [
+                [
+                    {
+                        "node": "По штучно",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code (подготовка данных для обновления таблицы)": {
+            "main": [
+                [
+                    {
+                        "node": "По штучно",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "По штучно": {
+            "main": [
+                [],
+                [
+                    {
+                        "node": "Новая запись?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Новая запись?": {
+            "main": [
+                [
+                    {
+                        "node": "Update row(s)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Insert row",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields": {
+            "main": [
+                [
+                    {
+                        "node": "Beget Auth",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "pinData": {},
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "e57531a2cc575c8a2ad75bb1a37b1fcb529f6e6a1790286b60f11fb2641dadd1"
+    }
+}

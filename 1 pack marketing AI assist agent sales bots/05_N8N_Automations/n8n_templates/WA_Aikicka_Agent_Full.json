@@ -1,0 +1,478 @@
+{
+  "name": "🤖 WA AI Агент Aikicka (Evolution API)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# 🤖 WA AI Агент Aikicka\n## ⚙️ Настройка (3 шага):\n1. **apikey** — замени `YOUR_EVOLUTION_API_KEY` во всех HTTP-узлах\n2. **instance** — замени `YOUR_INSTANCE` на имя инстанса из Evolution Manager\n3. **Gemini** — подключи кредишл `Google Gemini(PaLM) Api account`\n4. **Google TTS** — замени `YOUR_GOOGLE_TTS_KEY` (1М символов/мес бесплатно!)\n5. **Webhook URL** — в Evolution Manager поставь вебхук: `https://n8n.aiconicvibe.store/webhook/wa-aikicka`\n   + включи `base64: true` для медиа в настройках вебхука\n\n## 🔗 Evolution API\nhttps://evolutionapi.aiconicvibe.store/manager",
+        "height": 320,
+        "width": 480,
+        "color": 7
+      },
+      "id": "sticky_setup",
+      "name": "📋 Инструкция по настройке",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-320, -340]
+    },
+    {
+      "parameters": {
+        "content": "## 📨 Шаг 1: Вебхук\nПолучает ВСЕ события из WhatsApp.\nПуть: `/wa-aikicka`\n\nВ Evolution Manager → Instance Settings → Webhook:\n- URL: `https://n8n.aiconicvibe.store/webhook/wa-aikicka`\n- Включи: `base64: true`",
+        "height": 200,
+        "width": 280,
+        "color": 6
+      },
+      "id": "sticky_1",
+      "name": "Sticky 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [200, -340]
+    },
+    {
+      "parameters": {
+        "content": "## 🔍 Шаг 2: Фильтр\nПропускаем только:\n- входящие (fromMe = false)\n- событие messages.upsert\n\nБоты и системные события игнорируются.",
+        "height": 200,
+        "width": 280,
+        "color": 5
+      },
+      "id": "sticky_2",
+      "name": "Sticky 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [520, -340]
+    },
+    {
+      "parameters": {
+        "content": "## 🎤 Шаг 3: Маршрут по типу\n**Голос** → base64 декод → Whisper ASR\n**Текст/Фото/Видео** → извлечь текст/подпись\n\nОба пути сходятся к AI Агенту.",
+        "height": 200,
+        "width": 280,
+        "color": 4
+      },
+      "id": "sticky_3",
+      "name": "Sticky 3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [840, -340]
+    },
+    {
+      "parameters": {
+        "content": "## 🧠 Шаг 4: Gemini AI Агент\n- Модель: gemini-2.0-flash\n- Память: 10 последних сообщений\n- Сессия: по chatId (remoteJid)\n\nЕсли решает ответить голосом — начинает ответ с `[VOICE]`",
+        "height": 200,
+        "width": 280,
+        "color": 3
+      },
+      "id": "sticky_4",
+      "name": "Sticky 4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1260, -340]
+    },
+    {
+      "parameters": {
+        "content": "## 📤 Шаг 5: Отправка\n**[VOICE] в ответе** → Google Cloud TTS → voice note в WA\n**Текст** → sendText в WA\n\nGoogle TTS: ru-RU-Wavenet-D\n1 млн символов/мес БЕСПЛАТНО",
+        "height": 200,
+        "width": 280,
+        "color": 2
+      },
+      "id": "sticky_5",
+      "name": "Sticky 5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1680, -340]
+    },
+    {
+      "parameters": {
+        "path": "wa-aikicka",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Evolution Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "cond-not-me",
+              "leftValue": "={{ $json.body.data.key.fromMe }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEqual"
+              }
+            },
+            {
+              "id": "cond-event",
+              "leftValue": "={{ $json.body.event }}",
+              "rightValue": "messages.upsert",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "filter_own",
+      "name": "Только входящие",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "cond-audio",
+              "leftValue": "={{ $json.body.data.messageType }}",
+              "rightValue": "audioMessage",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "is_audio",
+      "name": "Это голос?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [700, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Извлекаем текст из текстового/медиа-сообщения WhatsApp\nconst data = $input.first().json.body.data;\nconst msgType = data.messageType;\nconst msg = data.message || {};\n\nlet userMessage = '';\nlet mediaHint = '';\n\nswitch (msgType) {\n  case 'conversation':\n    userMessage = msg.conversation || '';\n    break;\n  case 'extendedTextMessage':\n    userMessage = msg.extendedTextMessage?.text || '';\n    break;\n  case 'imageMessage':\n    userMessage = msg.imageMessage?.caption || '[Пользователь прислал изображение без подписи]';\n    mediaHint = '(изображение)';\n    break;\n  case 'videoMessage':\n    userMessage = msg.videoMessage?.caption || '[Пользователь прислал видео]';\n    mediaHint = '(видео)';\n    break;\n  case 'documentMessage':\n    const fname = msg.documentMessage?.fileName || 'файл';\n    userMessage = msg.documentMessage?.caption || `[Прислал документ: ${fname}]`;\n    mediaHint = '(документ)';\n    break;\n  case 'stickerMessage':\n    userMessage = '[Прислал стикер 😊 — ответь на него уместно]';\n    break;\n  case 'reactionMessage':\n    userMessage = `[Поставил реакцию ${msg.reactionMessage?.text || '👍'} на сообщение]`;\n    break;\n  default:\n    userMessage = `[Неизвестный тип: ${msgType}]`;\n}\n\nconst sender = data.key?.participant || data.key?.remoteJid || 'unknown';\nconst chatId = data.key?.remoteJid || 'unknown';\nconst senderName = data.pushName || sender.replace('@s.whatsapp.net', '');\n\nreturn [{\n  json: {\n    userMessage,\n    mediaHint,\n    sender,\n    senderName,\n    chatId,\n    instanceName: $input.first().json.body.instance,\n    messageType: msgType,\n    isVoice: false\n  }\n}];"
+      },
+      "id": "extract_text",
+      "name": "Извлечь текст",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [940, 120]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Конвертируем base64 аудио в бинарный файл для Whisper\n// Для работы: в Evolution Manager → Instance → Webhook → включи base64=true\nconst item = $input.first().json;\nconst data = item.body.data;\n\nconst base64Data = data.message?.base64\n  || data.message?.audioMessage?.base64\n  || data.message?.audioMessage?.jpegThumbnail; // fallback\n\nif (!base64Data) {\n  throw new Error('❌ base64 аудио не найдено! Открой Evolution Manager → Instance → Webhook → включи \"Base64\" для медиафайлов');\n}\n\nconst sender = data.key?.participant || data.key?.remoteJid || 'unknown';\nconst chatId = data.key?.remoteJid || 'unknown';\nconst senderName = data.pushName || sender.replace('@s.whatsapp.net', '');\n\nreturn [{\n  json: {\n    sender,\n    senderName,\n    chatId,\n    instanceName: item.body.instance,\n    messageType: 'audioMessage',\n    isVoice: true\n  },\n  binary: {\n    audioFile: {\n      data: base64Data,\n      mimeType: 'audio/ogg',\n      fileName: 'voice.ogg'\n    }\n  }\n}];"
+      },
+      "id": "decode_audio",
+      "name": "Декодировать аудио",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [940, -120]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openai-whisper-asr-webservice-production.up.railway.app/asr",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "task", "value": "transcribe" },
+            { "name": "output", "value": "json" },
+            { "name": "encode", "value": "true" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "accept", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "audio_file",
+              "inputDataFieldName": "audioFile"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "whisper",
+      "name": "Whisper Транскрипция",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1160, -120]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Собираем данные после Whisper — берём транскрипт и мета из Декодировать аудио\nconst whisperResult = $input.first().json;\nconst transcript = whisperResult.text || '[Не удалось распознать речь]';\n\nconst prev = $('Декодировать аудио').first().json;\n\nreturn [{\n  json: {\n    userMessage: `🎤 [голосовое]: ${transcript}`,\n    mediaHint: '(голосовое сообщение)',\n    sender: prev.sender,\n    senderName: prev.senderName,\n    chatId: prev.chatId,\n    instanceName: prev.instanceName,\n    messageType: 'audioMessage',\n    isVoice: true\n  }\n}];"
+      },
+      "id": "merge_whisper",
+      "name": "Собрать аудио данные",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1380, -120]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ ($json.isVoice ? '🎤 ГОЛОСОВОЕ ' : '💬 ТЕКСТ ') + 'от ' + $json.senderName + ':\\n' + $json.userMessage + ($json.mediaHint ? '\\n(' + $json.mediaHint + ')' : '') }}",
+        "options": {
+          "systemMessage": "Ты — Айкичка, умный и дружелюбный AI-ассистент в WhatsApp. Немного с характером, но всегда полезный.\n\n**Как ты общаешься:**\n- Кратко и по делу — не растекайся водой\n- Используй эмодзи умеренно, только для акцента\n- Помнишь контекст разговора (используй это)\n- Если не знаешь — честно скажи\n\n**Форматирование (СТРОГО WhatsApp Markdown):**\n- *жирный* для акцентов\n- _курсив_ для примечаний  \n- ~зачёркнутый~ при необходимости\n- Списки: - или 1. 2. 3.\n- БЕЗ HTML! Никаких <b> <i> <br> <h3>\n\n**Когда отвечать ГОЛОСОМ:**\nЕсли сообщение пришло как ГОЛОСОВОЕ — предпочти голосовой ответ.\nЕсли вопрос неформальный и короткий (< 15 слов) — тоже можно голосом.\nВ таких случаях начни ответ с тега [VOICE] (без пробела перед текстом).\n\nПример голосового ответа:\n[VOICE]Конечно, сделаю! Дай минуту 😊\n\nПример текстового ответа:\n*Вот что нашёл по твоему вопросу:*\n- Пункт 1\n- Пункт 2"
+        }
+      },
+      "id": "ai_agent",
+      "name": "AI Агент Айкичка",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [1620, 0]
+    },
+    {
+      "parameters": {
+        "model": "gemini-2.0-flash",
+        "options": {}
+      },
+      "id": "gemini_llm",
+      "name": "Google Gemini Flash",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [1580, 200],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Evolution Webhook').first().json.body.data.key.remoteJid }}",
+        "contextWindowLength": 10
+      },
+      "id": "window_memory",
+      "name": "Память чата (10 сообщений)",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.2,
+      "position": [1760, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "cond-voice-resp",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "[VOICE]",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "check_voice",
+      "name": "Ответить голосом?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1880, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Очищаем тег [VOICE] и убираем WA markdown для чистого TTS текста\nconst raw = $input.first().json.output;\nconst cleanText = raw.replace(/^\\[VOICE\\]\\s*/, '').trim();\n\nconst ttsText = cleanText\n  .replace(/\\*([^*]+)\\*/g, '$1')\n  .replace(/_([^_]+)_/g, '$1')\n  .replace(/~([^~]+)~/g, '$1')\n  .replace(/`([^`]+)`/g, '$1')\n  .trim();\n\nconst chatId = $('Evolution Webhook').first().json.body.data.key.remoteJid;\nconst instanceName = $('Evolution Webhook').first().json.body.instance;\n\nreturn [{\n  json: {\n    cleanText,\n    ttsText,\n    chatId,\n    instanceName,\n    ttsBody: JSON.stringify({\n      input: { text: ttsText },\n      voice: {\n        languageCode: 'ru-RU',\n        name: 'ru-RU-Wavenet-D',\n        ssmlGender: 'MALE'\n      },\n      audioConfig: {\n        audioEncoding: 'MP3',\n        speakingRate: 1.05\n      }\n    })\n  }\n}];"
+      },
+      "id": "prep_tts",
+      "name": "Подготовить TTS запрос",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2100, -120]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://texttospeech.googleapis.com/v1/text:synthesize?key=YOUR_GOOGLE_TTS_KEY",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "string",
+        "body": "={{ $json.ttsBody }}",
+        "options": {}
+      },
+      "id": "google_tts",
+      "name": "Google Cloud TTS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2320, -120]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://evolutionapi.aiconicvibe.store/message/sendWhatsAppAudio/{{ $('Подготовить TTS запрос').first().json.instanceName }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "YOUR_EVOLUTION_API_KEY" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $('Подготовить TTS запрос').first().json.chatId }}\",\n  \"encoding\": true,\n  \"audio\": \"{{ $json.audioContent }}\"\n}",
+        "options": {}
+      },
+      "id": "send_audio",
+      "name": "Отправить аудио в WA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2540, -120]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://evolutionapi.aiconicvibe.store/message/sendText/{{ $('Evolution Webhook').first().json.body.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "YOUR_EVOLUTION_API_KEY" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $('Evolution Webhook').first().json.body.data.key.remoteJid }}\",\n  \"text\": \"{{ $json.output }}\"\n}",
+        "options": {}
+      },
+      "id": "send_text",
+      "name": "Отправить текст в WA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2100, 120]
+    }
+  ],
+  "connections": {
+    "Evolution Webhook": {
+      "main": [
+        [
+          { "node": "Только входящие", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Только входящие": {
+      "main": [
+        [
+          { "node": "Это голос?", "type": "main", "index": 0 }
+        ],
+        []
+      ]
+    },
+    "Это голос?": {
+      "main": [
+        [
+          { "node": "Декодировать аудио", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Извлечь текст", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Декодировать аудио": {
+      "main": [
+        [
+          { "node": "Whisper Транскрипция", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Whisper Транскрипция": {
+      "main": [
+        [
+          { "node": "Собрать аудио данные", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Собрать аудио данные": {
+      "main": [
+        [
+          { "node": "AI Агент Айкичка", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Извлечь текст": {
+      "main": [
+        [
+          { "node": "AI Агент Айкичка", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "AI Агент Айкичка": {
+      "main": [
+        [
+          { "node": "Ответить голосом?", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Google Gemini Flash": {
+      "ai_languageModel": [
+        [
+          { "node": "AI Агент Айкичка", "type": "ai_languageModel", "index": 0 }
+        ]
+      ]
+    },
+    "Память чата (10 сообщений)": {
+      "ai_memory": [
+        [
+          { "node": "AI Агент Айкичка", "type": "ai_memory", "index": 0 }
+        ]
+      ]
+    },
+    "Ответить голосом?": {
+      "main": [
+        [
+          { "node": "Подготовить TTS запрос", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Отправить текст в WA", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Подготовить TTS запрос": {
+      "main": [
+        [
+          { "node": "Google Cloud TTS", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Google Cloud TTS": {
+      "main": [
+        [
+          { "node": "Отправить аудио в WA", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}

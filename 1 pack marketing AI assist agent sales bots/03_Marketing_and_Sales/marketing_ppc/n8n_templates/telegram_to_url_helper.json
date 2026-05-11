@@ -1,0 +1,123 @@
+{
+    "name": "Helper: Get Image URL from Telegram (Ultra Robust)",
+    "nodes": [
+        {
+            "parameters": {
+                "updates": [
+                    "message"
+                ]
+            },
+            "id": "1",
+            "name": "Telegram Trigger",
+            "type": "n8n-nodes-base.telegramTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                0,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Впиши свой токен ниже ОДИН РАЗ.\n// Он нужен для сборки ссылки, т.к. n8n Credentials не отдают токен в открытом виде.\nconst token = \"ТВОЙ_ТОКЕН_БОТА\"; \n\nconst photo = $json.message?.photo;\nif (photo && Array.isArray(photo) && photo.length > 0) {\n  return {\n    bot_token: token,\n    file_id: photo.reverse()[0].file_id,\n    chat_id: $json.message.chat.id\n  };\n}\nreturn null;"
+            },
+            "id": "2",
+            "name": "Check for Photo",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "getFile",
+                "fileId": "={{ $json.file_id }}"
+            },
+            "id": "3",
+            "name": "Get File Info",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.2,
+            "position": [
+                500,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Сборка финального URL\n// Мы берем данные из текущего узла ($json) \n// И данные из САМОГО ПЕРВОГО узла с кодом через поиск по имени\n// Чтобы избежать ошибок 'Node unexecuted', мы используем прямую ссылку.\n\nconst fileInfo = $json;\nconst checkNode = $items(\"Check for Photo\")[0].json;\n\nreturn {\n  direct_url: `https://api.telegram.org/file/bot${checkNode.bot_token}/${fileInfo.file_path}`,\n  chat_id: checkNode.chat_id\n};"
+            },
+            "id": "4",
+            "name": "Construct Direct URL",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                750,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "chatId": "={{ $json.chat_id }}",
+                "text": "=🔗 <b>Твоя ссылка на картинку:</b>\n\n<code>{{ $json.direct_url }}</code>",
+                "additionalFields": {
+                    "parse_mode": "HTML"
+                }
+            },
+            "id": "5",
+            "name": "Send URL Back",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.2,
+            "position": [
+                1000,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Telegram Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Check for Photo",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Check for Photo": {
+            "main": [
+                [
+                    {
+                        "node": "Get File Info",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get File Info": {
+            "main": [
+                [
+                    {
+                        "node": "Construct Direct URL",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Construct Direct URL": {
+            "main": [
+                [
+                    {
+                        "node": "Send URL Back",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

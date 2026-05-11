@@ -1,0 +1,285 @@
+{
+  "name": "TG -> WhatsApp (Evolution API)",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "1",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "api_key",
+              "value": "ВАШ_КЛЮЧ_EVOLUTION",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "instance",
+              "value": "ИМЯ_ИНСТАНСА",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "target_number",
+              "value": "77000000000",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond1",
+              "leftValue": "={{ $json.message.photo }}",
+              "rightValue": "",
+              "operator": {
+                "type": "any",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3",
+      "name": "Проверка наличия фото",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 3,
+      "position": [
+        400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": "={{ $json.message.photo.slice(-1)[0].file_id }}",
+        "binaryPropertyName": "data",
+        "additionalFields": {}
+      },
+      "id": "4",
+      "name": "Telegram (Download)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        600,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://localhost:8081/message/sendMedia/{{ $node[\"Config\"].json[\"instance\"] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $node[\"Config\"].json[\"target_number\"] }}"
+            },
+            {
+              "name": "media",
+              "value": "=data:image/jpeg;base64,{{ $binary.data.data }}"
+            },
+            {
+              "name": "mediatype",
+              "value": "image"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $json.message.caption || '' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5",
+      "name": "Send Media (Evolution)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        800,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://localhost:8081/message/sendText/{{ $node[\"Config\"].json[\"instance\"] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $node[\"Config\"].json[\"target_number\"] }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.message.text || 'Получено сообщение неподдерживаемого типа' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6",
+      "name": "Send Text (Evolution)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        600,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Настройка Telegram\n1. Подключите Credentials бота.\n2. Бот будет слушать все входящие сообщения.",
+        "height": 140,
+        "width": 280
+      },
+      "id": "sticky1",
+      "name": "Стикер 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Глобальные Переменные\nЗдесь укажите: `api_key` для Evolution, `instance` и `target_number` (номер в WA, куда будем пересылать).",
+        "height": 140,
+        "width": 280
+      },
+      "id": "sticky2",
+      "name": "Стикер 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Загрузка Медиа\nБерём самое большое фото (slice -1).\nСвойство: `binary property name = data`.",
+        "height": 140,
+        "width": 280
+      },
+      "id": "sticky3",
+      "name": "Стикер 3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        580,
+        40
+      ]
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Проверка наличия фото",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Проверка наличия фото": {
+      "main": [
+        [
+          {
+            "node": "Telegram (Download)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Text (Evolution)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram (Download)": {
+      "main": [
+        [
+          {
+            "node": "Send Media (Evolution)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

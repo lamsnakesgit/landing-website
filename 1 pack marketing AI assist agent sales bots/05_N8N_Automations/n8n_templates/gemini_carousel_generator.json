@@ -1,0 +1,166 @@
+{
+  "name": "Gemini AI Carousel Generator (N8N API)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "GEMINI_API_KEY",
+              "value": "AIzaSyD5jmzR6scSp-KsRH0ECOjSqLbemAfQWw0"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2",
+      "name": "Set API Key",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key={{ $json.GEMINI_API_KEY }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "contents",
+              "value": "={{ [\n  {\n    \"parts\": [\n      {\n         \"text\": \"Ты — ИИ-маркетолог. Создай текст для 4 триггерных слайдов карусели в Instagram/Telegram на тему «Как я увеличиваю конверсии отдела продаж за счет AI-ассистентов». Верни СТРОГО чистый JSON-массив объектов с полями 'slide' и 'text' (очень короткий цепляющий заголовок).\"\n      }\n    ]\n  }\n] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3",
+      "name": "Gemini HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        400,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  // API Gemini возвращает текст внутри candidates[0].content.parts[0].text\n  const rawText = $input.all()[0].json.candidates[0].content.parts[0].text;\n  \n  // Очищаем текст от маркдаун блоков, если они есть (например ```json ... ```)\n  const cleanJson = rawText.replace(/```json/g, '').replace(/```/g, '').trim();\n  \n  const slides = JSON.parse(cleanJson);\n  \n  // Преобразуем массив в формат n8n (каждый элемент = отдельный Item)\n  return slides.map(slide => ({ json: slide }));\n} catch (e) {\n  return [{ json: { error: \"Failed to parse response\", raw: $input.all()[0].json } }];\n}"
+      },
+      "id": "4",
+      "name": "Parse JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "addText",
+        "text": "={{ $json.text }}",
+        "fontColor": "#ffffff",
+        "fontSize": 60,
+        "positionX": 100,
+        "positionY": 500,
+        "options": {
+          "lineWrap": true,
+          "maxLineWidth": 800
+        }
+      },
+      "id": "5",
+      "name": "Edit Image (Overlay Text)",
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        800,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Подключение Gemini API\nЯ уже добавил сюда ваш публичный ключ `AIzaSy...` в ноду `Set API Key`. Теперь вам **вообще не надо** настраивать Credentials в самом n8n! Воркфлоу готов к запуску из коробки.",
+        "height": 130,
+        "width": 310
+      },
+      "id": "sticky1",
+      "name": "Стикер 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        40
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set API Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set API Key": {
+      "main": [
+        [
+          {
+            "node": "Gemini HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Parse JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse JSON": {
+      "main": [
+        [
+          {
+            "node": "Edit Image (Overlay Text)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

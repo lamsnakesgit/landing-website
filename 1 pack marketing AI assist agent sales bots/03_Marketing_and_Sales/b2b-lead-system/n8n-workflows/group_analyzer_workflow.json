@@ -1,0 +1,552 @@
+{
+  "name": "B2B Analyzer — Telegram + WhatsApp группы",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "id": "trigger-schedule",
+      "name": "Триггер каждые 30 мин",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Список чатов для мониторинга\n// Заполни своими данными\nreturn [\n  {\n    json: {\n      type: 'telegram',\n      chat_id: '-100XXXXXXXXXX',   // ID Telegram-группы (узнать: @userinfobot)\n      chat_name: 'IT Kazakhstan',\n      bot_token: '{{ $vars.TELEGRAM_BOT_TOKEN }}',\n    }\n  },\n  {\n    json: {\n      type: 'telegram',\n      chat_id: '-100YYYYYYYYYY',\n      chat_name: 'Маркетинг Алматы',\n      bot_token: '{{ $vars.TELEGRAM_BOT_TOKEN }}',\n    }\n  },\n  {\n    json: {\n      type: 'whatsapp',\n      chat_id: 'GROUP_PHONE_OR_ID@g.us',\n      chat_name: 'B2B Казахстан',\n      wa_token: '{{ $vars.WHATSAPP_API_TOKEN }}',\n      wa_phone_id: '{{ $vars.WHATSAPP_PHONE_ID }}',\n    }\n  }\n];"
+      },
+      "id": "chat-list",
+      "name": "Список чатов",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "telegram",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      },
+      "id": "split-by-type",
+      "name": "Разделить: TG / WA",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.telegram.org/bot{{ $json.bot_token }}/getUpdates",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "offset",
+              "value": "={{ $vars['TG_OFFSET_' + $json.chat_id] || 0 }}"
+            },
+            {
+              "name": "limit",
+              "value": "100"
+            },
+            {
+              "name": "allowed_updates",
+              "value": "[\"message\",\"channel_post\"]"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "get-telegram-updates",
+      "name": "Получить TG сообщения",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "const updates = $input.first().json.result || [];\nconst chatId = $('Разделить: TG / WA').first().json.chat_id;\nconst chatName = $('Разделить: TG / WA').first().json.chat_name;\n\nconst messages = [];\nlet maxUpdateId = 0;\n\nfor (const update of updates) {\n  const updateId = update.update_id;\n  if (updateId > maxUpdateId) maxUpdateId = updateId;\n\n  const msg = update.message || update.channel_post;\n  if (!msg) continue;\n  if (String(msg.chat?.id) !== String(chatId)) continue;\n\n  const from = msg.from || {};\n  messages.push({\n    source: 'telegram',\n    chat_id: String(chatId),\n    chat_name: chatName,\n    message_id: String(msg.message_id),\n    user_id: String(from.id || 'channel'),\n    user_name: from.first_name || '',\n    username: from.username || '',\n    text: msg.text || msg.caption || '',\n    datetime: new Date(msg.date * 1000).toISOString(),\n    next_offset: maxUpdateId + 1,\n  });\n}\n\nreturn messages.map(m => ({ json: m }));"
+      },
+      "id": "parse-tg-messages",
+      "name": "Парсинг TG сообщений",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 180]
+    },
+
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://graph.facebook.com/v18.0/{{ $json.wa_phone_id }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.wa_token }}"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,from,text,timestamp,type"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "get-wa-messages",
+      "name": "Получить WA сообщения",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 420]
+    },
+    {
+      "parameters": {
+        "jsCode": "// WhatsApp Cloud API — парсинг сообщений\nconst data = $input.first().json;\nconst chatId = $('Разделить: TG / WA').last().json.chat_id;\nconst chatName = $('Разделить: TG / WA').last().json.chat_name;\n\nconst messages = [];\nconst entries = data.data || data.messages || [];\n\nfor (const msg of entries) {\n  if (msg.type !== 'text') continue;\n  messages.push({\n    source: 'whatsapp',\n    chat_id: chatId,\n    chat_name: chatName,\n    message_id: String(msg.id || ''),\n    user_id: String(msg.from || ''),\n    user_name: '',\n    username: String(msg.from || ''),\n    text: msg.text?.body || '',\n    datetime: msg.timestamp\n      ? new Date(parseInt(msg.timestamp) * 1000).toISOString()\n      : new Date().toISOString(),\n  });\n}\n\nreturn messages.map(m => ({ json: m }));"
+      },
+      "id": "parse-wa-messages",
+      "name": "Парсинг WA сообщений",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 420]
+    },
+
+    {
+      "parameters": {
+        "mode": "mergeByIndex"
+      },
+      "id": "merge-messages",
+      "name": "Объединить сообщения",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Фильтр: пустые и очень короткие сообщения\nconst items = $input.all();\nreturn items.filter(item => {\n  const text = item.json.text || '';\n  return text.trim().length >= 15;\n});"
+      },
+      "id": "filter-empty",
+      "name": "Фильтр коротких",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 300]
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://YOUR_SUPABASE_URL.supabase.co/rest/v1/raw_messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $vars.SUPABASE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $vars.SUPABASE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=ignore-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  source: $json.source,\n  chat_id: $json.chat_id,\n  chat_name: $json.chat_name,\n  message_id: $json.message_id,\n  user_id: $json.user_id,\n  text: $json.text,\n  datetime: $json.datetime,\n  is_analyzed: false\n}) }}",
+        "options": {}
+      },
+      "id": "save-raw-messages",
+      "name": "Сохранить raw_messages",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1780, 300]
+    },
+
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Ты — AI-аналитик B2B лидогенерации. Анализируй сообщения из бизнес-чатов Казахстана.\n\nТвоя целевая аудитория (ЦА): владельцы и руководители бизнеса, маркетологи, директора, тимлиды, которые ИНТЕРЕСУЮТСЯ или НУЖДАЮТСЯ в:\n- AI-автоматизации бизнес-процессов\n- CRM-системах и автоматизации продаж\n- Маркетинге и лидогенерации\n- IT-решениях для бизнеса\n- Логистических системах\n- Аутсорсинге\n\nОтвечай ТОЛЬКО в формате JSON, без markdown-блоков.\n\nФормат ответа:\n{\n  \"keywords\": [\"массив\", \"ключевых\", \"слов\"],\n  \"topics\": [\"тема1\", \"тема2\"],\n  \"intent\": \"одно из: ищет_подрядчика | ищет_работу | нанимает | продаёт | обсуждает | спрашивает | спам | нерелевантно\",\n  \"relevance_score\": 0.85,\n  \"is_target\": true,\n  \"reason\": \"Краткое объяснение (1 предложение), почему это целевой/нецелевой контакт\",\n  \"summary\": \"Одна строка — суть сообщения для алерта\"\n}\n\nrelevance_score: 0.0 = совсем нерелевантно, 1.0 = идеальный лид."
+            },
+            {
+              "role": "user",
+              "content": "=Проанализируй это сообщение из чата \"{{ $json.chat_name }}\" (источник: {{ $json.source }}):\n\nТекст: \"{{ $json.text }}\"\n\nОтвет ТОЛЬКО в JSON."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "ai-analyze-message",
+      "name": "AI: Анализ сообщения",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.5,
+      "position": [2000, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst prevJson = $('Фильтр коротких').first().json;\n\nlet analysis = {};\ntry {\n  const raw = input.message?.content || input.choices?.[0]?.message?.content || '{}';\n  analysis = JSON.parse(raw.replace(/```json|```/g, '').trim());\n} catch(e) {\n  analysis = {\n    keywords: [],\n    topics: [],\n    intent: 'нерелевантно',\n    relevance_score: 0,\n    is_target: false,\n    reason: 'Ошибка разбора AI ответа',\n    summary: '',\n  };\n}\n\nreturn [{\n  json: {\n    ...prevJson,\n    ...analysis,\n    keywords: analysis.keywords || [],\n    topics: analysis.topics || [],\n    intent: analysis.intent || 'нерелевантно',\n    relevance_score: parseFloat(analysis.relevance_score || 0),\n    is_target: analysis.is_target || false,\n    ai_summary: analysis.summary || '',\n    ai_reason: analysis.reason || '',\n  }\n}];"
+      },
+      "id": "parse-ai-result",
+      "name": "Парсинг AI ответа",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2220, 300]
+    },
+
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Ты оцениваешь профиль отправителя сообщения в бизнес-чате для B2B лидогенерации.\n\nОтвечай ТОЛЬКО в JSON без markdown.\n\nФормат:\n{\n  \"is_decision_maker\": true,\n  \"profile_score\": 0.75,\n  \"tags\": [\"ЛПР\", \"IT\", \"руководитель\"],\n  \"profile_summary\": \"Краткое описание профиля (1 строка)\"\n}"
+            },
+            {
+              "role": "user",
+              "content": "=Источник: {{ $json.source }}\nИмя: {{ $json.user_name }}\nUsername: {{ $json.username }}\nПоследнее сообщение: \"{{ $json.text }}\"\n\nОцени вероятность, что это ЛПР или потенциальный клиент в сфере AI-автоматизации/маркетинга/IT.\nОтвет ТОЛЬКО JSON."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "ai-profile-analysis",
+      "name": "AI: Анализ профиля",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.5,
+      "position": [2440, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+
+    {
+      "parameters": {
+        "jsCode": "const aiProfileRaw = $input.first().json;\nconst prevData = $('Парсинг AI ответа').first().json;\n\nlet profile = {};\ntry {\n  const raw = aiProfileRaw.message?.content || aiProfileRaw.choices?.[0]?.message?.content || '{}';\n  profile = JSON.parse(raw.replace(/```json|```/g, '').trim());\n} catch(e) {\n  profile = { is_decision_maker: false, profile_score: 0, tags: [], profile_summary: '' };\n}\n\n// Итоговый скор: взвешенная сумма\nconst msgScore = parseFloat(prevData.relevance_score || 0);\nconst profScore = parseFloat(profile.profile_score || 0);\nconst finalScore = msgScore * 0.7 + profScore * 0.3;\n\nconst THRESHOLD = 0.65; // порог для алерта (меняй под себя)\n\nreturn [{\n  json: {\n    ...prevData,\n    profile_score: profScore,\n    profile_tags: profile.tags || [],\n    profile_summary: profile.profile_summary || '',\n    is_decision_maker: profile.is_decision_maker || false,\n    final_score: Math.round(finalScore * 100) / 100,\n    should_alert: finalScore >= THRESHOLD,\n    threshold: THRESHOLD,\n  }\n}];"
+      },
+      "id": "combine-scores",
+      "name": "Объединить скоры",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2660, 300]
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://YOUR_SUPABASE_URL.supabase.co/rest/v1/matches",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $vars.SUPABASE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $vars.SUPABASE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  user_id: $json.user_id,\n  keywords: $json.keywords,\n  intent: $json.intent,\n  topics: $json.topics,\n  relevance_score: $json.final_score,\n  is_target: $json.should_alert,\n  alert_sent: false,\n  status: 'new',\n  ai_summary: $json.ai_summary\n}) }}",
+        "options": {}
+      },
+      "id": "save-match",
+      "name": "Сохранить match",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2880, 300]
+    },
+
+    {
+      "parameters": {
+        "conditions": {
+          "options": {},
+          "conditions": [
+            {
+              "leftValue": "={{ $json.should_alert }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ]
+        }
+      },
+      "id": "check-threshold",
+      "name": "Проверка порога",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [3100, 300]
+    },
+
+    {
+      "parameters": {
+        "jsCode": "const d = $json;\nconst scorePercent = Math.round(d.final_score * 100);\nconst tags = (d.profile_tags || []).join(', ') || 'не определено';\nconst keywords = (d.keywords || []).slice(0, 5).join(', ') || '-';\nconst topics = (d.topics || []).join(', ') || '-';\n\nconst intentMap = {\n  'ищет_подрядчика': '🔥 ИЩЕТ ПОДРЯДЧИКА',\n  'нанимает': '💼 Нанимает сотрудников',\n  'ищет_работу': '👤 Ищет работу',\n  'продаёт': '📦 Продаёт',\n  'обсуждает': '💬 Обсуждает тему',\n  'спрашивает': '❓ Задаёт вопрос',\n  'спам': '🚫 Спам',\n};\n\nconst intentLabel = intentMap[d.intent] || d.intent;\n\nconst text = [\n  `🎯 *Новый целевой контакт* — ${scorePercent}% релевантности`,\n  ``,\n  `📍 *Чат:* ${d.chat_name} (${d.source})`,\n  `👤 *Отправитель:* ${d.user_name || 'неизвестно'} ${d.username ? '@' + d.username : ''}`,\n  `🎭 *Портрет:* ${tags}`,\n  `📌 *Намерение:* ${intentLabel}`,\n  `🔑 *Ключевые слова:* ${keywords}`,\n  `📂 *Темы:* ${topics}`,\n  ``,\n  `💬 *Сообщение:*`,\n  `_${d.text.slice(0, 300)}${d.text.length > 300 ? '...' : ''}_`,\n  ``,\n  `🤖 *AI-разбор:* ${d.ai_summary || d.ai_reason || ''}`,\n].join('\\n');\n\nreturn [{ json: { ...d, alert_text: text } }];"
+      },
+      "id": "format-alert",
+      "name": "Форматировать алерт",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3320, 180]
+    },
+
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "telegramApi",
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $vars.TELEGRAM_ALERT_CHAT_ID }}",
+        "text": "={{ $json.alert_text }}",
+        "additionalFields": {
+          "parse_mode": "Markdown",
+          "reply_markup": "={{ JSON.stringify({\n  inline_keyboard: [\n    [\n      { text: '💾 Сохранить', callback_data: 'save_' + $json.user_id + '_' + $json.source },\n      { text: '✅ Отработано', callback_data: 'done_' + $json.user_id + '_' + $json.source },\n      { text: '🚫 Чёрный список', callback_data: 'blacklist_' + $json.user_id + '_' + $json.source }\n    ]\n  ]\n}) }}"
+        }
+      },
+      "id": "send-alert-telegram",
+      "name": "Отправить алерт",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [3540, 180],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_WITH_YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+
+    {
+      "parameters": {
+        "updates": ["callback_query"],
+        "additionalFields": {}
+      },
+      "id": "tg-callback-trigger",
+      "name": "Callback Query (кнопки)",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 700],
+      "webhookId": "tg-callback-webhook",
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_WITH_YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const cb = $input.first().json.callback_query;\nconst data = cb?.data || '';\nconst [action, userId, source] = data.split('_');\n\nconst statusMap = {\n  save: 'saved',\n  done: 'done',\n  blacklist: 'blacklisted',\n};\n\nreturn [{\n  json: {\n    action,\n    user_id: userId,\n    source,\n    new_status: statusMap[action] || 'new',\n    callback_id: cb?.id,\n    message_id: cb?.message?.message_id,\n    chat_id: cb?.message?.chat?.id,\n    in_blacklist: action === 'blacklist',\n  }\n}];"
+      },
+      "id": "parse-callback",
+      "name": "Парсинг callback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 700]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://YOUR_SUPABASE_URL.supabase.co/rest/v1/matches?user_id=eq.{{ $json.user_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $vars.SUPABASE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $vars.SUPABASE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ status: $json.new_status }) }}",
+        "options": {}
+      },
+      "id": "update-match-status",
+      "name": "Обновить статус матча",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 700]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://YOUR_SUPABASE_URL.supabase.co/rest/v1/profiles?user_id=eq.{{ $json.user_id }}&source=eq.{{ $json.source }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $vars.SUPABASE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $vars.SUPABASE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ in_blacklist: $json.in_blacklist }) }}",
+        "options": {}
+      },
+      "id": "update-profile",
+      "name": "Обновить профиль",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 700]
+    }
+  ],
+  "connections": {
+    "Триггер каждые 30 мин": {
+      "main": [[{"node": "Список чатов", "type": "main", "index": 0}]]
+    },
+    "Список чатов": {
+      "main": [[{"node": "Разделить: TG / WA", "type": "main", "index": 0}]]
+    },
+    "Разделить: TG / WA": {
+      "main": [
+        [{"node": "Получить TG сообщения", "type": "main", "index": 0}],
+        [{"node": "Получить WA сообщения", "type": "main", "index": 0}]
+      ]
+    },
+    "Получить TG сообщения": {
+      "main": [[{"node": "Парсинг TG сообщений", "type": "main", "index": 0}]]
+    },
+    "Получить WA сообщения": {
+      "main": [[{"node": "Парсинг WA сообщений", "type": "main", "index": 0}]]
+    },
+    "Парсинг TG сообщений": {
+      "main": [[{"node": "Объединить сообщения", "type": "main", "index": 0}]]
+    },
+    "Парсинг WA сообщений": {
+      "main": [[{"node": "Объединить сообщения", "type": "main", "index": 1}]]
+    },
+    "Объединить сообщения": {
+      "main": [[{"node": "Фильтр коротких", "type": "main", "index": 0}]]
+    },
+    "Фильтр коротких": {
+      "main": [[{"node": "Сохранить raw_messages", "type": "main", "index": 0}]]
+    },
+    "Сохранить raw_messages": {
+      "main": [[{"node": "AI: Анализ сообщения", "type": "main", "index": 0}]]
+    },
+    "AI: Анализ сообщения": {
+      "main": [[{"node": "Парсинг AI ответа", "type": "main", "index": 0}]]
+    },
+    "Парсинг AI ответа": {
+      "main": [[{"node": "AI: Анализ профиля", "type": "main", "index": 0}]]
+    },
+    "AI: Анализ профиля": {
+      "main": [[{"node": "Объединить скоры", "type": "main", "index": 0}]]
+    },
+    "Объединить скоры": {
+      "main": [[{"node": "Сохранить match", "type": "main", "index": 0}]]
+    },
+    "Сохранить match": {
+      "main": [[{"node": "Проверка порога", "type": "main", "index": 0}]]
+    },
+    "Проверка порога": {
+      "main": [
+        [{"node": "Форматировать алерт", "type": "main", "index": 0}],
+        []
+      ]
+    },
+    "Форматировать алерт": {
+      "main": [[{"node": "Отправить алерт", "type": "main", "index": 0}]]
+    },
+    "Callback Query (кнопки)": {
+      "main": [[{"node": "Парсинг callback", "type": "main", "index": 0}]]
+    },
+    "Парсинг callback": {
+      "main": [[{"node": "Обновить статус матча", "type": "main", "index": 0}]]
+    },
+    "Обновить статус матча": {
+      "main": [[{"node": "Обновить профиль", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "pinData": {},
+  "versionId": "1.0.0",
+  "meta": {
+    "instanceId": "b2b-group-analyzer"
+  }
+}

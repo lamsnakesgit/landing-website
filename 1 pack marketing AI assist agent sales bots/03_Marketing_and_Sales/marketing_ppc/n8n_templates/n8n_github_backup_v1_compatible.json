@@ -1,0 +1,95 @@
+{
+    "name": "GitHub Backup (Legacy Compatible v1)",
+    "nodes": [
+        {
+            "parameters": {},
+            "id": "manual",
+            "name": "Manual Trigger",
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [
+                250,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "getAll"
+            },
+            "id": "get-wf",
+            "name": "Get Workflows",
+            "type": "n8n-nodes-base.n8n",
+            "typeVersion": 1,
+            "position": [
+                450,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "functionCode": "const allData = items[0].json;\nreturn [{json: {data: JSON.stringify(items, null, 2), name: items[0].json.name}}];"
+            },
+            "id": "code-fix",
+            "name": "Format JSON",
+            "type": "n8n-nodes-base.function",
+            "typeVersion": 1,
+            "position": [
+                650,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "authentication": "oAuth2",
+                "owner": "GITHUB_USER",
+                "repository": "REPO_NAME",
+                "filePath": "={{$json[\"name\"]}}.json",
+                "fileContent": "={{$json[\"data\"]}}",
+                "commitMessage": "Backup"
+            },
+            "id": "git-push",
+            "name": "GitHub",
+            "type": "n8n-nodes-base.github",
+            "typeVersion": 1,
+            "position": [
+                850,
+                500
+            ]
+        }
+    ],
+    "connections": {
+        "Manual Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Get Workflows",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Workflows": {
+            "main": [
+                [
+                    {
+                        "node": "Format JSON",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Format JSON": {
+            "main": [
+                [
+                    {
+                        "node": "GitHub",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

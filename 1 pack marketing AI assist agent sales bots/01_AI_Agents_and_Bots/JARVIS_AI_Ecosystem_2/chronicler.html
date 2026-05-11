@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Хроникер — Саммари-агент для чатов | JARVIS</title>
+  <meta name="description" content="Хроникер читает всё, что происходит в вашем Telegram-чате, транскрибирует голосовые, вычленяет задачи и решения — и каждый день присылает вам дайджест.">
+  <meta property="og:title" content="Хроникер — Саммари-агент для чатов | JARVIS">
+  <meta property="og:description" content="Читает чат. Помнит всё. Пропускаешь ты — не пропускает он. AI-агент для командной памяти в Telegram.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@300,400,500,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* === PRODUCT PAGE OVERRIDES === */
+    .breadcrumb {
+      font-size: var(--text-xs);
+      color: var(--color-text-faint);
+      letter-spacing: 0.04em;
+      margin-bottom: var(--space-6);
+    }
+    .breadcrumb a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+    }
+    .breadcrumb a:hover { color: var(--color-primary); }
+    .breadcrumb span { color: var(--color-text-faint); margin-inline: var(--space-2); }
+
+    .back-link {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .back-link:hover { color: var(--color-primary); }
+
+    /* Digest mock */
+    .digest-mock {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg), 0 0 60px var(--color-glow);
+      max-width: 520px;
+      margin: var(--space-12) auto 0;
+    }
+    .digest-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--color-divider);
+      background: var(--color-surface-2);
+    }
+    .digest-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: var(--color-primary-highlight);
+      border: 1px solid rgba(0,212,200,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: var(--text-xs);
+    }
+    .digest-name { font-weight: 600; font-size: var(--text-sm); }
+    .digest-time { font-size: var(--text-xs); color: var(--color-text-faint); }
+    .digest-body {
+      padding: var(--space-5);
+      font-size: var(--text-sm);
+      line-height: 1.7;
+    }
+    .digest-body .digest-title {
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: var(--space-3);
+      font-size: var(--text-sm);
+    }
+    .digest-body .digest-section {
+      margin-bottom: var(--space-4);
+    }
+    .digest-body .digest-section-title {
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: var(--space-2);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .digest-body ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+    .digest-body li {
+      color: var(--color-text-muted);
+      padding-left: var(--space-4);
+      position: relative;
+    }
+    .digest-body li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    /* Showcase cards */
+    .showcase-section {
+      padding-block: clamp(var(--space-16), 10vw, var(--space-24));
+    }
+    .showcase-section h2 {
+      font-size: var(--text-2xl);
+      margin-bottom: var(--space-12);
+    }
+    .showcase-cards {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+    .showcase-card {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: var(--space-6);
+      align-items: start;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      transition: border-color var(--transition-interactive), box-shadow var(--transition-interactive);
+    }
+    .showcase-card:hover {
+      border-color: rgba(0,212,200,0.3);
+      box-shadow: 0 0 32px var(--color-glow);
+    }
+    .showcase-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--color-primary-highlight);
+      border: 1px solid rgba(0,212,200,0.2);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary);
+    }
+    .showcase-card h3 {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      margin-bottom: var(--space-3);
+    }
+    .showcase-card p {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      line-height: 1.7;
+    }
+    @media (max-width: 600px) {
+      .showcase-card { grid-template-columns: 1fr; }
+      .showcase-icon { width: 52px; height: 52px; }
+    }
+
+    /* Segments */
+    .segments-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-6);
+    }
+    .segment-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      transition: border-color var(--transition-interactive);
+    }
+    .segment-card:hover { border-color: rgba(0,212,200,0.3); }
+    .segment-card h3 {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      margin-bottom: var(--space-4);
+      color: var(--color-primary);
+    }
+    .segment-card p {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      line-height: 1.7;
+    }
+
+    /* Footer minimal */
+    .footer-minimal {
+      border-top: 1px solid var(--color-divider);
+      padding-block: var(--space-8);
+    }
+    .footer-minimal-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+    .footer-minimal-inner span {
+      font-size: var(--text-xs);
+      color: var(--color-text-faint);
+    }
+    .footer-minimal-inner a {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      text-decoration: none;
+    }
+    .footer-minimal-inner a:hover { color: var(--color-primary); }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" aria-label="JARVIS — главная">
+        <svg width="120" height="32" viewBox="0 0 120 32" fill="none" aria-label="JARVIS logo">
+          <rect x="0" y="6" width="20" height="20" rx="4" fill="var(--color-primary)"/>
+          <path d="M5 16 L10 11 L15 16 L10 21 Z" fill="#0a0a0a" stroke="none"/>
+          <path d="M10 11 L10 21" stroke="#0a0a0a" stroke-width="1.5"/>
+          <text x="28" y="22" font-family="'Clash Display', sans-serif" font-size="18" font-weight="600" fill="var(--color-text)" letter-spacing="0.05em">JARVIS</text>
+        </svg>
+      </a>
+      <nav class="nav" aria-label="Основное меню">
+        <a href="index.html" class="back-link">← Все продукты</a>
+        <a href="#features">Возможности</a>
+        <a href="#for-whom">Для кого</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="header-actions">
+        <a href="https://t.me/nnsvt" class="btn btn-primary btn-sm" target="_blank" rel="noopener">Попробовать бесплатно</a>
+      </div>
+      <button class="nav-burger" aria-label="Открыть меню" id="burger">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero-bg"></div>
+      <div class="container hero-content">
+        <div class="breadcrumb">
+          <a href="index.html">JARVIS</a>
+          <span>/</span>
+          Хроникер
+        </div>
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          Командная память · AI-агент
+        </div>
+        <h1 class="hero-headline">
+          Пока вы не читали чат —<br>
+          <span class="accent">Хроникер прочитал.</span><br>
+          И запомнил всё важное.
+        </h1>
+        <p class="hero-sub">
+          Хроникер — AI-агент, который подключается к вашему Telegram-чату, транскрибирует голосовые, вытаскивает задачи, решения и вопросы без ответа — и присылает вам структурированный дайджест. Раз в день, раз в неделю или прямо сейчас — по запросу.
+        </p>
+        <div class="hero-cta">
+          <a href="https://t.me/nnsvt" class="btn btn-primary btn-lg" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.04 9.615c-.154.688-.555.856-1.125.533l-3.113-2.295-1.502 1.445c-.166.166-.305.305-.625.305l.223-3.168 5.76-5.201c.25-.223-.055-.346-.39-.123L7.09 14.233l-3.046-.952c-.662-.208-.674-.662.139-.979l11.9-4.59c.553-.2 1.036.135.479.536z"/></svg>
+            Подключить к чату
+          </a>
+          <a href="#how" class="btn btn-ghost btn-lg">
+            Как это работает
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+        <p class="hero-proof">
+          Первые 7 дней бесплатно · Без карты · Без установки приложений
+        </p>
+      </div>
+
+      <!-- Digest mock -->
+      <div class="digest-mock" style="margin-inline: auto;">
+        <div class="digest-header">
+          <div class="digest-avatar">Х</div>
+          <div>
+            <div class="digest-name">Хроникер</div>
+            <div class="digest-time">Дайджест за 5 апреля · 18:00</div>
+          </div>
+        </div>
+        <div class="digest-body">
+          <div class="digest-title">📋 Дайджест: Команда продукта</div>
+          <div class="digest-section">
+            <div class="digest-section-title">Решения</div>
+            <ul>
+              <li>Запуск нового тарифа перенесён на 12 апреля — @Марина</li>
+              <li>Дизайн лендинга утверждён, передаётся в разработку</li>
+            </ul>
+          </div>
+          <div class="digest-section">
+            <div class="digest-section-title">Задачи</div>
+            <ul>
+              <li>@Дима — подготовить API-документацию до 8 апр</li>
+              <li>@Аня — обновить FAQ на сайте</li>
+            </ul>
+          </div>
+          <div class="digest-section">
+            <div class="digest-section-title">Вопросы без ответа</div>
+            <ul>
+              <li>Кто отвечает за интеграцию с amoCRM? (спросил @Олег в 11:47)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ПРОБЛЕМА -->
+    <section class="problem-section" id="problem">
+      <div class="container problem-inner">
+        <div class="problem-text">
+          <div class="section-label">Проблема</div>
+          <h2>Ваш рабочий чат —<br>это кладбище решений.</h2>
+          <p>Каждый день в рабочих Telegram-группах задачи тонут в потоке, решения забываются, голосовые никто не слушает, а вопросы зависают без ответа.</p>
+          <p>Средний рабочий чат генерирует 300–500 сообщений в день. Чтобы не пропустить важное — нужно читать всё. Это 1–2 часа фокусного времени в день. Которых у вас нет.</p>
+        </div>
+        <div class="problem-metrics">
+          <div class="metric-card">
+            <div class="metric-icon">💬</div>
+            <div class="metric-val">300–500</div>
+            <div class="metric-desc">сообщений в день в среднем рабочем чате — из них 10–15 реально важных</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">⏱</div>
+            <div class="metric-val">1–2 часа</div>
+            <div class="metric-desc">фокусного времени в день уходит на чтение чатов — или вы пропускаете важное</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">🔇</div>
+            <div class="metric-val">20 мин</div>
+            <div class="metric-desc">в день на прослушивание голосовых — или потеря содержания, если не слушать</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ЧТО ДЕЛАЕТ SHOWCASE -->
+    <section class="showcase-section" id="showcase">
+      <div class="container">
+        <div class="section-label">Что делает</div>
+        <h2>Три суперспособности<br>Хроникера</h2>
+        <div class="showcase-cards">
+          <div class="showcase-card">
+            <div class="showcase-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <div>
+              <h3>Читает всё</h3>
+              <p>Хроникер работает в фоне — читает текстовые сообщения, анализирует поток коммуникации. Не пишет в чат, не перебивает, не уведомляет команду. Молча читает и отчитывается только перед вами.</p>
+            </div>
+          </div>
+          <div class="showcase-card">
+            <div class="showcase-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </div>
+            <div>
+              <h3>Транскрибирует голосовые</h3>
+              <p>Все голосовые в чате — автоматически переводятся в текст и включаются в дайджест. Ни один голосовой не останется неуслышанным. Команда может продолжать записывать — бот всё переведёт.</p>
+            </div>
+          </div>
+          <div class="showcase-card">
+            <div class="showcase-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div>
+              <h3>Дайджест по расписанию</h3>
+              <p>Ежедневный отчёт в 18:00? Сводка за неделю каждый понедельник? Или просто напишите боту «что было за последние 3 часа» — и получите ответ мгновенно. Один дайджест вместо 500 сообщений.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- КАК РАБОТАЕТ -->
+    <section class="how-section" id="how">
+      <div class="container">
+        <div class="section-label">Как работает</div>
+        <h2>От подключения до первого дайджеста — 3 минуты</h2>
+        <div class="steps-grid">
+          <div class="step">
+            <div class="step-num">01</div>
+            <h3>Подключение</h3>
+            <p>Добавляете Хроникера в Telegram-группу как участника. Выбираете расписание дайджестов и кто их получает. Настройка — 3 минуты.</p>
+          </div>
+          <div class="step">
+            <div class="step-num">02</div>
+            <h3>Мониторинг в реальном времени</h3>
+            <p>Хроникер читает всё что происходит в чате: текстовые сообщения, голосовые (транскрибирует в текст), файлы. Работает тихо — не пишет в чат, не уведомляет участников.</p>
+          </div>
+          <div class="step">
+            <div class="step-num">03</div>
+            <h3>Анализ и структурирование</h3>
+            <p>AI анализирует поток коммуникации: выделяет задачи и поручения, фиксирует принятые решения, находит вопросы без ответов, отмечает упоминания людей и дедлайны.</p>
+          </div>
+          <div class="step">
+            <div class="step-num">04</div>
+            <h3>Дайджест в Telegram</h3>
+            <p>В назначенное время — или по вашему запросу — бот присылает структурированный отчёт. Кратко, по делу, с ссылками на оригинальные сообщения если нужно разобраться глубже.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ВОЗМОЖНОСТИ -->
+    <section class="features-section" id="features">
+      <div class="container">
+        <div class="section-label">Возможности</div>
+        <h2>Что умеет Хроникер</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <h3>Ежедневный дайджест</h3>
+            <p>Один структурированный отчёт в конце дня: решения, задачи, вопросы, ключевые обсуждения. Вместо 500 сообщений — одна страница по существу.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </div>
+            <h3>Транскрипция голосовых</h3>
+            <p>Все голосовые в чате — автоматически переводятся в текст и включаются в дайджест. Ни один голосовой не останется неуслышанным.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <h3>Реестр задач</h3>
+            <p>AI выделяет все поручения из потока сообщений — даже написанные неформально. Кто поставил, кому, в каком контексте, когда.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h3>Вопросы без ответа</h3>
+            <p>Отдельный блок в каждом дайджесте: вопросы, которые остались без ответа. Идеально для руководителей, которые хотят видеть где в команде застряло.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <h3>Поиск по истории</h3>
+            <p>Напишите боту «что мы решали по проекту X в прошлом месяце» — он найдёт и перескажет. Командная память на 100%.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <h3>Мультичатовая сводка</h3>
+            <p>Для руководителей с несколькими группами: один агрегированный дайджест по всем чатам сразу. Полная картина без погружения в каждый чат по отдельности.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ДЛЯ КОГО -->
+    <section class="for-whom-section" id="for-whom">
+      <div class="container">
+        <div class="section-label">Для кого</div>
+        <h2>Кому нужен Хроникер</h2>
+        <div class="segments-grid">
+          <div class="segment-card">
+            <h3>Команды и проджекты</h3>
+            <p>Контроль задач и решений без ручного ведения протоколов. Всё что сказано в чате — зафиксировано и структурировано автоматически. Проджект-менеджеры получают полный обзор без операционной перегрузки.</p>
+          </div>
+          <div class="segment-card">
+            <h3>Продажи</h3>
+            <p>Вы не можете читать каждый рабочий чат. Но должны знать что происходит. Хроникер — это ваши «уши» в каждой команде, которые сообщают только существенное.</p>
+          </div>
+          <div class="segment-card">
+            <h3>Руководители</h3>
+            <p>Несколько команд, несколько чатов, несколько проектов — один агрегированный дайджест с полной картиной. Операционный контроль без операционной перегрузки. Видите кто участвует, кто не отвечает.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ОТЗЫВЫ -->
+    <section class="testimonials-section" id="testimonials">
+      <div class="container">
+        <div class="section-label">Отзывы</div>
+        <h2>Что говорят пользователи</h2>
+        <div class="testimonials-grid">
+          <div class="testimonial-card">
+            <div class="stars">★★★★★</div>
+            <blockquote>«У нас было 8 рабочих чатов. Я физически не мог их все читать. Хроникер решил это за неделю — теперь я получаю один дайджест утром и один вечером по всем группам. Это как иметь личного ассистента, который сидит во всех чатах одновременно. Мы нашли задачи, которые висели невыполненными три недели — просто потому что их никто не заметил в потоке.»</blockquote>
+            <div class="testimonial-author">
+              <div class="author-avatar">ДЧ</div>
+              <div>
+                <div class="author-name">Дмитрий Черников</div>
+                <div class="author-role">Операционный директор, IT-компания, 60 человек</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="stars">★★★★★</div>
+            <blockquote>«Голосовые сообщения были моей личной болью. Команда любит записывать голосовые по 5 минут, а у меня нет времени их слушать. Хроникер транскрибирует всё и включает в дайджест. Теперь я за 5 минут знаю всё что говорилось за день — включая голосовые. Это просто магия.»</blockquote>
+            <div class="testimonial-author">
+              <div class="author-avatar">ЕЛ</div>
+              <div>
+                <div class="author-name">Екатерина Ланская</div>
+                <div class="author-role">CEO, маркетинговое агентство</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section" id="faq">
+      <div class="container faq-inner">
+        <div class="section-label">FAQ</div>
+        <h2>Частые вопросы</h2>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>Участники чата знают, что бот всё читает?</summary>
+            <p>Бот добавляется в чат как участник — он виден в списке членов группы. Вы можете уведомить команду или не делать этого — решение за вами. В большинстве корпоративных чатов это нормальная практика.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Работает ли с WhatsApp и другими мессенджерами?</summary>
+            <p>Нативно — с Telegram. WhatsApp и другие платформы — в режиме бета-тестирования. Уточните у нашей команды актуальный статус интеграций.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Сколько чатов можно подключить?</summary>
+            <p>Зависит от тарифа. На базовом — до 3 чатов. На корпоративном — без ограничений. Мультичатовая агрегированная сводка доступна с тарифа Pro.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Что если в чате обсуждается конфиденциальная информация?</summary>
+            <p>Данные обрабатываются на защищённых серверах и не используются для обучения моделей. Дайджесты получают только те, кому вы дали доступ. Полный контроль над тем, кто видит отчёты — у вас.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="final-cta-section">
+      <div class="container final-cta-inner">
+        <h2>Сколько задач тонет<br>в вашем чате прямо сейчас?</h2>
+        <p>Подключите Хроникера — и узнайте. Первые 7 дней бесплатно. Без карты. Без установки приложений. Просто добавьте бота в чат и посмотрите, что он найдёт за первый день.</p>
+        <div class="hero-cta">
+          <a href="https://t.me/nnsvt" class="btn btn-primary btn-xl" target="_blank" rel="noopener">
+            Подключить Хроникера бесплатно
+          </a>
+          <a href="https://t.me/nnsvt" class="btn btn-ghost btn-lg" target="_blank" rel="noopener">
+            Задать вопрос в Telegram
+          </a>
+        </div>
+        <p class="final-proof">7 дней · Бесплатно · Без карты · Без обязательств</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer-minimal">
+    <div class="container footer-minimal-inner">
+      <a href="index.html" class="logo" aria-label="JARVIS — главная">
+        <svg width="100" height="28" viewBox="0 0 120 32" fill="none">
+          <rect x="0" y="6" width="20" height="20" rx="4" fill="var(--color-primary)"/>
+          <path d="M5 16 L10 11 L15 16 L10 21 Z" fill="#0a0a0a"/>
+          <text x="28" y="22" font-family="'Clash Display', sans-serif" font-size="18" font-weight="600" fill="var(--color-text)" letter-spacing="0.05em">JARVIS</text>
+        </svg>
+      </a>
+      <a href="index.html">← Вернуться на главный сайт</a>
+      <a href="https://t.me/nnsvt" target="_blank" rel="noopener">Telegram</a>
+      <span>© 2026 JARVIS. Все права защищены.</span>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+<script data-pplx-inline-edit>
+(function(){
+  if(window===window.top)return;
+  function inlineAll(orig,clone){
+    if(orig.nodeType!==1)return;
+    try{
+      var cs=getComputedStyle(orig);
+      var t='';
+      for(var i=0;i<cs.length;i++){t+=cs[i]+':'+cs.getPropertyValue(cs[i])+';';}
+      clone.style.cssText=t;
+    }catch(e){}
+    var oc=orig.children,cc=clone.children;
+    for(var j=0;j<oc.length&&j<cc.length;j++){inlineAll(oc[j],cc[j]);}
+  }
+  function stripExternal(clone){
+    var imgs=clone.querySelectorAll('img');
+    for(var i=0;i<imgs.length;i++){
+      var s=imgs[i].getAttribute('src');
+      if(s&&!s.startsWith('data:'))imgs[i].removeAttribute('src');
+    }
+    var all=clone.querySelectorAll('*');
+    for(var i=0;i<all.length;i++){
+      var st=all[i].style.cssText;
+      if(st&&st.indexOf('url(')>=0){
+        all[i].style.cssText=st.replace(/url\(["']?(?!data:)[^)"']*["']?\)/gi,'none');
+      }
+    }
+  }
+  window.addEventListener('message',function(e){
+    if(!e.data||e.data.type!=='INLINE_EDIT_CAPTURE_REQUEST')return;
+    var scrollX=window.scrollX||window.pageXOffset||0;
+    var scrollY=window.scrollY||window.pageYOffset||0;
+    var w=window.innerWidth,h=window.innerHeight;
+    try{
+      var clone=document.documentElement.cloneNode(true);
+      var rm=clone.querySelectorAll('script,link[rel="stylesheet"],style');
+      for(var i=0;i<rm.length;i++){rm[i].remove();}
+      inlineAll(document.documentElement,clone);
+      stripExternal(clone);
+      var html=new XMLSerializer().serializeToString(clone);
+      var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">'
+        +'<foreignObject width="100%" height="100%">'
+        +'<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+w+'px;height:'+h+'px;overflow:hidden">'
+        +'<div style="transform:translate(-'+scrollX+'px,-'+scrollY+'px);transform-origin:top left">'
+        +html+'</div></div></foreignObject></svg>';
+      var svgUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+      var img=new Image();
+      img.onload=function(){
+        var c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0);
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:c.toDataURL('image/png'),scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.onerror=function(){
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.src=svgUrl;
+    }catch(err){
+      window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+    }
+  });
+})();
+</script></body>
+</html>

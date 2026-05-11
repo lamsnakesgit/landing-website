@@ -1,0 +1,39 @@
+/Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/2 video analyze parse/flova_edit/venv/lib/python3.9/site-packages/whisper/transcribe.py:132: UserWarning: FP16 is not supported on CPU; using FP32 instead
+  warnings.warn("FP16 is not supported on CPU; using FP32 instead")
+/Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/2 video analyze parse/flova_edit/venv/lib/python3.9/site-packages/whisper/transcribe.py:132: UserWarning: FP16 is not supported on CPU; using FP32 instead
+  warnings.warn("FP16 is not supported on CPU; using FP32 instead")
+/Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/2 video analyze parse/flova_edit/venv/lib/python3.9/site-packages/whisper/transcribe.py:132: UserWarning: FP16 is not supported on CPU; using FP32 instead
+  warnings.warn("FP16 is not supported on CPU; using FP32 instead")
+/Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/2 video analyze parse/flova_edit/venv/lib/python3.9/site-packages/whisper/transcribe.py:132: UserWarning: FP16 is not supported on CPU; using FP32 instead
+  warnings.warn("FP16 is not supported on CPU; using FP32 instead")
+/Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/2 video analyze parse/flova_edit/venv/lib/python3.9/site-packages/whisper/transcribe.py:132: UserWarning: FP16 is not supported on CPU; using FP32 instead
+  warnings.warn("FP16 is not supported on CPU; using FP32 instead")
+/Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/2 video analyze parse/flova_edit/venv/lib/python3.9/site-packages/whisper/transcribe.py:132: UserWarning: FP16 is not supported on CPU; using FP32 instead
+  warnings.warn("FP16 is not supported on CPU; using FP32 instead")
+/Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/2 video analyze parse/flova_edit/venv/lib/python3.9/site-packages/whisper/transcribe.py:132: UserWarning: FP16 is not supported on CPU; using FP32 instead
+  warnings.warn("FP16 is not supported on CPU; using FP32 instead")
+Loading whisper model (base)...
+Found 7 files to process.
+Processing flova_Shot_LipSync_202603131959_00bdea.mp4...
+--> Our strategy is clear. It's clear and achievable.
+Processing flova_Shot_LipSync_202603132007_1d6e0f.mp4...
+--> Our strategy is clear and focused.
+Processing flova_Shot_LipSync_202603132016_7a004c.mp4...
+--> Высливаете 40% рекламного бюджета каждый месяц. И даже не знаете об этом. Пока ваши менеджеры спят, обедают, или просто забывают перезвонить теплые лиды, остывают. И уходят...
+Processing flova_Shot_LipSync_202603132030_293ae1.mp4...
+--> и уходит конкурентом. Я внедрила и менеджера, в отдел продаж строительной компании. Он отвечает за 3 секунды. Квалифицирует лидо 24 на 7. И сам.
+Processing flova_Shot_LipSync_202603132058_94c6a7.mp4...
+--> И сам, назначает встречи в CRM. Результат, конверсия выросла в 2-е раза, а фон до платы труда сократился. Хочешь узнать, как внедрить такого ИИ, ассистента в свой бизнес всего за три дня...
+Processing flova_Shot_LipSync_202603132112_bfcea5.mp4...
+--> Пиши слова, робот, в комментарии. Я скину тебя, пошаговую схему.
+Processing flova_Shot_Speech_Part_1_video_202602111234_14984a.mp4...
+--> Kurime Taha Gain Tuz, Dost Yan, Kudacıkca, Ayalı Menümbalarım, Zümeylarım, Birkebirliklerinin Hayrasi Ketbi, Osla Birlilerimin Baskos'u, Silası Cakan'ın tamıyıca, Kuanıştımı, Menaralarında Jürgen Gezde,
+
+--- FINAL RESULTS ---
+flova_Shot_LipSync_202603131959_00bdea.mp4: Our strategy is clear. It's clear and achievable.
+flova_Shot_LipSync_202603132007_1d6e0f.mp4: Our strategy is clear and focused.
+flova_Shot_LipSync_202603132016_7a004c.mp4: Высливаете 40% рекламного бюджета каждый месяц. И даже не знаете об этом. Пока ваши менеджеры спят, обедают, или просто забывают перезвонить теплые лиды, остывают. И уходят...
+flova_Shot_LipSync_202603132030_293ae1.mp4: и уходит конкурентом. Я внедрила и менеджера, в отдел продаж строительной компании. Он отвечает за 3 секунды. Квалифицирует лидо 24 на 7. И сам.
+flova_Shot_LipSync_202603132058_94c6a7.mp4: И сам, назначает встречи в CRM. Результат, конверсия выросла в 2-е раза, а фон до платы труда сократился. Хочешь узнать, как внедрить такого ИИ, ассистента в свой бизнес всего за три дня...
+flova_Shot_LipSync_202603132112_bfcea5.mp4: Пиши слова, робот, в комментарии. Я скину тебя, пошаговую схему.
+flova_Shot_Speech_Part_1_video_202602111234_14984a.mp4: Kurime Taha Gain Tuz, Dost Yan, Kudacıkca, Ayalı Menümbalarım, Zümeylarım, Birkebirliklerinin Hayrasi Ketbi, Osla Birlilerimin Baskos'u, Silası Cakan'ın tamıyıca, Kuanıştımı, Menaralarında Jürgen Gezde,

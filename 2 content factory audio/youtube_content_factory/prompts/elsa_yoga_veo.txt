@@ -1,0 +1,11 @@
+# Elsa Yoga Scene Prompt for VEO 3.1
+
+## Scene 1: Introduction to Yoga
+**Visual Prompt (Expert Edition):**
+Cinematic close-up of Elsa from Frozen, she is standing in a majestic and serene ice palace, she is wearing professional yoga gear with ice-like patterns. She is smiling and doing a slow yoga stretch pose (Upward Salute), raising her hands gracefully. The background shows glowing ice crystals with a beautiful bokeh effect. Shot on 35mm lens, corporate mystical lighting, 4k high-resolution, vibrant colors, crisp textures.
+The character speaks clearly in Russian with accurate lip-syncing: "Привет, ребята! Сегодня мы с вами сделаем простую зарядку. Встаньте ровно, как я, и потянитесь вверх!"
+
+**Settings:**
+- Aspect Ratio: 16:9
+- Style: Sleek corporate aesthetics mixed with fantasy
+- Model: veo-3.1-generate-preview

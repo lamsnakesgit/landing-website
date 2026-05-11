@@ -1,0 +1,101 @@
+{
+    "name": "WhatsApp: JID Resolver (Who is this?)",
+    "nodes": [
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "jids",
+                            "name": "lookup_jids",
+                            "value": "jid1@g.us, jid2@g.us, jid3@g.us",
+                            "type": "string"
+                        },
+                        {
+                            "id": "inst",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        },
+                        {
+                            "id": "api",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "1",
+            "name": "Input JIDs",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                0,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/chat/findChats/{{ $json.instance }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $json.api_key }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "2",
+            "name": "Fetch All Chats",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                250,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Резолвим имена чатов по JID\nconst lookupJids = $node[\"Input JIDs\"].json.lookup_jids.split(',').map(j => j.trim());\nconst allChats = Array.isArray($json) ? $json : [$json];\n\nconst results = lookupJids.map(targetJid => {\n  const found = allChats.find(c => (c.id === targetJid || c.remoteJid === targetJid || c.jid === targetJid));\n  return {\n    searched_jid: targetJid,\n    name: found ? (found.pushName || found.name || \"Unknown\") : \"Not Found\",\n    type: found ? (targetJid.endsWith('@g.us') ? 'Group' : targetJid.endsWith('@newsletter') ? 'Channel' : 'Private') : \"Unknown\",\n    participantCount: found ? (found.participantCount || (found.participants ? found.participants.length : 0)) : 0\n  };\n});\n\nreturn results;"
+            },
+            "id": "3",
+            "name": "Match JIDs to Names",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                500,
+                0
+            ]
+        }
+    ],
+    "connections": {
+        "Input JIDs": {
+            "main": [
+                [
+                    {
+                        "node": "Fetch All Chats",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch All Chats": {
+            "main": [
+                [
+                    {
+                        "node": "Match JIDs to Names",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

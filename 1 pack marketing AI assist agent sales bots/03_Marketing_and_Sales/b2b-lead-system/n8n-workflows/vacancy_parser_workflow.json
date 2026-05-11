@@ -1,0 +1,240 @@
+{
+  "name": "B2B Parser — Вакансии и компании",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "parse-vacancies",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "b2b-parser-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Валидация и нормализация входных параметров\nconst body = $input.first().json.body || $input.first().json;\n\nconst city = body.city || 'Алматы';\nconst sphere = body.sphere || 'IT';\nconst role = body.role || 'директор';\nconst sources = body.sources || ['hh', 'adata'];\nconst minContacts = body.min_contacts || false;\nconst hhPages = Math.min(body.hh_pages || 3, 10);\nconst adataPages = Math.min(body.adata_pages || 2, 5);\nconst saveToSupabase = body.save_to_supabase !== false;\n\nreturn [{\n  json: {\n    city,\n    sphere,\n    role,\n    sources,\n    min_contacts: minContacts,\n    hh_pages: hhPages,\n    adata_pages: adataPages,\n    save_to_supabase: saveToSupabase,\n    gis_api_key: body.gis_api_key || '',\n    gis_provider: body.gis_provider || '2gis',\n  }\n}];"
+      },
+      "id": "validate-params",
+      "name": "Валидация параметров",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://localhost:8080/parse",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "city",
+              "value": "={{ $json.city }}"
+            },
+            {
+              "name": "sphere",
+              "value": "={{ $json.sphere }}"
+            },
+            {
+              "name": "role",
+              "value": "={{ $json.role }}"
+            },
+            {
+              "name": "sources",
+              "value": "={{ $json.sources }}"
+            },
+            {
+              "name": "hh_pages",
+              "value": "={{ $json.hh_pages }}"
+            },
+            {
+              "name": "adata_pages",
+              "value": "={{ $json.adata_pages }}"
+            },
+            {
+              "name": "save_to_supabase",
+              "value": "={{ $json.save_to_supabase }}"
+            },
+            {
+              "name": "min_contacts",
+              "value": "={{ $json.min_contacts }}"
+            },
+            {
+              "name": "gis_api_key",
+              "value": "={{ $json.gis_api_key }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "call-parser-api",
+      "name": "Вызов парсера (HTTP)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $input.first().json;\nconst stats = {\n  companies: result.companies || 0,\n  vacancies: result.vacancies || 0,\n  contacts: result.contacts || 0,\n  status: result.status || 'ok',\n};\n\nconsole.log(`Парсер завершён: ${JSON.stringify(stats)}`);\nreturn [{ json: stats }];"
+      },
+      "id": "process-result",
+      "name": "Обработка результата",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "webhook-response",
+      "name": "Ответ Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Расписание (каждые 6ч)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Конфиг для автоматического запуска по расписанию\n// Поменяй параметры под свои нужды\nreturn [{\n  json: {\n    city: 'Алматы',\n    sphere: 'IT',\n    role: 'директор',\n    sources: ['hh', 'adata'],\n    hh_pages: 5,\n    adata_pages: 3,\n    save_to_supabase: true,\n    min_contacts: false,\n    gis_api_key: '',\n  }\n}];"
+      },
+      "id": "schedule-config",
+      "name": "Конфиг расписания",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 500]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://localhost:8080/parse",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 180000
+        }
+      },
+      "id": "schedule-call-parser",
+      "name": "Запуск парсера по расписанию",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 500]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "telegramApi",
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $vars.TELEGRAM_ALERT_CHAT_ID }}",
+        "text": "=✅ *Парсер завершён*\n\nКомпаний: {{ $json.companies }}\nВакансий: {{ $json.vacancies }}\nКонтактов: {{ $json.contacts }}\n\n_Данные сохранены в Supabase_",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "telegram-notify-schedule",
+      "name": "Уведомление в Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [900, 500],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_WITH_YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [{"node": "Валидация параметров", "type": "main", "index": 0}]
+      ]
+    },
+    "Валидация параметров": {
+      "main": [
+        [{"node": "Вызов парсера (HTTP)", "type": "main", "index": 0}]
+      ]
+    },
+    "Вызов парсера (HTTP)": {
+      "main": [
+        [{"node": "Обработка результата", "type": "main", "index": 0}]
+      ]
+    },
+    "Обработка результата": {
+      "main": [
+        [{"node": "Ответ Webhook", "type": "main", "index": 0}]
+      ]
+    },
+    "Расписание (каждые 6ч)": {
+      "main": [
+        [{"node": "Конфиг расписания", "type": "main", "index": 0}]
+      ]
+    },
+    "Конфиг расписания": {
+      "main": [
+        [{"node": "Запуск парсера по расписанию", "type": "main", "index": 0}]
+      ]
+    },
+    "Запуск парсера по расписанию": {
+      "main": [
+        [{"node": "Уведомление в Telegram", "type": "main", "index": 0}]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "pinData": {},
+  "versionId": "1.0.0",
+  "meta": {
+    "instanceId": "b2b-lead-parser"
+  }
+}

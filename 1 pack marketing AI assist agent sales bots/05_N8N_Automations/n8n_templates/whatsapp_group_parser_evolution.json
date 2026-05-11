@@ -1,0 +1,233 @@
+{
+    "name": "WhatsApp Group Parser & Joiner",
+    "nodes": [
+        {
+            "parameters": {},
+            "id": "trigger-join",
+            "name": "1. Запуск: Вступить в группу",
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [
+                200,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "values": {
+                    "string": [
+                        {
+                            "name": "inviteLink",
+                            "value": "https://chat.whatsapp.com/ExAmPLEC0de123abc"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "set-invite-link",
+            "name": "Вставить ссылку приглашение",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                420,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "let link = $input.item.json.inviteLink;\nlet code = link.split('chat.whatsapp.com/')[1] || link;\nreturn { json: { inviteCode: code.trim() } };"
+            },
+            "id": "extract-code",
+            "name": "Извлечь Код инвайта",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                640,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://151.241.100.226:8081/group/acceptInvite/salesbot_v1",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"inviteCode\": \"{{ $json.inviteCode }}\"\n}",
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "02F56A66-ED87-41F0-9AA0-9DB88E3C94A6"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "evo-join-group",
+            "name": "Evolution: Join Group",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                860,
+                200
+            ]
+        },
+        {
+            "parameters": {},
+            "id": "trigger-parse",
+            "name": "2. Запуск: Спарсить участников",
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [
+                200,
+                460
+            ]
+        },
+        {
+            "parameters": {
+                "method": "GET",
+                "url": "http://151.241.100.226:8081/group/fetchAllGroups/salesbot_v1",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "getParticipants",
+                            "value": "true"
+                        }
+                    ]
+                },
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "02F56A66-ED87-41F0-9AA0-9DB88E3C94A6"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "evo-fetch-groups",
+            "name": "Evolution: Fetch Groups & Participants",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                420,
+                460
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Получаем ответ от API\nlet groups = $input.item.json;\nlet allParticipants = [];\n\n// Проходим по всем группам, в которых состоит бот\nfor (let group of groups) {\n    if (group.participants && group.participants.length > 0) {\n        for (let participant of group.participants) {\n            // Очищаем номер (убираем @s.whatsapp.net)\n            let phone = participant.id.split('@')[0];\n            \n            allParticipants.push({\n                json: {\n                    groupName: group.subject,\n                    groupId: group.id,\n                    phone: phone,\n                    isAdmin: participant.admin !== null\n                }\n            });\n        }\n    }\n}\n\n// Возвращаем каждый контакт как отдельный элемент данных для Google Sheets\nreturn allParticipants;"
+            },
+            "id": "process-participants",
+            "name": "Собрать все телефоны",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                640,
+                460
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "append",
+                "documentId": {
+                    "__rl": true,
+                    "value": "ENTER_YOUR_GOOGLE_SHEET_ID_HERE",
+                    "mode": "id"
+                },
+                "sheetName": {
+                    "__rl": true,
+                    "value": "Sheet1",
+                    "mode": "name"
+                },
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": {
+                        "groupName": "={{ $json.groupName }}",
+                        "phone": "={{ $json.phone }}",
+                        "isAdmin": "={{ $json.isAdmin }}"
+                    }
+                },
+                "options": {}
+            },
+            "id": "save-to-sheets",
+            "name": "Сохранить Лидов в Google Sheets",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 4.5,
+            "position": [
+                860,
+                460
+            ]
+        }
+    ],
+    "connections": {
+        "1. Запуск: Вступить в группу": {
+            "main": [
+                [
+                    {
+                        "node": "Вставить ссылку приглашение",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Вставить ссылку приглашение": {
+            "main": [
+                [
+                    {
+                        "node": "Извлечь Код инвайта",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Извлечь Код инвайта": {
+            "main": [
+                [
+                    {
+                        "node": "Evolution: Join Group",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "2. Запуск: Спарсить участников": {
+            "main": [
+                [
+                    {
+                        "node": "Evolution: Fetch Groups & Participants",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Evolution: Fetch Groups & Participants": {
+            "main": [
+                [
+                    {
+                        "node": "Собрать все телефоны",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Собрать все телефоны": {
+            "main": [
+                [
+                    {
+                        "node": "Сохранить Лидов в Google Sheets",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {}
+}

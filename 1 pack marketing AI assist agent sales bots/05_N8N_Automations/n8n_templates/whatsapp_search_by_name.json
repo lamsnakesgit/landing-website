@@ -1,0 +1,101 @@
+{
+    "name": "WhatsApp: Find JID by Name",
+    "nodes": [
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "names",
+                            "name": "search_names",
+                            "value": "Реклама и Бизнес, LOVE ДВИЖ, Вакансии и резюме",
+                            "type": "string"
+                        },
+                        {
+                            "id": "inst",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        },
+                        {
+                            "id": "api",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "1",
+            "name": "Search Settings",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                0,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/chat/findChats/{{ encodeURIComponent($json.instance) }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $json.api_key }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "2",
+            "name": "Get All Chats",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                250,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Поиск чатов по части названия\nconst searchTerms = $node[\"Search Settings\"].json.search_names.split(',').map(t => t.trim().toLowerCase());\nconst allChats = Array.isArray($json) ? $json : [$json];\n\nconst results = [];\n\nfor (const chat of allChats) {\n  const chatName = (chat.pushName || chat.name || \"\").toLowerCase();\n  const chatId = chat.id || chat.remoteJid || chat.jid;\n  \n  const isMatch = searchTerms.some(term => chatName.includes(term));\n  \n  if (isMatch) {\n    results.push({\n      found_name: chat.pushName || chat.name,\n      jid: chatId,\n      type: chatId.endsWith('@g.us') ? 'Group' : 'Private'\n    });\n  }\n}\n\nreturn results;"
+            },
+            "id": "3",
+            "name": "Filter by Name",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                500,
+                0
+            ]
+        }
+    ],
+    "connections": {
+        "Search Settings": {
+            "main": [
+                [
+                    {
+                        "node": "Get All Chats",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get All Chats": {
+            "main": [
+                [
+                    {
+                        "node": "Filter by Name",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

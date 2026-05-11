@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zoom Call Ассистент — 3 в 1 | JARVIS</title>
+  <meta name="description" content="Zoom Call Ассистент записывает, транскрибирует и превращает каждый созвон в готовые задачи, фоллоуап и контент — автоматически, прямо в Telegram.">
+  <meta property="og:title" content="Zoom Call Ассистент — 3 в 1 | JARVIS">
+  <meta property="og:description" content="Созвон закончился. Задачи — готовы. Фоллоуап — отправлен. Пост — написан. Автоматически в Telegram.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@300,400,500,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* === PRODUCT PAGE OVERRIDES === */
+    .breadcrumb {
+      font-size: var(--text-xs);
+      color: var(--color-text-faint);
+      letter-spacing: 0.04em;
+      margin-bottom: var(--space-6);
+    }
+    .breadcrumb a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+    }
+    .breadcrumb a:hover { color: var(--color-primary); }
+    .breadcrumb span { color: var(--color-text-faint); margin-inline: var(--space-2); }
+
+    .back-link {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .back-link:hover { color: var(--color-primary); }
+
+    /* 3-in-1 badge */
+    .hero-big-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      background: var(--color-primary-highlight);
+      border: 1px solid rgba(0,212,200,0.3);
+      border-radius: var(--radius-xl);
+      padding: var(--space-3) var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+    .hero-big-badge .badge-number {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--color-primary);
+      line-height: 1;
+    }
+    .hero-big-badge .badge-text {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Showcase cards */
+    .showcase-section {
+      padding-block: clamp(var(--space-16), 10vw, var(--space-24));
+    }
+    .showcase-section h2 {
+      font-size: var(--text-2xl);
+      margin-bottom: var(--space-12);
+    }
+    .showcase-cards {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+    .showcase-card {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: var(--space-6);
+      align-items: start;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      transition: border-color var(--transition-interactive), box-shadow var(--transition-interactive);
+    }
+    .showcase-card:hover {
+      border-color: rgba(0,212,200,0.3);
+      box-shadow: 0 0 32px var(--color-glow);
+    }
+    .showcase-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--color-primary-highlight);
+      border: 1px solid rgba(0,212,200,0.2);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary);
+    }
+    .showcase-card h3 {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      margin-bottom: var(--space-3);
+    }
+    .showcase-card p {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      line-height: 1.7;
+    }
+
+    @media (max-width: 600px) {
+      .showcase-card { grid-template-columns: 1fr; }
+      .showcase-icon { width: 52px; height: 52px; }
+    }
+
+    /* Segments / For Whom — 3 columns */
+    .segments-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-6);
+    }
+    .segment-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      transition: border-color var(--transition-interactive);
+    }
+    .segment-card:hover { border-color: rgba(0,212,200,0.3); }
+    .segment-card h3 {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      margin-bottom: var(--space-4);
+      color: var(--color-primary);
+    }
+    .segment-card p {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      line-height: 1.7;
+    }
+
+    /* Footer minimal */
+    .footer-minimal {
+      border-top: 1px solid var(--color-divider);
+      padding-block: var(--space-8);
+    }
+    .footer-minimal-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+    .footer-minimal-inner span {
+      font-size: var(--text-xs);
+      color: var(--color-text-faint);
+    }
+    .footer-minimal-inner a {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      text-decoration: none;
+    }
+    .footer-minimal-inner a:hover { color: var(--color-primary); }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" aria-label="JARVIS — главная">
+        <svg width="120" height="32" viewBox="0 0 120 32" fill="none" aria-label="JARVIS logo">
+          <rect x="0" y="6" width="20" height="20" rx="4" fill="var(--color-primary)"/>
+          <path d="M5 16 L10 11 L15 16 L10 21 Z" fill="#0a0a0a" stroke="none"/>
+          <path d="M10 11 L10 21" stroke="#0a0a0a" stroke-width="1.5"/>
+          <text x="28" y="22" font-family="'Clash Display', sans-serif" font-size="18" font-weight="600" fill="var(--color-text)" letter-spacing="0.05em">JARVIS</text>
+        </svg>
+      </a>
+      <nav class="nav" aria-label="Основное меню">
+        <a href="index.html" class="back-link">← Все продукты</a>
+        <a href="#features">Возможности</a>
+        <a href="#for-whom">Для кого</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="header-actions">
+        <a href="https://t.me/nnsvt" class="btn btn-primary btn-sm" target="_blank" rel="noopener">Попробовать бесплатно</a>
+      </div>
+      <button class="nav-burger" aria-label="Открыть меню" id="burger">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero-bg"></div>
+      <div class="container hero-content">
+        <div class="breadcrumb">
+          <a href="index.html">JARVIS</a>
+          <span>/</span>
+          Zoom-ассистент
+        </div>
+        <div class="hero-big-badge">
+          <span class="badge-number">3</span>
+          <span class="badge-text">в 1</span>
+        </div>
+        <h1 class="hero-headline">
+          Созвон закончился.<br>
+          <span class="accent">Задачи — готовы.</span><br>
+          Фоллоуап — отправлен. Пост — написан.
+        </h1>
+        <p class="hero-sub">
+          Zoom Call Ассистент подключается к вашим встречам и автоматически превращает каждый созвон в готовые итоги, задачи для команды, фоллоуап для клиента и контент для соцсетей. Прямо в Telegram. Через 2 минуты после окончания звонка.
+        </p>
+        <div class="hero-cta">
+          <a href="https://t.me/nnsvt" class="btn btn-primary btn-lg" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.04 9.615c-.154.688-.555.856-1.125.533l-3.113-2.295-1.502 1.445c-.166.166-.305.305-.625.305l.223-3.168 5.76-5.201c.25-.223-.055-.346-.39-.123L7.09 14.233l-3.046-.952c-.662-.208-.674-.662.139-.979l11.9-4.59c.553-.2 1.036.135.479.536z"/></svg>
+            Подключить бесплатно
+          </a>
+          <a href="#how" class="btn btn-ghost btn-lg">
+            Как это работает
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+        <p class="hero-proof">
+          Первые 5 звонков без оплаты · Без карты · Без регистрации
+        </p>
+      </div>
+    </section>
+
+    <!-- ПРОБЛЕМА -->
+    <section class="problem-section" id="problem">
+      <div class="container problem-inner">
+        <div class="problem-text">
+          <div class="section-label">Проблема</div>
+          <h2>Вы проводите встречи.<br>Результаты исчезают.</h2>
+          <p>Среднестатистический руководитель проводит 15–20 созвонов в неделю. После каждого — хаос: задачи зафиксированы в трёх мессенджерах или нигде, фоллоуап клиенту отправляют «завтра», а завтра забывают. Боли клиента остались в голове менеджера — и с ним же ушли.</p>
+          <p>Встреча стоит денег. Времени. Внимания. А на выходе — пустота.</p>
+        </div>
+        <div class="problem-metrics">
+          <div class="metric-card">
+            <div class="metric-icon">⏱</div>
+            <div class="metric-val">40 мин</div>
+            <div class="metric-desc">после каждого созвона тратится на «вспомнить и записать» — вместо работы</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">📉</div>
+            <div class="metric-val">30%</div>
+            <div class="metric-desc">задач, поставленных устно на встречах, не выполняются в срок</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">💸</div>
+            <div class="metric-val">3,75 млн ₽</div>
+            <div class="metric-desc">недополученной выручки ежемесячно из-за потери конверсии на 15% при среднем чеке 500K₽</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 В 1 SHOWCASE -->
+    <section class="showcase-section" id="showcase">
+      <div class="container">
+        <div class="section-label">3 в 1</div>
+        <h2>Один бот — три результата<br>после каждой встречи</h2>
+        <div class="showcase-cards">
+          <div class="showcase-card">
+            <div class="showcase-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div>
+              <h3>Саммари с таймкодами</h3>
+              <p>Не просто «о чём говорили» — а кто, что и когда сказал. Можно вернуться к любому моменту разговора за секунды. Идеально для разборов звонков, обучения менеджеров, контроля договорённостей.</p>
+            </div>
+          </div>
+          <div class="showcase-card">
+            <div class="showcase-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div>
+              <h3>Задачи и решения</h3>
+              <p>AI выделяет все договорённости: задачи с исполнителями, дедлайны, решения. Ничего не потеряется и не «забудется». Для продающих звонков — отдельный блок: боли, потребности, возражения и точки давления.</p>
+            </div>
+          </div>
+          <div class="showcase-card">
+            <div class="showcase-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </div>
+            <div>
+              <h3>Контент из встречи</h3>
+              <p>Каждый созвон — это экспертиза. Бот превращает её в пост для Telegram, Instagram, LinkedIn или статью для блога. Контент без усилий — из ваших же слов. Готовый фоллоуап клиенту — одной кнопкой.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- КАК РАБОТАЕТ -->
+    <section class="how-section" id="how">
+      <div class="container">
+        <div class="section-label">Как работает</div>
+        <h2>От подключения до результата —<br>4 простых шага</h2>
+        <div class="steps-grid">
+          <div class="step">
+            <div class="step-num">01</div>
+            <h3>Подключение за 5 минут</h3>
+            <p>Добавляете JARVIS-бота в Telegram. Вводите ссылку на Zoom или Google Meet — бот подключается как участник встречи. Один раз настроили — работает на всех звонках.</p>
+          </div>
+          <div class="step">
+            <div class="step-num">02</div>
+            <h3>Бот слушает встречу</h3>
+            <p>Во время созвона AI в реальном времени транскрибирует всё, что говорят участники. Фиксирует кто говорит, что говорит, в какой момент. Работает на русском, английском и смешанных языках.</p>
+          </div>
+          <div class="step">
+            <div class="step-num">03</div>
+            <h3>Обработка и структурирование</h3>
+            <p>Сразу после завершения встречи AI анализирует транскрипт, выделяет ключевые точки, формирует структурированный пакет материалов под тип встречи: планёрка, продающий звонок, онбординг или стратегическая сессия.</p>
+          </div>
+          <div class="step">
+            <div class="step-num">04</div>
+            <h3>Результат в Telegram</h3>
+            <p>Через 2 минуты после окончания созвона вы получаете в Telegram всё, что нужно для продолжения работы. Одобрили — отправили фоллоуап. Прочитали задачи — делегировали. Взяли пост — опубликовали.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ВОЗМОЖНОСТИ -->
+    <section class="features-section" id="features">
+      <div class="container">
+        <div class="section-label">Возможности</div>
+        <h2>Что умеет Zoom Call Ассистент</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <h3>Саммари с таймкодами</h3>
+            <p>Не просто «о чём говорили» — а кто, что и когда сказал. Можно вернуться к любому моменту разговора за секунды.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <h3>Задачи и решения</h3>
+            <p>AI выделяет все договорённости: задачи с исполнителями, дедлайны, решения. Ничего не потеряется и не «забудется».</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <h3>Карта болей клиента</h3>
+            <p>Для продающих звонков: автоматически выделяет боли, потребности, возражения и точки давления. Менеджер идёт на следующий контакт подготовленным.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.27 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.09 6.09l1.95-1.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <h3>Фоллоуап за 0 минут</h3>
+            <p>Готовое профессиональное письмо с итогами встречи и следующим шагом. Отправляете клиенту сразу после звонка — пока конкуренты ещё думают что написать.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </div>
+            <h3>Контент из разговора</h3>
+            <p>Каждый созвон — это экспертиза. Бот превращает её в пост для Telegram, Instagram, LinkedIn или статью для блога. Контент без усилий.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <h3>Любые форматы встреч</h3>
+            <p>Zoom, Google Meet, Telegram-звонки, Teams — без ограничений и дополнительных настроек. Подключил бота — он уже работает.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ДЛЯ КОГО -->
+    <section class="for-whom-section" id="for-whom">
+      <div class="container">
+        <div class="section-label">Для кого</div>
+        <h2>Кому нужен Zoom Call Ассистент</h2>
+        <div class="segments-grid">
+          <div class="segment-card">
+            <h3>РОПы и отделы продаж</h3>
+            <p>Каждый продающий звонок — под контролем. Боли клиента зафиксированы. Фоллоуап ушёл вовремя. Конверсия растёт не потому что «постарались» — а потому что система работает.</p>
+          </div>
+          <div class="segment-card">
+            <h3>Команды и планёрки</h3>
+            <p>Вы не хотите вести протоколы — вы хотите управлять. Бот делает всю фиксацию за вас. Вы видите итоги каждой встречи без личного участия в её расшифровке.</p>
+          </div>
+          <div class="segment-card">
+            <h3>Эксперты и онбординг</h3>
+            <p>Ваши разговоры с клиентами — это золото. Перестаньте его терять. Каждая консультация теперь превращается в кейс, пост и точку роста. Вводные встречи фиксируются автоматически.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ОТЗЫВЫ -->
+    <section class="testimonials-section" id="testimonials">
+      <div class="container">
+        <div class="section-label">Отзывы</div>
+        <h2>Что говорят пользователи</h2>
+        <div class="testimonials-grid">
+          <div class="testimonial-card">
+            <div class="stars">★★★★★</div>
+            <blockquote>«Мы сразу перестали терять задачи после планёрок. Раньше менеджеры клялись, что "договорились" — теперь у всех один и тот же документ с таймкодами. Споров не стало вообще. А фоллоуапы начали уходить клиентам в тот же день — конверсия выросла примерно на 18% за первый месяц.»</blockquote>
+            <div class="testimonial-author">
+              <div class="author-avatar">АВ</div>
+              <div>
+                <div class="author-name">Артём Волков</div>
+                <div class="author-role">CEO, строительная компания, 180 сотрудников</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="stars">★★★★★</div>
+            <blockquote>«Я делала по 6–8 консультаций в день и не успевала делать контент. Теперь каждый разговор автоматически становится постом. За первый месяц у меня накопилось 40 готовых публикаций — это три месяца контент-плана. При этом я не потратила на написание ни минуты.»</blockquote>
+            <div class="testimonial-author">
+              <div class="author-avatar">МС</div>
+              <div>
+                <div class="author-name">Марина Соколова</div>
+                <div class="author-role">Эксперт по маркетингу, 12 лет практики</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section" id="faq">
+      <div class="container faq-inner">
+        <div class="section-label">FAQ</div>
+        <h2>Частые вопросы</h2>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>Клиенты узнают, что разговор записывается?</summary>
+            <p>Это ваш выбор. Бот может подключаться тихо — или вы можете уведомить участников, что встреча записывается. В большинстве B2B-сценариев запись встреч — норма, особенно для онбординга и стратегических сессий. Юридически это регулируется вашей политикой конфиденциальности.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Работает ли бот с русским языком и смешанными переговорами?</summary>
+            <p>Да. Транскрипция работает на русском, английском и в смешанном формате. Качество распознавания — выше 95% при нормальных условиях звука.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Как долго хранятся записи и транскрипты?</summary>
+            <p>По умолчанию — 90 дней. Вы можете настроить автоудаление или экспортировать архив в любой момент. Данные хранятся на защищённых серверах, доступ — только у вашей команды.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Можно подключить к нескольким аккаунтам Zoom одновременно?</summary>
+            <p>Да. На корпоративном тарифе — без ограничений по количеству аккаунтов и параллельных встреч. Бот масштабируется вместе с вашим бизнесом.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="final-cta-section">
+      <div class="container final-cta-inner">
+        <h2>Хватит терять<br>результаты встреч.</h2>
+        <p>Подключите Zoom Call Ассистент сегодня — первые 5 звонков бесплатно. Без карты. Без обязательств. Просто посмотрите, что происходит после вашего следующего созвона.</p>
+        <div class="hero-cta">
+          <a href="https://t.me/nnsvt" class="btn btn-primary btn-xl" target="_blank" rel="noopener">
+            Подключить бесплатно
+          </a>
+          <a href="https://t.me/nnsvt" class="btn btn-ghost btn-lg" target="_blank" rel="noopener">
+            Написать в Telegram
+          </a>
+        </div>
+        <p class="final-proof">Первые 5 звонков · Бесплатно · Без карты</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer-minimal">
+    <div class="container footer-minimal-inner">
+      <a href="index.html" class="logo" aria-label="JARVIS — главная">
+        <svg width="100" height="28" viewBox="0 0 120 32" fill="none">
+          <rect x="0" y="6" width="20" height="20" rx="4" fill="var(--color-primary)"/>
+          <path d="M5 16 L10 11 L15 16 L10 21 Z" fill="#0a0a0a"/>
+          <text x="28" y="22" font-family="'Clash Display', sans-serif" font-size="18" font-weight="600" fill="var(--color-text)" letter-spacing="0.05em">JARVIS</text>
+        </svg>
+      </a>
+      <a href="index.html">← Вернуться на главный сайт</a>
+      <a href="https://t.me/nnsvt" target="_blank" rel="noopener">Telegram</a>
+      <span>© 2026 JARVIS. Все права защищены.</span>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+<script data-pplx-inline-edit>
+(function(){
+  if(window===window.top)return;
+  function inlineAll(orig,clone){
+    if(orig.nodeType!==1)return;
+    try{
+      var cs=getComputedStyle(orig);
+      var t='';
+      for(var i=0;i<cs.length;i++){t+=cs[i]+':'+cs.getPropertyValue(cs[i])+';';}
+      clone.style.cssText=t;
+    }catch(e){}
+    var oc=orig.children,cc=clone.children;
+    for(var j=0;j<oc.length&&j<cc.length;j++){inlineAll(oc[j],cc[j]);}
+  }
+  function stripExternal(clone){
+    var imgs=clone.querySelectorAll('img');
+    for(var i=0;i<imgs.length;i++){
+      var s=imgs[i].getAttribute('src');
+      if(s&&!s.startsWith('data:'))imgs[i].removeAttribute('src');
+    }
+    var all=clone.querySelectorAll('*');
+    for(var i=0;i<all.length;i++){
+      var st=all[i].style.cssText;
+      if(st&&st.indexOf('url(')>=0){
+        all[i].style.cssText=st.replace(/url\(["']?(?!data:)[^)"']*["']?\)/gi,'none');
+      }
+    }
+  }
+  window.addEventListener('message',function(e){
+    if(!e.data||e.data.type!=='INLINE_EDIT_CAPTURE_REQUEST')return;
+    var scrollX=window.scrollX||window.pageXOffset||0;
+    var scrollY=window.scrollY||window.pageYOffset||0;
+    var w=window.innerWidth,h=window.innerHeight;
+    try{
+      var clone=document.documentElement.cloneNode(true);
+      var rm=clone.querySelectorAll('script,link[rel="stylesheet"],style');
+      for(var i=0;i<rm.length;i++){rm[i].remove();}
+      inlineAll(document.documentElement,clone);
+      stripExternal(clone);
+      var html=new XMLSerializer().serializeToString(clone);
+      var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">'
+        +'<foreignObject width="100%" height="100%">'
+        +'<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+w+'px;height:'+h+'px;overflow:hidden">'
+        +'<div style="transform:translate(-'+scrollX+'px,-'+scrollY+'px);transform-origin:top left">'
+        +html+'</div></div></foreignObject></svg>';
+      var svgUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+      var img=new Image();
+      img.onload=function(){
+        var c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0);
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:c.toDataURL('image/png'),scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.onerror=function(){
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.src=svgUrl;
+    }catch(err){
+      window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+    }
+  });
+})();
+</script></body>
+</html>

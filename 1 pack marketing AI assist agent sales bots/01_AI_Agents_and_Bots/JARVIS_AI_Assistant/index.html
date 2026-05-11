@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JARVIS — Персональный AI-ассистент в Telegram | Твой операционный штаб</title>
+  <meta name="description" content="JARVIS — AI-ассистент прямо в Telegram. Помнит всё о вашем бизнесе, ведёт календарь, анализирует документы, создаёт контент. 7 дней бесплатно.">
+  <meta property="og:title" content="JARVIS — Твоя правая рука в Telegram">
+  <meta property="og:description" content="Персональный операционный штаб для руководителей и экспертов. Без регистрации. 7 дней бесплатно.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <!-- Fonts: Clash Display (hero) + Satoshi (body) -->
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@300,400,500,700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "JARVIS",
+    "description": "Персональный AI-ассистент внутри Telegram для руководителей и экспертов",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Telegram",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "RUB",
+      "description": "7 дней бесплатно"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <a href="/" class="logo" aria-label="JARVIS — главная">
+        <svg width="120" height="32" viewBox="0 0 120 32" fill="none" aria-label="JARVIS logo">
+          <rect x="0" y="6" width="20" height="20" rx="4" fill="var(--color-primary)"/>
+          <path d="M5 16 L10 11 L15 16 L10 21 Z" fill="#0a0a0a" stroke="none"/>
+          <path d="M10 11 L10 21" stroke="#0a0a0a" stroke-width="1.5"/>
+          <text x="28" y="22" font-family="'Clash Display', sans-serif" font-size="18" font-weight="600" fill="var(--color-text)" letter-spacing="0.05em">JARVIS</text>
+        </svg>
+      </a>
+      <nav class="nav" aria-label="Основное меню">
+        <a href="#features">Возможности</a>
+        <a href="#how">Как работает</a>
+        <a href="#for-whom">Для кого</a>
+        <a href="#blog">Блог</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-sm" data-theme-toggle aria-label="Переключить тему">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <a href="#trial" class="btn btn-primary btn-sm">Попробовать бесплатно</a>
+      </div>
+      <button class="nav-burger" aria-label="Открыть меню" id="burger">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero-bg"></div>
+      <div class="container hero-content">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          Работает в Telegram · Без установки
+        </div>
+        <h1 class="hero-headline">
+          Ты нанял<br>
+          <span class="accent">правую руку.</span><br>
+          Она живёт в Telegram.
+        </h1>
+        <p class="hero-sub">
+          Большинство руководителей тратят лучшую часть дня на задачи, которые не должны касаться их вообще. JARVIS — персональный AI-ассистент, который берёт на себя операционку, помнит контекст твоего бизнеса и действует раньше, чем ты успеешь попросить.
+        </p>
+        <div class="hero-cta">
+          <a href="#trial" class="btn btn-primary btn-lg">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.27 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.09 6.09l1.95-1.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Запустить JARVIS бесплатно
+          </a>
+          <a href="#how" class="btn btn-ghost btn-lg">
+            Как это работает
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+        <p class="hero-proof">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--color-primary)" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Уже 1 200+ руководителей и экспертов. Без карты. Без регистрации.
+        </p>
+      </div>
+
+      <!-- Floating UI mock -->
+      <div class="hero-ui container">
+        <div class="chat-mock">
+          <div class="chat-header">
+            <div class="chat-avatar">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="16" height="16" rx="3" fill="var(--color-primary)"/><path d="M6 12 L10 8 L14 12 L10 16 Z" fill="#0a0a0a"/></svg>
+            </div>
+            <div>
+              <div class="chat-name">JARVIS</div>
+              <div class="chat-status"><span class="status-dot"></span> онлайн</div>
+            </div>
+          </div>
+          <div class="chat-messages">
+            <div class="msg msg-bot">
+              <p>Доброе утро, Алексей. Вот сводка на сегодня:</p>
+              <ul>
+                <li>📅 3 встречи — 10:00, 14:00, 17:30</li>
+                <li>📄 Договор с «Технострой» — ожидает подписи</li>
+                <li>🔔 Дедлайн по квартальному отчёту — сегодня</li>
+              </ul>
+            </div>
+            <div class="msg msg-user">Сделай краткое резюме договора с Технострой</div>
+            <div class="msg msg-bot">
+              <p>Договор №47 — подряд на 12 млн ₽, срок 6 мес. Ключевые риски: штраф 0,1%/день за просрочку, нет форс-мажорной оговорки. Рекомендую добавить пункт 8.3 перед подписью.</p>
+            </div>
+            <div class="msg msg-typing">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats-section">
+      <div class="container stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">3 ч</div>
+          <div class="stat-label">возвращает каждый день</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-number">24/7</div>
+          <div class="stat-label">работает без выходных</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-number">60 с</div>
+          <div class="stat-label">до первого результата</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-number">×3</div>
+          <div class="stat-label">к эффективности</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROBLEM -->
+    <section class="problem-section" id="problem">
+      <div class="container problem-inner">
+        <div class="problem-text">
+          <div class="section-label">Проблема</div>
+          <h2>Ты управляешь бизнесом.<br>Или бизнес управляет тобой?</h2>
+          <p>Каждое утро начинается одинаково: почта, мессенджеры, встречи, согласования. К обеду — ощущение что был занят, но ничего важного не сделал. К вечеру — усталость от операционки, а стратегические задачи снова перенесены на «завтра».</p>
+          <p>Это не проблема дисциплины. Это системная ловушка: чем больше растёт бизнес, тем больше рутины падает лично на тебя.</p>
+        </div>
+        <div class="problem-metrics">
+          <div class="metric-card">
+            <div class="metric-icon">⏱</div>
+            <div class="metric-val">3–4 часа</div>
+            <div class="metric-desc">в день уходит на задачи, которые не требуют участия руководителя</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">📉</div>
+            <div class="metric-val">60+ часов</div>
+            <div class="metric-desc">в месяц — полторы рабочие недели сгорают в никуда</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">💸</div>
+            <div class="metric-val">от 100K₽</div>
+            <div class="metric-desc">цена одного пропущенного стратегического решения</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOLUTION -->
+    <section class="solution-section" id="solution">
+      <div class="container">
+        <div class="solution-label">Решение</div>
+        <h2 class="solution-title">JARVIS — не ещё один инструмент.<br>Это твой <span class="accent">операционный штаб.</span></h2>
+        <p class="solution-desc">JARVIS работает внутри Telegram — там, где ты уже находишься. Он помнит всё о тебе и твоём бизнесе, слышит голосовые сообщения, анализирует документы и действует первым, не дожидаясь команды.</p>
+        <div class="solution-pillars">
+          <div class="pillar">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>
+            <span>Не ждёт команды — действует первым</span>
+          </div>
+          <div class="pillar">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Живёт в Telegram — ничего устанавливать</span>
+          </div>
+          <div class="pillar">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <span>Помнит весь контекст твоего бизнеса</span>
+          </div>
+          <div class="pillar">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Команда AI-агентов под капотом</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="how-section" id="how">
+      <div class="container">
+        <div class="section-label">Как работает</div>
+        <h2>От первого сообщения<br>до результата — 60 секунд</h2>
+        <div class="steps-grid">
+          <div class="step">
+            <div class="step-num">01</div>
+            <h3>Запуск за 60 секунд</h3>
+            <p>Открываешь Telegram, находишь JARVIS, нажимаешь старт. Никакой регистрации, никаких настроек. Первый разговор — уже рабочий.</p>
+          </div>
+          <div class="step">
+            <div class="step-num">02</div>
+            <h3>JARVIS узнаёт тебя</h3>
+            <p>Расскажи о своём бизнесе и задачах — один раз. Он запомнит и будет использовать этот контекст в каждом взаимодействии. Чем дольше работаешь — тем точнее понимает.</p>
+          </div>
+          <div class="step">
+            <div class="step-num">03</div>
+            <h3>Ставишь задачу — получаешь результат</h3>
+            <p>Надиктуй голосовое, отправь документ, напиши запрос — JARVIS обрабатывает всё. Исследует, анализирует, создаёт, планирует. Не даёт советы — делает.</p>
+          </div>
+          <div class="step">
+            <div class="step-num">04</div>
+            <h3>Он ведёт тебя по дню</h3>
+            <p>Без твоего запроса — утренняя сводка, напоминания о встречах, проактивные предложения по зависшим задачам. JARVIS не ждёт. Он работает.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features-section" id="features">
+      <div class="container">
+        <div class="section-label">Возможности</div>
+        <h2>Что умеет JARVIS</h2>
+        <div class="features-grid">
+          <div class="feature-card feature-large">
+            <div class="feature-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </div>
+            <h3>Персонализированная память</h3>
+            <p>Помнит всё о тебе, твоём бизнесе, клиентах и проектах. Контекст никогда не теряется — даже через месяц. Не нужно объяснять с нуля каждый раз.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </div>
+            <h3>Голосовые сообщения</h3>
+            <p>Надиктуй в машине или на бегу — JARVIS расшифрует, структурирует и поставит задачу.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <h3>Веб-исследования</h3>
+            <p>Ищет информацию в интернете, анализирует и суммирует. Не ссылки — а готовый вывод.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <h3>Анализ документов</h3>
+            <p>Фото, PDF, скриншот, таблица — JARVIS читает и выдаёт суть. 12 страниц договора за 30 секунд.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </div>
+            <h3>Создание контента</h3>
+            <p>Посты, офферы, письма, изображения, музыкальные концепции — по запросу, в твоём стиле.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <h3>Календарь и расписание</h3>
+            <p>Ведёт расписание, планирует встречи, расставляет приоритеты и напоминает сам.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <h3>Проактивность</h3>
+            <p>Утренняя сводка, дедлайны, зависшие задачи — JARVIS не ждёт команды. Он уже работает.</p>
+          </div>
+          <div class="feature-card feature-large">
+            <div class="feature-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <h3>Команда AI-агентов</h3>
+            <p>За одним окном — несколько специализированных агентов: исследователь, копирайтер, планировщик, аналитик. Больше задач — без потери качества.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <h3>Облачное хранилище</h3>
+            <p>Сохраняет файлы на Google Drive прямо из чата. Всё на своём месте автоматически.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOR WHOM -->
+    <section class="for-whom-section" id="for-whom">
+      <div class="container">
+        <div class="section-label">Для кого</div>
+        <h2>JARVIS создан для тех,<br>кто не может позволить себе терять время</h2>
+        <div class="audience-grid">
+          <div class="audience-card">
+            <div class="audience-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <h3>Руководители<br>и собственники бизнеса</h3>
+            <ul class="audience-list">
+              <li>Принимаешь десятки решений в день — JARVIS готовит для них почву</li>
+              <li>Контроль задач и команды без погружения в детали</li>
+              <li>Брифы, аналитика, переписка — делегировано ассистенту, который не забывает</li>
+              <li>Расписание под контролем, даже когда всё горит</li>
+              <li>Стратегическое время защищено от операционки</li>
+            </ul>
+          </div>
+          <div class="audience-card">
+            <div class="audience-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <h3>Эксперты, консультанты<br>и фрилансеры</h3>
+            <ul class="audience-list">
+              <li>Работаешь один — но действуешь как команда</li>
+              <li>Контент, предложения, исследования — без лишних часов за компьютером</li>
+              <li>Быстрые ответы клиентам: JARVIS помогает формулировать чётко</li>
+              <li>Больше клиентов без больше стресса</li>
+              <li>Личный ассистент за цену меньше одного рабочего часа в день</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="testimonials-section" id="testimonials">
+      <div class="container">
+        <div class="section-label">Отзывы</div>
+        <h2>Что говорят те, кто уже внутри</h2>
+        <div class="testimonials-grid">
+          <div class="testimonial-card">
+            <div class="stars">★★★★★</div>
+            <blockquote>«Я скептик по натуре. AI-ассистенты пробовал несколько раз — каждый раз разочарование. JARVIS другой. Реально помнит контекст. Экономлю часа два-три в день. Главное — утро начинается не с хаоса, а со сводки.»</blockquote>
+            <div class="testimonial-author">
+              <div class="author-avatar">АК</div>
+              <div>
+                <div class="author-name">Алексей К.</div>
+                <div class="author-role">Основатель строительной компании, 180 сотрудников</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="stars">★★★★★</div>
+            <blockquote>«У меня не было ресурсов нанять ассистента — а без него уже задыхалась. JARVIS закрыл этот вопрос. Теперь работаю меньше — а зарабатываю больше, потому что время пошло туда, где я реально создаю ценность.»</blockquote>
+            <div class="testimonial-author">
+              <div class="author-avatar">МВ</div>
+              <div>
+                <div class="author-name">Марина В.</div>
+                <div class="author-role">Бизнес-консультант, 12 активных клиентов</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="stars">★★★★★</div>
+            <blockquote>«Меня зацепили голосовые — я много езжу, мысли и задачи просто терялись. Теперь диктую — JARVIS структурирует, ставит задачи. Плюс анализирует документы быстрее любого аналитика. Это не замена людям — усилитель. Ты становишься ×2 версией себя.»</blockquote>
+            <div class="testimonial-author">
+              <div class="author-avatar">ДР</div>
+              <div>
+                <div class="author-name">Дмитрий Р.</div>
+                <div class="author-role">Директор по развитию, технологическая компания</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING / TRIAL CTA -->
+    <section class="trial-section" id="trial">
+      <div class="container trial-inner">
+        <div class="trial-text">
+          <div class="section-label">Старт</div>
+          <h2>Попробуй JARVIS —<br>7 дней бесплатно</h2>
+          <p>Не нужно ничего настраивать. Не нужно читать инструкции. Просто открой Telegram и начни разговор с реальной задачей из своей жизни.</p>
+          <p>После семи дней ты либо останешься, потому что уже не представляешь как без него, либо уйдёшь — без вопросов. Мы в это не верим, но карту не попросим.</p>
+          <a href="https://t.me/jarvisai_bot" class="btn btn-primary btn-lg" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.04 9.615c-.154.688-.555.856-1.125.533l-3.113-2.295-1.502 1.445c-.166.166-.305.305-.625.305l.223-3.168 5.76-5.201c.25-.223-.055-.346-.39-.123L7.09 14.233l-3.046-.952c-.662-.208-.674-.662.139-.979l11.9-4.59c.553-.2 1.036.135.479.536z"/></svg>
+            Запустить JARVIS в Telegram
+          </a>
+          <p class="trial-guarantee">Без регистрации · Без карты · 7 дней полного доступа</p>
+        </div>
+        <div class="pricing-cards">
+          <div class="pricing-card">
+            <div class="pricing-tag">Solo</div>
+            <div class="pricing-desc">Для экспертов и фрилансеров</div>
+            <div class="pricing-price">от <span>2 990 ₽</span>/мес</div>
+            <ul class="pricing-features">
+              <li>Персонализированная память</li>
+              <li>Голосовые сообщения</li>
+              <li>Анализ документов</li>
+              <li>Веб-исследования</li>
+              <li>Создание контента</li>
+              <li>Календарь и расписание</li>
+            </ul>
+          </div>
+          <div class="pricing-card pricing-featured">
+            <div class="pricing-badge">Популярный</div>
+            <div class="pricing-tag">Business</div>
+            <div class="pricing-desc">Для команд и руководителей</div>
+            <div class="pricing-price">от <span>7 990 ₽</span>/мес</div>
+            <ul class="pricing-features">
+              <li>Всё из Solo +</li>
+              <li>Расширенная память</li>
+              <li>Команда AI-агентов</li>
+              <li>Приоритетная обработка</li>
+              <li>Интеграции с CRM</li>
+              <li>Онбординг-сессия</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section" id="faq">
+      <div class="container faq-inner">
+        <div class="section-label">FAQ</div>
+        <h2>Частые вопросы</h2>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>Это безопасно? Мои данные не утекут?</summary>
+            <p>Всё, что ты рассказываешь JARVIS, хранится в зашифрованном виде и не передаётся третьим лицам. Мы не используем твои данные для обучения моделей. Твой контекст — только твой.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Нужно ли устанавливать что-то новое?</summary>
+            <p>Нет. JARVIS работает прямо в Telegram. Если у тебя есть аккаунт в Telegram — ты уже готов. Никаких приложений, никаких браузерных расширений.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Чем JARVIS отличается от ChatGPT?</summary>
+            <p>ChatGPT не помнит тебя. Каждый раз — с нуля. JARVIS строит персональную память, знает твой бизнес, ведёт расписание и действует проактивно. Это не справочник — это ассистент с характером и контекстом.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Что если я не умею «правильно» ставить задачи AI?</summary>
+            <p>Не нужно уметь. Пиши как пишешь коллеге: «Нужно подготовить письмо клиенту, вот контекст...» Или просто надиктуй голосовое. JARVIS разберётся.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Сколько стоит после бесплатного периода?</summary>
+            <p>Тарифы начинаются от стоимости одного бизнес-ланча в месяц. После 7 дней ты сам поймёшь, сколько тебе это стоит — и сколько экономит. Мы уверены: разрыв будет очевиден.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Я уже пользуюсь другими AI-инструментами. Зачем ещё один?</summary>
+            <p>Именно поэтому. У тебя их слишком много. JARVIS объединяет всё в одной точке: память, исследования, контент, расписание, документы — в одном Telegram-диалоге. Меньше переключений, больше результата.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOG SECTION -->
+    <section class="blog-section" id="blog">
+      <div class="container">
+        <div class="section-label">Блог</div>
+        <h2>Как работать умнее</h2>
+        <div class="blog-grid">
+          <article class="blog-card blog-card-large">
+            <div class="blog-meta">AI для бизнеса · 5 мин</div>
+            <h3>Как руководитель возвращает 3 часа в день с помощью AI-ассистента</h3>
+            <p>Разбираем реальный кейс: что делегировали JARVIS, что автоматизировали и как изменился рабочий день собственника строительной компании.</p>
+            <a href="/blog/3-hours-back" class="blog-link">Читать статью →</a>
+          </article>
+          <article class="blog-card">
+            <div class="blog-meta">Продуктивность · 4 мин</div>
+            <h3>Команда AI-агентов: почему один ассистент — это уже прошлое</h3>
+            <a href="/blog/ai-agents-team" class="blog-link">Читать →</a>
+          </article>
+          <article class="blog-card">
+            <div class="blog-meta">Инструменты · 3 мин</div>
+            <h3>ChatGPT vs JARVIS: в чём разница для бизнеса</h3>
+            <a href="/blog/jarvis-vs-chatgpt" class="blog-link">Читать →</a>
+          </article>
+          <article class="blog-card">
+            <div class="blog-meta">Кейсы · 6 мин</div>
+            <h3>Как консультант автоматизировал 80% рутины и взял ещё 3 клиентов</h3>
+            <a href="/blog/consultant-case" class="blog-link">Читать →</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="final-cta-section">
+      <div class="container final-cta-inner">
+        <h2>Твоя правая рука<br>ждёт в Telegram.</h2>
+        <p>Пока ты читаешь это — кто-то из твоих конкурентов уже работает быстрее, думает чище и делает больше. Не потому что он умнее. Потому что у него есть JARVIS.</p>
+        <a href="https://t.me/jarvisai_bot" class="btn btn-primary btn-xl" target="_blank" rel="noopener">
+          Запустить JARVIS сейчас
+        </a>
+        <p class="final-proof">7 дней · Бесплатно · Без карты · Без обязательств</p>
+        <p class="final-social">Уже 1 200+ руководителей и экспертов используют JARVIS ежедневно.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <svg width="100" height="28" viewBox="0 0 120 32" fill="none">
+          <rect x="0" y="6" width="20" height="20" rx="4" fill="var(--color-primary)"/>
+          <path d="M5 16 L10 11 L15 16 L10 21 Z" fill="#0a0a0a"/>
+          <text x="28" y="22" font-family="'Clash Display', sans-serif" font-size="18" font-weight="600" fill="var(--color-text)" letter-spacing="0.05em">JARVIS</text>
+        </svg>
+        <p>Персональный операционный штаб для тех, кто ценит своё время.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <div class="footer-col-title">Продукт</div>
+          <a href="#features">Возможности</a>
+          <a href="#how">Как работает</a>
+          <a href="#trial">Тарифы</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Компания</div>
+          <a href="/about">О нас</a>
+          <a href="/blog">Блог</a>
+          <a href="/contact">Контакты</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Связаться</div>
+          <a href="https://t.me/jarvisai_support">Telegram</a>
+          <a href="mailto:hello@jarvis.ai">Email</a>
+        </div>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© 2026 JARVIS. Все права защищены.</span>
+      <div class="footer-legal">
+        <a href="/privacy">Политика конфиденциальности</a>
+        <a href="/terms">Условия использования</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+<script data-pplx-inline-edit>
+(function(){
+  if(window===window.top)return;
+  function inlineAll(orig,clone){
+    if(orig.nodeType!==1)return;
+    try{
+      var cs=getComputedStyle(orig);
+      var t='';
+      for(var i=0;i<cs.length;i++){t+=cs[i]+':'+cs.getPropertyValue(cs[i])+';';}
+      clone.style.cssText=t;
+    }catch(e){}
+    var oc=orig.children,cc=clone.children;
+    for(var j=0;j<oc.length&&j<cc.length;j++){inlineAll(oc[j],cc[j]);}
+  }
+  function stripExternal(clone){
+    var imgs=clone.querySelectorAll('img');
+    for(var i=0;i<imgs.length;i++){
+      var s=imgs[i].getAttribute('src');
+      if(s&&!s.startsWith('data:'))imgs[i].removeAttribute('src');
+    }
+    var all=clone.querySelectorAll('*');
+    for(var i=0;i<all.length;i++){
+      var st=all[i].style.cssText;
+      if(st&&st.indexOf('url(')>=0){
+        all[i].style.cssText=st.replace(/url\(["']?(?!data:)[^)"']*["']?\)/gi,'none');
+      }
+    }
+  }
+  window.addEventListener('message',function(e){
+    if(!e.data||e.data.type!=='INLINE_EDIT_CAPTURE_REQUEST')return;
+    var scrollX=window.scrollX||window.pageXOffset||0;
+    var scrollY=window.scrollY||window.pageYOffset||0;
+    var w=window.innerWidth,h=window.innerHeight;
+    try{
+      var clone=document.documentElement.cloneNode(true);
+      var rm=clone.querySelectorAll('script,link[rel="stylesheet"],style');
+      for(var i=0;i<rm.length;i++){rm[i].remove();}
+      inlineAll(document.documentElement,clone);
+      stripExternal(clone);
+      var html=new XMLSerializer().serializeToString(clone);
+      var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">'
+        +'<foreignObject width="100%" height="100%">'
+        +'<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+w+'px;height:'+h+'px;overflow:hidden">'
+        +'<div style="transform:translate(-'+scrollX+'px,-'+scrollY+'px);transform-origin:top left">'
+        +html+'</div></div></foreignObject></svg>';
+      var svgUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+      var img=new Image();
+      img.onload=function(){
+        var c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0);
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:c.toDataURL('image/png'),scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.onerror=function(){
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.src=svgUrl;
+    }catch(err){
+      window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+    }
+  });
+})();
+</script></body>
+</html>

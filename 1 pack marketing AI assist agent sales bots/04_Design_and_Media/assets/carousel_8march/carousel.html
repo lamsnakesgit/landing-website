@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8 Марта — Проблематика и Солидарность | Aiconic Agency</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0f;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .carousel-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 0 80px rgba(138, 43, 226, 0.15), 0 0 200px rgba(138, 43, 226, 0.05);
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+            opacity: 0;
+            transform: translateX(60px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            pointer-events: none;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        .slide-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            gap: 16px;
+        }
+
+        /* --- Слайд 1: Хук --- */
+        .slide-1 {
+            background-image: url('slide1.png');
+        }
+
+        .slide-1::before {
+            background: linear-gradient(180deg, rgba(10, 10, 15, 0.75) 0%, rgba(10, 10, 15, 0.3) 40%, rgba(10, 10, 15, 0.7) 100%);
+        }
+
+        .slide-1 .main-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4em;
+            font-weight: 700;
+            line-height: 1.2;
+            text-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
+            max-width: 90%;
+        }
+
+        .slide-1 .main-text span {
+            color: #d4af37;
+        }
+
+        .slide-1 .sub-text {
+            font-size: 0.85em;
+            font-weight: 300;
+            opacity: 0.7;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 12px;
+        }
+
+        /* --- Слайд 2: Mind Map --- */
+        .slide-2 {
+            background-image: url('slide2.png');
+        }
+
+        .slide-2::before {
+            background: linear-gradient(180deg, rgba(10, 10, 15, 0.65) 0%, rgba(10, 10, 15, 0.2) 50%, rgba(10, 10, 15, 0.65) 100%);
+        }
+
+        .slide-2 .main-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6em;
+            font-weight: 700;
+            line-height: 1.3;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.9);
+            margin-bottom: 8px;
+        }
+
+        /* --- Слайд 3: Рита Грачева --- */
+        .slide-3 {
+            background-image: url('slide3.png');
+        }
+
+        .slide-3::before {
+            background: linear-gradient(180deg, rgba(10, 10, 15, 0.8) 0%, rgba(10, 10, 15, 0.35) 50%, rgba(10, 10, 15, 0.85) 100%);
+        }
+
+        .slide-3 .year {
+            font-size: 3em;
+            font-weight: 900;
+            color: #d4af37;
+            text-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
+            letter-spacing: 4px;
+        }
+
+        .slide-3 .main-text {
+            font-size: 1.1em;
+            font-weight: 400;
+            line-height: 1.6;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9);
+            max-width: 95%;
+        }
+
+        .slide-3 .thesis {
+            font-size: 0.85em;
+            font-weight: 300;
+            font-style: italic;
+            color: #e8a0a0;
+            border-left: 3px solid #d4af37;
+            padding-left: 12px;
+            text-align: left;
+            margin-top: 8px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        /* --- Слайд 4: Статистика --- */
+        .slide-4 {
+            background-image: url('slide4.png');
+        }
+
+        .slide-4::before {
+            background: linear-gradient(180deg, rgba(10, 10, 15, 0.7) 0%, rgba(10, 10, 15, 0.3) 50%, rgba(10, 10, 15, 0.8) 100%);
+        }
+
+        .slide-4 .big-number {
+            font-size: 5em;
+            font-weight: 900;
+            color: #ff4444;
+            text-shadow: 0 0 60px rgba(255, 68, 68, 0.5), 0 0 120px rgba(255, 68, 68, 0.2);
+            line-height: 1;
+        }
+
+        .slide-4 .main-text {
+            font-size: 1em;
+            font-weight: 400;
+            line-height: 1.5;
+            max-width: 90%;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9);
+        }
+
+        .slide-4 .stat-badge {
+            display: inline-block;
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid rgba(255, 68, 68, 0.4);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1.1em;
+            color: #ff6b6b;
+            margin-top: 8px;
+        }
+
+        /* --- Слайд 5: Экономическое неравенство --- */
+        .slide-5 {
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 40%, #0f0f2a 100%);
+        }
+
+        .slide-5::before {
+            background: radial-gradient(ellipse at 30% 70%, rgba(138, 43, 226, 0.08) 0%, transparent 60%);
+        }
+
+        .slide-5 .gap-number {
+            font-size: 4em;
+            font-weight: 900;
+            background: linear-gradient(135deg, #d4af37, #f0d060);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+            line-height: 1;
+        }
+
+        .slide-5 .main-text {
+            font-size: 1.15em;
+            font-weight: 400;
+            margin-bottom: 16px;
+        }
+
+        .slide-5 .bars {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+            height: 120px;
+            margin: 16px 0;
+        }
+
+        .slide-5 .bar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .slide-5 .bar {
+            width: 50px;
+            border-radius: 6px 6px 0 0;
+            background: linear-gradient(180deg, #8b5cf6, #6d28d9);
+            position: relative;
+            transition: height 0.8s ease;
+        }
+
+        .slide-5 .bar-label {
+            font-size: 0.7em;
+            font-weight: 300;
+            opacity: 0.7;
+            max-width: 70px;
+            text-align: center;
+        }
+
+        .slide-5 .bar-value {
+            font-size: 0.8em;
+            font-weight: 700;
+            color: #d4af37;
+        }
+
+        .slide-5 .thesis {
+            font-size: 0.9em;
+            font-style: italic;
+            opacity: 0.8;
+            border-top: 1px solid rgba(212, 175, 55, 0.3);
+            padding-top: 12px;
+            max-width: 90%;
+        }
+
+        /* --- Слайд 6: Правовой вакуум --- */
+        .slide-6 {
+            background: linear-gradient(180deg, #0a0a0f 0%, #1a0505 50%, #0a0a0f 100%);
+        }
+
+        .slide-6::before {
+            background: radial-gradient(ellipse at center, rgba(180, 30, 30, 0.06) 0%, transparent 70%);
+        }
+
+        .slide-6 .icon-block {
+            font-size: 3em;
+            margin-bottom: 8px;
+        }
+
+        .slide-6 .main-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5em;
+            font-weight: 700;
+            line-height: 1.3;
+            color: #ff6b6b;
+            max-width: 95%;
+        }
+
+        .slide-6 .thesis {
+            font-size: 0.9em;
+            font-weight: 300;
+            line-height: 1.6;
+            opacity: 0.85;
+            max-width: 90%;
+            margin-top: 16px;
+            border-left: 3px solid rgba(255, 68, 68, 0.5);
+            padding-left: 14px;
+            text-align: left;
+        }
+
+        /* --- Слайд 7: Aiconic Agency --- */
+        .slide-7 {
+            background: linear-gradient(135deg, #0f0a1a 0%, #1a0f2e 30%, #0a1020 70%, #0f0a1a 100%);
+        }
+
+        .slide-7::before {
+            background: radial-gradient(ellipse at 50% 50%, rgba(138, 43, 226, 0.1) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 40%);
+        }
+
+        .slide-7 .brand {
+            font-size: 0.85em;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: #d4af37;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .slide-7 .main-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5em;
+            font-weight: 700;
+            line-height: 1.4;
+            max-width: 90%;
+        }
+
+        .slide-7 .sub-text {
+            font-size: 0.9em;
+            font-weight: 300;
+            opacity: 0.75;
+            margin-top: 12px;
+            max-width: 85%;
+            line-height: 1.5;
+        }
+
+        /* --- Слайд 8: Солидарность --- */
+        .slide-8 {
+            background: linear-gradient(180deg, #0a0a1a 0%, #0f1a0a 50%, #0a0a1a 100%);
+        }
+
+        .slide-8::before {
+            background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.08) 0%, transparent 60%);
+        }
+
+        .slide-8 .main-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3em;
+            font-weight: 700;
+            line-height: 1.5;
+            max-width: 90%;
+        }
+
+        .slide-8 .main-text em {
+            color: #d4af37;
+            font-style: normal;
+            font-weight: 700;
+        }
+
+        .slide-8 .highlight-box {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-top: 16px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #d4af37;
+        }
+
+        /* --- Слайд 9: Пожелания --- */
+        .slide-9 {
+            background: linear-gradient(135deg, #1a0a2e 0%, #2a1040 30%, #0f0a1a 100%);
+        }
+
+        .slide-9::before {
+            background: radial-gradient(ellipse at 50% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 60%);
+        }
+
+        .slide-9 .heart {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+        }
+
+        .slide-9 .main-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.35em;
+            font-weight: 700;
+            line-height: 1.5;
+            max-width: 90%;
+        }
+
+        .slide-9 .main-text span {
+            color: #d4af37;
+        }
+
+        /* --- Слайд 10: Финал --- */
+        .slide-10 {
+            background: linear-gradient(180deg, #0a0a0f 0%, #0f0a1a 40%, #1a0f2e 70%, #0a0a0f 100%);
+        }
+
+        .slide-10::before {
+            background: radial-gradient(ellipse at 50% 80%, rgba(212, 175, 55, 0.12) 0%, transparent 50%);
+        }
+
+        .slide-10 .date {
+            font-size: 5em;
+            font-weight: 900;
+            background: linear-gradient(135deg, #d4af37, #f0d060, #d4af37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 6px;
+            line-height: 1;
+            margin-bottom: 16px;
+        }
+
+        .slide-10 .main-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2em;
+            font-weight: 700;
+            line-height: 1.5;
+            max-width: 85%;
+            opacity: 0.9;
+        }
+
+        .slide-10 .brand-final {
+            font-size: 0.8em;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            color: #d4af37;
+            font-weight: 600;
+            margin-top: 24px;
+            opacity: 0.8;
+        }
+
+        .slide-10 .brand-final::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 2px;
+            background: #d4af37;
+            margin: 12px auto 0;
+        }
+
+        /* --- Навигация --- */
+        .nav-arrows {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .nav-btn {
+            width: 44px;
+            height: 44px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            color: #fff;
+            font-size: 1.1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(212, 175, 55, 0.3);
+            border-color: #d4af37;
+        }
+
+        .slide-counter {
+            position: absolute;
+            bottom: 28px;
+            left: 20px;
+            font-size: 0.75em;
+            font-weight: 300;
+            letter-spacing: 2px;
+            opacity: 0.5;
+            z-index: 10;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #d4af37, #8b5cf6);
+            z-index: 10;
+            transition: width 0.6s ease;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 640px) {
+            .carousel-wrapper {
+                border-radius: 0;
+                max-width: 100vw;
+            }
+
+            .slide {
+                padding: 28px;
+            }
+
+            .slide-1 .main-text {
+                font-size: 1.8em;
+            }
+
+            .slide-3 .year {
+                font-size: 2.2em;
+            }
+
+            .slide-3 .main-text {
+                font-size: 0.95em;
+            }
+
+            .slide-4 .big-number {
+                font-size: 3.5em;
+            }
+
+            .slide-5 .gap-number {
+                font-size: 3em;
+            }
+
+            .slide-5 .bar {
+                width: 36px;
+            }
+
+            .slide-10 .date {
+                font-size: 3.5em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="carousel-wrapper">
+
+        <!-- Слайд 1: Хук -->
+        <div class="slide slide-1 active" data-index="0">
+            <div class="slide-content">
+                <div class="main-text">8 Марта — <span>это праздник с корнями в борьбе.</span></div>
+                <div class="sub-text">Проблематика и солидарность</div>
+            </div>
+        </div>
+
+        <!-- Слайд 2: Mind Map -->
+        <div class="slide slide-2" data-index="1">
+            <div class="slide-content">
+                <div class="main-text">О чём мы говорим, когда говорим об 8 Марта?</div>
+            </div>
+        </div>
+
+        <!-- Слайд 3: Символ — Рита Грачева -->
+        <div class="slide slide-3" data-index="2">
+            <div class="slide-content">
+                <div class="year">2017</div>
+                <div class="main-text">Маргарита Грачева. Муж отрубает ей кисти рук. Это не просто трагедия — это
+                    индикатор системы.</div>
+                <div class="thesis">Отсутствие закона о профилактике насилия делает такие случаи возможными.</div>
+            </div>
+        </div>
+
+        <!-- Слайд 4: Статистика смертности -->
+        <div class="slide slide-4" data-index="3">
+            <div class="slide-content">
+                <div class="big-number">963</div>
+                <div class="main-text">женщины погибли от рук партнёров или родственников в 2024 году.</div>
+                <div class="stat-badge">47% всех женских убийств — домашнее насилие</div>
+            </div>
+        </div>
+
+        <!-- Слайд 5: Экономическое неравенство -->
+        <div class="slide slide-5" data-index="4">
+            <div class="slide-content">
+                <div class="gap-number">33.4%</div>
+                <div class="main-text">Разрыв в зарплатах</div>
+                <div class="bars">
+                    <div class="bar-item">
+                        <div class="bar-value">33%</div>
+                        <div class="bar" style="height: 100px;"></div>
+                        <div class="bar-label">Культура</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-value">29%</div>
+                        <div class="bar" style="height: 88px;"></div>
+                        <div class="bar-label">IT</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-value">29%</div>
+                        <div class="bar" style="height: 88px;"></div>
+                        <div class="bar-label">HoReCa</div>
+                    </div>
+                </div>
+                <div class="thesis">«Равный труд не означает равную оплату. Пока что.»</div>
+            </div>
+        </div>
+
+        <!-- Слайд 6: Правовой вакуум -->
+        <div class="slide slide-6" data-index="5">
+            <div class="slide-content">
+                <div class="icon-block">⚖️</div>
+                <div class="main-text">В России до сих пор нет отдельного закона против домашнего насилия.</div>
+                <div class="thesis">Декриминализация побоев (2017) оставила тысячи женщин без защиты при первом
+                    «предупреждении».</div>
+            </div>
+        </div>
+
+        <!-- Слайд 7: Почему мы это пишем? -->
+        <div class="slide slide-7" data-index="6">
+            <div class="slide-content">
+                <div class="brand">Aiconic Agency</div>
+                <div class="main-text">Мы — про будущее. А в будущем нет места насилию и дискриминации.</div>
+                <div class="sub-text">Мы за технологии, которые освобождают, а не ограничивают.</div>
+            </div>
+        </div>
+
+        <!-- Слайд 8: Сила солидарности -->
+        <div class="slide slide-8" data-index="7">
+            <div class="slide-content">
+                <div class="main-text">Солидарность — это не только про митинги. Это про поддержку коллег, про огласку,
+                    про <em>«я тебе верю»</em>.</div>
+                <div class="highlight-box">Поддержка начинается с нас</div>
+            </div>
+        </div>
+
+        <!-- Слайд 9: Наши пожелания -->
+        <div class="slide slide-9" data-index="8">
+            <div class="slide-content">
+                <div class="heart">💛</div>
+                <div class="main-text">Девчонки, вы сильные. Вы видите глубже подделок, чувствуете точнее алгоритмов.
+                    <span>Вы — двигатель жизни.</span></div>
+            </div>
+        </div>
+
+        <!-- Слайд 10: Финал -->
+        <div class="slide slide-10" data-index="9">
+            <div class="slide-content">
+                <div class="date">08.03</div>
+                <div class="main-text">Пусть каждый день будет шагом к свободе, уважению и безопасности.</div>
+                <div class="brand-final">Aiconic Agency</div>
+            </div>
+        </div>
+
+        <!-- Навигация -->
+        <div class="slide-counter"><span id="current">1</span> / 10</div>
+        <div class="nav-arrows">
+            <button class="nav-btn" id="prevBtn" aria-label="Назад">‹</button>
+            <button class="nav-btn" id="nextBtn" aria-label="Вперёд">›</button>
+        </div>
+        <div class="progress-bar" id="progressBar" style="width: 10%;"></div>
+
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const total = slides.length;
+        let currentIndex = 0;
+
+        const counterEl = document.getElementById('current');
+        const progressBar = document.getElementById('progressBar');
+
+        function showSlide(index) {
+            slides.forEach(s => s.classList.remove('active'));
+            slides[index].classList.add('active');
+            counterEl.textContent = index + 1;
+            progressBar.style.width = ((index + 1) / total * 100) + '%';
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % total;
+            showSlide(currentIndex);
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + total) % total;
+            showSlide(currentIndex);
+        });
+
+        // Свайп для мобильных
+        let touchStartX = 0;
+        const wrapper = document.querySelector('.carousel-wrapper');
+        wrapper.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
+        wrapper.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) { currentIndex = (currentIndex + 1) % total; }
+                else { currentIndex = (currentIndex - 1 + total) % total; }
+                showSlide(currentIndex);
+            }
+        });
+
+        // Клавиатурная навигация
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') { currentIndex = (currentIndex + 1) % total; showSlide(currentIndex); }
+            if (e.key === 'ArrowLeft') { currentIndex = (currentIndex - 1 + total) % total; showSlide(currentIndex); }
+        });
+    </script>
+
+</body>
+
+</html>

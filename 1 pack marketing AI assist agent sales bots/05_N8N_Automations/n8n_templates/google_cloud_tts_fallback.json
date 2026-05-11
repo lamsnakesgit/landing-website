@@ -1,0 +1,66 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://texttospeech.googleapis.com/v1/text:synthesize",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "ТВОЙ_КЛЮЧ_GEMINI_AIzaSy"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"text\": \"{{ $json.text }}\"\n  },\n  \"voice\": {\n    \"languageCode\": \"ru-RU\",\n    \"name\": \"ru-RU-Neural2-C\"\n  },\n  \"audioConfig\": {\n    \"audioEncoding\": \"OGG_OPUS\",\n    \"speakingRate\": 1.1\n  }\n}",
+        "options": {}
+      },
+      "id": "google_tts_http",
+      "name": "Google Cloud TTS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Получаем строку Base64 из ответа Google TTS\nconst base64Audio = $input.item.json.audioContent;\n\n// Создаем бинарный объект в n8n (назовем файл voice.ogg)\nreturn {\n  json: $input.item.json,\n  binary: {\n    data: {\n      data: base64Audio,\n      mimeType: 'audio/ogg',\n      fileName: 'voice.ogg'\n    }\n  }\n};"
+      },
+      "id": "base64_to_binary",
+      "name": "Base64 to Audio File",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Google Cloud TTS": {
+      "main": [
+        [
+          {
+            "node": "Base64 to Audio File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

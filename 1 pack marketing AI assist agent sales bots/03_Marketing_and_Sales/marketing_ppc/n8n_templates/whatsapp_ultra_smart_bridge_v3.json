@@ -1,0 +1,432 @@
+{
+    "name": "WhatsApp: Ultra Smart Bridge v3 (Native Nodes)",
+    "nodes": [
+        {
+            "parameters": {
+                "updates": [
+                    "message"
+                ],
+                "additionalFields": {}
+            },
+            "id": "1",
+            "name": "Telegram Trigger",
+            "type": "n8n-nodes-base.telegramTrigger",
+            "typeVersion": 1,
+            "position": [
+                0,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "manual",
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "a-key",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        },
+                        {
+                            "id": "inst",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        },
+                        {
+                            "id": "grp",
+                            "name": "target_group_id",
+                            "value": "ВСТАВИ_ID_ГРУППЫ",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {
+                    "append": true
+                }
+            },
+            "id": "14",
+            "name": "Config",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                220,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateIndividualFields",
+                "fieldsToAggregate": {
+                    "fieldToAggregate": [
+                        {
+                            "fieldToAggregate": "message.text"
+                        },
+                        {
+                            "fieldToAggregate": "message.caption"
+                        },
+                        {
+                            "fieldToAggregate": "message.photo"
+                        },
+                        {
+                            "fieldToAggregate": "message.video"
+                        }
+                    ]
+                },
+                "options": {
+                    "groupingFields": "message.from.id",
+                    "maxWaitTime": 10
+                }
+            },
+            "id": "4",
+            "name": "Aggregate (Wait 10s)",
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [
+                440,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Собираем текст и определяем медиа из агрегированных массивов\nconst item = $json;\n\n// Склеиваем текст и подписи\nconst allText = []\n  .concat(item.message.text || [])\n  .concat(item.message.caption || [])\n  .filter(t => t && t !== 'undefined')\n  .join('\\n');\n\n// Ищем фото (берем последнее присланное)\nlet photo_id = null;\nif (item.message.photo && item.message.photo.length > 0) {\n  const photoArray = item.message.photo.filter(p => p !== null && p !== undefined).pop();\n  if (photoArray && photoArray.length > 0) {\n    photo_id = photoArray.pop().file_id;\n  }\n}\n\n// Ищем видео\nlet video_id = null;\nif (item.message.video && item.message.video.length > 0) {\n  video_id = item.message.video.filter(v => v !== null).pop()?.file_id;\n}\n\nreturn {\n  final_text: allText || '',\n  photo_id: photo_id,\n  video_id: video_id,\n  target_type: video_id ? 'video' : (photo_id ? 'image' : 'text')\n};"
+            },
+            "id": "5",
+            "name": "Assemble Post",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                660,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "rules": {
+                    "values": [
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict"
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "is-video",
+                                        "leftHandSide": "={{ $json.target_type }}",
+                                        "operator": "equal",
+                                        "rightHandSide": "video"
+                                    }
+                                ],
+                                "combinator": "and"
+                            },
+                            "outputIndex": 0
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict"
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "is-photo",
+                                        "leftHandSide": "={{ $json.target_type }}",
+                                        "operator": "equal",
+                                        "rightHandSide": "image"
+                                    }
+                                ],
+                                "combinator": "and"
+                            },
+                            "outputIndex": 1
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict"
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "is-text",
+                                        "leftHandSide": "={{ $json.target_type }}",
+                                        "operator": "equal",
+                                        "rightHandSide": "text"
+                                    }
+                                ],
+                                "combinator": "and"
+                            },
+                            "outputIndex": 2
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "9",
+            "name": "Switch Type",
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 1,
+            "position": [
+                880,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "getFile",
+                "fileId": "={{ $json.video_id }}"
+            },
+            "id": "10",
+            "name": "Get TG Video",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.1,
+            "position": [
+                1100,
+                150
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "getFile",
+                "fileId": "={{ $json.photo_id }}"
+            },
+            "id": "7",
+            "name": "Get TG Photo",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.1,
+            "position": [
+                1100,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendMedia/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $node[\"Config\"].json[\"target_group_id\"] }}"
+                        },
+                        {
+                            "name": "mediatype",
+                            "value": "video"
+                        },
+                        {
+                            "name": "caption",
+                            "value": "={{ $node[\"Assemble Post\"].json[\"final_text\"] }}"
+                        }
+                    ]
+                },
+                "sendBodyData": "binaryData",
+                "bodyParametersBinary": [
+                    {
+                        "parameterName": "media",
+                        "inputDataFieldName": "data"
+                    }
+                ]
+            },
+            "id": "11",
+            "name": "WA: Send Video",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1320,
+                150
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendMedia/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $node[\"Config\"].json[\"target_group_id\"] }}"
+                        },
+                        {
+                            "name": "mediatype",
+                            "value": "image"
+                        },
+                        {
+                            "name": "caption",
+                            "value": "={{ $node[\"Assemble Post\"].json[\"final_text\"] }}"
+                        }
+                    ]
+                },
+                "sendBodyData": "binaryData",
+                "bodyParametersBinary": [
+                    {
+                        "parameterName": "media",
+                        "inputDataFieldName": "data"
+                    }
+                ]
+            },
+            "id": "8",
+            "name": "WA: Send Photo",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1320,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendText/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $node[\"Config\"].json[\"target_group_id\"] }}"
+                        },
+                        {
+                            "name": "text",
+                            "value": "={{ $node[\"Assemble Post\"].json[\"final_text\"] }}"
+                        }
+                    ]
+                }
+            },
+            "id": "13",
+            "name": "WA: Send Just Text",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1100,
+                450
+            ]
+        }
+    ],
+    "connections": {
+        "Telegram Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Config",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Config": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate (Wait 10s)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate (Wait 10s)": {
+            "main": [
+                [
+                    {
+                        "node": "Assemble Post",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Assemble Post": {
+            "main": [
+                [
+                    {
+                        "node": "Switch Type",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Switch Type": {
+            "main": [
+                [
+                    {
+                        "node": "Get TG Video",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Get TG Photo",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "WA: Send Just Text",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get TG Video": {
+            "main": [
+                [
+                    {
+                        "node": "WA: Send Video",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get TG Photo": {
+            "main": [
+                [
+                    {
+                        "node": "WA: Send Photo",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

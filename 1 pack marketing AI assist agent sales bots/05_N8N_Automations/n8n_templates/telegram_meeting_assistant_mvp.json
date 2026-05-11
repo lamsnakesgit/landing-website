@@ -1,0 +1,676 @@
+{
+  "name": "Telegram Meeting Assistant MVP",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "tg-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1560,
+        260
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $json.message || {};\nconst file = msg.voice || msg.audio || msg.document || msg.video || msg.video_note || null;\nconst fileName = file?.file_name || msg.document?.file_name || null;\nconst mimeType = file?.mime_type || null;\nconst ext = fileName && fileName.includes('.') ? fileName.split('.').pop().toLowerCase() : null;\n\nlet inputType = 'unknown';\nif (msg.text) inputType = 'text';\nelse if (msg.voice) inputType = 'voice';\nelse if (msg.audio) inputType = 'audio';\nelse if (msg.document) {\n  const audioExts = ['m4a', 'mp3', 'wav', 'aac', 'ogg'];\n  inputType = audioExts.includes(ext || '') ? 'document_audio' : 'document_other';\n} else if (msg.video_note) inputType = 'video_note';\nelse if (msg.video) inputType = 'video';\n\nreturn [{ json: {\n  chat_id: msg.chat?.id,\n  message_id: msg.message_id,\n  user_id: msg.from?.id,\n  username: msg.from?.username || '',\n  first_name: msg.from?.first_name || '',\n  input_type: inputType,\n  text_input: msg.text || msg.caption || '',\n  file_id: file?.file_id || null,\n  file_name: fileName,\n  mime_type: mimeType,\n  file_ext: ext,\n  raw_message: msg\n}}];"
+      },
+      "id": "detect-input",
+      "name": "Detect Input Type",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1320,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "is-text",
+              "leftValue": "={{ $json.input_type }}",
+              "rightValue": "text",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-text",
+      "name": "Is Text?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1090,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.file_id }}",
+        "additionalFields": {}
+      },
+      "id": "tg-get-file",
+      "name": "Get Telegram File",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -860,
+        420
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.result.file_id }}",
+        "additionalFields": {}
+      },
+      "id": "tg-download-file",
+      "name": "Download File",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -620,
+        420
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const meta = $('Detect Input Type').first().json;\nconst item = $input.first();\nif (!item.binary || !item.binary.data) throw new Error('Binary file not found');\nitem.binary.data.fileName = meta.file_name || item.binary.data.fileName || `input.${meta.file_ext || 'bin'}`;\nitem.binary.data.mimeType = meta.mime_type || item.binary.data.mimeType || 'application/octet-stream';\nreturn [{ json: { ...meta, media_ready: true }, binary: { data: item.binary.data } }];"
+      },
+      "id": "normalize-binary",
+      "name": "Normalize Media",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -380,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openai-whisper-asr-webservice-production.up.railway.app/asr",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "task",
+              "value": "transcribe"
+            },
+            {
+              "name": "output",
+              "value": "json"
+            },
+            {
+              "name": "encode",
+              "value": "true"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "audio_file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "whisper",
+      "name": "Whisper Transcribe",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        420
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const meta = $('Detect Input Type').first().json;\nconst stt = $input.first().json;\nconst transcript = stt.text || stt.output || stt.transcript || '';\nreturn [{ json: { ...meta, transcript_text: transcript, text_for_agents: transcript || meta.text_input || '' } }];"
+      },
+      "id": "build-text-from-stt",
+      "name": "Build Text From STT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const meta = $input.first().json;\nreturn [{ json: { ...meta, transcript_text: meta.text_input, text_for_agents: meta.text_input } }];"
+      },
+      "id": "build-text-direct",
+      "name": "Build Text Direct",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -860,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "id": "merge-text",
+      "name": "Merge Canonical Text",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        340,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text_for_agents }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a meeting intelligence analyst. Convert transcript into valid JSON only. Extract: meeting_title, one_paragraph_summary, key_topics, decisions, action_items, next_steps, open_questions, timeline, confidence_notes. Do not invent facts."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "agent-structurer",
+      "name": "Meeting Structurer",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        580,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "id": "gemini-structurer",
+      "name": "Gemini Structurer Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        580,
+        460
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "REPLACE_GEMINI_CREDENTIAL_ID",
+          "name": "Google Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst raw = input.output || input.text || '{}';\nlet parsed;\ntry { parsed = JSON.parse(String(raw).replace(/```json|```/g, '').trim()); } catch (e) { parsed = { meeting_title: 'Untitled', one_paragraph_summary: String(raw), key_topics: [], decisions: [], action_items: [], next_steps: [], open_questions: [], timeline: [], confidence_notes: ['JSON parse fallback used'] }; }\nreturn [{ json: { ...$('Merge Canonical Text').first().json, structurer: parsed } }];"
+      },
+      "id": "parse-structurer",
+      "name": "Parse Structurer JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        820,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ JSON.stringify({ transcript: $json.text_for_agents, structurer: $json.structurer }) }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a B2B sales meeting analyst. Return valid JSON only with fields: meeting_type, deal_stage, customer_pains, desired_outcomes, objections, buying_signals, stakeholders, agreements, risks, recommended_next_step, follow_up_message_draft. Separate facts from interpretation."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "agent-sales",
+      "name": "Sales Analyst",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1060,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "id": "gemini-sales",
+      "name": "Gemini Sales Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        460
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "REPLACE_GEMINI_CREDENTIAL_ID",
+          "name": "Google Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.output || '{}';\nlet parsed;\ntry { parsed = JSON.parse(String(raw).replace(/```json|```/g, '').trim()); } catch (e) { parsed = { meeting_type: 'unknown', deal_stage: 'unknown', customer_pains: [], desired_outcomes: [], objections: [], buying_signals: [], stakeholders: [], agreements: [], risks: ['JSON parse fallback used'], recommended_next_step: '', follow_up_message_draft: '' }; }\nreturn [{ json: { ...$('Parse Structurer JSON').first().json, sales: parsed } }];"
+      },
+      "id": "parse-sales",
+      "name": "Parse Sales JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ JSON.stringify({ transcript: $json.text_for_agents, structurer: $json.structurer, sales: $json.sales }) }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a content strategist. Return valid JSON only with fields: telegram_post, instagram_caption, story_frames, hooks, cta, sensitive_info_flags. Do not include confidential info."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "agent-content",
+      "name": "Content Repurposer",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1540,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "id": "gemini-content",
+      "name": "Gemini Content Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        460
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "REPLACE_GEMINI_CREDENTIAL_ID",
+          "name": "Google Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.output || '{}';\nlet parsed;\ntry { parsed = JSON.parse(String(raw).replace(/```json|```/g, '').trim()); } catch (e) { parsed = { telegram_post: '', instagram_caption: '', story_frames: [], hooks: [], cta: '', sensitive_info_flags: ['JSON parse fallback used'] }; }\nconst src = $('Parse Sales JSON').first().json;\nconst message = ['<b>1. Summary</b>', src.structurer?.one_paragraph_summary || '', '', '<b>2. Sales Analysis</b>', src.sales?.recommended_next_step || '', src.sales?.follow_up_message_draft ? ('\\n<b>Follow-up:</b> ' + src.sales.follow_up_message_draft) : '', '', '<b>3. Content Draft</b>', parsed.telegram_post || ''].join('\\n').trim();\nreturn [{ json: { ...src, content: parsed, final_message: message } }];"
+      },
+      "id": "compose-final",
+      "name": "Compose Final Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1780,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.final_message }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML",
+          "reply_to_message_id": "={{ $json.message_id }}"
+        }
+      },
+      "id": "tg-send",
+      "name": "Send Telegram Reply",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2020,
+        260
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "=Пока поддерживаются: текст, voice, audio и audio-документы (.m4a/.mp3/.wav/.aac/.ogg). Этот тип сообщения ещё не подключен полностью.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "reply_to_message_id": "={{ $json.message_id }}"
+        }
+      },
+      "id": "tg-unsupported",
+      "name": "Reply Unsupported",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -860,
+        640
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Detect Input Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Input Type": {
+      "main": [
+        [
+          {
+            "node": "Is Text?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Text?": {
+      "main": [
+        [
+          {
+            "node": "Build Text Direct",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Telegram File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Reply Unsupported",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Telegram File": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Normalize Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Media": {
+      "main": [
+        [
+          {
+            "node": "Whisper Transcribe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Whisper Transcribe": {
+      "main": [
+        [
+          {
+            "node": "Build Text From STT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Text Direct": {
+      "main": [
+        [
+          {
+            "node": "Merge Canonical Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Text From STT": {
+      "main": [
+        [
+          {
+            "node": "Merge Canonical Text",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Canonical Text": {
+      "main": [
+        [
+          {
+            "node": "Meeting Structurer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Structurer Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Meeting Structurer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meeting Structurer": {
+      "main": [
+        [
+          {
+            "node": "Parse Structurer JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Structurer JSON": {
+      "main": [
+        [
+          {
+            "node": "Sales Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Sales Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sales Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales Analyst": {
+      "main": [
+        [
+          {
+            "node": "Parse Sales JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Sales JSON": {
+      "main": [
+        [
+          {
+            "node": "Content Repurposer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Content Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content Repurposer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Repurposer": {
+      "main": [
+        [
+          {
+            "node": "Compose Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compose Final Response": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "telegram-meeting-assistant-mvp-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "replace-me"
+  },
+  "id": "telegram-meeting-assistant-mvp"
+}

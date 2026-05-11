@@ -1,0 +1,232 @@
+{
+    "name": "Telegram to WhatsApp: Smart Post Builder (Buffered)",
+    "nodes": [
+        {
+            "parameters": {
+                "updates": [
+                    "message"
+                ],
+                "additionalFields": {}
+            },
+            "id": "1",
+            "name": "Telegram Trigger",
+            "type": "n8n-nodes-base.telegramTrigger",
+            "typeVersion": 1,
+            "position": [
+                0,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Сохраняем входящие данные в контекст выполнения или базу\n// Для простоты используем ноду Aggregate ниже, но сначала пометим тип\nconst msg = $json.message;\nlet type = 'text';\nlet file_id = null;\n\nif (msg.photo) {\n  type = 'photo';\n  file_id = msg.photo.reverse()[0].file_id;\n} else if (msg.audio || msg.voice) {\n  type = 'audio';\n  file_id = msg.audio ? msg.audio.file_id : msg.voice.file_id;\n}\n\nreturn {\n  user_id: msg.from.id,\n  text: msg.text || msg.caption || '',\n  type: type,\n  file_id: file_id,\n  timestamp: new Date().getTime()\n};"
+            },
+            "id": "2",
+            "name": "Pre-Process",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                200,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "id-1",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        },
+                        {
+                            "id": "id-2",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        },
+                        {
+                            "id": "id-3",
+                            "name": "target_group_id",
+                            "value": "ВСТАВИ_ID_ГРУППЫ",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "3",
+            "name": "Config",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                450,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateIndividualFields",
+                "fieldsToAggregate": {
+                    "fieldToAggregate": [
+                        {
+                            "fieldToAggregate": "text"
+                        },
+                        {
+                            "fieldToAggregate": "file_id"
+                        },
+                        {
+                            "fieldToAggregate": "type"
+                        }
+                    ]
+                },
+                "options": {
+                    "groupingFields": "user_id",
+                    "maxWaitTime": 10
+                }
+            },
+            "id": "4",
+            "name": "Aggregate (Wait 10s)",
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Формируем итоговый пост\nconst aggregated = $json;\nconst texts = aggregated.text.filter(t => t !== '').join('\\n');\nconst photos = [];\nconst audios = [];\n\nfor (let i = 0; i < aggregated.type.length; i++) {\n  if (aggregated.type[i] === 'photo') photos.push(aggregated.file_id[i]);\n  if (aggregated.type[i] === 'audio') audios.push(aggregated.file_id[i]);\n}\n\nreturn {\n  final_text: texts,\n  photo_id: photos.length > 0 ? photos[0] : null,\n  audio_id: audios.length > 0 ? audios[0] : null\n};"
+            },
+            "id": "5",
+            "name": "Assemble Post",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "getFile",
+                "fileId": "={{ $json.photo_id }}"
+            },
+            "id": "6",
+            "name": "Get Photo Content",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.1,
+            "position": [
+                900,
+                200
+            ],
+            "executeOnce": true
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendMedia/{{ $node[\"Config\"].json[\"instance\"] }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $node[\"Config\"].json[\"api_key\"] }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $node[\"Config\"].json[\"target_group_id\"] }}"
+                        },
+                        {
+                            "name": "mediatype",
+                            "value": "image"
+                        },
+                        {
+                            "name": "caption",
+                            "value": "={{ $node[\"Assemble Post\"].json[\"final_text\"] }}"
+                        }
+                    ]
+                },
+                "sendBodyData": "binaryData",
+                "bodyParametersBinary": [
+                    {
+                        "parameterName": "media",
+                        "inputDataFieldName": "data"
+                    }
+                ]
+            },
+            "id": "7",
+            "name": "WA: Send Photopost with Caption",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1150,
+                200
+            ]
+        }
+    ],
+    "connections": {
+        "Telegram Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Pre-Process",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Pre-Process": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate (Wait 10s)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate (Wait 10s)": {
+            "main": [
+                [
+                    {
+                        "node": "Assemble Post",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Assemble Post": {
+            "main": [
+                [
+                    {
+                        "node": "Get Photo Content",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Photo Content": {
+            "main": [
+                [
+                    {
+                        "node": "WA: Send Photopost with Caption",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

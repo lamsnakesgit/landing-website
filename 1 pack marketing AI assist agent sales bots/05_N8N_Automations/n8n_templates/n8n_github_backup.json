@@ -1,0 +1,211 @@
+{
+    "name": "N8N GitHub Sync & Backup",
+    "nodes": [
+        {
+            "parameters": {},
+            "id": "manual-trigger",
+            "name": "On clicking 'execute'",
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [
+                0,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hoursInterval": 24
+                        }
+                    ]
+                }
+            },
+            "id": "schedule-trigger",
+            "name": "Daily Sync",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                0,
+                180
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "getAll"
+            },
+            "id": "get-workflows",
+            "name": "Get Workflows",
+            "type": "n8n-nodes-base.n8n",
+            "typeVersion": 1,
+            "position": [
+                220,
+                80
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "toJson",
+                "options": {
+                    "fileName": "={{ $json.name }}.json"
+                }
+            },
+            "id": "convert-json",
+            "name": "Convert Content",
+            "type": "n8n-nodes-base.convertToFile",
+            "typeVersion": 1.1,
+            "position": [
+                440,
+                80
+            ]
+        },
+        {
+            "parameters": {
+                "authentication": "oAuth2",
+                "owner": "ВАШ_ЛОГИН_GITHUB",
+                "repository": "ИМЯ_РЕПОЗИТОРИЯ",
+                "filePath": "=workflows/{{ $node[\"Get Workflows\"].json.name }}.json",
+                "fileContent": "={{ $json.data }}",
+                "commitMessage": "=Backup workflow: {{ $node[\"Get Workflows\"].json.name }}"
+            },
+            "id": "github-upload",
+            "name": "Push to GitHub",
+            "type": "n8n-nodes-base.github",
+            "typeVersion": 1,
+            "position": [
+                660,
+                80
+            ],
+            "credentials": {
+                "githubOAuth2Api": {
+                    "id": "re-use-or-create",
+                    "name": "GitHub Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "command": "npx n8n export:credentials --all --output=/tmp/creds.json"
+            },
+            "id": "exec-creds",
+            "name": "Export Creds",
+            "type": "n8n-nodes-base.executeCommand",
+            "typeVersion": 1,
+            "position": [
+                220,
+                240
+            ]
+        },
+        {
+            "parameters": {
+                "filePath": "/tmp/creds.json"
+            },
+            "id": "read-creds",
+            "name": "Read Creds",
+            "type": "n8n-nodes-base.readBinaryFile",
+            "typeVersion": 1,
+            "position": [
+                440,
+                240
+            ]
+        },
+        {
+            "parameters": {
+                "authentication": "oAuth2",
+                "owner": "ВАШ_ЛОГИН_GITHUB",
+                "repository": "ИМЯ_РЕПОЗИТОРИЯ",
+                "filePath": "backups/credentials_backup.json",
+                "fileContent": "={{ $json.data }}",
+                "commitMessage": "Daily Security Backup: Credentials"
+            },
+            "id": "github-creds",
+            "name": "Push Creds to Git",
+            "type": "n8n-nodes-base.github",
+            "typeVersion": 1,
+            "position": [
+                660,
+                240
+            ]
+        }
+    ],
+    "connections": {
+        "On clicking 'execute'": {
+            "main": [
+                [
+                    {
+                        "node": "get-workflows",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "exec-creds",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Daily Sync": {
+            "main": [
+                [
+                    {
+                        "node": "get-workflows",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "exec-creds",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "get-workflows": {
+            "main": [
+                [
+                    {
+                        "node": "convert-json",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "convert-json": {
+            "main": [
+                [
+                    {
+                        "node": "github-upload",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "exec-creds": {
+            "main": [
+                [
+                    {
+                        "node": "read-creds",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "read-creds": {
+            "main": [
+                [
+                    {
+                        "node": "github-creds",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

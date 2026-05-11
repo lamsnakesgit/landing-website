@@ -1,0 +1,294 @@
+{
+    "name": "WhatsApp: EXPERT DB Broadcaster (Anti-Ban Loop)",
+    "nodes": [
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "img",
+                            "name": "image_url",
+                            "value": "ВСТАВЬ_ССЫЛКУ_НА_ФОТО",
+                            "type": "string"
+                        },
+                        {
+                            "id": "cap",
+                            "name": "caption",
+                            "value": "Текст твоей экспертной рассылки",
+                            "type": "string"
+                        },
+                        {
+                            "id": "type",
+                            "name": "filter_type",
+                            "value": "Group",
+                            "type": "string"
+                        },
+                        {
+                            "id": "inst",
+                            "name": "instance",
+                            "value": "8326 301 n8n wa 1",
+                            "type": "string"
+                        },
+                        {
+                            "id": "api",
+                            "name": "api_key",
+                            "value": "b5485840231d596018f5d67b50b4a05ffaaa792cec60595f",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "1",
+            "name": "Expert Config",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                -200,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "get",
+                "dataTableId": "whatsapp_chats_db",
+                "returnAll": true
+            },
+            "id": "2",
+            "name": "Read Table",
+            "type": "n8n-nodes-base.dataTable",
+            "typeVersion": 1,
+            "position": [
+                50,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Фильтрация и подготовка объектов\nconst config = $node[\"Expert Config\"].json;\nconst chats = Array.isArray($json) ? $json : [$json];\n\nconst filtered = chats.filter(c => config.filter_type === 'All' || c.type === config.filter_type);\n\nreturn filtered.map(c => ({\n  jid: c.jid || c.chat_id,\n  name: c.name,\n  image_url: config.image_url,\n  caption: config.caption,\n  instance: config.instance,\n  api_key: config.api_key,\n  typing_delay: Math.floor(Math.random() * (5 - 2 + 1) + 2) // Случайные 2-5 секунд\n}));"
+            },
+            "id": "3",
+            "name": "Build Queue",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                300,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "batchSize": 1,
+                "options": {}
+            },
+            "id": "4",
+            "name": "Loop Over Chats",
+            "type": "n8n-nodes-base.splitInBatches",
+            "typeVersion": 1,
+            "position": [
+                550,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/chat/sendPresence/{{ encodeURIComponent($json.instance) }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $json.api_key }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $json.jid }}"
+                        },
+                        {
+                            "name": "presence",
+                            "value": "composing"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "5",
+            "name": "Simulate Typing",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                800,
+                -100
+            ]
+        },
+        {
+            "parameters": {
+                "amount": "={{ $json.typing_delay }}",
+                "unit": "seconds"
+            },
+            "id": "6",
+            "name": "Typing Wait",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.1,
+            "position": [
+                1050,
+                -100
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=http://localhost:8081/message/sendMedia/{{ encodeURIComponent($json.instance) }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{ $json.api_key }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "number",
+                            "value": "={{ $json.jid }}"
+                        },
+                        {
+                            "name": "media",
+                            "value": "={{ $json.image_url }}"
+                        },
+                        {
+                            "name": "mediatype",
+                            "value": "image"
+                        },
+                        {
+                            "name": "caption",
+                            "value": "={{ $json.caption }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "7",
+            "name": "Final Send",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1300,
+                -100
+            ]
+        },
+        {
+            "parameters": {
+                "amount": 3,
+                "unit": "seconds"
+            },
+            "id": "8",
+            "name": "Cycle Linker",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.1,
+            "position": [
+                1550,
+                0
+            ]
+        }
+    ],
+    "connections": {
+        "Expert Config": {
+            "main": [
+                [
+                    {
+                        "node": "Read Table",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Read Table": {
+            "main": [
+                [
+                    {
+                        "node": "Build Queue",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Build Queue": {
+            "main": [
+                [
+                    {
+                        "node": "Loop Over Chats",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Loop Over Chats": {
+            "main": [
+                [
+                    {
+                        "node": "Simulate Typing",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Simulate Typing": {
+            "main": [
+                [
+                    {
+                        "node": "Typing Wait",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Typing Wait": {
+            "main": [
+                [
+                    {
+                        "node": "Final Send",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Final Send": {
+            "main": [
+                [
+                    {
+                        "node": "Cycle Linker",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Cycle Linker": {
+            "main": [
+                [
+                    {
+                        "node": "Loop Over Chats",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
