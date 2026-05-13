@@ -1,0 +1,6 @@
+telethon
+loguru
+python-dotenv
+requests
+supabase
+google-generativeai
