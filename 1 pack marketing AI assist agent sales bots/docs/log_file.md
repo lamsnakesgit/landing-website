@@ -49,6 +49,24 @@
 
 ## Предыдущие записи
 
+## 2026-05-14 — Fix: WhatsApp Summary Agent webhook (Evolution API)
+
+### ✅ Что сделано (Wins / Победы):
+1. Прочитан `docs/handoff_summary.md` и подтверждено, что проблема находится в связке Evolution API → n8n webhook.
+2. Найден релевантный шаблон `n8n_templates/WhatsApp_Summary_Agent_Evolution_API.json`.
+3. Выявлена вероятная причина: у ноды `Evolution Webhook` отсутствовал явный параметр `httpMethod: "POST"`.
+4. В JSON добавлена явная настройка `POST` для webhook-trigger, чтобы принимать входящие события от Evolution API корректно.
+
+### 🔴 Проблемы / Issues:
+- В handoff упоминаются старые имена файлов (`whatsapp_to_telegram_media_bridge_v2.json`, `whatsapp_to_tg_bridge_fixed.json`), которых сейчас нет по точному имени в дереве проекта.
+- Живой runtime n8n и настройки Evolution Manager в этом шаге не проверялись автоматически, поэтому после импорта нужен ручной smoke test.
+
+### 📋 Следующие шаги:
+1. Импортировать/обновить `n8n_templates/WhatsApp_Summary_Agent_Evolution_API.json` в n8n.
+2. В Evolution Manager проверить webhook URL и убедиться, что включено событие `MESSAGES_UPSERT`.
+3. Если планируется голос/медиа — убедиться, что включена передача `Base64`.
+4. Отправить тестовое сообщение в WhatsApp и проверить, что execution в n8n стартует сразу на webhook.
+
 ## 2026-04-15 — Telegram Meeting Assistant MVP
 
 ### ✅ Что сделано (Wins / Победы):

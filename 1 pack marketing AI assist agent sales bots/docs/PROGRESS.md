@@ -11,3 +11,8 @@
 - [x] Добавлена цепочка из 3 AI-блоков: `Meeting Structurer` → `Sales Analyst` → `Content Repurposer`.
 - [x] Добавлен Whisper STT шаг для голосовых и аудиофайлов.
 - [x] Шаблон подготовлен как MVP-основа под дальнейшее расширение до `video/video_note` и `Fathom webhook`.
+
+## 2026-05-14
+- [x] Найден и частично исправлен шаблон `n8n_templates/WhatsApp_Summary_Agent_Evolution_API.json`.
+- [x] Для webhook-ноды `Evolution Webhook` добавлен явный `httpMethod: POST`, чтобы входящие события от Evolution API корректно принимались n8n.
+- [x] Подготовлен минимальный фикс под проблему "webhook не триггерится на сообщения".

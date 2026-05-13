@@ -58,6 +58,7 @@
 
 - [/] `N8N-03` Telegram Meeting Assistant MVP workflow (text + voice + audio + m4a) — Начато: 2026-04-15
 - [/] `WA-01/WA-03` Модуль Умной Рассылки Python (Очередь + Ротация) — Начато: 2026-04-18
+- [/] `WA-05` Webhook трекинг: delivered/read/reply → Supabase — Начато: 2026-05-14
 - [/] `INFRA-06` Remote Sync & Smart Fortress VPS Setup — Начато: 2026-04-19
 - [/] `POS-01` Личная Операционная Система (Personal OS) — Начато: 2026-05-14
 - [/] `COP-02` AI Sales Copilot 2.0 (TG Userbot + Voice) — Начато: 2026-05-14
