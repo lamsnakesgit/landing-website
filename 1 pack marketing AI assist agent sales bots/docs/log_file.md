@@ -56,6 +56,8 @@
 2. Найден релевантный шаблон `n8n_templates/WhatsApp_Summary_Agent_Evolution_API.json`.
 3. Выявлена вероятная причина: у ноды `Evolution Webhook` отсутствовал явный параметр `httpMethod: "POST"`.
 4. В JSON добавлена явная настройка `POST` для webhook-trigger, чтобы принимать входящие события от Evolution API корректно.
+5. Выявлено второе ограничение: workflow пропускал только `audioMessage`, поэтому обычные текстовые сообщения из общей группы не доходили до AI-обработки.
+6. Добавлена отдельная ветка `Extract Text Message`, которая достаёт текст из `conversation` / `extendedTextMessage.text` и отправляет его сразу в `Summary AI Agent`.
 
 ### 🔴 Проблемы / Issues:
 - В handoff упоминаются старые имена файлов (`whatsapp_to_telegram_media_bridge_v2.json`, `whatsapp_to_tg_bridge_fixed.json`), которых сейчас нет по точному имени в дереве проекта.
@@ -66,6 +68,7 @@
 2. В Evolution Manager проверить webhook URL и убедиться, что включено событие `MESSAGES_UPSERT`.
 3. Если планируется голос/медиа — убедиться, что включена передача `Base64`.
 4. Отправить тестовое сообщение в WhatsApp и проверить, что execution в n8n стартует сразу на webhook.
+5. Отправить в общую группу обычный текст и убедиться, что он проходит по ветке `Extract Text Message`, даже если это не голосовое сообщение.
 
 ## 2026-04-15 — Telegram Meeting Assistant MVP
 

@@ -16,3 +16,4 @@
 - [x] Найден и частично исправлен шаблон `n8n_templates/WhatsApp_Summary_Agent_Evolution_API.json`.
 - [x] Для webhook-ноды `Evolution Webhook` добавлен явный `httpMethod: POST`, чтобы входящие события от Evolution API корректно принимались n8n.
 - [x] Подготовлен минимальный фикс под проблему "webhook не триггерится на сообщения".
+- [x] Добавлена поддержка обычных текстовых сообщений из групп через новую ветку `Extract Text Message`.

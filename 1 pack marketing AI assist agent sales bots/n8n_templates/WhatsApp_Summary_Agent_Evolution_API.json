@@ -116,6 +116,19 @@
     },
     {
       "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst message = item.body?.data?.message || {};\nconst text = message.conversation || message.extendedTextMessage?.text || message.imageMessage?.caption || message.videoMessage?.caption || '';\n\nif (!text || !text.trim()) {\n  return [];\n}\n\nreturn [{\n  json: {\n    ...item,\n    text: text.trim()\n  }\n}];"
+      },
+      "id": "8",
+      "name": "Extract Text Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        120
+      ]
+    },
+    {
+      "parameters": {
         "method": "POST",
         "url": "https://openai-whisper-asr-webservice-production.up.railway.app/asr",
         "sendQuery": true,
@@ -254,6 +267,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Extract Text Message",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -269,6 +289,17 @@
       ]
     },
     "Whisper Transcribe": {
+      "main": [
+        [
+          {
+            "node": "Summary AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Text Message": {
       "main": [
         [
           {
