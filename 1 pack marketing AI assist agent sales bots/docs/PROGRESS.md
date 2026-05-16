@@ -17,3 +17,27 @@
 - [x] Для webhook-ноды `Evolution Webhook` добавлен явный `httpMethod: POST`, чтобы входящие события от Evolution API корректно принимались n8n.
 - [x] Подготовлен минимальный фикс под проблему "webhook не триггерится на сообщения".
 - [x] Добавлена поддержка обычных текстовых сообщений из групп через новую ветку `Extract Text Message`.
+- [x] Установлен и подключён Exa MCP server с именем `github.com/exa-labs/exa-mcp-server` для Cline.
+- [x] Сохранён существующий MCP-конфиг без перезаписи сервера Vapi, добавлен новый сервер в `cline_mcp_settings.json`.
+- [x] Создана локальная директория `/Users/higherpower/Documents/Cline/MCP/github.com/exa-labs/exa-mcp-server` под новый MCP.
+- [x] Подтверждена работоспособность Exa через тестовый вызов инструмента `web_search_exa`.
+- [x] OpenClaw не выбрасывать, но держать как отдельную future-ветку под swarm, chat-monitoring, dashboards или multi-agent routing, если Hermes Core станет узким местом.
+
+## 2026-05-15
+- [x] В `cline_mcp_settings.json` добавлены MCP servers `github.com/github/github-mcp-server` и `github.com/upstash/context7` без перезаписи уже существующих Vapi / Exa / Tavily.
+- [x] Созданы локальные директории `/Users/higherpower/Documents/Cline/MCP/github.com/github/github-mcp-server` и `/Users/higherpower/Documents/Cline/MCP/github.com/upstash/context7`.
+- [x] Для GitHub MCP выбран запуск через Docker с runtime-получением токена из `gh auth token`, чтобы не хранить GitHub token открыто в JSON-конфиге.
+- [x] Для Context7 выбран локальный запуск через `npx -y @upstash/context7-mcp` без API key на первом этапе.
+- [x] Подтверждён smoke test Context7 через вывод `--help`.
+- [x] Выявлено ограничение GitHub MCP: Docker установлен, но локальный Docker daemon не был запущен во время проверки.
+
+## 2026-05-16
+- [x] Проведён аудит существующих наработок по Telegram assistant, Fathom post-meeting flow, памяти/RAG и интеграциям.
+- [x] Зафиксировано целевое решение для Hermes: Telegram как основной интерфейс, n8n как orchestration-слой, Supabase как память и база артефактов.
+- [x] Подтверждено, что уже есть хорошие заготовки для MVP: `telegram_meeting_assistant_mvp.json`, `zoom_fathom_assistant_spec.md`, шаблоны summary/audio flows и паттерны chat memory.
+- [x] Определено, что мониторинг групп/ЛС лучше выносить в отдельный агентный контур, а не перегружать основной личный поток Hermes.
+- [x] Проведён внешний research по Hermes docs / GitHub / community guides и сопоставление с OpenClaw.
+- [x] Подтверждено, что Hermes лучше ложится на сценарий личного и бизнес-ассистента с памятью, Telegram, cron, MCP и growth-through-skills.
+- [/] `HERMES-SETUP` Подготовка к развёртыванию Hermes на VPS (Личный + Outreach).
+
+- [x] Зафиксировано решение, что tracking стоимости моделей и API должен быть отдельным системным контуром, а не «на глаз» внутри чатов.

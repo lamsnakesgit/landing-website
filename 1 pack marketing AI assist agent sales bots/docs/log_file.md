@@ -49,6 +49,109 @@
 
 ## Предыдущие записи
 
+## 2026-05-16 — Hermes Assistant: базовая архитектура личного и бизнес-ассистента
+
+### ✅ Что сделано (Wins / Победы):
+1. Проведён быстрый аудит текущего репозитория на предмет готовых артефактов для Telegram assistant, Fathom/Zoom, памяти, summary и мультимодальности.
+2. Подтверждено, что в проекте уже есть сильная основа для MVP: Telegram intake, Whisper/STT, summary pipeline, Fathom post-meeting spec.
+3. Зафиксировано архитектурное решение: **Hermes как front-assistant в Telegram**, **n8n как orchestration/integration engine**, **Supabase как persistent memory + RAG + storage**.
+4. Отдельно выделен контур встреч: Fathom/Zoom → webhook/poller → summary + timecodes + action items + follow-up → Telegram / Notion / Asana.
+5. Сформулировано решение по chat monitoring: для групп и массовых каналов лучше делать отдельный агент/контур, а не смешивать всё в одном персональном боте.
+
+### 🔴 Проблемы / Issues:
+- Hermes как конкретный продукт/рантайм пока не зафиксирован на уровне live deployment: на этом шаге утверждена архитектура, но не выполнена установка/подключение runtime.
+- Нет ещё финальной матрицы по моделям для image/video/voice generation и по SLA между «быстрым личным ответом» и тяжёлыми фоновыми задачами.
+- Не определён финальный policy по правам доступа: что бот может делать сам, а что только после подтверждения.
+
+### 📋 Следующие шаги:
+1. Собрать master-spec `Hermes Assistant` с capability map: tasks, memory, RAG, media, meeting intelligence, integrations.
+2. Определить MVP-v1: Telegram text/voice/audio/files + web search + task capture + memory + Notion/Asana + Fathom summaries.
+3. Выбрать runtime-контур: Hermes/OpenClaw/гибрид, и отдельно решить где живёт planner, где tool execution, где long-term memory.
+4. После этого перейти к сборке n8n workflows и backend storage под выбранную схему.
+
+## 2026-05-16 — Hermes vs OpenClaw: установка, runtime и учёт расходов
+
+### ✅ Что подтверждено по источникам:
+1. По официальному GitHub и docs Hermes позиционируется как self-improving persistent agent с Telegram gateway, cron, MCP, memory и skills.
+2. Official docs Hermes прямо покрывают сценарии: Telegram assistant, team bot, memory, cron scheduling, voice mode, MCP servers, multiple terminal backends.
+3. Community-гайды и обзоры сходятся в том, что Hermes особенно хорош, когда нужен **долгоживущий personal assistant на VPS**, а не просто dev-tool.
+4. По community/open guides OpenClaw силён в multi-agent, dashboards, plugin ecosystem и control surfaces, но по security-практике требует заметно более осторожного hardening.
+5. Для твоего кейса — личный + бизнес ассистент, Fathom, Notion/Asana, медиа, память, проекты — Hermes выглядит как более прямой fit, а n8n остаётся сильным orchestration-слоем.
+
+### 🔴 Практические выводы:
+- **Ставить Hermes первым** имеет смысл, если нужен агент «как человек в чате», который ведёт память, проекты, recurring задачи и живёт в Telegram.
+- **n8n не заменять**, а использовать под интеграции, webhook flows, Fathom/Zoom ingest, Notion/Asana sync, отчётность и фоновые пайплайны.
+- **OpenClaw не выбрасывать**, но держать как отдельную future-ветку под swarm, chat-monitoring, dashboards или multi-agent routing, если Hermes Core станет узким местом.
+
+### 💸 Что важно по cost tracking:
+- Реальная стоимость чаще упирается не в VPS, а в **LLM API usage**.
+- Нужен явный routing по типу задач:
+  - дешёвые модели → triage, summaries, search condensation;
+  - средние → рабочие бизнес-задачи и project management;
+  - дорогие → стратегия, сложный reasoning, важные решения, premium writing.
+- Учёт расходов лучше вести через отдельные таблицы `model_usage`, `task_runs`, `provider_costs`, `monthly_budgets` в Supabase/Postgres.
+- Для image/video generation тоже нужен отдельный журнал провайдера, модели, job type, duration/asset count, status и estimated cost.
+
+### 📋 Следующие шаги:
+1. Сделать спецификацию установки Hermes именно под твой стек: Telegram + n8n + Supabase + Fathom + Notion/Asana.
+
+## 2026-05-16 — Инициация развёртывания Hermes (Personal + Outreach)
+
+**Задачи:**
+1. Подготовка плана развёртывания (Personal Assistant + Outreach Sub-agent).
+2. Выбор Hermes Agent в качестве основного ядра.
+3. Определение n8n как слоя для бизнес-логики аутрича.
+
+**Результаты:**
+- Создан [implementation_plan.md](file:///Users/higherpower/.gemini/antigravity/brain/c7e0e523-336e-4eb1-976a-bdaf06ca0afe/implementation_plan.md).
+- Сформулированы вопросы по VPS и площадкам для поиска клиентов.
+
+**Проблемы:**
+- Требуется IP адрес VPS для начала удаленной настройки.
+
+2. Спроектировать схему project/memory/cost tables.
+3. Определить model routing matrix: какая модель для каких задач.
+4. После этого уже идти в live install/runtime setup.
+
+## 2026-05-15 — Infra: GitHub MCP + Context7 для Cline
+
+### ✅ Что сделано (Wins / Победы):
+1. Загружена MCP-документация и повторно прочитан существующий `cline_mcp_settings.json` перед изменениями.
+2. По официальным источникам выбраны серверы `github.com/github/github-mcp-server` и `github.com/upstash/context7`.
+3. Созданы локальные директории `/Users/higherpower/Documents/Cline/MCP/github.com/github/github-mcp-server` и `/Users/higherpower/Documents/Cline/MCP/github.com/upstash/context7`.
+4. В `cline_mcp_settings.json` аккуратно добавлены новые MCP-серверы без перезаписи уже существующих `github.com/VapiAI/mcp-server`, `github.com/exa-labs/exa-mcp-server` и `github.com/tavily-ai/tavily-mcp`.
+5. Для GitHub MCP устранено небезопасное хранение секрета: токен убран из JSON и заменён на runtime-чтение через `gh auth token` при запуске Docker-контейнера.
+6. Для Context7 настроен локальный запуск через `npx -y @upstash/context7-mcp`.
+7. Выполнен smoke test Context7: пакет запускается и отдаёт корректный `--help`.
+
+### 🔴 Проблемы / Issues:
+- GitHub MCP не прошёл runtime smoke test не из-за конфига, а из-за состояния локальной среды: Docker daemon недоступен (`Cannot connect to the Docker daemon ...`).
+- Context7 установлен без API key, поэтому будет работать с более ограниченными лимитами до последующего добавления ключа.
+
+### 📋 Следующие шаги:
+1. Запустить Docker Desktop / Docker daemon на macOS.
+2. После запуска Docker перепроверить GitHub MCP фактическим стартом сервера.
+3. При необходимости добавить `CONTEXT7_API_KEY` в конфиг для повышения лимитов и стабильности.
+
+## 2026-05-14 — Infra: Exa MCP server для Cline
+
+### ✅ Что сделано (Wins / Победы):
+1. Загружена MCP-документация и соблюдён безопасный порядок установки.
+2. Прочитан существующий файл `cline_mcp_settings.json` перед изменением, чтобы не перезаписать уже подключённый `github.com/VapiAI/mcp-server`.
+3. Создана отдельная локальная директория `/Users/higherpower/Documents/Cline/MCP/github.com/exa-labs/exa-mcp-server` под новый MCP server.
+4. Установлен npm-пакет `exa-mcp-server` в локальную директорию.
+5. В `cline_mcp_settings.json` добавлен сервер с именем `github.com/exa-labs/exa-mcp-server`, параметрами `disabled: false` и `autoApprove: []`.
+6. Проверена работоспособность через тестовый вызов инструмента Exa `web_search_exa`.
+
+### 🔴 Проблемы / Issues:
+- `npm install exa-mcp-server` сообщил о 3 уязвимостях зависимостей (`2 moderate`, `1 high`) в установленном пакете/его дереве зависимостей.
+- API key временно сохранён в MCP-конфиге в открытом виде, так как именно этот формат нужен для запуска сервера в текущем окружении.
+
+### 📋 Следующие шаги:
+1. При необходимости перевыпустить Exa API key и заменить его в `cline_mcp_settings.json`.
+2. При следующем проходе по инфраструктуре проверить, можно ли перевести хранение ключа на более безопасную схему.
+3. Использовать Exa MCP для web-research задач, где нужен быстрый поиск и извлечение контента.
+
 ## 2026-05-14 — Fix: WhatsApp Summary Agent webhook (Evolution API)
 
 ### ✅ Что сделано (Wins / Победы):
