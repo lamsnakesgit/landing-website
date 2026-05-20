@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Как восстановить сон за 3 шага | Face to Face</title>
+    <!-- Подключаем Google Fonts: Cormorant Garamond для заголовков и Montserrat для текста -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Верхний прогресс-бар -->
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- Навигационные кнопки для десктопа -->
+        <button class="nav-btn prev-btn" id="prevBtn" aria-label="Предыдущий слайд">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+        <button class="nav-btn next-btn" id="nextBtn" aria-label="Следующий слайд">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+
+        <!-- Слайдер -->
+        <div class="slides-wrapper" id="slidesWrapper">
+            
+            <!-- СЛАЙД 1: Титульный -->
+            <section class="slide theme-light active" id="slide-1">
+                <div class="copyright-grid"></div>
+                <div class="watermark-logo">
+                    <svg viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2 2" />
+                        <text x="60" y="66" font-family="'Cormorant Garamond', serif" font-size="46" font-weight="300" letter-spacing="-5" fill="currentColor" text-anchor="middle" dominant-baseline="middle">FF</text>
+                    </svg>
+                    <span class="watermark-handle">@buycryptocash1</span>
+                </div>
+                
+                <div class="slide-content">
+                    <div class="slide-image-wrapper">
+                        <img src="assets/images/page_32_X1.png" alt="Face to Face" class="slide-image">
+                    </div>
+                    <div class="brand-top-label">FACE TO FACE — WELLNESS JOURNAL</div>
+                    <h1 class="main-title">Как за 3 шага<br><span class="italic-serif">восстановить</span> сон</h1>
+                    <div class="divider"></div>
+                    <p class="main-subtitle">Без мелатонина и резких решений</p>
+                    
+                    <div class="slide-footer">
+                        <div class="swipe-hint">
+                            <span class="swipe-icon">↓</span>
+                            <span>Листайте вниз или используйте стрелки</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- СЛАЙД 2: Шаг 1 -->
+            <section class="slide theme-dark" id="slide-2">
+                <div class="copyright-grid"></div>
+                <div class="watermark-logo">
+                    <svg viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2 2" />
+                        <text x="60" y="66" font-family="'Cormorant Garamond', serif" font-size="46" font-weight="300" letter-spacing="-5" fill="currentColor" text-anchor="middle" dominant-baseline="middle">FF</text>
+                    </svg>
+                    <span class="watermark-handle">@buycryptocash1</span>
+                </div>
+                
+                <div class="slide-content">
+                    <div class="step-num">ШАГ 1</div>
+                    <h2 class="slide-title">Темнота — основа сна</h2>
+                    <p class="slide-description">Мелатонин вырабатывается только в полной темноте. Даже небольшие источники света мешают глубокому сну.</p>
+                    
+                    <div class="tips-grid">
+                        <div class="tip-card">
+                            <div class="tip-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <rect x="5" y="2" width="14" height="20" rx="2" stroke-linecap="round"/>
+                                    <path d="M12 18h.01M9 5h6" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <span class="tip-text">уберите мигающие устройства</span>
+                        </div>
+                        <div class="tip-card">
+                            <div class="tip-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <circle cx="12" cy="12" r="4"/>
+                                    <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <span class="tip-text">выключите ночники</span>
+                        </div>
+                        <div class="tip-card">
+                            <div class="tip-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M3 3h18v18H3zM9 3v18M15 3v18" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <span class="tip-text">используйте блэкаут-шторы</span>
+                        </div>
+                    </div>
+
+                    <div class="highlight-box dark-accent">
+                        <svg class="box-quote-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9.9 19c-1.7 0-3.3-.7-4.4-1.9-1.1-1.2-1.6-2.9-1.4-4.6.4-3.1 3-5.6 6.1-6v2.1c-2 .4-3.6 2-3.9 4 .3 0 .6-.1.9-.1 2 0 3.7 1.6 3.7 3.6 0 2-1.6 3.7-3.7 3.7zm10 0c-1.7 0-3.3-.7-4.4-1.9-1.1-1.2-1.6-2.9-1.4-4.6.4-3.1 3-5.6 6.1-6v2.1c-2 .4-3.6 2-3.9 4 .3 0 .6-.1.9-.1 2 0 3.7 1.6 3.7 3.6 0 2-1.6 3.7-3.7 3.7z"/>
+                        </svg>
+                        <p>Если организм не вырабатывает мелатонин, то выспаться физически становится невозможно.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- СЛАЙД 3: Шаг 2 -->
+            <section class="slide theme-light" id="slide-3">
+                <div class="copyright-grid"></div>
+                <div class="watermark-logo">
+                    <svg viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2 2" />
+                        <text x="60" y="66" font-family="'Cormorant Garamond', serif" font-size="46" font-weight="300" letter-spacing="-5" fill="currentColor" text-anchor="middle" dominant-baseline="middle">FF</text>
+                    </svg>
+                    <span class="watermark-handle">@buycryptocash1</span>
+                </div>
+                
+                <div class="slide-content">
+                    <div class="step-num">ID 2</div>
+                    <h2 class="slide-title">Магний для нервной системы</h2>
+                    <p class="slide-description">Магний помогает организму переключиться из режима напряжения в режим восстановления.</p>
+                    
+                    <div class="slide-image-wrapper compact">
+                        <img src="assets/images/page_39_X3.png" alt="Magnesium" class="slide-image">
+                    </div>
+                    
+                    <div class="magnesium-info">
+                        <div class="info-block">
+                            <h3>Лучшие формы</h3>
+                            <ul class="styled-list">
+                                <li>
+                                    <span class="bullet-dot"></span>
+                                    <span class="item-title">магний глицинат</span>
+                                    <span class="item-desc">— идеален при стрессе и для улучшения качества сна</span>
+                                </li>
+                                <li>
+                                    <span class="bullet-dot"></span>
+                                    <span class="item-title">магний треонат</span>
+                                    <span class="item-desc">— улучшает работу мозга и память</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="info-block">
+                            <h3>Особенно важен, если Вы:</h3>
+                            <div class="tag-container">
+                                <span class="tag">живёте в мегаполисе</span>
+                                <span class="tag">занимаетесь спортом</span>
+                                <span class="tag">живёте в стрессе</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="highlight-box light-accent">
+                        <p>Если хотя бы один из этих факторов про Вас, магний Вам необходим.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- СЛАЙД 4: Шаг 3 -->
+            <section class="slide theme-taupe" id="slide-4">
+                <div class="copyright-grid"></div>
+                <div class="watermark-logo">
+                    <svg viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2 2" />
+                        <text x="60" y="66" font-family="'Cormorant Garamond', serif" font-size="46" font-weight="300" letter-spacing="-5" fill="currentColor" text-anchor="middle" dominant-baseline="middle">FF</text>
+                    </svg>
+                    <span class="watermark-handle">@buycryptocash1</span>
+                </div>
+                
+                <div class="slide-content">
+                    <div class="step-num">ШАГ 3</div>
+                    <h2 class="slide-title">Мягкое возвращение режима</h2>
+                    <p class="slide-description">Сон не восстанавливается резко. Организму требуется время для адаптации циркадных ритмов.</p>
+                    
+                    <div class="rhythm-visual">
+                        <div class="rhythm-circle">
+                            <span class="rhythm-time">-10 <span class="small-text">минут</span></span>
+                            <span class="rhythm-label">сдвиг в день</span>
+                        </div>
+                        <p class="rhythm-text">Сдвигайте время сна на 5–10 минут в день. Это незаметно для нервной системы и физиологически комфортно.</p>
+                    </div>
+
+                    <div class="highlight-box dark-accent">
+                        <p>Так режим возвращается устойчиво, без дополнительного стресса для организма.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- СЛАЙД 5: Итог -->
+            <section class="slide theme-light" id="slide-5">
+                <div class="copyright-grid"></div>
+                <div class="watermark-logo">
+                    <svg viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2 2" />
+                        <text x="60" y="66" font-family="'Cormorant Garamond', serif" font-size="46" font-weight="300" letter-spacing="-5" fill="currentColor" text-anchor="middle" dominant-baseline="middle">FF</text>
+                    </svg>
+                    <span class="watermark-handle">@buycryptocash1</span>
+                </div>
+                
+                <div class="slide-content">
+                    <div class="step-num">ИТОГ</div>
+                    <h2 class="slide-title">Хороший сон — это база</h2>
+                    
+                    <div class="slide-image-wrapper compact">
+                        <img src="assets/images/page_39_X1.png" alt="Base" class="slide-image">
+                    </div>
+                    
+                    <p class="slide-description">Когда сон в порядке, весь организм работает как швейцарские часы:</p>
+                    
+                    <div class="benefits-list">
+                        <div class="benefit-item">
+                            <span class="benefit-num">01</span>
+                            <span class="benefit-text">Кожа лучше реагирует на косметические процедуры</span>
+                        </div>
+                        <div class="benefit-item">
+                            <span class="benefit-num">02</span>
+                            <span class="benefit-text">Гормональный фон становится более стабильным</span>
+                        </div>
+                        <div class="benefit-item">
+                            <span class="benefit-num">03</span>
+                            <span class="benefit-text">Общее восстановление организма идёт в разы быстрее</span>
+                        </div>
+                    </div>
+
+                    <div class="f2f-outro">
+                        <p class="outro-text">Если сон нарушен давно и Вы не понимаете причину, начать стоит с профессиональной консультации.</p>
+                        <p class="outro-highlight">В <span class="serif">Face To Face</span> мы смотрим на сон как на часть общего состояния организма.</p>
+                    </div>
+
+                    <div class="cta-container">
+                        <a href="https://t.me/buycryptocash1" target="_blank" class="cta-button">
+                            <span>Записаться в Face To Face</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Точки-навигаторы внизу -->
+        <div class="slide-dots" id="slideDots">
+            <span class="dot active" data-slide="0"></span>
+            <span class="dot" data-slide="1"></span>
+            <span class="dot" data-slide="2"></span>
+            <span class="dot" data-slide="3"></span>
+            <span class="dot" data-slide="4"></span>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
