@@ -1,18 +1,18 @@
-/* Переменные проекта */
+/* Переменные проекта Face to Face */
 :root {
+    /* Основные цвета бренда */
+    --color-primary: #755B4C;      /* Dark Teakwood */
     --color-bg-light: #EFECE5;     /* Silky White */
     --color-bg-dark: #201B17;      /* Темное дерево / Ночь */
     --color-bg-taupe: #998C80;     /* Taupe Glacé */
-    --color-primary: #755B4C;      /* Фирменный теплый коричневый */
-    --color-text-dark: #2D2520;    /* Почти черный для светлой темы */
-    --color-text-light: #F7F5F2;   /* Почти белый для темных слайдов */
-    --color-accent-green: #6E7E73; /* Мягкий шалфейный зеленый */
-    --color-card-light: rgba(255, 255, 255, 0.4);
-    --color-card-dark: rgba(255, 255, 255, 0.05);
+    --color-text-dark: #2D2520;    /* Темный текст для светлой темы */
+    --color-text-light: #F7F5F2;   /* Светлый текст для темных слайдов */
     
-    --font-serif: 'Cormorant Garamond', Georgia, serif;
-    --font-sans: 'Montserrat', sans-serif;
+    /* Шрифты */
+    --font-serif: 'Circe Contrast', Georgia, serif;  /* Заголовки */
+    --font-sans: 'Montserrat', sans-serif;          /* Основной текст */
     
+    /* Анимации */
     --transition-smooth: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
     --transition-quick: all 0.3s ease;
 }
@@ -731,3 +731,86 @@ body {
 .slide.active .slide-image {
     transform: scale(1.02);
 }
+
+/* Блок скачивания материалов */
+.download-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    border-top: 1px dashed rgba(117, 91, 76, 0.15);
+    padding-top: 16px;
+}
+
+.download-title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: var(--color-primary);
+    opacity: 0.8;
+    text-transform: uppercase;
+}
+
+.download-links {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+}
+
+.download-link {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: var(--transition-quick);
+    border: 1px solid rgba(117, 91, 76, 0.2);
+    color: var(--color-primary);
+    background: transparent;
+}
+
+.download-link:hover {
+    background: rgba(117, 91, 76, 0.05);
+    border-color: var(--color-primary);
+}
+
+.download-link svg {
+    flex-shrink: 0;
+}
+
+/* ==========================================
+   Режим экспорта для карусели картинок и видео
+   ========================================== */
+body.export-mode {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 100vh !important;
+    width: 100vw !important;
+}
+
+body.export-mode .presentation-container {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+body.export-mode .progress-bar-container,
+body.export-mode .nav-btn,
+body.export-mode .slide-dots,
+body.export-mode .swipe-hint,
+body.export-mode .download-container {
+    display: none !important;
+}
+
+
