@@ -56,6 +56,13 @@
 <!-- Агент берёт задачу отсюда, переносит из Backlog -->
 <!-- Формат: - [/] `ID` Описание — Начато: YYYY-MM-DD -->
 
+- [/] `HERMES-01` Архитектура Hermes Telegram Assistant (личный + бизнес ассистент с памятью, мультимодальностью и интеграциями) — Начато: 2026-05-16
+- [/] `INFRA-07` Установить и подключить MCP servers для Cline (Vapi / Exa / GitHub / Context7) — Начато: 2026-05-14
+
+### Прогресс по активным задачам
+- `HERMES-01`: проведён быстрый аудит существующих Telegram / Fathom / memory / summary артефактов в репозитории; подтверждено, что лучший путь — Hermes как Telegram-facing ассистент, n8n как orchestration/integration слой, Supabase как память и база артефактов — Обновлено: 2026-05-16
+- `INFRA-07`: подключён Exa MCP server (`github.com/exa-labs/exa-mcp-server`) в `cline_mcp_settings.json`, создана локальная папка `/Users/higherpower/Documents/Cline/MCP/github.com/exa-labs/exa-mcp-server`, выполнен тест инструмента Exa search — Обновлено: 2026-05-14
+- `INFRA-07`: добавлены `github.com/github/github-mcp-server` и `github.com/upstash/context7` в `cline_mcp_settings.json`, созданы локальные директории под оба MCP, GitHub token убран из JSON и переведён на runtime-чтение через `gh auth token`, Context7 smoke test успешен, GitHub MCP требует запущенный Docker daemon — Обновлено: 2026-05-15
 - [/] `N8N-03` Telegram Meeting Assistant MVP workflow (text + voice + audio + m4a) — Начато: 2026-04-15
 - [/] `WA-01/WA-03` Модуль Умной Рассылки Python (Очередь + Ротация) — Начато: 2026-04-18
 - [/] `WA-05` Webhook трекинг: delivered/read/reply → Supabase — Начато: 2026-05-14
@@ -69,6 +76,7 @@
 
 <!-- Формат: - [x] `ID` Описание — Завершено: YYYY-MM-DD -->
 - [x] `PLAN-01` Стратегический план Outreach Pipeline — Завершено: 2026-04-15
+- [x] `N8N-04` Копирование воркфлоу Zoom Call Summary и интеграция Telegram-бота с Whisper STT — Завершено: 2026-05-23
 - [x] `PLAN-02` Глоссарий AI-концепций (Specs/API/MCP/Skills/Workflows/Rules/Subagents) — Завершено: 2026-04-15
 - [x] `PLAN-03` Создание KANBAN.md — Завершено: 2026-04-15
 - [x] `STRUCT-01` Реструктуризация проекта на 6 доменов — Завершено: 2026-04-12

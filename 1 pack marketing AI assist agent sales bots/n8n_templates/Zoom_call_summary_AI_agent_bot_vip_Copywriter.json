@@ -1,0 +1,1264 @@
+[
+  {
+    "updatedAt": "2026-05-23T12:48:18.051Z",
+    "createdAt": "2026-04-04T10:22:41.903Z",
+    "id": "H8e9RQAi8UadTusi",
+    "name": "Zoom  call summary AI agent bot vip  Copywriter",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=СТРОГО не более 3900 символов в ответе: ({{ $json.Text }}{{ $json.chatInput }}\n\n{{ $json.share_url }}\n\n{{ $json.title }}\n\n{{ $json.transcriptFormatted }})",
+          "needsFallback": true,
+          "options": {
+            "systemMessage": "=Ты — саммарайзер. Твоя задача — по входному тексту (Zoom-встреча, созвон, потоковая речь) создать краткое, структурированное саммари строго по формату Павла Думбрао для фиксации в Notion.\n\n⸻\n🔥 ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА:\n\n• Максимальная длина ответа — 3900 символов (чтобы влезло в Telegram при отправке).\n• Если текста слишком много — сожми, но сохрани структуру и смысл.\n• Не пиши “AI”, “GPT”, “саммарайзер” — текст должен выглядеть как от живого человека.\n• Не добавляй приветствий, подписей и вводок — сразу по структуре.\n• Вывод всегда в формате HTML для Telegram.\n• Данные формируй так, чтобы их можно было перенести в Notion-таблицу (каждое поле с отдельным заголовком).\n\n⸻\n 📋 СТРУКТУРА ВЫВОДА:\n\n<b>📅Дата:</b> ДД.ММ.ГГГГ  \n<b>✨Тема:</b> Одно чёткое предложение о сути встречи  \n\n<b>🗣Спикер(спикеры):</b> Имя и фамилия всех ключевых участников или докладчиков. Пиши спикер если один, и спикеры если несколько.\n\n<b>⏱️ Таймкоды встречи:</b>  \n<blockquote>\n> 00:00 — Вступление и цели встречи  \n> 05:10 — Контекст и текущая ситуация  \n> 14:25 — Обсуждение ключевых вопросов  \n> 27:50 — Принятые решения  \n> 39:30 — Итоги и договорённости  \n> 45:00 — Финальные выводы и завершение\n</blockquote>  \n<i>Формат: HH:MM или HH:MM:SS — кратко о содержании. Можно указывать диапазоны и отмечать говорящего.</i>\n\n<b>🎯 Основные инсайты:</b>  \n– Ключевые выводы, открытия и идеи из дискуссии  \n– Важные наблюдения или неожиданные инсайты  \n– Новые риски или возможности, которые были выявлены\n\n<b>💡 Решения / шаги:</b>  \n– Конкретные договорённости и действия, утверждённые на встрече  \n– Ответственные и дедлайны, если они прозвучали  \n– Что нужно сделать немедленно, а что — в перспективе\n\n<b>🚀 Следующие шаги и фокус:</b>  \n– Главные цели и приоритеты на ближайший этап  \n– Направления, требующие отдельного внимания  \n– Гипотезы или эксперименты, которые планируется запустить  \n– Вопросы, требующие дальнейшей проработки\n\n<b>💬 Комментарий:</b>  \n– Общее настроение встречи, динамика обсуждения или ключевая мысль на выходе  \n\n<b>📎 Материалы:</b>  \n– Ссылки, документы, файлы или материалы, упомянутые на встрече  \n– Ссылка на запись: <a href=\"URL\">Посмотреть встречу</a>\n\n⸻\n🧾 ФОРМАТИРОВАНИЕ (HTML для Telegram):\n\n✅ Можно использовать только:\n<b>жирный</b>, <i>курсив</i>, <u>подчёркнутый</u>, <s>зачёркнутый</s>, <code>моно</code>, <pre>блок кода</pre>, <blockquote>цитата</blockquote>, <a href=\"...\">ссылка</a>, <tg-spoiler>скрытый текст</tg-spoiler>  \n\n❌ Запрещено:\n– Markdown (звёздочки, подчёркивания)  \n– Вложенные теги  \n– Неразрешённые теги (div, span, h1 и т.д.)  \n– Превышать лимит 4000 символов"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2.1,
+        "position": [
+          2256,
+          976
+        ],
+        "id": "ec6cb0dd-26db-4209-9794-ccee7506e284",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "modelName": "models/gemini-2.5-pro",
+          "options": {
+            "temperature": 0.3
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          1936,
+          1280
+        ],
+        "id": "c74a25df-d207-4b1b-9f24-3268cd447a85",
+        "name": "Google Gemini Chat Model",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "07mn330Ii1yGriyp",
+            "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "output",
+          "options": {}
+        },
+        "id": "5d983299-05af-4bc3-9e52-13611bb3d92a",
+        "name": "Split Out",
+        "type": "n8n-nodes-base.splitOut",
+        "position": [
+          3056,
+          976
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "jsCode": "function cleanHtmlForTelegram(htmlString) {\n    const allowedTags = ['b', 'strong', 'i', 'em', 'u', 's', 'code', 'pre', 'blockquote', 'tg-spoiler', 'a'];\n    let cleaned = htmlString;\n    cleaned = cleaned.replace(/<(?!\\/?(?:b|strong|i|em|u|s|code|pre|blockquote|tg-spoiler|a)(\\s|>))[^>]*>/gi, '');\n    cleaned = cleaned.replace(/<a(?!\\s+href=\"[^\"]*\")[^>]*>(.*?)<\\/a>/gi, '$1');\n    return cleaned;\n}\n\nfunction splitTelegramMessage(text, maxLength = 4096) {\n    if (text.length <= maxLength) {\n        return [text];\n    }\n    \n    const messages = [];\n    let currentChunk = '';\n    const parts = text.split(/(<\\/blockquote>|<\\/pre>|<\\/code>|\\n\\n)/);\n    \n    for (const part of parts) {\n        if (!part) continue;\n        if (currentChunk.length + part.length > maxLength) {\n            if (currentChunk.trim()) {\n                messages.push(currentChunk.trim());\n            }\n            currentChunk = part;\n        } else {\n            currentChunk += part;\n        }\n    }\n    \n    if (currentChunk.trim()) {\n        messages.push(currentChunk.trim());\n    }\n    \n    return messages;\n}\n\ntry {\n    const geminiOutput = $input.first().json.output;\n    const cleaned = cleanHtmlForTelegram(geminiOutput);\n    const messageParts = splitTelegramMessage(cleaned);\n    \n    console.log(`Обработано частей: ${messageParts.length}`);\n    return { output: messageParts };\n    \n} catch (error) {\n    console.error('Ошибка:', error);\n    return { output: [`❌ Ошибка: ${error.message}`] };\n}\n"
+        },
+        "id": "79f1ffe7-8d23-486a-9147-537afda179e2",
+        "name": "Handle formatting and split1",
+        "type": "n8n-nodes-base.code",
+        "position": [
+          2848,
+          976
+        ],
+        "typeVersion": 2,
+        "notes": "This is used to prevent Markdown issues in Telegram while sending messages."
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "698ca267-bea6-4cc1-a7ac-43868a88f189",
+                "name": "output",
+                "value": "={{ $json.output }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2656,
+          960
+        ],
+        "id": "02794c6f-4fee-4d44-bcb3-8f7b2bef82fe",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $node['Detect Input Type']?.json?.chat_id || '888005446' }}",
+          "text": "={{ $json.output }}",
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "HTML"
+          }
+        },
+        "id": "cc30d56a-ef5f-4d0e-b4e3-47e24075bc88",
+        "name": "Send a text message1",
+        "type": "n8n-nodes-base.telegram",
+        "position": [
+          3584,
+          976
+        ],
+        "webhookId": "e4ab1c28-1c31-4935-a5c6-970fbb415242",
+        "typeVersion": 1.2,
+        "alwaysOutputData": false,
+        "credentials": {
+          "telegramApi": {
+            "id": "8Zz1yvlFoCvmoLP2",
+            "name": "Telegram account 2 rage kill assist pers ai 103"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Замена Markdown на HTML + исправление звездочек в спойлерах\nfunction convertMarkdownToHtml(text) {\n    // Заменяем **текст** на <b>текст</b>\n    text = text.replace(/\\*\\*(.*?)\\*\\*/g, '<b>$1</b>');\n    \n    // Заменяем *текст* на <i>текст</i> (но осторожно, чтобы не затронуть списки)\n    text = text.replace(/\\*([^*\\n]+?)\\*/g, '<i>$1</i>');\n    \n    // Исправляем звездочки в списках внутри спойлеров\n    text = text.replace(/\\*\\s+<b>/g, '• <b>');\n    text = text.replace(/\\*\\s+([^<])/g, '• $1');\n    \n    // Исправляем остальные звездочки в начале строк (списки)\n    text = text.replace(/^\\*\\s+/gm, '• ');\n    \n    // ДОБАВЬТЕ ЭТУ СТРОКУ: Принудительно добавляем expandable к blockquote\n    text = text.replace(/<blockquote>/g, '<blockquote expandable>');\n    \n    return text;\n}\n\ntry {\n    const inputText = $input.first().json.output;\n    const convertedText = convertMarkdownToHtml(inputText);\n    \n    console.log('Конвертация выполнена успешно');\n    return [{ json: { output: convertedText } }];\n    \n} catch (error) {\n    console.error('Ошибка конвертации:', error);\n    return [{ json: { output: inputText || 'Ошибка' } }];\n}\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3344,
+          976
+        ],
+        "id": "6b5c2c0f-7107-48f7-ba56-dfc5d8dc2c40",
+        "name": "Code"
+      },
+      {
+        "parameters": {
+          "content": "## Allow Users to Send a Sequence of Messages to an AI Agent in Telegram with Supabase\n### Use Case\nWhen creating chatbots that interface through applications such as **Telegram** and **WhatsApp**, users can often sends multiple shorter messages in quick succession, in place of a single, longer message. This workflow accounts for this behaviour.\n### What it Does\nThis workflow allows users to send several messages in quick succession, treating them as one coherent conversation instead of separate messages requiring individual responses. \n### How it Works\n1. When messages arrive, they are stored in a **Supabase PostgreSQL** table\n2. The system waits briefly to see if additional messages arrive\n3. If no new messages arrive within the waiting period, all queued messages are:\n   - Combined and processed as a single conversation\n   - Responded to with one unified reply\n   - Deleted from the queue",
+          "height": 660,
+          "width": 700
+        },
+        "id": "7cfe189c-420b-448f-af39-1bae4b83ab09",
+        "name": "Sticky Note4",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          160,
+          672
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "### Setup\n1. Create a table in Supabase called **message_queue**. It needs to have the following columns: **user_id** (`uint8`), **message** (`text`), and **message_id** (`uint8`)\n2. Add your **Telegram**, **Supabase**, **OpenAI**, and **PostgreSQL** credentials\n3. Activate the workflow and test by sending multiple messages the Telegram bot in one go\n4. Wait ten seconds after which you will receive a single reply to all of your messages",
+          "height": 220,
+          "width": 520
+        },
+        "id": "dee11bbb-1e76-410a-8e72-d9a90127036e",
+        "name": "Sticky Note5",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          352,
+          288
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "public": true,
+          "initialMessages": "Вставь ниже текст:",
+          "options": {
+            "title": "=Привет! Это саммарайзер клуба для Спикеров!"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          1008,
+          512
+        ],
+        "id": "c7929d8b-0aef-44ae-a109-c4e6f2724be9",
+        "name": "When chat message received",
+        "webhookId": "d591b27b-a2fd-4e81-81b3-b3f151687062"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "/fathom-webhook",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          1024,
+          960
+        ],
+        "id": "2dcb7776-2607-498d-93af-b6bf3c05c544",
+        "name": "Webhook",
+        "webhookId": "7aa72b1b-bc3c-4058-829d-99164020c35c"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "d413e30d-d013-45e5-bf00-73b95371ac71",
+                "name": "share_url",
+                "value": "={{ $json.body.share_url }}",
+                "type": "string"
+              },
+              {
+                "id": "c8ac6a79-dc99-4309-acf2-f3e7190cbd66",
+                "name": "title",
+                "value": "={{ $json.body.title }}",
+                "type": "string"
+              },
+              {
+                "id": "98f86254-7540-45e9-90ce-79712ff86658",
+                "name": "transcript",
+                "value": "={{ $json.body.transcript }}",
+                "type": "array"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1312,
+          960
+        ],
+        "id": "ac999c9e-abd9-43e7-9e92-a615eb4f15a5",
+        "name": "Edit Fields1"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Получаем все входные элементы\nconst items = $input.all();\n\n// Обрабатываем каждый элемент\nconst processedItems = items.map(item => {\n  let transcript = item.json.transcript || [];\n  \n  // Проверяем, что это массив объектов\n  if (Array.isArray(transcript) && transcript.length > 0) {\n    // Форматируем каждый элемент: [timestamp] speaker: text\n    const formattedTranscript = transcript.map(t => {\n      // Обработка timestamp: если объект, стрингифицируем или берём поле\n      let timestamp = t.timestamp;\n      if (typeof timestamp === 'object') {\n        timestamp = timestamp.text || timestamp.start || JSON.stringify(timestamp);\n      } else if (!timestamp) {\n        timestamp = '';\n      }\n      \n      // Обработка speaker: если объект, берём name или стрингифицируем\n      let speaker = t.speaker;\n      if (typeof speaker === 'object') {\n        speaker = speaker.name || speaker.display_name || JSON.stringify(speaker);\n      } else if (!speaker) {\n        speaker = 'Unknown';\n      }\n      \n      // Обработка text: если объект, берём text или стрингифицируем\n      let text = t.text;\n      if (typeof text === 'object') {\n        text = text.content || JSON.stringify(text);\n      } else if (!text) {\n        text = '';\n      }\n      \n      return `[${timestamp}] ${speaker}: ${text}`;\n    }).join('\\n');\n    \n    // Добавляем форматированную строку в JSON\n    item.json.transcriptFormatted = formattedTranscript;\n  } else {\n    // Если не массив или пусто, добавляем пустую строку\n    item.json.transcriptFormatted = '';\n  }\n  \n  return item;\n});\n\nreturn processedItems;\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1584,
+          960
+        ],
+        "id": "d7e5da87-735a-47e4-ae6b-bdf669015de1",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "modelName": "models/gemini-2.5-pro",
+          "options": {
+            "temperature": 0.3
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          2176,
+          1296
+        ],
+        "id": "f531fe82-faf4-4c55-b6ba-8fa510548f86",
+        "name": "Google Gemini Chat Model1",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "07mn330Ii1yGriyp",
+            "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "Нужно выбрать своего БОТА\n"
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          3520,
+          848
+        ],
+        "typeVersion": 1,
+        "id": "d1189611-7b14-466e-a47d-3c9107968a23",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "content": "## Чтобы БОТ не отвечал вам же на свои же сообщения нужно:\n\nЧтобы получить id !\n1) Перейдите в бота [GetMyId](https://t.me/getmyidx_bot)\n2) Отправьте любое сообщение \n3) В ответе вы получите Your user ID: `444090909`\n4) Замените в узле IF в поле где написано  `Укажите ваш id`\n\n",
+          "height": 328,
+          "width": 420,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          3456,
+          1712
+        ],
+        "typeVersion": 1,
+        "id": "3cd3b007-665f-4a4f-80b5-0cdb3aa493c9",
+        "name": "Sticky Note6"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $node['Detect Input Type']?.json?.chat_id || '450206471' }}",
+          "text": "={{ $json.output }}",
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "HTML"
+          }
+        },
+        "id": "32134a63-95f4-4771-952f-4ac96b7217be",
+        "name": "Send a text message",
+        "type": "n8n-nodes-base.telegram",
+        "position": [
+          3728,
+          1120
+        ],
+        "webhookId": "e4ab1c28-1c31-4935-a5c6-970fbb415242",
+        "typeVersion": 1.2,
+        "alwaysOutputData": false,
+        "credentials": {
+          "telegramApi": {
+            "id": "fmRi7ongAOXXVp4X",
+            "name": "Telegram account threads - yt"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelName": "models/gemini-2.5-pro",
+          "options": {
+            "temperature": 0.3
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          2336,
+          1616
+        ],
+        "id": "60332b31-bbf0-4075-9b2e-aaaa4d8a634c",
+        "name": "Google Gemini Chat Model2",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "07mn330Ii1yGriyp",
+            "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelName": "models/gemini-2.5-pro",
+          "options": {
+            "temperature": 0.3
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          2496,
+          1680
+        ],
+        "id": "eaf63078-fea0-4ac6-a952-362476436003",
+        "name": "Google Gemini Chat Model3",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "07mn330Ii1yGriyp",
+            "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=СТРОГО не более 3900 символов в ответе: ({{ $json.Text }}{{ $json.chatInput }}\n\n{{ $json.share_url }}\n\n{{ $json.title }}\n\n{{ $json.transcriptFormatted }})",
+          "needsFallback": true,
+          "options": {
+            "systemMessage": "=Ты — SMM копирайтер. Твоя задача — по входному тексту (Zoom-встреча, созвон, потоковая речь) создать краткое, структурированное пост по форумлам  строго по формату Павла Думбрао для фиксации в Notion.\n\n⸻\n🔥 ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА:\n\n• Максимальная длина ответа — 3900 символов (чтобы влезло в Telegram при отправке).\n• Если текста слишком много — сожми, но сохрани структуру и смысл.\n• Не пиши “AI”, “GPT”, “саммарайзер” — текст должен выглядеть как от живого человека.\n• Не добавляй приветствий, подписей и вводок — сразу по структуре.\n• Вывод всегда в формате HTML для Telegram.\n• Данные формируй так, чтобы их можно было перенести в Notion-таблицу (каждое поле с отдельным заголовком).\n\n⸻\n 📋 СТРУКТУРА ВЫВОДА:\n\n<b>📅Дата:</b> ДД.ММ.ГГГГ  \n<b>✨Тема:</b> Одно чёткое предложение о сути встречи  \n\n<b>🗣Спикер(спикеры):</b> Имя и фамилия всех ключевых участников или докладчиков. Пиши спикер если один, и спикеры если несколько.\n\n<b>⏱️ Таймкоды встречи:</b>  \n<blockquote>\n> 00:00 — Вступление и цели встречи  \n> 05:10 — Контекст и текущая ситуация  \n> 14:25 — Обсуждение ключевых вопросов  \n> 27:50 — Принятые решения  \n> 39:30 — Итоги и договорённости  \n> 45:00 — Финальные выводы и завершение\n</blockquote>  \n<i>Формат: HH:MM или HH:MM:SS — кратко о содержании. Можно указывать диапазоны и отмечать говорящего.</i>\n\n<b>🎯 Основные инсайты:</b>  \n– Ключевые выводы, открытия и идеи из дискуссии  \n– Важные наблюдения или неожиданные инсайты  \n– Новые риски или возможности, которые были выявлены\n\n<b>💡 Решения / шаги:</b>  \n– Конкретные договорённости и действия, утверждённые на встрече  \n– Ответственные и дедлайны, если они прозвучали  \n– Что нужно сделать немедленно, а что — в перспективе\n\n<b>🚀 Следующие шаги и фокус:</b>  \n– Главные цели и приоритеты на ближайший этап  \n– Направления, требующие отдельного внимания  \n– Гипотезы или эксперименты, которые планируется запустить  \n– Вопросы, требующие дальнейшей проработки\n\n<b>💬 Комментарий:</b>  \n– Общее настроение встречи, динамика обсуждения или ключевая мысль на выходе  \n\n<b>📎 Материалы:</b>  \n– Ссылки, документы, файлы или материалы, упомянутые на встрече  \n– Ссылка на запись: <a href=\"URL\">Посмотреть встречу</a>\n\n⸻\n🧾 ФОРМАТИРОВАНИЕ (HTML для Telegram):\n\n✅ Можно использовать только:\n<b>жирный</b>, <i>курсив</i>, <u>подчёркнутый</u>, <s>зачёркнутый</s>, <code>моно</code>, <pre>блок кода</pre>, <blockquote>цитата</blockquote>, <a href=\"...\">ссылка</a>, <tg-spoiler>скрытый текст</tg-spoiler>  \n\n❌ Запрещено:\n– Markdown (звёздочки, подчёркивания)  \n– Вложенные теги  \n– Неразрешённые теги (div, span, h1 и т.д.)  \n– Превышать лимит 4000 символов"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          2336,
+          1968
+        ],
+        "id": "b53874cd-c332-4355-a7e9-17162cbfdeba",
+        "name": "AI Agent2",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=СТРОГО не более 3900 символов в ответе: ({{ $json.Text }}{{ $json.chatInput }}\n{{ $('When chat message received').item.json.chatInput }}\n{{ $json.share_url }}\n\n{{ $json.title }}\n\n{{ $json.transcriptFormatted }})",
+          "needsFallback": true,
+          "options": {
+            "systemMessage": "=Ты — SMM-копирайтер и сторителлер, который пишет от лица эксперта по маркетингу, автоматизации, AI-инженерии, ИИ-агентам и автоматизации бизнес-процессов.\n\nТвоя задача — по расшифровке Zoom-созвона/звонка сделать:\n1) кейсовый пост для Telegram-канала,\n2) серию сторис (раскадровку) по этой же истории.\n\nОба формата должны:\n– показывать мою экспертизу (n8n, ИИ-агенты, Telegram-боты, автоворонки, \"контент-завод\" для экспертов),\n– прогревать аудиторию к работе со мной,\n– подводить к лёгкому шагу: написать мне, пройти бота, запросить разбор/чек-лист.\n\n⸻\n🔥 МОЙ ПЕРСОНАЛЬНЫЙ СТИЛЬ:\n\n• Пишешь от первого лица: «я», «ко мне пришёл клиент», «я собрал систему».\n• Я — практик, не теоретик: меньше воды, больше конкретики и архитектуры решений.\n• Короткие абзацы, живой язык, без канцелярита.\n• Я часто опираюсь на n8n, Telegram-ботов, ИИ-агентов, MCP/HTTP-интеграции.\n• Показывай, как я экономлю людям часы жизни и превращаю хаос (таблицы, ручные задачи, созвоны) в систему.\n• Не используй слова “нейросеть”, “GPT”, “ИИ-модель” в технарском стиле. Говори как человек: «агент», «умный помощник», «система на n8n».\n• Общая длина всего ответа — до 3900 символов.\n\n⸻\n⚙️ ЗАДАЧА:\n\nИз входного текста (созвон, консультация, разбор) сделай:\n1) один кейсовый пост,\n2) одну серию сторис (7–10 экранов)\n\nтак, чтобы:\n– рассказывалась история клиента,\n– было видно, как через автоматизацию мы меняем ему жизнь/бизнес,\n– читатель получал 1–2 инсайта,\n– в конце был мягкий призыв к действию.\n\n⸻\n📋 СТРУКТУРА ВЫВОДА (HTML):\n\n<b>📌 Пост для Telegram:</b>\n\nДай цельный текст поста, без приветствий и подписи, но с внутренней драматургией:\n\n1) <b>Крючок:</b> 1–3 предложения, которые сразу цепляют.\n2) <b>Герой и контекст:</b> кто клиент, какая ниша, какой хаос/масштаб.\n3) <b>Боль и хаос до:</b> что у него было до нашего вмешательства.\n4) <b>Решение, которое я предложил:</b> какую систему на базе n8n/ботов/агентов я собрал, главные элементы.\n5) <b>Момент “дошло”:</b> инсайт клиента, реакция.\n6) <b>Расширение и мой фокус:</b> куда я иду дальше (виртуальные сотрудники, системы, которые сами работают).\n7) <b>Призыв к действию (прогрев):</b> мягкий CTA: написать, запросить разбор, ключевое слово и т.д.\n\n⸻\n<b>🎬 Серия сторис по этой же истории:</b>\n\nСделай 7–10 сторис. Каждая сторис — 1–3 предложения.\n\n<b>Сторис 1 — Крючок:</b>  \n<b>Сторис 2 — Герой и контекст:</b>  \n<b>Сторис 3 — Боль/хаос:</b>  \n<b>Сторис 4 — Поворот/мой взгляд:</b>  \n<b>Сторис 5 — Решение (система на n8n/агентах/ботах):</b>  \n<b>Сторис 6 — Момент инсайта клиента:</b>  \n<b>Сторис 7 — Результат для клиента:</b>  \n<b>Сторис 8 — Расширение (я строю архитектуру систем/виртуальных сотрудников):</b>  \n<b>Сторис 9 — Вопрос к подписчику (узнать себя):</b>  \n<b>Сторис 10 — Мягкий CTA:</b>  \n\nВыведи сторис в формате:\n\n<b>Сторис 1:</b> текст  \n<b>Сторис 2:</b> текст  \n...  \n\n⸻\nФОРМАТИРОВАНИЕ:\n\n• Вывод строго в HTML для Telegram.\n• Используй только теги: <b>, <i>, <u>, <s>, <code>, <pre>, <blockquote>, <a>, <tg-spoiler>.\n• Не используй Markdown (`**`, `_`, ``` и т.п.)."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          2464,
+          1328
+        ],
+        "id": "8d7ca3e4-7933-4d52-bf37-00d949ef3b6f",
+        "name": "AI Agent1 SMM copywriter"
+      },
+      {
+        "parameters": {
+          "modelName": "models/gemini-2.5-pro",
+          "options": {
+            "temperature": 0.3
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          2752,
+          1680
+        ],
+        "id": "8b9352ae-3972-42e7-b3a7-8fd8a00eeddf",
+        "name": "Google Gemini Chat Model4",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "07mn330Ii1yGriyp",
+            "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelName": "models/gemini-2.5-pro",
+          "options": {
+            "temperature": 0.3
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          2912,
+          1632
+        ],
+        "id": "8d2b9310-5580-41e5-be04-f829798b3984",
+        "name": "Google Gemini Chat Model5",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "07mn330Ii1yGriyp",
+            "name": "Google Gemini(PaLM) Api account HB 10326 1348"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "output",
+          "options": {}
+        },
+        "id": "4fde16f3-93f5-4151-b97d-dc9042b47961",
+        "name": "Split Out1",
+        "type": "n8n-nodes-base.splitOut",
+        "position": [
+          3536,
+          1344
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "jsCode": "function cleanHtmlForTelegram(htmlString) {\n    const allowedTags = ['b', 'strong', 'i', 'em', 'u', 's', 'code', 'pre', 'blockquote', 'tg-spoiler', 'a'];\n    let cleaned = htmlString;\n    cleaned = cleaned.replace(/<(?!\\/?(?:b|strong|i|em|u|s|code|pre|blockquote|tg-spoiler|a)(\\s|>))[^>]*>/gi, '');\n    cleaned = cleaned.replace(/<a(?!\\s+href=\"[^\"]*\")[^>]*>(.*?)<\\/a>/gi, '$1');\n    return cleaned;\n}\n\nfunction splitTelegramMessage(text, maxLength = 4096) {\n    if (text.length <= maxLength) {\n        return [text];\n    }\n    \n    const messages = [];\n    let currentChunk = '';\n    const parts = text.split(/(<\\/blockquote>|<\\/pre>|<\\/code>|\\n\\n)/);\n    \n    for (const part of parts) {\n        if (!part) continue;\n        if (currentChunk.length + part.length > maxLength) {\n            if (currentChunk.trim()) {\n                messages.push(currentChunk.trim());\n            }\n            currentChunk = part;\n        } else {\n            currentChunk += part;\n        }\n    }\n    \n    if (currentChunk.trim()) {\n        messages.push(currentChunk.trim());\n    }\n    \n    return messages;\n}\n\ntry {\n    const geminiOutput = $input.first().json.output;\n    const cleaned = cleanHtmlForTelegram(geminiOutput);\n    const messageParts = splitTelegramMessage(cleaned);\n    \n    console.log(`Обработано частей: ${messageParts.length}`);\n    return { output: messageParts };\n    \n} catch (error) {\n    console.error('Ошибка:', error);\n    return { output: [`❌ Ошибка: ${error.message}`] };\n}\n"
+        },
+        "id": "410cd530-fa34-4b00-aed7-e49493860a15",
+        "name": "Handle formatting and split",
+        "type": "n8n-nodes-base.code",
+        "position": [
+          3328,
+          1344
+        ],
+        "typeVersion": 2,
+        "notes": "This is used to prevent Markdown issues in Telegram while sending messages."
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "698ca267-bea6-4cc1-a7ac-43868a88f189",
+                "name": "output",
+                "value": "={{ $json.output }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          3136,
+          1328
+        ],
+        "id": "bd2853bb-61d1-4ec7-a974-d7a2ac0d7997",
+        "name": "Edit Fields2"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $node['Detect Input Type']?.json?.chat_id || '888005446' }}",
+          "text": "={{ $json.output }}",
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "HTML"
+          }
+        },
+        "id": "0737f0d0-eb6b-452f-ab50-099fd9971c6b",
+        "name": "Send a text message2",
+        "type": "n8n-nodes-base.telegram",
+        "position": [
+          4064,
+          1344
+        ],
+        "webhookId": "e4ab1c28-1c31-4935-a5c6-970fbb415242",
+        "typeVersion": 1.2,
+        "alwaysOutputData": false,
+        "credentials": {
+          "telegramApi": {
+            "id": "8Zz1yvlFoCvmoLP2",
+            "name": "Telegram account 2 rage kill assist pers ai 103"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Замена Markdown на HTML + исправление звездочек в спойлерах\nfunction convertMarkdownToHtml(text) {\n    // Заменяем **текст** на <b>текст</b>\n    text = text.replace(/\\*\\*(.*?)\\*\\*/g, '<b>$1</b>');\n    \n    // Заменяем *текст* на <i>текст</i> (но осторожно, чтобы не затронуть списки)\n    text = text.replace(/\\*([^*\\n]+?)\\*/g, '<i>$1</i>');\n    \n    // Исправляем звездочки в списках внутри спойлеров\n    text = text.replace(/\\*\\s+<b>/g, '• <b>');\n    text = text.replace(/\\*\\s+([^<])/g, '• $1');\n    \n    // Исправляем остальные звездочки в начале строк (списки)\n    text = text.replace(/^\\*\\s+/gm, '• ');\n    \n    // ДОБАВЬТЕ ЭТУ СТРОКУ: Принудительно добавляем expandable к blockquote\n    text = text.replace(/<blockquote>/g, '<blockquote expandable>');\n    \n    return text;\n}\n\ntry {\n    const inputText = $input.first().json.output;\n    const convertedText = convertMarkdownToHtml(inputText);\n    \n    console.log('Конвертация выполнена успешно');\n    return [{ json: { output: convertedText } }];\n    \n} catch (error) {\n    console.error('Ошибка конвертации:', error);\n    return [{ json: { output: inputText || 'Ошибка' } }];\n}\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3824,
+          1344
+        ],
+        "id": "af973061-add6-4fc2-9d2f-5da1bb527b90",
+        "name": "Code1"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=СТРОГО не более 3900 символов в ответе: ({{ $json.Text }}{{ $json.chatInput }}\n{{ $('When chat message received').item.json.chatInput }}\n{{ $json.share_url }}\n\n{{ $json.title }}\n\n{{ $json.transcriptFormatted }})",
+          "needsFallback": true,
+          "options": {
+            "systemMessage": "=Ты — SMM-копирайтер. Твоя задача — по расшифровке Zoom-встречи / созвона / живой речи сделать материал для соцсетей:\n\n1) Вариант А: Оформленный пост для Telegram-канала\n2) Вариант Б: Раскадровка для серии сторис (по формуле Миши Тимчука)\n\n⸻\n🔥 ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА:\n\n• Максимальная длина всего ответа — до 3900 символов.\n• Пиши живым, разговорным языком, без “AI”, “GPT” и прочего техно-языка.\n• Не добавляй приветствий и подписей, сразу к структуре.\n• Вывод строго в формате HTML для Telegram.\n• Не выдумывай факты, опирайся только на смысл созвона.\n• Цель — показать экспертизу и инсайты, а не пересказать дословно.\n\n⸻\n📋 СТРУКТУРА ВЫВОДА:\n\n<b>📌 Вариант А — Пост для Telegram:</b>\n\n<b>1. Заголовок / крючок:</b>  \n1–2 варианта цепляющего заголовка, который сразу цепляет боль или желание аудитории.\n\n<b>2. Основной текст (по формуле):</b>  \n– <b>Крючок:</b> 1–2 предложения, которые цепляют (ошибка, боль, парадокс, результат).  \n– <b>Контекст:</b> 2–4 предложения: что за ситуация/созвон, кто человек, в какой нише.  \n– <b>Конфликт / боль:</b> в чём была главная проблема, тупик, заблуждение.  \n– <b>Инсайт:</b> какая ключевая мысль или переворот случился в разговоре.  \n– <b>Решение / подход:</b> как это можно решать на практике (структура, шаги, принципы).  \n– <b>Пример / мини-кейс:</b> если в созвоне звучал пример — укажи кратко.  \n– <b>Призыв к действию:</b> что читателю сделать: написать кодовое слово, задать вопрос, прийти на созвон, сохранить пост и т.п.\n\n<b>3. Стиль:</b>  \n– Короткие абзацы, по 1–3 строки.  \n– Можно использовать списки, чтобы текст было легче читать.  \n– Тон: экспертный, но дружелюбный.\n\n⸻\n<b>🎬 Вариант Б — Раскадровка для сторис (по Тимчуку):</b>\n\n<b>Сторис 1 — Крючок:</b>  \nКороткая фраза, которая цепляет боль / страх / желание (один экран).\n\n<b>Сторис 2 — Контекст:</b>  \nКто человек / ниша / ситуация (1–2 предложения).\n\n<b>Сторис 3 — Боль / конфликт:</b>  \nЧто у него не работало, во что упирался.\n\n<b>Сторис 4 — Инсайт с созвона:</b>  \nКороткий поворот мысли: что человек осознал.\n\n<b>Сторис 5 — Решение / новый подход:</b>  \nФормула, схема, 3 шага, которые вы обсудили.\n\n<b>Сторис 6 — Социальное доказательство (если есть):</b>  \nФраза из диалога, намёк на результат, реакция участника.\n\n<b>Сторис 7 — Призыв к действию:</b>  \nЧто сделать зрителю: написать кодовое слово, записаться на разбор, прийти на эфир и т.п.\n\nПиши раскадровку в формате:\n\n<b>Сторис 1:</b> текст  \n<b>Сторис 2:</b> текст  \n... и т.д.\n\nЕсли из созвона не получается выжать нормальный контент (слишком технический / хаотичный), честно напиши, что материал слабый для соцсетей, и сформулируй 1–2 альтернативные темы поста, которые можно сделать на основе инсайтов из разговора."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          2656,
+          1968
+        ],
+        "id": "a625e525-7aa5-410a-9be9-4cd88bedc545",
+        "name": "AI Agent1 SMM copywriter2",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=СТРОГО не более 3900 символов в ответе: ({{ $json.Text }}{{ $json.chatInput }}\n{{ $('When chat message received').item.json.chatInput }}\n{{ $json.share_url }}\n\n{{ $json.title }}\n\n{{ $json.transcriptFormatted }})",
+          "needsFallback": true,
+          "options": {
+            "systemMessage": "=Ты — эксперт по продажам и Customer Success. Твоя задача — по расшифровке Zoom-встречи / созвона сделать ГЛУБОКИЙ анализ:\n\n1) Потребности и боли клиента\n2) Ошибки и слабые места со стороны продажника\n3) Договоренности и обязательства\n4) Конкретный следующий шаг и текст следующего сообщения клиенту\n\n⸻\n🔥 ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА:\n\n• Максимальная длина ответа — до 3900 символов (чтобы влезло в Telegram).\n• Если текста слишком много — сожми, но сохрани смысл и конкретику.\n• Не пиши “AI”, “GPT”, “саммарайзер” и т.п. — текст должен выглядеть как живой человек.\n• Не добавляй приветствий и подписей — сразу по структуре.\n• Вывод строго в формате HTML для Telegram.\n• Пиши так, чтобы блоки можно было разложить по столбцам в Notion-таблице.\n• Если каких‑то данных в расшифровке нет — честно напиши, что данных нет, а не выдумывай.\n\n⸻\n📋 СТРУКТУРА ВЫВОДА (HTML):\n\n<b>📅Дата созвона:</b> ДД.ММ.ГГГГ  \n\n<b>👤 Клиент / компания:</b>  \nКратко: кто клиент, какая ниша, роль собеседника.\n\n<b>✨ Цель созвона:</b>  \n1–2 предложения, зачем созванивались.\n\n<b>🎯 Портрет клиента и контекст:</b>  \n– Что сейчас уже делает клиент  \n– Какой у него примерный уровень (новичок / продвинутый / эксперты)  \n– Какие каналы / инструменты уже использует  \n\n<b>🔥 Боли и потребности клиента:</b>  \n– Основные боли (списком)  \n– Чего клиент хочет достичь в идеале  \n– Ограничения: по деньгам, времени, ресурсам, команде  \n\n<b>🧩 Триггеры и мотивация:</b>  \n– Почему клиент вообще сейчас ищет решение  \n– События / ситуации, которые подтолкнули к созвону  \n\n<b>📉 Слабые места со стороны продаж:</b>  \n– Где менеджер недожал по вопросам (потребности, деньги, сроки, ЛПР)  \n– Где ушёл в “обучение” вместо диагностики  \n– Где не было четкого оффера или следующего шага  \n– Какие фразы / моменты могут снижать доверие или ценность  \n\n<b>💰 Обсуждение денег и ценности:</b>  \n– Обсуждался ли бюджет и в каком виде  \n– Как клиент реагировал на цену / деньги  \n– Что можно сделать, чтобы усилить ценность перед озвучкой цены  \n\n<b>🤝 Договорённости по итогу:</b>  \n– О чем конкретно договорились  \n– Кто что должен сделать (клиент / ты)  \n– Сроки, дедлайны, обещания  \n\n<b>🚀 Рекомендованный следующий шаг:</b>  \n– Что логично сделать СЕЙЧАС (1–3 шага)  \n– Какой формат: доп созвон, демо, тест, отправка материалов и т.д.  \n\n<b>📩 Шаблон следующего сообщения клиенту:</b>  \nНапиши готовый текст сообщения, которое можно отправить клиенту в WhatsApp / Telegram.  \nФормат: живой, человеческий, без канцелярита.  \nМожет быть на “ты” или “вы” — выбери стиль по тону диалога из созвона.\n\n<b>🧠 Итоговый вывод по шансу сделки:</b>  \n– Насколько клиент “тёплый” (холодный / тёплый / горячий)  \n– Основные риски  \n– Что критически важно учесть на следующем шаге."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          2784,
+          1488
+        ],
+        "id": "1cc28a45-7bad-43da-bf99-1c8dbb60f1fd",
+        "name": "AI Agent1 Sales analytics Chronics"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=СТРОГО не более 3900 символов в ответе: ({{ $json.Text }}{{ $json.chatInput }}\n{{ $('When chat message received').item.json.chatInput }}\n{{ $json.share_url }}\n\n{{ $json.title }}\n\n{{ $json.transcriptFormatted }})",
+          "needsFallback": true,
+          "options": {
+            "systemMessage": "=Ты — SMM-копирайтер и сторителлер, который пишет от лица эксперта по маркетингу, автоматизации,AI инженерии, ИИ-агентам и автоматизации бизнес-процессов.\n\nТвоя задача — по расшифровке Zoom-созвона/звонка сделать пост, который:\n1) показывает мою экспертизу (n8n, ИИ-агенты, Telegram-боты, автоворонки, \"контент-завод\" для экспертов),\n2) прогревает аудиторию к работе со мной,\n3) подводит к лёгкому шагу: написать мне, пройти бота, запросить разбор/чек-лист.\n\n⸻\n🔥 МОЙ ПЕРСОНАЛЬНЫЙ СТИЛЬ:\n\n• Пишешь от первого лица: «я», «ко мне пришёл клиент», «я собрал систему».\n• Я — практик, не теоретик: меньше воды, больше конкретики и архитектуры решений.\n• Короткие абзацы, живой язык, без канцелярита.\n• Я часто опираюсь на n8n, Telegram-ботов, ИИ-агентов, MCP/HTTP-интеграции.\n• Показывай, как я экономлю людям часы жизни и превращаю хаос (таблицы, ручные задачи, созвоны) в систему.\n\nНе используй слова “нейросеть”, “GPT”, “ИИ-модель” в технарском стиле. Говори как человек: «агент», «умный помощник», «система на n8n».\n\n⸻\n⚙️ ЗАДАЧА ПО ПОСТУ:\n\nИз входного текста (созвон, консультация, разбор) сделай 1 кейсовый пост так, чтобы он:\n– рассказывал историю клиента,\n– показывал, как мы через автоматизацию меняем ему жизнь/бизнес,\n– давал 1–2 инсайта читателю,\n– заканчивался мягким призывом к действию.\n\n⸻\n📋 СТРУКТУРА ВЫВОДА (HTML):\n\n<b>📌 Пост для Telegram:</b>\n\nДай цельный текст поста, без приветствий и подписи, но с внутренней драматургией:\n\n1) <b>Крючок:</b>  \n1–3 предложения, которые сразу цепляют.  \nПримеры: «Сегодня на созвоне у директора просто поменялось лицо, когда он понял одну вещь», «Ко мне пришёл клиент с десятью таблицами и ощущением, что только он может всё свести».\n\n2) <b>Герой и контекст:</b>  \nКто человек (без лишних ФИО, можно обезличено: коммерческий директор, владелец студии, продюсер, эксперт), какая ниша, какие масштабы (оборот, команда, хаос в задачах).\n\n3) <b>Боль и хаос до:</b>  \n– Что у него было до нашего вмешательства: Excel, ручные созвоны, постоянный контроль, просадки в продажах, недопродажи из-за бардака.  \n– Что его раздражало/пугало: «никто, кроме меня», «всё держится на мне», «рутина сжирает время».\n\n4) <b>Решение, которое я предложил:</b>  \n– Какую систему на базе n8n/ботов/агентов я собрал.  \n– Какие ключевые элементы: интеграции, агенты, автоворонки, связки (без слишком глубокой технарщины, но с ощущением архитектуры).  \n– Важно: показать мысль «мы не ломаем привычный мир клиента, мы делаем умную надстройку».\n\n5) <b>Момент “дошло”:</b>  \nОпиши момент инсайта клиента: фраза, реакция, пауза.  \nПримерно в духе: «Он посмотрел на результат и сказал: “Так я это и сам могу” — и тут до него дошло, что теперь ему это делать не нужно».\n\n6) <b>Расширение и мой фокус:</b>  \n– Куда я иду дальше: архитектура виртуальных сотрудников, системы, которые сами собирают данные, принимают решения и выдают результат.  \n– Что это даёт: высвобождает время, снимает “незаменимость”, строит повторяемую систему.\n\n7) <b>Призыв к действию (прогрев):</b>  \nМягкий, не продающий в лоб, 1–2 предложения.  \nПримеры направления:  \n– предложить написать мне, если у человека такой же хаос;  \n– предложить ключевое слово в личку, чтобы получить разбор/каркас системы;  \n– спросить, какую рутину читатель до сих пор тянет сам.\n\n⸻\nФОРМАТИРОВАНИЕ:\n\n• Используй только HTML-теги, которые понимает Telegram: <b>, <i>, <u>, <s>, <code>, <pre>, <blockquote>, <a>, <tg-spoiler>.  \n• Не используй Markdown (звездочки, подчёркивания, backticks).  \n• Общая длина — до 3900 символов."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          3040,
+          1968
+        ],
+        "id": "eb76f456-0d94-46c2-b6a6-bce6034cea35",
+        "name": "AI Agent1 SMM copywriter1 NICE POST",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "updates": [
+            "message"
+          ],
+          "additionalFields": {}
+        },
+        "id": "tg-trigger",
+        "name": "Telegram Trigger",
+        "type": "n8n-nodes-base.telegramTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          1000,
+          -100
+        ],
+        "credentials": {
+          "telegramApi": {
+            "id": "8Zz1yvlFoCvmoLP2",
+            "name": "Telegram account 2 rage kill assist pers ai 103"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const msg = $json.message || {};\nconst file = msg.voice || msg.audio || msg.document || msg.video || msg.video_note || null;\nconst fileName = file?.file_name || msg.document?.file_name || null;\nconst mimeType = file?.mime_type || null;\nconst ext = fileName && fileName.includes('.') ? fileName.split('.').pop().toLowerCase() : null;\n\nlet inputType = 'unknown';\nif (msg.text) inputType = 'text';\nelse if (msg.voice) inputType = 'voice';\nelse if (msg.audio) inputType = 'audio';\nelse if (msg.document) {\n  const audioExts = ['m4a', 'mp3', 'wav', 'aac', 'ogg'];\n  inputType = audioExts.includes(ext || '') ? 'document_audio' : 'document_other';\n} else if (msg.video_note) inputType = 'video_note';\nelse if (msg.video) inputType = 'video';\n\nreturn [{ json: {\n  chat_id: msg.chat?.id,\n  message_id: msg.message_id,\n  user_id: msg.from?.id,\n  username: msg.from?.username || '',\n  first_name: msg.from?.first_name || '',\n  input_type: inputType,\n  text_input: msg.text || msg.caption || '',\n  file_id: file?.file_id || null,\n  file_name: fileName,\n  mime_type: mimeType,\n  file_ext: ext,\n  raw_message: msg\n}}];"
+        },
+        "id": "detect-input",
+        "name": "Detect Input Type",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1220,
+          -100
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "is-text",
+                "leftValue": "={{ $json.input_type }}",
+                "rightValue": "text",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "if-text",
+        "name": "Is Text?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1440,
+          -100
+        ]
+      },
+      {
+        "parameters": {
+          "resource": "file",
+          "fileId": "={{ $json.file_id }}",
+          "additionalFields": {}
+        },
+        "id": "tg-get-file",
+        "name": "Get Telegram File",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1660,
+          60
+        ],
+        "credentials": {
+          "telegramApi": {
+            "id": "8Zz1yvlFoCvmoLP2",
+            "name": "Telegram account 2 rage kill assist pers ai 103"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "file",
+          "fileId": "={{ $json.result.file_id }}",
+          "additionalFields": {}
+        },
+        "id": "tg-download-file",
+        "name": "Download File",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1880,
+          60
+        ],
+        "credentials": {
+          "telegramApi": {
+            "id": "8Zz1yvlFoCvmoLP2",
+            "name": "Telegram account 2 rage kill assist pers ai 103"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const meta = $('Detect Input Type').first().json;\nconst item = $input.first();\nif (!item.binary || !item.binary.data) throw new Error('Binary file not found');\nitem.binary.data.fileName = meta.file_name || item.binary.data.fileName || `input.${meta.file_ext || 'bin'}`;\nitem.binary.data.mimeType = meta.mime_type || item.binary.data.mimeType || 'application/octet-stream';\nreturn [{ json: { ...meta, media_ready: true }, binary: { data: item.binary.data } }];"
+        },
+        "id": "normalize-binary",
+        "name": "Normalize Media",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2100,
+          60
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.openai.com/v1/audio/transcriptions",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $env.OPENAI_API_KEY || 'sk-8EobYRv3Rxkh5FWiEc735e5e391948569f3269Cf6273A9Ac' }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "contentType": "multipart-form-data",
+          "bodyParameters": {
+            "parameters": [
+              {
+                "parameterType": "formBinaryData",
+                "name": "file",
+                "inputDataFieldName": "data"
+              },
+              {
+                "name": "model",
+                "value": "whisper-1"
+              },
+              {
+                "name": "language",
+                "value": "ru"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "whisper-openai",
+        "name": "Whisper OpenAI",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2320,
+          60
+        ],
+        "retryOnFail": true,
+        "maxTries": 2
+      },
+      {
+        "parameters": {
+          "jsCode": "const meta = $('Detect Input Type').first().json;\nconst stt = $input.first().json;\nconst transcript = stt.text || stt.output || stt.transcript || '';\nreturn [{ json: { ...meta, transcript_text: transcript, text_for_agents: transcript || meta.text_input || '' } }];"
+        },
+        "id": "build-text-from-stt",
+        "name": "Build Text From STT",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2540,
+          60
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const meta = $input.first().json;\nreturn [{ json: { ...meta, transcript_text: meta.text_input, text_for_agents: meta.text_input } }];"
+        },
+        "id": "build-text-direct",
+        "name": "Build Text Direct",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1660,
+          -200
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "chatInput",
+                "name": "chatInput",
+                "value": "={{ $json.text_for_agents }}",
+                "type": "string"
+              },
+              {
+                "id": "Text",
+                "name": "Text",
+                "value": "={{ $json.text_for_agents }}",
+                "type": "string"
+              },
+              {
+                "id": "share_url",
+                "name": "share_url",
+                "value": "",
+                "type": "string"
+              },
+              {
+                "id": "title",
+                "name": "title",
+                "value": "Telegram Message",
+                "type": "string"
+              },
+              {
+                "id": "transcriptFormatted",
+                "name": "transcriptFormatted",
+                "value": "",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "prepare-data-for-agent",
+        "name": "Prepare Data for Agent",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2800,
+          -100
+        ]
+      }
+    ],
+    "connections": {
+      "Google Gemini Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "AI Agent1 SMM copywriter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split Out": {
+        "main": [
+          [
+            {
+              "node": "Code",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Handle formatting and split1": {
+        "main": [
+          [
+            {
+              "node": "Split Out",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Handle formatting and split1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code": {
+        "main": [
+          [
+            {
+              "node": "Send a text message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields1": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Gemini Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Google Gemini Chat Model2": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent1 SMM copywriter",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Gemini Chat Model3": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent1 SMM copywriter",
+              "type": "ai_languageModel",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "AI Agent1 SMM copywriter": {
+        "main": [
+          [
+            {
+              "node": "AI Agent1 Sales analytics Chronics",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Edit Fields2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Gemini Chat Model4": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent1 Sales analytics Chronics",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Gemini Chat Model5": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent1 Sales analytics Chronics",
+              "type": "ai_languageModel",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Split Out1": {
+        "main": [
+          [
+            {
+              "node": "Code1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Handle formatting and split": {
+        "main": [
+          [
+            {
+              "node": "Split Out1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields2": {
+        "main": [
+          [
+            {
+              "node": "Handle formatting and split",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code1": {
+        "main": [
+          [
+            {
+              "node": "Send a text message2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent1 Sales analytics Chronics": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram Trigger": {
+        "main": [
+          [
+            {
+              "node": "Detect Input Type",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Detect Input Type": {
+        "main": [
+          [
+            {
+              "node": "Is Text?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Text?": {
+        "main": [
+          [
+            {
+              "node": "Build Text Direct",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get Telegram File",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Telegram File": {
+        "main": [
+          [
+            {
+              "node": "Download File",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Download File": {
+        "main": [
+          [
+            {
+              "node": "Normalize Media",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalize Media": {
+        "main": [
+          [
+            {
+              "node": "Whisper OpenAI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Whisper OpenAI": {
+        "main": [
+          [
+            {
+              "node": "Build Text From STT",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Text Direct": {
+        "main": [
+          [
+            {
+              "node": "Prepare Data for Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Text From STT": {
+        "main": [
+          [
+            {
+              "node": "Prepare Data for Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Data for Agent": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate",
+      "availableInMCP": false,
+      "timeSavedMode": "fixed",
+      "errorWorkflow": "FSu4r8FwjzrNSRfS",
+      "callerPolicy": "workflowsFromSameOwner"
+    },
+    "staticData": null,
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "pinData": {},
+    "versionId": "daccb3a2-ed04-4604-9e2c-d4d60c0e6e39",
+    "activeVersionId": "a5791c35-020d-4892-b02a-6af42876fc74",
+    "versionCounter": 100,
+    "triggerCount": 2,
+    "tags": [
+      {
+        "updatedAt": "2026-03-17T05:38:02.104Z",
+        "createdAt": "2026-03-17T05:38:02.104Z",
+        "id": "b4QJj89YBaGqlJYs",
+        "name": "instagram.com/lamanopro_"
+      },
+      {
+        "updatedAt": "2026-03-17T05:38:11.374Z",
+        "createdAt": "2026-03-17T05:38:11.374Z",
+        "id": "jscQfXpaptAld79y",
+        "name": "instagram.com/aiconicvib"
+      },
+      {
+        "updatedAt": "2026-03-17T05:38:18.048Z",
+        "createdAt": "2026-03-17T05:38:18.048Z",
+        "id": "8TzW3sktsmA1KHaC",
+        "name": "t.me/nnsvt"
+      }
+    ],
+    "shared": [
+      {
+        "updatedAt": "2026-04-04T10:22:41.903Z",
+        "createdAt": "2026-04-04T10:22:41.903Z",
+        "role": "workflow:owner",
+        "workflowId": "H8e9RQAi8UadTusi",
+        "projectId": "geed8Llzh1c3Rpmq",
+        "project": {
+          "updatedAt": "2026-03-07T21:30:46.210Z",
+          "createdAt": "2026-03-07T21:21:19.888Z",
+          "id": "geed8Llzh1c3Rpmq",
+          "name": "Lana Kkkil <n8nwidenfuns3@topfoc.anonaddy.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "afb72683-701c-4bab-88fd-831fc463da20"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]
