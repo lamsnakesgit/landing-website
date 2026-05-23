@@ -1,0 +1,548 @@
+{
+  "group_name": "25.10 | НЕТВОРКИНГ",
+  "group_id": "120363421429149407@g.us",
+  "participants_count": 60,
+  "description": null,
+  "participants": [
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "22372618899697@lid",
+      "jid_type": "lid",
+      "phone_raw": "22372618899697",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "222221926678765@lid",
+      "jid_type": "lid",
+      "phone_raw": "222221926678765",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "279206445120@lid",
+      "jid_type": "lid",
+      "phone_raw": "279206445120",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "24056178995235@lid",
+      "jid_type": "lid",
+      "phone_raw": "24056178995235",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "71051660771480@lid",
+      "jid_type": "lid",
+      "phone_raw": "71051660771480",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "203302344110134@lid",
+      "jid_type": "lid",
+      "phone_raw": "203302344110134",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "99321135521940@lid",
+      "jid_type": "lid",
+      "phone_raw": "99321135521940",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "246526878159017@lid",
+      "jid_type": "lid",
+      "phone_raw": "246526878159017",
+      "admin": "admin"
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "97461465030803@lid",
+      "jid_type": "lid",
+      "phone_raw": "97461465030803",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "271635793871046@lid",
+      "jid_type": "lid",
+      "phone_raw": "271635793871046",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "64038448967740@lid",
+      "jid_type": "lid",
+      "phone_raw": "64038448967740",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "259484760940655@lid",
+      "jid_type": "lid",
+      "phone_raw": "259484760940655",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "3256055013507@lid",
+      "jid_type": "lid",
+      "phone_raw": "3256055013507",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "52253176164437@lid",
+      "jid_type": "lid",
+      "phone_raw": "52253176164437",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "100270356861076@lid",
+      "jid_type": "lid",
+      "phone_raw": "100270356861076",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "79800676929702@lid",
+      "jid_type": "lid",
+      "phone_raw": "79800676929702",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "141544959041748@lid",
+      "jid_type": "lid",
+      "phone_raw": "141544959041748",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "49117279613142@lid",
+      "jid_type": "lid",
+      "phone_raw": "49117279613142",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "234977778221283@lid",
+      "jid_type": "lid",
+      "phone_raw": "234977778221283",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "20058101313757@lid",
+      "jid_type": "lid",
+      "phone_raw": "20058101313757",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "47825014513770@lid",
+      "jid_type": "lid",
+      "phone_raw": "47825014513770",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "180302743908407@lid",
+      "jid_type": "lid",
+      "phone_raw": "180302743908407",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "223334189023417@lid",
+      "jid_type": "lid",
+      "phone_raw": "223334189023417",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "165880277246062@lid",
+      "jid_type": "lid",
+      "phone_raw": "165880277246062",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "190434773053440@lid",
+      "jid_type": "lid",
+      "phone_raw": "190434773053440",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "98569717608682@lid",
+      "jid_type": "lid",
+      "phone_raw": "98569717608682",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "274861482103016@lid",
+      "jid_type": "lid",
+      "phone_raw": "274861482103016",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "89163571454110@lid",
+      "jid_type": "lid",
+      "phone_raw": "89163571454110",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "280998403129344@lid",
+      "jid_type": "lid",
+      "phone_raw": "280998403129344",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "163028519641171@lid",
+      "jid_type": "lid",
+      "phone_raw": "163028519641171",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "184576236355765@lid",
+      "jid_type": "lid",
+      "phone_raw": "184576236355765",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "34806448525497@lid",
+      "jid_type": "lid",
+      "phone_raw": "34806448525497",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "208740141793503@lid",
+      "jid_type": "lid",
+      "phone_raw": "208740141793503",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "204788436312146@lid",
+      "jid_type": "lid",
+      "phone_raw": "204788436312146",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "234934862110797@lid",
+      "jid_type": "lid",
+      "phone_raw": "234934862110797",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "6030687776883@lid",
+      "jid_type": "lid",
+      "phone_raw": "6030687776883",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "21964630528030@lid",
+      "jid_type": "lid",
+      "phone_raw": "21964630528030",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "25795724636279@lid",
+      "jid_type": "lid",
+      "phone_raw": "25795724636279",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "157741364576300@lid",
+      "jid_type": "lid",
+      "phone_raw": "157741364576300",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "55603032494185@lid",
+      "jid_type": "lid",
+      "phone_raw": "55603032494185",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "219095089864934@lid",
+      "jid_type": "lid",
+      "phone_raw": "219095089864934",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "151440563671102@lid",
+      "jid_type": "lid",
+      "phone_raw": "151440563671102",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "254017435394291@lid",
+      "jid_type": "lid",
+      "phone_raw": "254017435394291",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "18743287619665@lid",
+      "jid_type": "lid",
+      "phone_raw": "18743287619665",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "236446757728283@lid",
+      "jid_type": "lid",
+      "phone_raw": "236446757728283",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "176020728619228@lid",
+      "jid_type": "lid",
+      "phone_raw": "176020728619228",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "6395323793496@lid",
+      "jid_type": "lid",
+      "phone_raw": "6395323793496",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "119803901669478@lid",
+      "jid_type": "lid",
+      "phone_raw": "119803901669478",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "168805250691278@lid",
+      "jid_type": "lid",
+      "phone_raw": "168805250691278",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "199656017510431@lid",
+      "jid_type": "lid",
+      "phone_raw": "199656017510431",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "168092286095462@lid",
+      "jid_type": "lid",
+      "phone_raw": "168092286095462",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "249095469961389@lid",
+      "jid_type": "lid",
+      "phone_raw": "249095469961389",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "238280507445372@lid",
+      "jid_type": "lid",
+      "phone_raw": "238280507445372",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "252909333815524@lid",
+      "jid_type": "lid",
+      "phone_raw": "252909333815524",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "263135667691759@lid",
+      "jid_type": "lid",
+      "phone_raw": "263135667691759",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "245015049703459@lid",
+      "jid_type": "lid",
+      "phone_raw": "245015049703459",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "222866004021357@lid",
+      "jid_type": "lid",
+      "phone_raw": "222866004021357",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "44564714885240@lid",
+      "jid_type": "lid",
+      "phone_raw": "44564714885240",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "156208094777500@lid",
+      "jid_type": "lid",
+      "phone_raw": "156208094777500",
+      "admin": ""
+    },
+    {
+      "group_name": "25.10 | НЕТВОРКИНГ",
+      "group_id": "120363421429149407@g.us",
+      "group_description": "",
+      "jid": "220929275777225@lid",
+      "jid_type": "lid",
+      "phone_raw": "220929275777225",
+      "admin": ""
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "instance": "8326 301 n8n wa 1",
+  "matched_groups_count": 18,
+  "unique_contacts_count": 2823,
+  "rows_written": 3607,
+  "jid_type_counts": {
+    "lid": 3607
+  },
+  "group_names": [
+    "Business Family Network Kazakhstan",
+    "Tochka Network - место твоего роста",
+    "Нетворкинг",
+    "Networking 🤝",
+    "16.10 | НЕТВОРКИНГ",
+    "НЕТВОРКИНГ | ЧАТ🙌🏻",
+    "14.02 | НЕТВОРКИНГ",
+    "25.10 | НЕТВОРКИНГ",
+    "08.02 | НЕТВОРКИНГ",
+    "Шымкент Network",
+    "15.03 | НЕТВОРКИНГ",
+    "Business Astana | Tochka Network",
+    "Tochka Network - место твоего роста",
+    "Business Family Network Алматы",
+    "Нетворкинг",
+    "✅НЕТВОРКИНГ | АЛМАТЫ",
+    "Бизнес - Походы на Горельник 🏔️ энергопрактики🧘‍♂️ нетворкинг",
+    "Business Family Network Kazakhstan"
+  ],
+  "json_path": "docs/exports/whatsapp_network_groups_expanded_20260517_214814.json",
+  "csv_path": "docs/exports/whatsapp_network_contacts_expanded_20260517_214814.csv",
+  "unique_json_path": "docs/exports/whatsapp_network_unique_contacts_expanded_20260517_214814.json"
+}
