@@ -8,6 +8,7 @@
 - [x] Проведён внешний research через Exa по реальным контент-заводам и viral media моделям: MrBeast / Rohan Kumar, Duolingo TikTok, Liquid Death, Red Bull Media House, Alex Hormozi / GaryVee. Tavily deep research дважды ушёл в timeout, поэтому источником для синтеза стали Exa-результаты.
 - [x] Усилены `smm_brand_ai/plan.md` и `smm_brand_ai/storyboard_plan.md`: добавлены референсные модели, алгоритмическая структура серии, 5 запусковых серий, шаблон выпуска 0–45 секунд, матрица проверки ролика и коммерческие мосты к услугам/продуктам.
 - [x] Доработана первая серия `smm_brand_ai/content_series/episode_1_counter_bake.md` до production-ready storyboard: кризис с арендой СТО, Баке ставит дедлайн на 1 млн ₸, Макс запускает AI-коллектора, деньги приходят, Баке повышает ставку до 2 млн ₸. Добавлены 5 сцен, реплики, экранные тексты, SFX, промпты Flux/NanoBanana, промпты Google Veo и монтажные указания.
+- [x] Проверена папка `smm_brand_ai/episode_1_fixed/`: подтверждено, что уже есть character prompts, scene prompts и 3 варианта первого кадра. Добавлен `generation_blueprint.md` с планом догенерации 9 ракурсов для Ахи, Макса, Баке и AI-коллектора, start/end frames для 5 сцен и готовыми промптами под Veo 3.1 Lite.
 
 ## 2026-04-12
 - [x] Реструктуризация рабочей директории: созданы `01_AI_Agents_and_Bots`, `02_Web_Projects`, `03_Marketing_and_Sales`, `04_Design_and_Media`, `05_N8N_Automations`, `06_Scripts_and_Tools`. Код, скрипты и документация распределены по папкам.
