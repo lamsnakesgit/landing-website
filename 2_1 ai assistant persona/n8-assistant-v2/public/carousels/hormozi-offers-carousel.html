@@ -360,17 +360,17 @@
 
     .watermark {
       position: absolute;
-      right: clamp(20px, 3.2vw, 34px);
-      bottom: clamp(16px, 2.4vw, 26px);
+      right: clamp(18px, 2.8vw, 30px);
+      bottom: clamp(14px, 2vw, 22px);
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      gap: 6px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: 999px;
-      background: rgba(8, 8, 12, 0.46);
-      color: rgba(247, 242, 234, 0.82);
-      font-size: clamp(12px, 1.45vw, 17px);
+      background: rgba(8, 8, 12, 0.42);
+      color: rgba(247, 242, 234, 0.78);
+      font-size: clamp(10px, 1.15vw, 14px);
       font-weight: 850;
       letter-spacing: -0.025em;
       backdrop-filter: blur(16px);
@@ -396,9 +396,13 @@
     }
 
     .footer {
-      margin-bottom: 46px;
-      font-size: clamp(13px, 1.45vw, 18px);
+      margin-bottom: 42px;
+      font-size: clamp(12px, 1.35vw, 16px);
       font-weight: 750;
+    }
+
+    .footer span:first-child {
+      max-width: 56%;
     }
 
     @media (max-width: 760px) {
