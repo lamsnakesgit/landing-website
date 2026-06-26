@@ -1,4 +1,4 @@
-достПроект: n8-assistant-v2.md
+Проект: n8-assistant-v2.md
 Завершённость: [██████░░░░░░░░░] 40% — carousel MVP
 
 # N8 Assistant v2 — project local rules
@@ -15,7 +15,7 @@
 
 - `@lamanopro_ × @aiconicvibe`
 - визуальная синяя verified-галочка в стиле Instagram, без использования чужих official assets;
-- `t.me/nnsvt` как компактный контакт/канал;
+- контакт/канал добавлять только если он нужен в конкретной карусели;
 - watermark должен быть читаемым, но не конкурировать с главным контентом;
 - watermark размещать в безопасной зоне, обычно bottom-right или footer-zone;
 - не добавлять реальные official Instagram logos/trademarks, если пользователь явно не просит и нет прав.
