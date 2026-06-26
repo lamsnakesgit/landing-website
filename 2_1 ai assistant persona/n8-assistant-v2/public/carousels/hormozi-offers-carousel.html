@@ -93,7 +93,7 @@
         radial-gradient(circle at 14% 12%, rgba(244, 200, 106, 0.22), transparent 22%),
         radial-gradient(circle at 86% 88%, rgba(255, 59, 71, 0.2), transparent 28%),
         #0c0c12;
-      padding: clamp(40px, 7vw, 86px);
+      padding: clamp(34px, 5.4vw, 58px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -205,26 +205,26 @@
 
     h2 {
       margin: 0;
-      font-size: clamp(62px, 9vw, 126px);
-      line-height: 0.88;
-      letter-spacing: -0.09em;
+      font-size: clamp(44px, 6.4vw, 84px);
+      line-height: 0.9;
+      letter-spacing: -0.08em;
       text-wrap: balance;
     }
 
     h3 {
       margin: 0;
-      font-size: clamp(46px, 7vw, 92px);
+      font-size: clamp(36px, 5.2vw, 66px);
       line-height: 0.94;
-      letter-spacing: -0.075em;
+      letter-spacing: -0.07em;
       text-wrap: balance;
     }
 
     .lead {
-      margin: 30px 0 0;
+      margin: 24px 0 0;
       max-width: 790px;
-      font-size: clamp(26px, 3.7vw, 48px);
-      line-height: 1.06;
-      letter-spacing: -0.055em;
+      font-size: clamp(21px, 2.7vw, 32px);
+      line-height: 1.08;
+      letter-spacing: -0.045em;
       color: var(--muted);
     }
 
@@ -275,8 +275,8 @@
     }
 
     .box {
-      min-height: 210px;
-      padding: 28px;
+      min-height: 154px;
+      padding: 24px;
       border: 1px solid var(--line);
       border-radius: 30px;
       background: var(--card);
@@ -285,30 +285,30 @@
 
     .box strong {
       display: block;
-      margin-bottom: 14px;
-      font-size: clamp(28px, 3vw, 42px);
+      margin-bottom: 10px;
+      font-size: clamp(23px, 2.4vw, 32px);
       line-height: 0.98;
-      letter-spacing: -0.055em;
+      letter-spacing: -0.05em;
     }
 
     .box span {
       display: block;
       color: var(--muted);
-      font-size: clamp(20px, 2.1vw, 29px);
-      line-height: 1.12;
-      letter-spacing: -0.035em;
+      font-size: clamp(16px, 1.75vw, 22px);
+      line-height: 1.14;
+      letter-spacing: -0.03em;
     }
 
     .formula {
-      margin-top: 34px;
-      padding: 32px;
+      margin-top: 28px;
+      padding: 26px;
       border: 1px solid var(--line);
       border-radius: 34px;
       background: rgba(255, 255, 255, 0.08);
-      font-size: clamp(32px, 4.8vw, 68px);
+      font-size: clamp(25px, 3.55vw, 46px);
       line-height: 1;
       font-weight: 950;
-      letter-spacing: -0.075em;
+      letter-spacing: -0.065em;
     }
 
     .stack {
@@ -340,9 +340,9 @@
 
     .row p {
       margin: 0;
-      font-size: clamp(26px, 3.2vw, 44px);
-      line-height: 1.02;
-      letter-spacing: -0.055em;
+      font-size: clamp(22px, 2.6vw, 34px);
+      line-height: 1.04;
+      letter-spacing: -0.05em;
     }
 
     .muted {
@@ -352,14 +352,52 @@
     .quote {
       padding-left: 28px;
       border-left: 8px solid var(--gold);
-      font-size: clamp(36px, 5.2vw, 76px);
-      line-height: 0.96;
-      letter-spacing: -0.07em;
+      font-size: clamp(31px, 4.35vw, 56px);
+      line-height: 0.98;
+      letter-spacing: -0.065em;
       font-weight: 950;
     }
 
+    .watermark {
+      position: absolute;
+      right: clamp(20px, 3.2vw, 34px);
+      bottom: clamp(16px, 2.4vw, 26px);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(8, 8, 12, 0.46);
+      color: rgba(247, 242, 234, 0.82);
+      font-size: clamp(12px, 1.45vw, 17px);
+      font-weight: 850;
+      letter-spacing: -0.025em;
+      backdrop-filter: blur(16px);
+    }
+
+    .slide.light .watermark {
+      border-color: rgba(0, 0, 0, 0.12);
+      background: rgba(255, 255, 255, 0.5);
+      color: rgba(17, 16, 22, 0.72);
+    }
+
+    .verified {
+      display: inline-grid;
+      width: 18px;
+      height: 18px;
+      place-items: center;
+      border-radius: 50%;
+      background: #1d9bf0;
+      color: white;
+      font-size: 12px;
+      line-height: 1;
+      box-shadow: 0 0 18px rgba(29, 155, 240, 0.5);
+    }
+
     .footer {
-      font-size: clamp(16px, 1.8vw, 23px);
+      margin-bottom: 46px;
+      font-size: clamp(13px, 1.45vw, 18px);
       font-weight: 750;
     }
 
@@ -440,7 +478,7 @@
     <section class="deck" aria-label="Карусель про офферы">
       <article class="slide">
         <div class="topline">
-          <span class="brand"><span class="brand-mark"></span>Offer Lab Notes</span>
+          <span class="brand"><span class="brand-mark"></span>@lamanopro_ × @aiconicvibe <span class="verified">✓</span></span>
           <span class="num">01/09</span>
         </div>
         <div class="content wide">
@@ -452,6 +490,7 @@
           <span>Не «что продаём», а «как воспринимается ценность»</span>
           <span>→</span>
         </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span> · t.me/nnsvt</div>
       </article>
 
       <article class="slide light">
@@ -478,6 +517,7 @@
           <span>Иногда внешние переменные сильнее самого продукта</span>
           <span>→</span>
         </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span> · t.me/nnsvt</div>
       </article>
 
       <article class="slide">
@@ -500,6 +540,7 @@
           <span>Дефицит переводит «подумаю» в «решаю сейчас»</span>
           <span>→</span>
         </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span> · t.me/nnsvt</div>
       </article>
 
       <article class="slide">
@@ -529,6 +570,7 @@
           <span>Меньше мест, чем ты можешь продать</span>
           <span>→</span>
         </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span> · t.me/nnsvt</div>
       </article>
 
       <article class="slide light">
@@ -546,6 +588,7 @@
           <span>Время — отдельная переменная ценности</span>
           <span>→</span>
         </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span> · t.me/nnsvt</div>
       </article>
 
       <article class="slide">
@@ -572,6 +615,7 @@
           <span>Не скидка. Больше воспринимаемой ценности.</span>
           <span>→</span>
         </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span> · t.me/nnsvt</div>
       </article>
 
       <article class="slide">
@@ -588,6 +632,7 @@
           <span>Loss aversion продаёт быстрее, чем «просто плюсы»</span>
           <span>→</span>
         </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span> · t.me/nnsvt</div>
       </article>
 
       <article class="slide light">
@@ -617,6 +662,7 @@
           <span>Даже free offer должен ощущаться ценным</span>
           <span>→</span>
         </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span> · t.me/nnsvt</div>
       </article>
 
       <article class="slide">
@@ -638,8 +684,9 @@
         </div>
         <div class="footer">
           <span>Сохрани, если собираешь свой premium offer</span>
-          <span>100M Offers</span>
+          <span>t.me/nnsvt</span>
         </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span> · t.me/nnsvt</div>
       </article>
     </section>
   </main>
