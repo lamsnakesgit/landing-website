@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Карусель — Формула дорогого оффера</title>
+  <style>
+    :root {
+      --bg: #08080c;
+      --ink: #f7f2ea;
+      --muted: #b8ad9f;
+      --gold: #f4c86a;
+      --orange: #ff6b35;
+      --red: #ff3b47;
+      --green: #63e6be;
+      --line: rgba(255, 255, 255, 0.14);
+      --card: rgba(255, 255, 255, 0.07);
+      --shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(244, 200, 106, 0.2), transparent 34rem),
+        radial-gradient(circle at bottom right, rgba(255, 59, 71, 0.18), transparent 34rem),
+        var(--bg);
+    }
+
+    .page {
+      width: min(100%, 1260px);
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    .intro {
+      margin: 0 auto 28px;
+      max-width: 1080px;
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      color: var(--muted);
+    }
+
+    .intro h1 {
+      margin: 0 0 8px;
+      color: var(--ink);
+      font-size: clamp(28px, 4vw, 48px);
+      letter-spacing: -0.06em;
+      line-height: 0.96;
+    }
+
+    .intro p {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .hint {
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      white-space: nowrap;
+      font-size: 14px;
+    }
+
+    .deck {
+      display: grid;
+      gap: 28px;
+      justify-items: center;
+    }
+
+    .slide {
+      position: relative;
+      width: min(100%, 640px);
+      aspect-ratio: 4 / 5;
+      overflow: hidden;
+      border-radius: 34px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: var(--shadow);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 28%),
+        radial-gradient(circle at 14% 12%, rgba(244, 200, 106, 0.22), transparent 22%),
+        radial-gradient(circle at 86% 88%, rgba(255, 59, 71, 0.2), transparent 28%),
+        #0c0c12;
+      padding: clamp(40px, 7vw, 86px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      isolation: isolate;
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+      background-size: 54px 54px;
+      mask-image: radial-gradient(circle at center, black, transparent 78%);
+      opacity: 0.45;
+      z-index: -1;
+    }
+
+    .slide::after {
+      content: "";
+      position: absolute;
+      width: 520px;
+      height: 520px;
+      right: -180px;
+      top: -170px;
+      border-radius: 50%;
+      border: 1px solid rgba(244, 200, 106, 0.24);
+      box-shadow: inset 0 0 70px rgba(244, 200, 106, 0.05);
+      z-index: -1;
+    }
+
+    .slide.light {
+      color: #111016;
+      background:
+        radial-gradient(circle at top left, rgba(244, 200, 106, 0.45), transparent 30%),
+        linear-gradient(145deg, #f6efe0, #d9d0c1);
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .slide.light::before {
+      background:
+        linear-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+    }
+
+    .slide.light .eyebrow,
+    .slide.light .footer,
+    .slide.light .muted {
+      color: rgba(17, 16, 22, 0.62);
+    }
+
+    .slide.light .pill,
+    .slide.light .box,
+    .slide.light .formula {
+      background: rgba(255, 255, 255, 0.52);
+      border-color: rgba(0, 0, 0, 0.12);
+      color: #111016;
+    }
+
+    .topline,
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      color: var(--muted);
+      font-size: clamp(18px, 2vw, 26px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .brand {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .brand-mark {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--gold), var(--red));
+      box-shadow: 0 0 30px rgba(244, 200, 106, 0.55);
+    }
+
+    .num {
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .content {
+      max-width: 860px;
+    }
+
+    .wide {
+      max-width: 940px;
+    }
+
+    .eyebrow {
+      margin: 0 0 24px;
+      color: var(--gold);
+      text-transform: uppercase;
+      font-size: clamp(16px, 2vw, 24px);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0.16em;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(62px, 9vw, 126px);
+      line-height: 0.88;
+      letter-spacing: -0.09em;
+      text-wrap: balance;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: clamp(46px, 7vw, 92px);
+      line-height: 0.94;
+      letter-spacing: -0.075em;
+      text-wrap: balance;
+    }
+
+    .lead {
+      margin: 30px 0 0;
+      max-width: 790px;
+      font-size: clamp(26px, 3.7vw, 48px);
+      line-height: 1.06;
+      letter-spacing: -0.055em;
+      color: var(--muted);
+    }
+
+    .slide.light .lead {
+      color: rgba(17, 16, 22, 0.72);
+    }
+
+    .accent {
+      color: var(--gold);
+    }
+
+    .hot {
+      color: var(--orange);
+    }
+
+    .loss {
+      color: var(--red);
+    }
+
+    .ok {
+      color: var(--green);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 34px;
+    }
+
+    .pill {
+      padding: 16px 22px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--ink);
+      font-size: clamp(18px, 2.1vw, 26px);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      backdrop-filter: blur(18px);
+    }
+
+    .boxes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 38px;
+    }
+
+    .box {
+      min-height: 210px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      background: var(--card);
+      backdrop-filter: blur(18px);
+    }
+
+    .box strong {
+      display: block;
+      margin-bottom: 14px;
+      font-size: clamp(28px, 3vw, 42px);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+    }
+
+    .box span {
+      display: block;
+      color: var(--muted);
+      font-size: clamp(20px, 2.1vw, 29px);
+      line-height: 1.12;
+      letter-spacing: -0.035em;
+    }
+
+    .formula {
+      margin-top: 34px;
+      padding: 32px;
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: clamp(32px, 4.8vw, 68px);
+      line-height: 1;
+      font-weight: 950;
+      letter-spacing: -0.075em;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+      margin-top: 36px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .badge {
+      width: 78px;
+      height: 78px;
+      display: grid;
+      place-items: center;
+      border-radius: 24px;
+      color: #0c0c12;
+      background: var(--gold);
+      font-size: 30px;
+      font-weight: 950;
+      letter-spacing: -0.06em;
+      box-shadow: 0 20px 54px rgba(244, 200, 106, 0.18);
+    }
+
+    .row p {
+      margin: 0;
+      font-size: clamp(26px, 3.2vw, 44px);
+      line-height: 1.02;
+      letter-spacing: -0.055em;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .quote {
+      padding-left: 28px;
+      border-left: 8px solid var(--gold);
+      font-size: clamp(36px, 5.2vw, 76px);
+      line-height: 0.96;
+      letter-spacing: -0.07em;
+      font-weight: 950;
+    }
+
+    .footer {
+      font-size: clamp(16px, 1.8vw, 23px);
+      font-weight: 750;
+    }
+
+    @media (max-width: 760px) {
+      .intro {
+        display: block;
+      }
+
+      .hint {
+        display: inline-flex;
+        margin-top: 18px;
+        white-space: normal;
+      }
+
+      .slide {
+        border-radius: 24px;
+        padding: 34px;
+      }
+
+      .boxes {
+        grid-template-columns: 1fr;
+      }
+
+      .box {
+        min-height: auto;
+      }
+
+      .row {
+        grid-template-columns: 64px 1fr;
+      }
+
+      .badge {
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
+        font-size: 23px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .intro {
+        display: none;
+      }
+
+      .page {
+        width: 1080px;
+        padding: 0;
+      }
+
+      .deck {
+        gap: 0;
+      }
+
+      .slide {
+        width: 1080px;
+        height: 1350px;
+        border-radius: 0;
+        box-shadow: none;
+        page-break-after: always;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="intro">
+      <div>
+        <h1>Формула дорогого оффера</h1>
+        <p>Черновик по заметкам из «$100M Offers» Алекса Хормози. Формат 4:5, export-ready HTML.</p>
+      </div>
+      <div class="hint">9 слайдов · 1080×1350 · Instagram</div>
+    </header>
+
+    <section class="deck" aria-label="Карусель про офферы">
+      <article class="slide">
+        <div class="topline">
+          <span class="brand"><span class="brand-mark"></span>Offer Lab Notes</span>
+          <span class="num">01/09</span>
+        </div>
+        <div class="content wide">
+          <p class="eyebrow">Главная мысль</p>
+          <h2>Продукт тот же. <span class="accent">Оффер дороже.</span></h2>
+          <p class="lead">Цена растёт не только от продукта. Часто решают срочность, редкость, бонусы и гарантия.</p>
+        </div>
+        <div class="footer">
+          <span>Не «что продаём», а «как воспринимается ценность»</span>
+          <span>→</span>
+        </div>
+      </article>
+
+      <article class="slide light">
+        <div class="topline">
+          <span class="brand"><span class="brand-mark"></span>Спрос × предложение</span>
+          <span class="num">02/09</span>
+        </div>
+        <div class="content wide">
+          <p class="eyebrow">Маркетинг</p>
+          <h3>Есть две ручки цены.</h3>
+          <div class="boxes">
+            <div class="box">
+              <strong>Поднять спрос</strong>
+              <span>Больше людей хотят то, что у тебя есть.</span>
+            </div>
+            <div class="box">
+              <strong>Сжать предложение</strong>
+              <span>Меньше мест, времени, доступов, слотов.</span>
+            </div>
+          </div>
+          <div class="formula">Больше спрос + меньше доступ = выше чек</div>
+        </div>
+        <div class="footer">
+          <span>Иногда внешние переменные сильнее самого продукта</span>
+          <span>→</span>
+        </div>
+      </article>
+
+      <article class="slide">
+        <div class="topline">
+          <span class="brand"><span class="brand-mark"></span>Желание</span>
+          <span class="num">03/09</span>
+        </div>
+        <div class="content">
+          <p class="eyebrow">Почему люди хотят</p>
+          <h3>Желание появляется от того, <span class="hot">чего нет</span>.</h3>
+          <p class="lead">Если доступ бесконечный — решение можно отложить. Если доступ ограничен — мозг считает это важным.</p>
+          <div class="pill-row">
+            <span class="pill">нет слотов</span>
+            <span class="pill">есть дедлайн</span>
+            <span class="pill">только сейчас</span>
+            <span class="pill">следующий набор позже</span>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Дефицит переводит «подумаю» в «решаю сейчас»</span>
+          <span>→</span>
+        </div>
+      </article>
+
+      <article class="slide">
+        <div class="topline">
+          <span class="brand"><span class="brand-mark"></span>Редкость</span>
+          <span class="num">04/09</span>
+        </div>
+        <div class="content wide">
+          <p class="eyebrow">Scarcity</p>
+          <h3>Редкость — это не трюк. Это управление мощностью.</h3>
+          <div class="stack">
+            <div class="row">
+              <span class="badge">6</span>
+              <p>Принимаю только 6 клиентов в неделю.</p>
+            </div>
+            <div class="row">
+              <span class="badge">81%</span>
+              <p>Места уже почти заняты — это ещё и social proof.</p>
+            </div>
+            <div class="row">
+              <span class="badge">0</span>
+              <p>Когда sold out — говори об этом публично.</p>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Меньше мест, чем ты можешь продать</span>
+          <span>→</span>
+        </div>
+      </article>
+
+      <article class="slide light">
+        <div class="topline">
+          <span class="brand"><span class="brand-mark"></span>Срочность</span>
+          <span class="num">05/09</span>
+        </div>
+        <div class="content">
+          <p class="eyebrow">Urgency</p>
+          <h3>Чем дольше ждать результата, тем сильнее нужен дедлайн.</h3>
+          <p class="lead">Если старт через месяц — добавь причину решить сейчас: онбординг, разбор материалов, бонус или фиксация цены.</p>
+          <div class="formula">Дедлайн двигает решение.</div>
+        </div>
+        <div class="footer">
+          <span>Время — отдельная переменная ценности</span>
+          <span>→</span>
+        </div>
+      </article>
+
+      <article class="slide">
+        <div class="topline">
+          <span class="brand"><span class="brand-mark"></span>Бонусы</span>
+          <span class="num">06/09</span>
+        </div>
+        <div class="content wide">
+          <p class="eyebrow">Stack</p>
+          <h3>Иногда бонус уже внутри оффера. Просто назови его.</h3>
+          <p class="lead">То, что ты и так даёшь, можно вынести как отдельный бонус: «разбор», «шаблоны», «онбординг», «чек-лист».</p>
+          <div class="boxes">
+            <div class="box">
+              <strong>До</strong>
+              <span>Просто услуга. Непонятно, за что платят.</span>
+            </div>
+            <div class="box">
+              <strong>После</strong>
+              <span>Услуга + бонусы + дедлайн + ограниченные места.</span>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Не скидка. Больше воспринимаемой ценности.</span>
+          <span>→</span>
+        </div>
+      </article>
+
+      <article class="slide">
+        <div class="topline">
+          <span class="brand"><span class="brand-mark"></span>FOMO</span>
+          <span class="num">07/09</span>
+        </div>
+        <div class="content">
+          <p class="eyebrow">Страх потери</p>
+          <div class="quote">Люди сильнее реагируют на потерю шанса, чем на обещание выгоды.</div>
+          <p class="lead">«Можно купить позже» убивает срочность. «Следующий набор неизвестно когда» включает внимание.</p>
+        </div>
+        <div class="footer">
+          <span>Loss aversion продаёт быстрее, чем «просто плюсы»</span>
+          <span>→</span>
+        </div>
+      </article>
+
+      <article class="slide light">
+        <div class="topline">
+          <span class="brand"><span class="brand-mark"></span>Lead magnet</span>
+          <span class="num">08/09</span>
+        </div>
+        <div class="content wide">
+          <p class="eyebrow">Бесплатное тоже можно ограничить</p>
+          <h3>Не всем. Не всегда. Не бесконечно.</h3>
+          <div class="stack">
+            <div class="row">
+              <span class="badge">20</span>
+              <p>20 скачиваний чек-листа в неделю.</p>
+            </div>
+            <div class="row">
+              <span class="badge">list</span>
+              <p>Закончилось? В список ожидания.</p>
+            </div>
+            <div class="row">
+              <span class="badge">next</span>
+              <p>На следующей неделе люди возвращаются сами.</p>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Даже free offer должен ощущаться ценным</span>
+          <span>→</span>
+        </div>
+      </article>
+
+      <article class="slide">
+        <div class="topline">
+          <span class="brand"><span class="brand-mark"></span>Summary</span>
+          <span class="num">09/09</span>
+        </div>
+        <div class="content wide">
+          <p class="eyebrow">Итог</p>
+          <h3>Чтобы поднять чек, не всегда нужно менять продукт.</h3>
+          <div class="pill-row">
+            <span class="pill">добавь редкость</span>
+            <span class="pill">поставь дедлайн</span>
+            <span class="pill">упакуй бонусы</span>
+            <span class="pill">покажи sold out</span>
+            <span class="pill">собери waitlist</span>
+          </div>
+          <p class="lead">Оффер = продукт + условия покупки + риск + скорость + доступность.</p>
+        </div>
+        <div class="footer">
+          <span>Сохрани, если собираешь свой premium offer</span>
+          <span>100M Offers</span>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
