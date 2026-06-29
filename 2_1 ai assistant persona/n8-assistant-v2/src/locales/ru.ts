@@ -1,6 +1,6 @@
 export const ru = {
   landing: {
-    brand: "N8 Assistant",
+    brand: "ИИ с руками",
     login: "Войти через Telegram",
     title_main: "Твой личный ",
     title_highlight: "AI-сотрудник.",
