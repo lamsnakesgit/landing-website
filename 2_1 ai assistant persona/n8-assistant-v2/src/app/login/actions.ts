@@ -32,12 +32,14 @@ export async function signup(formData: FormData) {
   const { error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://n8-assistant-v2.vercel.app'}/auth/callback`,
+    },
   })
 
   if (error) {
     return redirect('/login?message=' + encodeURIComponent(error.message))
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect('/login?message=check_email')
 }
