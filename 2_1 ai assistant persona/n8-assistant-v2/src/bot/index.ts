@@ -6,12 +6,12 @@ import { photoHandler } from "./handlers/photo";
 import { textHandler } from "./handlers/text";
 import { referHandler } from "./handlers/refer";
 
-const token = process.env.TELEGRAM_BOT_TOKEN;
+const token = process.env.TELEGRAM_BOT_TOKEN || "";
 if (!token) {
-  throw new Error("TELEGRAM_BOT_TOKEN is not set");
+  console.warn("⚠️ TELEGRAM_BOT_TOKEN is not set. Bot will not work.");
 }
 
-export const bot = new Bot(token);
+export const bot = new Bot(token || "123456:dummy_token_for_build");
 
 // === Commands ===
 bot.command("start", startHandler);
