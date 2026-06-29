@@ -208,6 +208,10 @@ CREATE TABLE referral_earnings (
 
 ## 10. Deploy
 
+**Current Deployment:** MVP stage deployed to Vercel.
+- **Production URL:** `https://n8-assistant-v2.vercel.app`
+- **Environment Variables:** `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are configured via Vercel CLI.
+
 | Stage | Cost | Users |
 |---|---|---|
 | MVP (Vercel Free + Supabase Free) | $0 | ~200 |
