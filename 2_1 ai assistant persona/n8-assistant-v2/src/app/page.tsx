@@ -1,3 +1,5 @@
+"use client";
+
 import { ArrowRight, Bot, Calendar, Image as ImageIcon, MessageSquare, Globe } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/contexts/LanguageContext";
