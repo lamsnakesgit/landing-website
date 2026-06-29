@@ -1,0 +1,33 @@
+export const ru = {
+  landing: {
+    brand: "N8 Assistant",
+    login: "Войти через Telegram",
+    title_main: "Твой личный ",
+    title_highlight: "AI-сотрудник.",
+    title_secondary: "Работает 24/7.",
+    subtitle: "Делегируй рутину. Мы создали платформу, где AI не просто общается, а ставит встречи в календарь, генерирует карусели и ведет переписку в WhatsApp.",
+    cta_primary: "Попробовать бесплатно",
+    cta_secondary: "Узнать больше",
+    feature1_title: "AI Секретарь",
+    feature1_desc: "Автоматически планирует встречи, управляет Google Календарем и Notion через Maton MCP.",
+    feature2_title: "Контент Завод",
+    feature2_desc: "Генерация готовых каруселей для Instagram и фотосессий через Nano Banana 2.",
+    feature3_title: "WhatsApp Рассылки",
+    feature3_desc: "Интеграция с твоим номером через Evolution API. Автоответы и прогрев лидов.",
+  },
+  dashboard: {
+    welcome: "С возвращением! 👋",
+    subtitle: "Твой ассистент готов к работе. Что будем делать сегодня?",
+    balance: "Баланс кредитов",
+    chat_title: "Открыть AI Чат",
+    chat_desc: "Дай задачу ассистенту: создать встречу, написать пост или отправить сообщение клиенту в WhatsApp.",
+    chat_btn: "Написать боту",
+    carousel_title: "Создать Карусель",
+    carousel_desc: "Генерация премиальной карусели для Instagram через Nano Banana 2. Стоимость: 5 кредитов.",
+    carousel_btn: "Сгенерировать",
+    recent_activity: "Недавняя активность",
+    activity_request: "Запрос к ассистенту",
+    activity_example: "Поставь встречу с клиентом на завтра в 14:00",
+    activity_time: "2 часа назад",
+  }
+};

@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Карусель — Как усилить оффер</title>
+  <style>
+    :root {
+      --bg: #f3efe8;
+      --ink: #1a1612;
+      --muted: #7a7266;
+      --marker: #facc15;
+      --accent: #2563eb;
+      --red: #dc2626;
+      --green: #16a34a;
+      --line: rgba(0, 0, 0, 0.1);
+      --card: rgba(255, 255, 255, 0.7);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      font-family: Georgia, "Times New Roman", Times, serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: var(--bg);
+    }
+
+    .page {
+      width: min(100%, 1260px);
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    .intro {
+      margin: 0 auto 28px;
+      max-width: 1080px;
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      color: var(--muted);
+      font-family: Inter, ui-sans-serif, sans-serif;
+    }
+
+    .intro h1 {
+      margin: 0 0 8px;
+      color: var(--ink);
+      font-size: clamp(28px, 4vw, 48px);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .intro p { margin: 0; font-size: 16px; line-height: 1.5; }
+
+    .hint {
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.5);
+      white-space: nowrap;
+      font-size: 14px;
+    }
+
+    .deck {
+      display: grid;
+      gap: 28px;
+      justify-items: center;
+    }
+
+    .slide {
+      position: relative;
+      width: min(100%, 640px);
+      aspect-ratio: 4 / 5;
+      overflow: hidden;
+      border-radius: 4px;
+      box-shadow: var(--shadow);
+      background: #fff;
+      padding: clamp(40px, 6vw, 72px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      isolation: isolate;
+    }
+
+    .slide.dark {
+      background: #1a1612;
+      color: #f3efe8;
+    }
+
+    .slide.dark .lead,
+    .slide.dark .footer,
+    .slide.dark .muted { color: rgba(243, 239, 232, 0.65); }
+    .slide.dark .pill { background: rgba(255, 255, 255, 0.1); color: #f3efe8; border-color: rgba(255, 255, 255, 0.15); }
+    .slide.dark .marker-line { border-left-color: var(--marker); }
+
+    .topline, .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      color: var(--muted);
+      font-family: Inter, ui-sans-serif, sans-serif;
+      font-size: clamp(14px, 1.6vw, 20px);
+      font-weight: 600;
+    }
+
+    .brand-mark {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
+    }
+
+    .num { color: var(--accent); }
+
+    .eyebrow {
+      margin: 0 0 28px;
+      color: var(--muted);
+      font-family: Inter, ui-sans-serif, sans-serif;
+      font-size: clamp(13px, 1.5vw, 18px);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(52px, 7.4vw, 100px);
+      line-height: 0.92;
+      letter-spacing: -0.025em;
+      font-weight: 700;
+      text-wrap: balance;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: clamp(40px, 5.6vw, 76px);
+      line-height: 0.96;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+      text-wrap: balance;
+    }
+
+    .lead {
+      margin: 28px 0 0;
+      max-width: 760px;
+      font-size: clamp(22px, 2.8vw, 34px);
+      line-height: 1.15;
+      color: var(--muted);
+    }
+
+    .accent { color: var(--accent); }
+    .marker { color: var(--marker); }
+
+    .marker-line {
+      padding-left: 28px;
+      border-left: 6px solid var(--marker);
+    }
+
+    .list {
+      display: grid;
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .check {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 20px;
+      font-family: Inter, ui-sans-serif, sans-serif;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .item p {
+      margin: 0;
+      font-size: clamp(22px, 2.6vw, 34px);
+      line-height: 1.08;
+    }
+
+    .item span {
+      display: block;
+      color: var(--muted);
+      font-size: clamp(16px, 1.6vw, 22px);
+      line-height: 1.2;
+      margin-top: 6px;
+      font-family: Inter, ui-sans-serif, sans-serif;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .card {
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .slide.dark .card {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: clamp(24px, 2.6vw, 36px);
+      line-height: 1;
+    }
+
+    .card span {
+      display: block;
+      color: var(--muted);
+      font-size: clamp(16px, 1.5vw, 20px);
+      line-height: 1.2;
+      font-family: Inter, ui-sans-serif, sans-serif;
+    }
+
+    .quote {
+      padding-left: 28px;
+      border-left: 6px solid var(--accent);
+      font-size: clamp(34px, 4.5vw, 60px);
+      line-height: 0.96;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .watermark {
+      position: absolute;
+      right: clamp(20px, 3vw, 40px);
+      bottom: clamp(16px, 2.2vw, 28px);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.6);
+      color: var(--muted);
+      font-family: Inter, ui-sans-serif, sans-serif;
+      font-size: clamp(10px, 1.1vw, 14px);
+      font-weight: 700;
+    }
+
+    .slide.dark .watermark {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: rgba(243, 239, 232, 0.6);
+    }
+
+    .verified {
+      display: inline-grid;
+      width: 16px; height: 16px;
+      place-items: center;
+      border-radius: 50%;
+      background: #1d9bf0;
+      color: #fff;
+      font-size: 10px;
+      line-height: 1;
+    }
+
+    .footer {
+      font-size: clamp(12px, 1.3vw, 16px);
+      font-weight: 600;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 760px) {
+      .intro { display: block; }
+      .hint { display: inline-flex; margin-top: 18px; white-space: normal; }
+      .slide { border-radius: 0; padding: 36px; }
+      .cards { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .intro { display: none; }
+      .page { width: 1080px; padding: 0; }
+      .deck { gap: 0; }
+      .slide { width: 1080px; height: 1350px; border-radius: 0; box-shadow: none; page-break-after: always; }
+    }
+  </style>
+  <script>
+    // Переключение слайдов по хэшу: #slide-1, #slide-2, ...
+    document.addEventListener('DOMContentLoaded', function() {
+      var slides = document.querySelectorAll('.slide');
+      function showSlide(idx) {
+        slides.forEach(function(s, i) {
+          s.style.display = (i === idx) ? '' : 'none';
+        });
+      }
+      function onHash() {
+        var m = location.hash.match(/^#slide-(\d+)$/);
+        if (m) showSlide(parseInt(m[1], 10) - 1);
+        else showSlide(0);
+      }
+      window.addEventListener('hashchange', onHash);
+      onHash();
+    });
+  </script>
+</head>
+<body>
+  <main class="page">
+    <header class="intro">
+      <div>
+        <h1>Как усилить оффер</h1>
+        <p>Заметки по Hormozi — ценность, чеклисты, рефералы. Формат 4:5, export-ready HTML.</p>
+      </div>
+      <div class="hint">8 слайдов · 1080×1350 · Instagram</div>
+    </header>
+
+    <section class="deck" aria-label="Карусель про усиление оффера">
+      <article class="slide dark">
+        <div class="topline">
+          <span><span class="brand-mark"></span> Offer Lab</span>
+          <span class="num">01/08</span>
+        </div>
+        <div class="content">
+          <p class="eyebrow">100M Offers — заметки</p>
+          <h2>Не добавляй ценность. <span class="accent">Упакуй её.</span></h2>
+          <p class="lead">Люди платят не за то, сколько ты сделал, а за то, как они это воспринимают.</p>
+          <div class="marker-line" style="margin-top:34px; padding-left:24px; border-left:6px solid var(--marker);">
+            <p style="margin:0; font-size:clamp(20px,2.4vw,32px); font-family:Inter,sans-serif; font-weight:600; letter-spacing:-0.02em;">Чеклист · Шаблоны · Файлы · Бонусы · Рефералы</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Всё, что уже есть внутри, можно упаковать заново</span>
+          <span>→</span>
+        </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span></div>
+      </article>
+
+      <article class="slide">
+        <div class="topline">
+          <span><span class="brand-mark"></span> Value stacking</span>
+          <span class="num">02/08</span>
+        </div>
+        <div class="content">
+          <p class="eyebrow">Чеклист — бонус с нулевой себестоимостью</p>
+          <h3>Сделай один раз —<br>используй всегда.</h3>
+          <div class="list">
+            <div class="item">
+              <span class="check">✓</span>
+              <div>
+                <p>Чеклист по твоей теме</p>
+                <span>То, что пользователю сложно собрать самому, но легко применить.</span>
+              </div>
+            </div>
+            <div class="item">
+              <span class="check">✓</span>
+              <div>
+                <p>Шаблоны, файлы, гайды</p>
+                <span>Отдаёшь сразу после покупки — воспринимается как отдельная ценность.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Создал один раз — продаёшь бесконечно</span>
+          <span>→</span>
+        </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span></div>
+      </article>
+
+      <article class="slide dark">
+        <div class="topline">
+          <span><span class="brand-mark"></span> Bonus stack</span>
+          <span class="num">03/08</span>
+        </div>
+        <div class="content">
+          <p class="eyebrow">Что уже есть внутри, можно назвать бонусом</p>
+          <h3>Самая дорогая часть оффера — <span class="accent">то, что ты и так делаешь.</span></h3>
+          <p class="lead">Но ты не называешь это бонусом. Клиент не видит ценность. Назови — и он увидит.</p>
+        </div>
+        <div class="footer">
+          <span>Всё, что ты даёшь — это стек ценности</span>
+          <span>→</span>
+        </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span></div>
+      </article>
+
+      <article class="slide">
+        <div class="topline">
+          <span><span class="brand-mark"></span> Before / After</span>
+          <span class="num">04/08</span>
+        </div>
+        <div class="content">
+          <p class="eyebrow">Как выглядит оффер до и после</p>
+          <h3>Упакуй то, что уже есть.</h3>
+          <div class="cards">
+            <div class="card">
+              <strong>До</strong>
+              <span>Просто услуга. Непонятно, за что платят. Ощущение «дорого».</span>
+            </div>
+            <div class="card">
+              <strong>После</strong>
+              <span>Услуга + чеклист + шаблоны + файлы + бонус. Воспринимается как премиум.</span>
+            </div>
+          </div>
+          <div style="margin-top:28px; padding:20px; background:var(--line); border-radius:4px; text-align:center; font-size:clamp(20px,2.3vw,30px); font-weight:800; font-family:Inter,sans-serif;">
+            Ценность ↑ — Себестоимость почти 0
+          </div>
+        </div>
+        <div class="footer">
+          <span>Ты не добавляешь работы — ты переупаковываешь</span>
+          <span>→</span>
+        </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span></div>
+      </article>
+
+      <article class="slide dark">
+        <div class="topline">
+          <span><span class="brand-mark"></span> Referral</span>
+          <span class="num">05/08</span>
+        </div>
+        <div class="content">
+          <p class="eyebrow">Продвигать реферальную систему</p>
+          <h3>Предложи бизнесу <span class="accent">% со сделки</span> с клиентов.</h3>
+          <p class="lead">Человек приводит клиента — получает процент. Ты платишь только за результат.</p>
+          <div class="list" style="margin-top:28px;">
+            <div class="item">
+              <span class="check">%</span>
+              <div>
+                <p>Процент с каждой сделки</p>
+                <span>Без риска — платишь только за приведённого клиента.</span>
+              </div>
+            </div>
+            <div class="item">
+              <span class="check">♻</span>
+              <div>
+                <p>Рефералы становятся амбассадорами</p>
+                <span>Сарафанное радио + мотивация деньгами.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Лучшая реклама — клиент, который зарабатывает с тобой</span>
+          <span>→</span>
+        </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span></div>
+      </article>
+
+      <article class="slide">
+        <div class="topline">
+          <span><span class="brand-mark"></span> Hard to build, easy to use</span>
+          <span class="num">06/08</span>
+        </div>
+        <div class="content">
+          <p class="eyebrow">Правило ценности</p>
+          <h3>То, что тебе сложно создать —<br><span class="accent">легко продать.</span></h3>
+          <div class="list">
+            <div class="item">
+              <span class="check">⚡</span>
+              <div>
+                <p>Сложно создать</p>
+                <span>Ты потратил время, опыт, тесты, ошибки.</span>
+              </div>
+            </div>
+            <div class="item">
+              <span class="check">⚡</span>
+              <div>
+                <p>Легко пользоваться</p>
+                <span>Клиент берёт готовое и применяет. Это и есть ценность.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Чем больше твоего труда «внутри» — тем выше ценность</span>
+          <span>→</span>
+        </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span></div>
+      </article>
+
+      <article class="slide dark">
+        <div class="topline">
+          <span><span class="brand-mark"></span> Framework</span>
+          <span class="num">07/08</span>
+        </div>
+        <div class="content">
+          <p class="eyebrow">5 способов усилить оффер</p>
+          <h3>Без изменения продукта.</h3>
+          <div class="list" style="margin-top:24px;">
+            <div class="item">
+              <span class="check">1</span>
+              <p>Чеклист — готовая инструкция к действию</p>
+            </div>
+            <div class="item">
+              <span class="check">2</span>
+              <p>Шаблоны — то, что клиенту лень делать самому</p>
+            </div>
+            <div class="item">
+              <span class="check">3</span>
+              <p>Бонусы — вынеси из оффера то, что уже даёшь</p>
+            </div>
+            <div class="item">
+              <span class="check">4</span>
+              <p>Рефералы — процент со сделки, без риска</p>
+            </div>
+            <div class="item">
+              <span class="check">5</span>
+              <p>Файлы / гайды — hard to build, easy to use</p>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Не меняешь продукт — меняешь упаковку</span>
+          <span>→</span>
+        </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span></div>
+      </article>
+
+      <article class="slide">
+        <div class="topline">
+          <span><span class="brand-mark"></span> Action</span>
+          <span class="num">08/08</span>
+        </div>
+        <div class="content">
+          <p class="eyebrow">Что сделать прямо сейчас</p>
+          <h3>Возьми свой текущий оффер и <span class="accent">добавь один элемент.</span></h3>
+          <div class="cards">
+            <div class="card">
+              <strong>Чеклист</strong>
+              <span>Напиши 5 шагов, которые делает клиент после покупки. Отдай как бонус.</span>
+            </div>
+            <div class="card">
+              <strong>Рефералка</strong>
+              <span>Предложи % со сделки. Один клиент приводит следующего.</span>
+            </div>
+          </div>
+          <p class="lead" style="margin-top:28px; font-size:clamp(20px,2.2vw,30px);">Сохрани этот пост — пригодится, когда будешь собирать свой премиум-оффер.</p>
+        </div>
+        <div class="footer">
+          <span>@lamanopro_ × @aiconicvibe</span>
+          <span>→</span>
+        </div>
+        <div class="watermark">@lamanopro_ × @aiconicvibe <span class="verified">✓</span></div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

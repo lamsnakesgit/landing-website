@@ -1,0 +1,33 @@
+export const en = {
+  landing: {
+    brand: "Hands-on AI",
+    login: "Login with Telegram",
+    title_main: "Your personal ",
+    title_highlight: "AI employee.",
+    title_secondary: "Works 24/7.",
+    subtitle: "Delegate your routine. We built a platform where AI doesn't just chat, but schedules meetings, generates carousels, and replies on WhatsApp.",
+    cta_primary: "Try for free",
+    cta_secondary: "Learn more",
+    feature1_title: "AI Secretary",
+    feature1_desc: "Automatically schedules meetings, manages Google Calendar and Notion via Maton MCP.",
+    feature2_title: "Content Factory",
+    feature2_desc: "Generates ready-made carousels for Instagram and photoshoots via Nano Banana 2.",
+    feature3_title: "WhatsApp Broadcasts",
+    feature3_desc: "Integrates with your number via Evolution API. Auto-replies and lead nurturing.",
+  },
+  dashboard: {
+    welcome: "Welcome back! 👋",
+    subtitle: "Your assistant is ready to work. What should we do today?",
+    balance: "Credit Balance",
+    chat_title: "Open AI Chat",
+    chat_desc: "Give your assistant a task: schedule a meeting, write a post, or message a client on WhatsApp.",
+    chat_btn: "Message bot",
+    carousel_title: "Create Carousel",
+    carousel_desc: "Generate premium Instagram carousels via Nano Banana 2. Cost: 5 credits.",
+    carousel_btn: "Generate",
+    recent_activity: "Recent Activity",
+    activity_request: "Assistant Request",
+    activity_example: "Schedule a meeting with a client tomorrow at 14:00",
+    activity_time: "2 hours ago",
+  }
+};

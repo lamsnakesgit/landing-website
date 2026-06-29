@@ -16,7 +16,7 @@ export async function login(formData: FormData) {
   })
 
   if (error) {
-    return redirect('/login?message=' + encodeURIComponent('Неверный email или пароль'))
+    return redirect('/login?message=' + encodeURIComponent(error.message))
   }
 
   revalidatePath('/', 'layout')
@@ -35,7 +35,7 @@ export async function signup(formData: FormData) {
   })
 
   if (error) {
-    return redirect('/login?message=' + encodeURIComponent('Ошибка регистрации'))
+    return redirect('/login?message=' + encodeURIComponent(error.message))
   }
 
   revalidatePath('/', 'layout')

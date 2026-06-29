@@ -1,18 +1,23 @@
+"use client";
+
 import { ArrowRight, ImageIcon, MessageSquare, Zap } from "lucide-react";
 import Link from "next/link";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function DashboardPage() {
+  const { t } = useLanguage();
+
   return (
     <div className="max-w-5xl mx-auto">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-4">
         <div>
-          <h1 className="text-3xl font-bold mb-2">С возвращением! 👋</h1>
-          <p className="text-gray-400">Твой ассистент готов к работе. Что будем делать сегодня?</p>
+          <h1 className="text-3xl font-bold mb-2">{t.dashboard.welcome}</h1>
+          <p className="text-gray-400">{t.dashboard.subtitle}</p>
         </div>
         
         <div className="glass-panel px-6 py-3 rounded-2xl flex items-center gap-4">
           <div className="flex flex-col">
-            <span className="text-xs text-gray-400">Баланс кредитов</span>
+            <span className="text-xs text-gray-400">{t.dashboard.balance}</span>
             <span className="font-bold text-lg text-blue-400">50 CR</span>
           </div>
           <Link href="/dashboard/billing" className="bg-white/10 hover:bg-white/20 p-2 rounded-xl transition-colors">
@@ -27,15 +32,15 @@ export default function DashboardPage() {
           <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
             <MessageSquare className="w-32 h-32 text-blue-500" />
           </div>
-          <h2 className="text-2xl font-bold mb-3 relative z-10">Открыть AI Чат</h2>
+          <h2 className="text-2xl font-bold mb-3 relative z-10">{t.dashboard.chat_title}</h2>
           <p className="text-gray-400 mb-8 max-w-sm relative z-10">
-            Дай задачу ассистенту: создать встречу, написать пост или отправить сообщение клиенту в WhatsApp.
+            {t.dashboard.chat_desc}
           </p>
           <Link 
             href="/dashboard/chat"
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-medium transition-colors relative z-10"
           >
-            Написать боту
+            {t.dashboard.chat_btn}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -45,15 +50,15 @@ export default function DashboardPage() {
           <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
             <ImageIcon className="w-32 h-32 text-purple-500" />
           </div>
-          <h2 className="text-2xl font-bold mb-3 relative z-10">Создать Карусель</h2>
+          <h2 className="text-2xl font-bold mb-3 relative z-10">{t.dashboard.carousel_title}</h2>
           <p className="text-gray-400 mb-8 max-w-sm relative z-10">
-            Генерация премиальной карусели для Instagram через Nano Banana 2. Стоимость: 5 кредитов.
+            {t.dashboard.carousel_desc}
           </p>
           <Link 
             href="/dashboard/chat?intent=carousel"
             className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full font-medium transition-colors relative z-10"
           >
-            Сгенерировать
+            {t.dashboard.carousel_btn}
             <ImageIcon className="w-4 h-4" />
           </Link>
         </div>
@@ -61,7 +66,7 @@ export default function DashboardPage() {
 
       {/* Recent Activity (Mock) */}
       <div>
-        <h3 className="text-xl font-bold mb-6">Недавняя активность</h3>
+        <h3 className="text-xl font-bold mb-6">{t.dashboard.recent_activity}</h3>
         <div className="glass-panel rounded-3xl overflow-hidden">
           <div className="divide-y divide-white/10">
             {[1, 2, 3].map((i) => (
@@ -71,11 +76,11 @@ export default function DashboardPage() {
                     <MessageSquare className="w-5 h-5 text-blue-400" />
                   </div>
                   <div>
-                    <p className="font-medium">Запрос к ассистенту</p>
-                    <p className="text-sm text-gray-400">"Поставь встречу с клиентом на завтра в 14:00"</p>
+                    <p className="font-medium">{t.dashboard.activity_request}</p>
+                    <p className="text-sm text-gray-400">"{t.dashboard.activity_example}"</p>
                   </div>
                 </div>
-                <span className="text-sm text-gray-500">2 часа назад</span>
+                <span className="text-sm text-gray-500">{t.dashboard.activity_time}</span>
               </div>
             ))}
           </div>
