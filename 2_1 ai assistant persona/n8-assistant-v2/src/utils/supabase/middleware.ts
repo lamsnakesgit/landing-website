@@ -32,25 +32,8 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Если юзер НЕ авторизован и пытается зайти в /dashboard, редиректим на /login
-  if (
-    !user &&
-    request.nextUrl.pathname.startsWith('/dashboard')
-  ) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
-  }
-
-  // Если юзер авторизован и пытается зайти на /login, редиректим в /dashboard
-  if (
-    user &&
-    request.nextUrl.pathname === '/login'
-  ) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
-  }
+  // Мы используем Telegram Mini App, поэтому убираем редиректы Supabase Auth
+  // (Юзер всегда авторизуется через window.Telegram.WebApp на клиенте)
 
   return supabaseResponse
 }
