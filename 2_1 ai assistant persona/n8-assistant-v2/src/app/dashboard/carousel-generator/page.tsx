@@ -170,7 +170,7 @@ export default function CarouselGeneratorPage() {
                   <div 
                     className="absolute inset-0 z-0"
                     style={{
-                      backgroundImage: \`url('\${slide.backgroundUrl}')\`,
+                      backgroundImage: "url('" + slide.backgroundUrl + "')",
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                       opacity: 0.6
