@@ -254,10 +254,13 @@ export default function CarouselGeneratorPage() {
               <p className="text-gray-400 text-xs mb-4">
                 Загрузите фото, чтобы ИИ перенял его стиль
               </p>
-              <label className="cursor-pointer px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm font-medium transition-colors inline-block">
+              <button 
+                onClick={() => document.getElementById('reference-upload')?.click()}
+                className="cursor-pointer px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm font-medium transition-colors inline-block"
+              >
                 Выбрать фото
-                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-              </label>
+              </button>
+              <input id="reference-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
             </div>
           </div>
 
