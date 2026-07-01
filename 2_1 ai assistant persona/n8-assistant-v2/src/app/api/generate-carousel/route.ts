@@ -28,7 +28,7 @@ async function generateImage(projectId: string, token: string, prompt: string, i
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      instances: [{ prompt: prompt + ", abstract, aesthetic, no text, no letters, cinematic lighting" }],
+      instances: [{ prompt: prompt }],
       parameters: {
         sampleCount: 1,
         aspectRatio: aspectRatio, // Options: "1:1", "9:16", "16:9", "3:4", "4:3"

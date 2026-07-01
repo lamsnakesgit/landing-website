@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { ArrowLeft, Upload, Loader2, Sparkles, Download, MessageSquare, CheckCircle, Image as ImageIcon } from 'lucide-react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { ArrowLeft, Upload, Loader2, Download, MessageSquare, CheckCircle, Image as ImageIcon } from 'lucide-react'
 import * as htmlToImage from 'html-to-image'
 
 interface SlideData {
@@ -18,6 +18,7 @@ interface ChatMessage {
 }
 
 export default function CarouselGeneratorPage() {
+  const router = useRouter()
   // Settings
   const [topic, setTopic] = useState('')
   const [modelChoice, setModelChoice] = useState('presentation')
@@ -185,7 +186,7 @@ export default function CarouselGeneratorPage() {
           onClick={() => {
             if (phase === 'finalized') setPhase('drafting')
             else if (phase === 'drafting') setPhase('setup')
-            else window.location.href = '/dashboard'
+            else router.back()
           }}
           className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
         >
@@ -234,9 +235,9 @@ export default function CarouselGeneratorPage() {
               onChange={(e) => setModelChoice(e.target.value)}
               className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:outline-none"
             >
-              <option value="presentation">Презентация (Текст без ИИ-картинок)</option>
-              <option value="nano">Nano Banana (Креативный и быстрый)</option>
-              <option value="nano2">Nano 2 (Реалистичный и глубокий)</option>
+              <option value="presentation">Презентация (Без ИИ-фонов)</option>
+              <option value="nano">Nano Banana (Быстрый ИИ-фон)</option>
+              <option value="nano2">Nano 2 (Продвинутый ИИ-фон)</option>
             </select>
           </div>
 
