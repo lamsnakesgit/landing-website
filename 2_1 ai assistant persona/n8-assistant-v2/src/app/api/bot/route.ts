@@ -39,6 +39,19 @@ export async function POST(req: Request) {
           }
         })
       });
+    } else {
+      // Если это просто текст, воспринимаем это как запрос на генерацию карусели
+      // (В будущем здесь будет вызов n8n или Vertex AI)
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: `⚙️ Принято! Начинаю генерацию карусели на тему: "${text}"...\n\n(Пока это заглушка. Скоро здесь появятся 6 готовых слайдов!)`
+        })
+      });
     }
 
     return NextResponse.json({ status: 'ok' });
