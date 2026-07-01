@@ -18,19 +18,19 @@ async function getVertexToken() {
 }
 
 async function generateText(projectId: string, token: string, topic: string) {
-  const url = \`https://us-central1-aiplatform.googleapis.com/v1/projects/\${projectId}/locations/us-central1/publishers/google/models/gemini-1.5-pro-002:generateContent\`;
+  const url = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/gemini-1.5-pro-002:generateContent`;
   
-  const prompt = \`Create a 6-slide carousel structure for an Instagram/Telegram post about: "\${topic}".
+  const prompt = `Create a 6-slide carousel structure for an Instagram/Telegram post about: "${topic}".
   Return ONLY a valid JSON array. Each object in the array must have exactly:
   - "title": A very short punchy uppercase category (e.g. "HOOK", "БОЛЬ", "РЕШЕНИЕ", "СЕКРЕТ", "ВЫГОДА", "CTA").
   - "subtitle": A bold catchy text (max 6-8 words) in Russian.
   - "imagePrompt": A highly detailed prompt in English for an AI image generator to create an abstract, clean, cinematic background without any text.
-  Make exactly 6 slides.\`;
+  Make exactly 6 slides.`;
 
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'Authorization': \`Bearer \${token}\`,
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -63,12 +63,12 @@ async function generateText(projectId: string, token: string, topic: string) {
 
 async function generateImage(projectId: string, token: string, prompt: string, isFast: boolean = false) {
   const model = isFast ? 'imagen-3.0-fast-generate-001' : 'imagen-3.0-generate-001';
-  const url = \`https://us-central1-aiplatform.googleapis.com/v1/projects/\${projectId}/locations/us-central1/publishers/google/models/\${model}:predict\`;
+  const url = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/${model}:predict`;
   
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'Authorization': \`Bearer \${token}\`,
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -114,12 +114,12 @@ export async function POST(req: Request) {
       
       if (modelChoice === 'presentation') {
         // Fallback or empty, we will use dark solid color or random Unsplash abstract
-        backgroundUrl = \`https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&h=1350&fit=crop&auto=format\`;
+        backgroundUrl = `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&h=1350&fit=crop&auto=format`;
       } else {
         // Nano 2 (pro) or Nano Banana (flash/fast)
         const isFast = modelChoice === 'nano';
         const img = await generateImage(projectId, token as string, slide.imagePrompt, isFast);
-        backgroundUrl = img || \`https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&h=1350&fit=crop&auto=format\`;
+        backgroundUrl = img || `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&h=1350&fit=crop&auto=format`;
       }
 
       return {
