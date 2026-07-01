@@ -1,28 +1,49 @@
-import { botWebhook } from "@/bot/index";
+import { NextResponse } from 'next/server';
 
-/**
- * Webhook endpoint для Telegram Bot.
- * POST /api/bot — Telegram шлёт сюда updates
- */
-export async function POST(request: Request) {
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const WEB_APP_URL = 'https://n8-assistant-v2.vercel.app/dashboard';
+
+export async function POST(req: Request) {
   try {
-    const response = await botWebhook(request);
-    return response;
-  } catch (err) {
-    console.error("Webhook error:", err);
-    return new Response("Webhook error", { status: 500 });
-  }
-}
+    const update = await req.json();
 
-/**
- * GET /api/bot — проверка что бот работает
- */
-export async function GET() {
-  return new Response(
-    JSON.stringify({ status: "ok", bot: "n8-assistant-bot" }),
-    {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
+    // Ignore if not a message
+    if (!update.message || !update.message.text) {
+      return NextResponse.json({ status: 'ignored' });
     }
-  );
+
+    const chatId = update.message.chat.id;
+    const text = update.message.text;
+
+    // Handle /start command
+    if (text.startsWith('/start')) {
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: '👋 Привет! Я твой AI-сотрудник с руками.\n\nНажми на кнопку ниже, чтобы открыть Контент Завод и начать генерацию.',
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text: '🚀 Открыть Приложение',
+                  web_app: {
+                    url: WEB_APP_URL
+                  }
+                }
+              ]
+            ]
+          }
+        })
+      });
+    }
+
+    return NextResponse.json({ status: 'ok' });
+  } catch (error) {
+    console.error('Error handling Telegram Webhook:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
 }
