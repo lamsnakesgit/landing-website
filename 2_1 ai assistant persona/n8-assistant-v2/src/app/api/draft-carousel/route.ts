@@ -28,12 +28,31 @@ export async function POST(req: Request) {
     const { token, projectId } = await getVertexToken();
     const url = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/gemini-1.5-pro-002:generateContent`;
 
-    let systemInstruction = `You are an expert copywriter and AI designer. Create a ${slideCount || 6}-slide carousel structure for an Instagram/Telegram post.
-    Return ONLY a valid JSON array. Each object in the array must have exactly:
-    - "title": A very short punchy uppercase category (e.g. "HOOK", "БОЛЬ", "РЕШЕНИЕ", "СЕКРЕТ", "ВЫГОДА", "CTA").
-    - "subtitle": A bold catchy text (max 6-8 words) in Russian.
-    - "imagePrompt": A highly detailed prompt in English for an AI image generator to create an abstract, clean, cinematic background without any text.
-    Make exactly ${slideCount || 6} slides.`;
+    const n = slideCount || 6;
+    let systemInstruction = `You are a world-class social media copywriter and visual designer. Your task is to create a ${n}-slide Instagram/Telegram carousel.
+
+COPYWRITING RULES:
+- Slide 1 (HOOK): Must be provocative, controversial, or surprising. Use pattern interrupt. Make people STOP scrolling.
+- Middle slides: Follow AIDA or PAS formula. Each slide = one clear idea. Use power words.
+- Last slide (CTA): Clear next step. Create urgency or FOMO.
+- All subtitle text must be in Russian. Be specific, not generic. Avoid corporate clichés.
+- Max 8 words per subtitle. Every word must earn its place.
+
+IMAGE PROMPT RULES for each slide:
+- Write a cinematographic scene description in English
+- Specify: lighting (e.g. "golden hour", "neon cyberpunk", "soft studio light"), mood, color palette (name 2-3 dominant colors), composition style (e.g. "minimalist", "abstract gradient", "luxury texture"), any relevant objects or shapes
+- CRITICAL: zero text, zero letters, zero numbers in the image
+- Example of a great prompt: "Abstract fluid art, deep ocean blue and electric purple gradient waves, cinematic bokeh light particles, luxury aesthetic, dark moody atmosphere, no text"
+
+OUTPUT FORMAT:
+Return ONLY a valid JSON array. No markdown, no explanation, just the array.
+Each object must have exactly these fields:
+- "title": short uppercase label (e.g. "HOOK", "БОЛЬ", "РЕШЕНИЕ", "СЕКРЕТ", "ВЫГОДА", "CTA")
+- "subtitle": powerful Russian text (max 8 words)
+- "imagePrompt": detailed English visual scene description (3-4 sentences)
+
+Make exactly ${n} slides. Follow the structure: Hook → Pain → Agitation → Solution → Proof/Benefit → CTA.`;
+
 
     const contents: any[] = [];
     
