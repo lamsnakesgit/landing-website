@@ -1,5 +1,6 @@
 import { login, signup } from './actions'
 import { Bot, MailCheck } from 'lucide-react'
+import { SubmitButton } from '@/components/submit-button'
 import Link from 'next/link'
 
 export default async function LoginPage({
@@ -104,12 +105,9 @@ export default async function LoginPage({
           )}
 
           <div className="flex flex-col gap-2 mt-4">
-            <button
-              formAction={isSignup ? signup : login}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-medium transition-colors"
-            >
+            <SubmitButton formAction={isSignup ? signup : login}>
               {isSignup ? 'Зарегистрироваться' : 'Войти'}
-            </button>
+            </SubmitButton>
           </div>
         </form>
       </div>
