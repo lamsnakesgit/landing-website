@@ -33,7 +33,7 @@ export default function Home() {
               {lang.toUpperCase()}
             </button>
             <Link
-              href="https://t.me/your_bot_username" // TODO: replace with real bot username
+              href="https://t.me/aihandscontent_bot"
               target="_blank"
               className="px-4 py-2 bg-white text-black text-sm font-medium rounded-full hover:bg-gray-200 transition-colors"
             >
@@ -57,7 +57,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="https://t.me/your_bot_username" // TODO: replace with real bot username
+              href="https://t.me/aihandscontent_bot"
               target="_blank"
               className="group flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-all"
             >
