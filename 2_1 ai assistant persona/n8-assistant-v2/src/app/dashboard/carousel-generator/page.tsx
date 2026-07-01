@@ -13,7 +13,7 @@ interface SlideData {
 
 export default function CarouselGeneratorPage() {
   const [topic, setTopic] = useState('')
-  const [modelChoice, setModelChoice] = useState('nano')
+  const [modelChoice, setModelChoice] = useState('presentation')
   const [isGenerating, setIsGenerating] = useState(false)
   const [slides, setSlides] = useState<SlideData[] | null>(null)
   const carouselRef = useRef<HTMLDivElement>(null)
@@ -92,14 +92,15 @@ export default function CarouselGeneratorPage() {
 
           {/* Model Selection */}
           <div className="glass-panel p-4 rounded-3xl border border-white/10">
-            <label className="block text-sm font-semibold mb-2">Нейросеть (Vertex AI / GRSai)</label>
+            <label className="block text-sm font-semibold mb-2">Тип Дизайна (AI или HTML)</label>
             <select 
               value={modelChoice}
               onChange={(e) => setModelChoice(e.target.value)}
               className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:outline-none"
             >
-              <option value="nano">Nano Banana (gemini-3.1-flash)</option>
-              <option value="nano2">Nano Banana Pro (gemini-3-pro)</option>
+              <option value="presentation">Презентация (Только HTML, без ИИ картинок)</option>
+              <option value="nano">С фоном Nano Banana (gemini-3.1-flash)</option>
+              <option value="nano2">С фоном Nano 2 (gemini-3-pro)</option>
             </select>
           </div>
 
