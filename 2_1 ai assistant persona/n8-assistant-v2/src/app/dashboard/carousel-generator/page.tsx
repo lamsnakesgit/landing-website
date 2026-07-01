@@ -1,37 +1,141 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { ArrowLeft, Upload, Loader2, ImageIcon, Sparkles, Download } from 'lucide-react'
+import { ArrowLeft, Upload, Loader2, Sparkles, Download, MessageSquare, CheckCircle, Image as ImageIcon } from 'lucide-react'
 import Link from 'next/link'
 import * as htmlToImage from 'html-to-image'
 
 interface SlideData {
   title: string
   subtitle: string
-  backgroundUrl: string
+  imagePrompt: string
+  backgroundUrl?: string
+}
+
+interface ChatMessage {
+  role: 'user' | 'model'
+  text: string
 }
 
 export default function CarouselGeneratorPage() {
+  // Settings
   const [topic, setTopic] = useState('')
   const [modelChoice, setModelChoice] = useState('presentation')
+  const [aspectRatio, setAspectRatio] = useState('4:5')
+  const [slideCount, setSlideCount] = useState(6)
+  const [referenceImage, setReferenceImage] = useState<string | null>(null)
+
+  // State
+  const [phase, setPhase] = useState<'setup' | 'drafting' | 'finalized'>('setup')
   const [isGenerating, setIsGenerating] = useState(false)
+  
+  // Drafting Data
+  const [draft, setDraft] = useState<SlideData[] | null>(null)
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([])
+  const [userFeedback, setUserFeedback] = useState('')
+
+  // Final Data
   const [slides, setSlides] = useState<SlideData[] | null>(null)
   const carouselRef = useRef<HTMLDivElement>(null)
 
-  const handleGenerate = async () => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      setReferenceImage(event.target?.result as string)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleGenerateDraft = async () => {
     if (!topic) return
+    setIsGenerating(true)
+    
+    try {
+      const res = await fetch('/api/draft-carousel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          topic, 
+          slideCount, 
+          referenceImage,
+          chatHistory: [],
+          currentDraft: null
+        })
+      })
+      
+      const data = await res.json()
+      if (data.draft) {
+        setDraft(data.draft)
+        setPhase('drafting')
+        setChatHistory([])
+      }
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleSendFeedback = async () => {
+    if (!userFeedback.trim() || !draft) return
+    setIsGenerating(true)
+    
+    const newHistory: ChatMessage[] = [
+      ...chatHistory,
+      { role: 'user', text: userFeedback }
+    ]
+    setChatHistory(newHistory)
+    setUserFeedback('')
+    
+    try {
+      const res = await fetch('/api/draft-carousel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          topic, 
+          slideCount, 
+          referenceImage,
+          chatHistory: newHistory,
+          currentDraft: draft
+        })
+      })
+      
+      const data = await res.json()
+      if (data.draft) {
+        setDraft(data.draft)
+        setChatHistory([
+          ...newHistory,
+          { role: 'model', text: 'Я обновил черновик с учетом ваших правок. Посмотрите!' }
+        ])
+      }
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleGenerateFinal = async () => {
+    if (!draft) return
     setIsGenerating(true)
     
     try {
       const res = await fetch('/api/generate-carousel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, modelChoice })
+        body: JSON.stringify({ 
+          slides: draft, 
+          modelChoice, 
+          aspectRatio 
+        })
       })
       
       const data = await res.json()
       if (data.slides) {
         setSlides(data.slides)
+        setPhase('finalized')
       }
     } catch (e) {
       console.error(e)
@@ -53,7 +157,6 @@ export default function CarouselGeneratorPage() {
         link.download = `slide_${i + 1}.png`
         link.href = dataUrl
         link.click()
-        // Небольшая пауза чтобы браузер успел скачать
         await new Promise(r => setTimeout(r, 300))
       } catch (err) {
         console.error('Failed to download slide', i, err)
@@ -61,93 +164,191 @@ export default function CarouselGeneratorPage() {
     }
   }
 
+  const getDimensions = () => {
+    switch(aspectRatio) {
+      case '1:1': return { w: 1080, h: 1080 }
+      case '3:4': return { w: 1080, h: 1440 }
+      case '4:5': return { w: 1080, h: 1350 }
+      case '9:16': return { w: 1080, h: 1920 }
+      case '16:9': return { w: 1920, h: 1080 }
+      default: return { w: 1080, h: 1350 }
+    }
+  }
+
+  const dims = getDimensions()
+
   return (
-    <div className="max-w-md mx-auto p-4 pb-20">
+    <div className="max-w-2xl mx-auto p-4 pb-20">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
-        <Link href="/dashboard" className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
+        <button 
+          onClick={() => {
+            if (phase === 'finalized') setPhase('drafting')
+            else if (phase === 'drafting') setPhase('setup')
+            else window.location.href = '/dashboard'
+          }}
+          className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
+        >
           <ArrowLeft className="w-5 h-5 text-gray-300" />
-        </Link>
+        </button>
         <div>
           <h1 className="text-xl font-bold">Контент Завод</h1>
-          <p className="text-gray-400 text-xs">AI Карусели 4:5</p>
+          <p className="text-gray-400 text-xs">AI Карусели</p>
         </div>
       </div>
 
-      {!slides ? (
+      {/* PHASE 1: SETUP */}
+      {phase === 'setup' && (
         <div className="space-y-6">
-          {/* Reference Image Upload */}
-          <div className="glass-panel p-6 rounded-3xl border border-white/10 text-center">
-            <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-dashed border-white/20">
-              <Upload className="w-8 h-8 text-gray-400" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="glass-panel p-4 rounded-3xl border border-white/10">
+              <label className="block text-sm font-semibold mb-2">Слайдов</label>
+              <input 
+                type="number" 
+                min="2" max="10" 
+                value={slideCount}
+                onChange={(e) => setSlideCount(parseInt(e.target.value) || 6)}
+                className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:outline-none"
+              />
             </div>
-            <h3 className="font-semibold mb-1">Референс Лица</h3>
-            <p className="text-gray-400 text-xs mb-4">
-              Ваше лицо будет встроено в фон
-            </p>
-            <button className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm font-medium transition-colors">
-              Выбрать фото
-            </button>
+            <div className="glass-panel p-4 rounded-3xl border border-white/10">
+              <label className="block text-sm font-semibold mb-2">Формат</label>
+              <select 
+                value={aspectRatio}
+                onChange={(e) => setAspectRatio(e.target.value)}
+                className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:outline-none"
+              >
+                <option value="1:1">1:1 (Квадрат)</option>
+                <option value="4:5">4:5 (Пост)</option>
+                <option value="3:4">3:4 (Портрет)</option>
+                <option value="9:16">9:16 (Stories/Reels)</option>
+                <option value="16:9">16:9 (YouTube)</option>
+              </select>
+            </div>
           </div>
 
-          {/* Model Selection */}
           <div className="glass-panel p-4 rounded-3xl border border-white/10">
-            <label className="block text-sm font-semibold mb-2">Тип Дизайна (AI или HTML)</label>
+            <label className="block text-sm font-semibold mb-2">Стиль Дизайна</label>
             <select 
               value={modelChoice}
               onChange={(e) => setModelChoice(e.target.value)}
               className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:outline-none"
             >
-              <option value="presentation">Презентация (Только HTML, без ИИ картинок)</option>
-              <option value="nano">С фоном Nano Banana (gemini-3.1-flash)</option>
-              <option value="nano2">С фоном Nano 2 (gemini-3-pro)</option>
+              <option value="presentation">Презентация (Текст без ИИ-картинок)</option>
+              <option value="nano">Nano Banana (Креативный и быстрый)</option>
+              <option value="nano2">Nano 2 (Реалистичный и глубокий)</option>
             </select>
           </div>
 
-          {/* Topic Input */}
+          <div className="glass-panel p-6 rounded-3xl border border-white/10 text-center relative overflow-hidden">
+            {referenceImage ? (
+              <div className="absolute inset-0 z-0 opacity-40">
+                <img src={referenceImage} alt="Reference" className="w-full h-full object-cover blur-sm" />
+              </div>
+            ) : null}
+            <div className="relative z-10">
+              <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-dashed border-white/20">
+                {referenceImage ? <ImageIcon className="w-8 h-8 text-purple-400" /> : <Upload className="w-8 h-8 text-gray-400" />}
+              </div>
+              <h3 className="font-semibold mb-1">Референс Фото (Опционально)</h3>
+              <p className="text-gray-400 text-xs mb-4">
+                Загрузите фото, чтобы ИИ перенял его стиль
+              </p>
+              <label className="cursor-pointer px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm font-medium transition-colors inline-block">
+                Выбрать фото
+                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+              </label>
+            </div>
+          </div>
+
           <div className="glass-panel p-6 rounded-3xl border border-white/10">
-            <label className="block font-semibold mb-2">О чем пост?</label>
+            <label className="block font-semibold mb-2">О чем будет карусель?</label>
             <textarea 
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              placeholder="Как продавать через ИИ-агентов..."
+              placeholder="Подробно опишите вашу идею..."
               className="w-full bg-black/40 border border-white/10 rounded-xl p-4 min-h-[100px] text-white focus:outline-none focus:border-purple-500/50 resize-none"
             />
           </div>
 
-          {/* Generate Button */}
           <button 
-            onClick={handleGenerate}
+            onClick={handleGenerateDraft}
             disabled={!topic || isGenerating}
             className="w-full py-4 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-600/50 disabled:cursor-not-allowed rounded-2xl font-bold text-white shadow-[0_0_30px_rgba(147,51,234,0.3)] transition-all flex items-center justify-center gap-2"
           >
-            {isGenerating ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Создаем дизайн и текст...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-5 h-5" />
-                Сгенерировать Карусель
-              </>
-            )}
+            {isGenerating ? <><Loader2 className="w-5 h-5 animate-spin" /> Пишем сценарий...</> : <><MessageSquare className="w-5 h-5" /> Создать Черновик</>}
           </button>
         </div>
-      ) : (
+      )}
+
+      {/* PHASE 2: DRAFTING */}
+      {phase === 'drafting' && draft && (
+        <div className="space-y-6">
+          <div className="glass-panel p-6 rounded-3xl border border-white/10">
+            <h2 className="text-xl font-bold mb-4">Черновик ({draft.length} слайдов)</h2>
+            <div className="space-y-4">
+              {draft.map((s, i) => (
+                <div key={i} className="p-4 bg-white/5 rounded-xl border border-white/5">
+                  <div className="text-xs text-purple-400 font-bold mb-1">{s.title}</div>
+                  <div className="font-medium text-lg leading-snug">{s.subtitle}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Chat History */}
+          {chatHistory.length > 0 && (
+            <div className="glass-panel p-6 rounded-3xl border border-white/10 space-y-4">
+              {chatHistory.map((msg, i) => (
+                <div key={i} className={`p-3 rounded-xl max-w-[85%] ${msg.role === 'user' ? 'bg-purple-600/30 ml-auto border border-purple-500/20' : 'bg-white/5 mr-auto border border-white/5'}`}>
+                  <p className="text-sm">{msg.text}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Feedback Input */}
+          <div className="flex gap-2">
+            <input 
+              type="text" 
+              value={userFeedback}
+              onChange={(e) => setUserFeedback(e.target.value)}
+              placeholder="Что исправить? (напр: сделай жестче)"
+              onKeyDown={(e) => e.key === 'Enter' && handleSendFeedback()}
+              className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:outline-none"
+            />
+            <button 
+              onClick={handleSendFeedback}
+              disabled={isGenerating || !userFeedback.trim()}
+              className="px-4 bg-white/10 hover:bg-white/20 disabled:opacity-50 rounded-xl transition-colors"
+            >
+              {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Отправить'}
+            </button>
+          </div>
+
+          <button 
+            onClick={handleGenerateFinal}
+            disabled={isGenerating}
+            className="w-full py-4 bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 rounded-2xl font-bold text-white shadow-[0_0_30px_rgba(22,163,74,0.3)] transition-all flex items-center justify-center gap-2 mt-4"
+          >
+            {isGenerating ? <><Loader2 className="w-5 h-5 animate-spin" /> Генерируем дизайн...</> : <><CheckCircle className="w-5 h-5" /> Одобрить и создать дизайн</>}
+          </button>
+        </div>
+      )}
+
+      {/* PHASE 3: FINALIZED */}
+      {phase === 'finalized' && slides && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-lg">Готово! 🎉</h3>
             <button 
-              onClick={() => setSlides(null)}
+              onClick={() => { setPhase('setup'); setDraft(null); setSlides(null); }}
               className="text-sm text-purple-400 hover:text-purple-300"
             >
               Сделать еще
             </button>
           </div>
           
-          {/* Скрытый контейнер для рендеринга 1080x1350 */}
-          {/* Мы показываем уменьшенную копию через CSS scale, но рендерим в оригинальном размере */}
           <div className="overflow-x-auto pb-4 hide-scrollbar">
             <div 
               ref={carouselRef}
@@ -158,16 +359,15 @@ export default function CarouselGeneratorPage() {
                   key={i} 
                   className="carousel-slide relative overflow-hidden flex flex-col justify-center items-center text-center p-12"
                   style={{ 
-                    width: '1080px', 
-                    height: '1350px',
-                    transform: 'scale(0.25)', // Уменьшаем для предпросмотра
+                    width: `${dims.w}px`, 
+                    height: `${dims.h}px`,
+                    transform: 'scale(0.25)', 
                     transformOrigin: 'top left',
-                    marginBottom: '-1012px', // Компенсируем высоту scale
-                    marginRight: '-810px', // Компенсируем ширину scale
+                    marginBottom: `-${dims.h * 0.75}px`,
+                    marginRight: `-${dims.w * 0.75}px`,
                     backgroundColor: '#111'
                   }}
                 >
-                  {/* Фоновая картинка сграбленная с AI */}
                   <div 
                     className="absolute inset-0 z-0"
                     style={{
@@ -177,11 +377,8 @@ export default function CarouselGeneratorPage() {
                       opacity: 0.6
                     }}
                   />
-                  
-                  {/* Темный градиент для читаемости текста */}
                   <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-                  {/* Контент поверх фона */}
                   <div className="relative z-20 flex flex-col items-center gap-8 text-white w-full px-8 mt-auto mb-32">
                     <div className="px-6 py-2 bg-purple-600/80 backdrop-blur-md rounded-full text-3xl font-bold tracking-widest uppercase border border-white/20 shadow-xl">
                       {slide.title}
@@ -191,7 +388,6 @@ export default function CarouselGeneratorPage() {
                     </h2>
                   </div>
 
-                  {/* Декоративные элементы */}
                   <div className="absolute top-12 left-12 z-20 text-white/50 text-3xl font-mono">
                     0{i + 1}
                   </div>
@@ -211,7 +407,7 @@ export default function CarouselGeneratorPage() {
             className="w-full py-4 bg-white text-black hover:bg-gray-200 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 mt-8"
           >
             <Download className="w-5 h-5" />
-            Скачать 6 слайдов (PNG)
+            Скачать {slides.length} слайдов
           </button>
         </div>
       )}
