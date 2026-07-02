@@ -1,27 +1,18 @@
-# Progress Log
+# Progress
 
-## Phase 1: MVP Setup & UI (Completed)
-- [x] Initialized Next.js project with Tailwind CSS.
-- [x] Implemented premium UI for Landing Page (`src/app/page.tsx`).
-- [x] Implemented User Dashboard Layout and Page (`src/app/dashboard/layout.tsx`, `src/app/dashboard/page.tsx`).
-- [x] Set up Supabase SSR middleware.
+## Wins
+- Setup Telegram Webhook integration via Vercel Edge API routes.
+- Created `Mini App` UI for `Контент Завод` (Carousel Generator).
+- Integrated `html-to-image` for generating final rendered slides.
+- Setup `Nano Banana 2` (gemini-3.1-flash-image) integration in `/api/generate-carousel` with `responseModalities=["IMAGE"]`.
+- Solved Telegram Mini App direct download blocking by routing image generation back through Telegram Bot API (`sendPhoto`).
+- Added Telegram Bot inline generation hook `/carousel` that seamlessly integrates with our draft generation route and prompts users to start visual generation.
+- Implemented robust `sendAdminNotification` logging for Bot, Draft generation, and Image rendering.
 
-## Phase 1.5: Deployment & Environment Configuration (Completed)
-- [x] Fixed `TELEGRAM_BOT_TOKEN` build errors by adding a development fallback in `src/bot/index.ts`.
-- [x] Programmatically pushed local `.env.local` Supabase environment variables to Vercel via CLI.
-- [x] Successfully deployed the frontend to Vercel production: `https://n8-assistant-v2.vercel.app`.
-- [x] Restored Supabase authentication middleware checks.
-- [x] Localized the app (English/Russian) with language switcher.
+## Issues / Blockers
+- **Vercel Serverless Max Duration:** Generating 6 high-quality Vertex AI images inline takes ~60 seconds, risking standard Vercel function timeouts. We moved to a two-step prompt-drafting and callback generation mechanism to alleviate this, but 60s is still tight for image batch generation.
+- **Maton.ai Integration:** Need exact `.env` credentials and workflow design to integrate Maton.ai MCP successfully.
 
-## Phase 1.6: Auth Fixes & Onboarding Preparation (Completed)
-- [x] Created `src/app/auth/callback/route.ts` to properly handle Supabase Email OTP links in Next.js SSR.
-- [x] Updated Supabase Site URL instructions for user to match Vercel production.
-- [x] Separated Login and Registration UI into tabs with `?mode=login` and `?mode=signup`.
-- [x] Implemented success notification UI after registration ("Check your email").
-- [x] Removed "free" marketing language from landing page CTAs.
-
-## Phase 2: Backend Integration & AI (Next Steps)
-- [ ] Implement Onboarding Flow (Quiz, Telegram/Instagram handles, Invite Code).
-- [ ] Create Database schema in Supabase (users, logs, etc.) and save onboarding data.
-- [ ] Set up actual `TELEGRAM_BOT_TOKEN` to activate Grammy bot webhook.
-- [ ] Build multi-LLM router and integrate AI capabilities.
+## ПРОГРЕСС НА РУССКОМ
+- **Успехи:** Развернули Telegram-бота, сделали Mini App интерфейс каруселей, внедрили логику Vertex AI (Nano Banana 2), сделали отправку фото в обход блокировки браузера прямо в бота. Настроили логи админу.
+- **Проблемы:** Vercel может обрывать долгие генерации картинок (лимит 60 сек). Ждем ключи от Maton для внедрения MCP сервера.

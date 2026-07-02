@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { sendAdminNotification } from '@/lib/telegram';
 
 export const maxDuration = 60;
 
@@ -86,31 +87,35 @@ export async function POST(req: Request) {
     if (!topic) {
       return NextResponse.json({ error: 'Topic is required' }, { status: 400 });
     }
+    
+    // Log to admin
+    await sendAdminNotification(`📝 **Генерация Черновика**\n**Тема:** ${topic}\n**Слайдов:** ${slideCount || 6}\n**С чатом?** ${chatHistory?.length ? 'Да' : 'Нет'}`);
 
     const n = slideCount || 6;
-    const systemInstruction = `You are a world-class social media copywriter and visual designer. Your task is to create a ${n}-slide Instagram/Telegram carousel.
+    const systemInstruction = `Вы — топовый копирайтер и арт-директор. Ваша задача — создать карусель для Instagram/Telegram на ${n} слайдов.
 
-COPYWRITING RULES:
-- Slide 1 (HOOK): Must be provocative, controversial, or surprising. Use pattern interrupt. Make people STOP scrolling.
-- Middle slides: Follow AIDA or PAS formula. Each slide = one clear idea. Use power words.
-- Last slide (CTA): Clear next step. Create urgency or FOMO.
-- All subtitle text must be in Russian. Be specific, not generic. Avoid corporate clichés.
-- Max 8 words per subtitle. Every word must earn its place.
+ПРАВИЛА КОПИРАЙТИНГА:
+- Слайд 1 (ХУК): Провокация, разрыв шаблона, неожиданный факт. Заставьте человека остановиться.
+- Слайды 2-${n - 1}: Раскройте тему глубоко. Используйте формулу AIDA или PAS. Пишите ёмко, используйте сильные глаголы. Никакой воды и корпоративных штампов.
+- Слайд ${n} (CTA): Четкий призыв к действию (подписка, комментарий, переход по ссылке). Создайте срочность.
+- Текст должен быть на русском языке. Звучать естественно, экспертно и интригующе.
 
-IMAGE PROMPT RULES for each slide (imagePrompt field):
-- Write a cinematographic visual scene description in English
-- Specify: lighting type (e.g. "golden hour", "neon cyberpunk", "soft studio light"), mood, color palette (2-3 dominant colors), composition (e.g. "minimalist", "abstract gradient", "luxury texture")
-- Prefer abstract/atmospheric backgrounds without visible text or UI elements
-- Example: "Abstract fluid art, deep ocean blue and electric purple gradient waves, cinematic bokeh light particles, luxury aesthetic, dark moody atmosphere"
+ПРАВИЛА ГЕНЕРАЦИИ ВИЗУАЛА (imagePrompt):
+- Опишите визуальную сцену на АНГЛИЙСКОМ языке (для нейросети).
+- Это ТЗ для дизайнера. Описывайте конкретно: композицию, освещение ("cinematic lighting", "neon glow"), цветовую палитру (2-3 цвета), текстуры, атмосферу.
+- Избегайте текста на картинках. Фокусируйтесь на абстракциях, метафорах или высококачественных фотореалистичных объектах.
+- Пример: "Minimalist abstract 3d rendering, glassmorphism UI elements floating in dark space, deep purple and electric blue gradient background, soft cinematic studio lighting, premium luxury aesthetic, 8k resolution, highly detailed."
 
-OUTPUT FORMAT:
-Return ONLY a valid JSON array. No markdown, no explanation.
-Each object must have exactly:
-- "title": short uppercase label (e.g. "HOOK", "БОЛЬ", "РЕШЕНИЕ", "СЕКРЕТ", "ВЫГОДА", "CTA")
-- "subtitle": powerful Russian text (max 8 words)
-- "imagePrompt": detailed English visual scene (3-4 sentences)
-
-Make exactly ${n} slides. Structure: Hook → Pain → Agitation → Solution → Proof/Benefit → CTA.`;
+ФОРМАТ ОТВЕТА (ВЕРНИТЕ ТОЛЬКО JSON ARRAY):
+[
+  {
+    "title": "ХУК", 
+    "subtitle": "Основной броский заголовок слайда (до 10 слов)",
+    "body": "Раскрывающий текст слайда, который можно разместить ниже или сказать голосом. 2-3 предложения конкретики. Раскройте мысль глубже.",
+    "imagePrompt": "Детальное ТЗ для визуала на английском языке (3-4 предложения)"
+  }
+]
+Структура: Hook → Pain → Agitation → Solution → Proof/Benefit → CTA. Сделайте ровно ${n} слайдов.`;
 
     const contents: any[] = [];
     const initialParts: any[] = [{ text: `Topic: "${topic}"` }];
@@ -157,6 +162,7 @@ Make exactly ${n} slides. Structure: Hook → Pain → Agitation → Solution �
 
   } catch (error: any) {
     console.error('Draft generation error:', error);
+    await sendAdminNotification(`❌ **Ошибка Черновика**\n\`${error.message || 'Unknown error'}\``);
     return NextResponse.json({ error: error.message || 'Failed to generate draft' }, { status: 500 });
   }
 }

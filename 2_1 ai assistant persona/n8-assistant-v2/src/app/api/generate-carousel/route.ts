@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleAuth } from 'google-auth-library';
+import { sendAdminNotification } from '@/lib/telegram';
 
 export const maxDuration = 60; // Allow more time for generation
 
@@ -17,10 +18,25 @@ async function getVertexToken() {
   return { token: token.token, projectId: credentials.project_id };
 }
 
-async function generateImage(projectId: string, token: string, prompt: string, isFast: boolean = false, aspectRatio: string = "3:4") {
-  const model = isFast ? 'imagen-3.0-fast-generate-001' : 'imagen-3.0-generate-001';
-  const url = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/${model}:predict`;
+async function generateImage(projectId: string, token: string, prompt: string, modelChoice: string = 'nano-banana-1', aspectRatio: string = "3:4", referenceImageBase64?: string) {
+  // Nano Banana 1 uses flash-image, Nano Banana 2 (pro) could use pro-image, but user asks for nano-banana-2
+  const model = modelChoice === 'nano-banana-2' ? 'gemini-3-pro-image' : 'gemini-3.1-flash-image';
   
+  // MUST use global endpoint for gemini-3.1-flash-image / gemini-3-pro-image
+  const url = `https://aiplatform.googleapis.com/v1/projects/${projectId}/locations/global/publishers/google/models/${model}:generateContent`;
+  
+  const parts: any[] = [{ text: prompt }];
+  if (referenceImageBase64) {
+    const base64Data = referenceImageBase64.replace(/^data:image\/\w+;base64,/, '');
+    const mimeType = referenceImageBase64.match(/^data:(image\/\w+);base64,/)?.[1] || 'image/jpeg';
+    parts.push({
+      inlineData: {
+        mimeType,
+        data: base64Data
+      }
+    });
+  }
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -28,51 +44,60 @@ async function generateImage(projectId: string, token: string, prompt: string, i
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      instances: [{ prompt: prompt }],
-      parameters: {
-        sampleCount: 1,
-        aspectRatio: aspectRatio, // Options: "1:1", "9:16", "16:9", "3:4", "4:3"
+      contents: [{
+        role: "user",
+        parts
+      }],
+      generationConfig: {
+        responseModalities: ["IMAGE"],
+        temperature: 1.0,
       }
     })
   });
 
   if (!response.ok) {
     const err = await response.text();
-    console.error('Imagen error:', err);
-    return null;
+    console.error('Nano Banana Vertex error:', err);
+    throw new Error(`Nano Banana API failed: ${response.statusText} - ${err.substring(0, 200)}`);
   }
 
   const data = await response.json();
-  const base64 = data.predictions?.[0]?.bytesBase64Encoded;
-  return base64 ? `data:image/png;base64,${base64}` : null;
+  const base64 = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+  const mimeTypeRes = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType || 'image/jpeg';
+  
+  return base64 ? `data:${mimeTypeRes};base64,${base64}` : null;
 }
 
 export async function POST(req: Request) {
   try {
-    const { slides, modelChoice, aspectRatio } = await req.json();
+    const { slides, modelChoice, aspectRatio, imageStyle, referenceImage } = await req.json();
 
     if (!slides || !Array.isArray(slides)) {
       return NextResponse.json({ error: 'Valid slides array is required' }, { status: 400 });
     }
 
+    // Log to admin
+    await sendAdminNotification(`🎨 **Рендеринг Дизайна**\n**Модель:** ${modelChoice}\n**Формат:** ${aspectRatio}\n**Слайдов:** ${slides.length}`);
+
     const { token, projectId } = await getVertexToken();
 
-    // Generate backgrounds for the approved draft
+    // Process each slide sequentially (or parallel, but Gemini might have rate limits)
     const finalSlides = await Promise.all(slides.map(async (slide: any) => {
-      let backgroundUrl = '';
+      let backgroundUrl = slide.backgroundUrl || '';
       
-      if (modelChoice === 'presentation') {
-        // Fallback or empty, we will use dark solid color or random Unsplash abstract
-        backgroundUrl = `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&h=1350&fit=crop&auto=format`;
-      } else {
-        // Nano 2 (pro) or Nano Banana (flash/fast)
-        const isFast = modelChoice === 'nano';
-        // Map 4:5 to 3:4 for Imagen API since 4:5 is not directly supported by Imagen 3 standard aspect ratios
-        let apiAspectRatio = aspectRatio;
-        if (apiAspectRatio === '4:5') apiAspectRatio = '3:4';
-        
-        const img = await generateImage(projectId, token as string, slide.imagePrompt, isFast, apiAspectRatio);
-        backgroundUrl = img || `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&h=1350&fit=crop&auto=format`;
+      if (!backgroundUrl) {
+        if (modelChoice === 'presentation') {
+           backgroundUrl = `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&h=1350&fit=crop&auto=format`;
+        } else {
+          // Here we build the prompt including the user's style preference
+          let promptWithStyle = slide.imagePrompt;
+          if (imageStyle) {
+            promptWithStyle += `\n\nVisual Style and Target Audience: ${imageStyle}`;
+          }
+          const aspectPrompt = `\n\nGenerate this image in ${aspectRatio} aspect ratio.`;
+          const img = await generateImage(projectId, token as string, promptWithStyle + aspectPrompt, modelChoice, aspectRatio, referenceImage);
+          backgroundUrl = img || `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&h=1350&fit=crop&auto=format`;
+        }
       }
 
       return {
@@ -85,6 +110,7 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     console.error('Carousel generation error:', error);
-    return NextResponse.json({ error: 'Failed to generate carousel images' }, { status: 500 });
+    await sendAdminNotification(`❌ **Ошибка Рендеринга**\n\`${error.message || 'Unknown error'}\``);
+    return NextResponse.json({ error: 'Failed to generate carousel' }, { status: 500 });
   }
 }

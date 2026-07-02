@@ -8,6 +8,7 @@ import * as htmlToImage from 'html-to-image'
 interface SlideData {
   title: string
   subtitle: string
+  body?: string
   imagePrompt: string
   backgroundUrl?: string
 }
@@ -128,7 +129,8 @@ export default function CarouselGeneratorPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           slides: draft, 
-          modelChoice, 
+          modelChoice,
+          referenceImage,
           aspectRatio 
         })
       })
@@ -145,23 +147,57 @@ export default function CarouselGeneratorPage() {
     }
   }
 
-  const downloadAll = async () => {
+  const [isSending, setIsSending] = useState(false)
+
+  const sendToBot = async () => {
     if (!carouselRef.current || !slides) return
+    setIsSending(true)
+    
+    // Check for Telegram WebApp environment
+    const tg = (window as any).Telegram?.WebApp
+    const chatId = tg?.initDataUnsafe?.user?.id
     
     const slideElements = carouselRef.current.querySelectorAll('.carousel-slide')
+    const images: string[] = []
     
     for (let i = 0; i < slideElements.length; i++) {
       const element = slideElements[i] as HTMLElement
       try {
         const dataUrl = await htmlToImage.toPng(element, { quality: 1.0, pixelRatio: 2 })
-        const link = document.createElement('a')
-        link.download = `slide_${i + 1}.png`
-        link.href = dataUrl
-        link.click()
-        await new Promise(r => setTimeout(r, 300))
+        images.push(dataUrl)
       } catch (err) {
-        console.error('Failed to download slide', i, err)
+        console.error('Failed to render slide', i, err)
       }
+    }
+
+    try {
+      if (chatId) {
+        // We are inside Telegram Mini App, send via bot
+        const res = await fetch('/api/bot/send-images', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chatId, images, topic })
+        })
+        if (res.ok) {
+          tg?.showAlert?.('Картинки успешно отправлены вам в чат!')
+        } else {
+          tg?.showAlert?.('Ошибка при отправке картинок.')
+        }
+      } else {
+        // Fallback for desktop browser without Telegram context - just download them
+        for (let i = 0; i < images.length; i++) {
+          const link = document.createElement('a')
+          link.download = `slide_${i + 1}.png`
+          link.href = images[i]
+          link.click()
+          await new Promise(r => setTimeout(r, 300))
+        }
+        alert('Картинки скачаны на ваше устройство.')
+      }
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setIsSending(false)
     }
   }
 
@@ -209,7 +245,7 @@ export default function CarouselGeneratorPage() {
                 min="2" max="10" 
                 value={slideCount}
                 onChange={(e) => setSlideCount(parseInt(e.target.value) || 6)}
-                className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:outline-none"
+                className="w-full bg-white/5 border border-white/20 rounded-xl p-3 text-white focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-colors"
               />
             </div>
             <div className="glass-panel p-4 rounded-3xl border border-white/10">
@@ -228,8 +264,13 @@ export default function CarouselGeneratorPage() {
             </div>
           </div>
 
-          <div className="glass-panel p-4 rounded-3xl border border-white/10">
-            <label className="block text-sm font-semibold mb-2">Стиль Дизайна</label>
+          {/* Image generation fields */}
+          <div className="space-y-4 pt-4 border-t border-white/10">
+            <h3 className="text-lg font-medium">Визуал</h3>
+            
+            <div className="space-y-2">
+              <label className="text-sm text-gray-400">Референсное фото (опционально)</label>
+            </div>
             <select 
               value={modelChoice}
               onChange={(e) => setModelChoice(e.target.value)}
@@ -292,9 +333,21 @@ export default function CarouselGeneratorPage() {
             <h2 className="text-xl font-bold mb-4">Черновик ({draft.length} слайдов)</h2>
             <div className="space-y-4">
               {draft.map((s, i) => (
-                <div key={i} className="p-4 bg-white/5 rounded-xl border border-white/5">
+                <div key={i} className="p-4 bg-white/5 rounded-xl border border-white/5 space-y-2">
                   <div className="text-xs text-purple-400 font-bold mb-1">{s.title}</div>
                   <div className="font-medium text-lg leading-snug">{s.subtitle}</div>
+                  {s.body && (
+                    <div className="text-sm text-gray-300 mt-2 p-3 bg-black/40 rounded-lg">
+                      <span className="text-xs text-gray-500 uppercase tracking-widest block mb-1">Основной текст</span>
+                      {s.body}
+                    </div>
+                  )}
+                  {s.imagePrompt && (
+                    <div className="text-xs text-blue-300/70 mt-2 p-3 bg-blue-900/20 border border-blue-500/20 rounded-lg">
+                      <span className="text-xs text-blue-400/50 uppercase tracking-widest block mb-1">ТЗ для визуала (Prompt)</span>
+                      {s.imagePrompt}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -399,7 +452,7 @@ export default function CarouselGeneratorPage() {
                     <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
                        <span className="text-white">AI</span>
                     </div>
-                    @ai_assistant
+                    @n8_assistant_bot
                   </div>
                 </div>
               ))}
@@ -407,11 +460,12 @@ export default function CarouselGeneratorPage() {
           </div>
 
           <button 
-            onClick={downloadAll}
-            className="w-full py-4 bg-white text-black hover:bg-gray-200 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 mt-8"
+            onClick={sendToBot}
+            disabled={isSending}
+            className="w-full py-4 bg-white text-black hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl font-bold transition-all flex items-center justify-center gap-2 mt-8"
           >
-            <Download className="w-5 h-5" />
-            Скачать {slides.length} слайдов
+            {isSending ? <Loader2 className="w-5 h-5 animate-spin" /> : <MessageSquare className="w-5 h-5" />}
+            {isSending ? 'Отправляем...' : `Отправить ${slides.length} слайдов в чат`}
           </button>
         </div>
       )}
