@@ -139,15 +139,20 @@ export async function POST(req: Request) {
       });
     }
 
-    // Пробуем Vertex, фолбэк на Gemini API
+    // Vertex AI — основной путь (Service Account из env)
+    // Фолбэк на Gemini только если явно задан GEMINI_API_KEY
     let textRes: string;
     try {
       textRes = await generateWithVertex(systemInstruction, contents);
-      console.log('Using Vertex AI');
-    } catch (vertexErr) {
-      console.warn('Vertex failed, falling back to Gemini API:', vertexErr);
-      textRes = await generateWithGeminiAPI(systemInstruction, contents);
-      console.log('Using Gemini API fallback');
+      console.log('✅ Using Vertex AI');
+    } catch (vertexErr: any) {
+      console.error('❌ Vertex AI error:', vertexErr?.message || vertexErr);
+      if (process.env.GEMINI_API_KEY) {
+        console.warn('⚠️ Falling back to Gemini API');
+        textRes = await generateWithGeminiAPI(systemInstruction, contents);
+      } else {
+        throw new Error(`Vertex AI failed: ${vertexErr?.message || 'Unknown'}. Check GOOGLE_APPLICATION_CREDENTIALS_JSON on Vercel.`);
+      }
     }
 
     let parsedDraft;
