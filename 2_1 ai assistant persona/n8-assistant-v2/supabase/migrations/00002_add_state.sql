@@ -1,0 +1,2 @@
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS state TEXT DEFAULT 'idle';
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS state_data JSONB;

@@ -89,7 +89,7 @@ export async function POST(req: Request) {
     }
     
     // Log to admin
-    await sendAdminNotification(`📝 **Генерация Черновика**\n**Тема:** ${topic}\n**Слайдов:** ${slideCount || 6}\n**С чатом?** ${chatHistory?.length ? 'Да' : 'Нет'}`);
+    console.log(`📝 Генерация Черновика\nТема: ${topic}\nСлайдов: ${slideCount}\nС чатом? ${chatHistory?.length ? 'Да' : 'Нет'}`);
 
     const n = slideCount || 6;
     const systemInstruction = `Вы — топовый копирайтер и арт-директор. Ваша задача — создать карусель для Instagram/Telegram на ${n} слайдов.
@@ -161,8 +161,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ draft: parsedDraft });
 
   } catch (error: any) {
-    console.error('Draft generation error:', error);
-    await sendAdminNotification(`❌ **Ошибка Черновика**\n\`${error.message || 'Unknown error'}\``);
-    return NextResponse.json({ error: error.message || 'Failed to generate draft' }, { status: 500 });
+    console.error('API Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
