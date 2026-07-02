@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { sendAdminNotification } from '@/lib/telegram';
+import { supabase } from '@/lib/supabase';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const WEB_APP_URL = 'https://n8-assistant-v2.vercel.app/dashboard';
@@ -17,6 +18,17 @@ export async function POST(req: Request) {
     const text = update.message.text;
     const username = update.message.from?.username || 'Unknown';
     const firstName = update.message.from?.first_name || '';
+
+    // Log to Supabase
+    await supabase.from('users').upsert(
+      { telegram_id: chatId, username, first_name: firstName, updated_at: new Date() },
+      { onConflict: 'telegram_id' }
+    );
+    await supabase.from('logs').insert({
+      telegram_id: chatId,
+      action: text.startsWith('/start') ? 'start' : 'message',
+      metadata: { text }
+    });
 
     // Log to admin
     await sendAdminNotification(`👤 **Юзер в боте:** @${username} (${firstName})\n💬 **Пишет:** ${text}`);

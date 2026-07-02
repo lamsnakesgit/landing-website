@@ -3,6 +3,8 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Upload, Loader2, Download, MessageSquare, CheckCircle, Image as ImageIcon } from 'lucide-react'
+import JSZip from 'jszip'
+import { saveAs } from 'file-saver'
 import * as htmlToImage from 'html-to-image'
 
 interface SlideData {
@@ -124,6 +126,10 @@ export default function CarouselGeneratorPage() {
     setIsGenerating(true)
     
     try {
+      // Check for Telegram WebApp environment
+      const tg = (window as any).Telegram?.WebApp
+      const telegramId = tg?.initDataUnsafe?.user?.id
+
       const res = await fetch('/api/generate-carousel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -131,7 +137,8 @@ export default function CarouselGeneratorPage() {
           slides: draft, 
           modelChoice,
           referenceImage,
-          aspectRatio 
+          aspectRatio,
+          telegramId
         })
       })
       
@@ -184,15 +191,20 @@ export default function CarouselGeneratorPage() {
           tg?.showAlert?.('Ошибка при отправке картинок.')
         }
       } else {
-        // Fallback for desktop browser without Telegram context - just download them
-        for (let i = 0; i < images.length; i++) {
-          const link = document.createElement('a')
-          link.download = `slide_${i + 1}.png`
-          link.href = images[i]
-          link.click()
-          await new Promise(r => setTimeout(r, 300))
+        // Fallback for desktop browser without Telegram context - just download them as a ZIP
+        try {
+          const zip = new JSZip()
+          for (let i = 0; i < images.length; i++) {
+            // Remove 'data:image/png;base64,' to get raw base64 data
+            const base64Data = images[i].split(',')[1]
+            zip.file(`slide_${i + 1}.png`, base64Data, { base64: true })
+          }
+          const content = await zip.generateAsync({ type: 'blob' })
+          saveAs(content, 'carousel_slides.zip')
+        } catch (zipError) {
+          console.error('Failed to create ZIP', zipError)
+          alert('Ошибка при архивации картинок.')
         }
-        alert('Картинки скачаны на ваше устройство.')
       }
     } catch (e) {
       console.error(e)

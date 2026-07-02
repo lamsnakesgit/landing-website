@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleAuth } from 'google-auth-library';
 import { sendAdminNotification } from '@/lib/telegram';
-
+import { supabase } from '@/lib/supabase';
 export const maxDuration = 60; // Allow more time for generation
 
 async function getVertexToken() {
@@ -70,10 +70,18 @@ async function generateImage(projectId: string, token: string, prompt: string, m
 
 export async function POST(req: Request) {
   try {
-    const { slides, modelChoice, aspectRatio, imageStyle, referenceImage } = await req.json();
+    const { slides, modelChoice, aspectRatio, imageStyle, referenceImage, telegramId } = await req.json();
 
     if (!slides || !Array.isArray(slides)) {
       return NextResponse.json({ error: 'Valid slides array is required' }, { status: 400 });
+    }
+
+    if (telegramId) {
+      await supabase.from('logs').insert({
+        telegram_id: telegramId,
+        action: 'generate_carousel',
+        metadata: { modelChoice, slidesCount: slides.length }
+      });
     }
 
     // Log to admin
