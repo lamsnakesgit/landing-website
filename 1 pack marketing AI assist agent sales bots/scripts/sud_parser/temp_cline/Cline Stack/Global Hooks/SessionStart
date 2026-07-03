@@ -1,0 +1,379 @@
+#!/usr/bin/env bash
+# Хук SessionStart: загружает operational continuity при старте/после compaction.
+# Variant B: restore marker выбирается по taskId, а workspaceRealpath остаётся safety fence.
+# Project identity определяется по явному маркеру `Проект:` и используется в section headers.
+
+input=$(cat)
+
+action_python() {
+  python3 - "$@"
+}
+
+home_path() {
+  python3 - "$@" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path.home()
+for part in sys.argv[1:]:
+    path /= part
+print(path)
+PY
+}
+
+resolve_realpath() {
+  local target="$1"
+  if [ -z "$target" ]; then
+    return
+  fi
+  python3 - "$target" <<'PY'
+import os
+import sys
+
+p = sys.argv[1]
+print(os.path.realpath(p) if os.path.exists(p) else os.path.abspath(os.path.expanduser(p)))
+PY
+}
+
+read_limited_file() {
+  local path="$1"
+  local max_chars="${2:-16000}"
+  python3 - "$path" "$max_chars" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+max_chars = int(sys.argv[2])
+if not path.exists():
+    raise SystemExit(0)
+text = path.read_text(errors='ignore')
+if len(text) > max_chars:
+    text = text[:max_chars].rstrip() + "\n\n[... обрезано для continuity preview ...]"
+print(text)
+PY
+}
+
+cleanup_task_markers() {
+  local marker_dir="$1"
+  local ttl_seconds="$2"
+  python3 - "$marker_dir" "$ttl_seconds" <<'PY'
+from pathlib import Path
+import json
+import sys
+import time
+
+marker_dir = Path(sys.argv[1])
+ttl = int(sys.argv[2])
+if not marker_dir.exists():
+    raise SystemExit(0)
+now = time.time()
+for path in marker_dir.glob('*.json'):
+    remove = False
+    try:
+        data = json.loads(path.read_text())
+    except Exception:
+        remove = True
+        data = {}
+    age = now - path.stat().st_mtime
+    if age > ttl:
+        remove = True
+    if not remove:
+        if not data.get('taskId'):
+            remove = True
+        elif not data.get('workspace') and not data.get('workspaceRealpath'):
+            remove = True
+    if remove:
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            pass
+PY
+}
+
+select_task_marker() {
+  local marker_dir="$1"
+  local task_id_arg="$2"
+  local workspace_arg="$3"
+  local workspace_real_arg="$4"
+  local user_id_arg="$5"
+  python3 - "$marker_dir" "$task_id_arg" "$workspace_arg" "$workspace_real_arg" "$user_id_arg" <<'PY'
+from pathlib import Path
+import json
+import sys
+
+marker_dir = Path(sys.argv[1])
+task_id = sys.argv[2]
+workspace = sys.argv[3]
+workspace_real = sys.argv[4]
+user_id = sys.argv[5]
+
+result = {"status": "none", "markerPath": "", "reason": "no-matching-marker"}
+if not marker_dir.exists():
+    print(json.dumps(result, ensure_ascii=False))
+    raise SystemExit(0)
+
+
+def load(path: Path):
+    try:
+        return json.loads(path.read_text())
+    except Exception:
+        return None
+
+
+def workspace_matches(data: dict) -> bool:
+    marker_real = data.get('workspaceRealpath') or ''
+    marker_plain = data.get('workspace') or ''
+    if workspace_real and marker_real:
+        return workspace_real == marker_real
+    if workspace and marker_plain:
+        return workspace == marker_plain
+    return False
+
+
+def user_matches(data: dict) -> bool:
+    marker_user = data.get('userId') or ''
+    if not user_id:
+        return True
+    if not marker_user:
+        return True
+    return marker_user == user_id
+
+
+candidates = []
+for path in marker_dir.glob('*.json'):
+    data = load(path)
+    if not data:
+        continue
+    if not workspace_matches(data):
+        continue
+    if not user_matches(data):
+        continue
+    candidates.append((path, data))
+
+if task_id:
+    exact = [(path, data) for path, data in candidates if (data.get('taskId') or '') == task_id]
+    if exact:
+        path, _ = sorted(exact, key=lambda item: item[0].stat().st_mtime, reverse=True)[0]
+        print(json.dumps({"status": "exact", "markerPath": str(path), "reason": "taskId-match"}, ensure_ascii=False))
+        raise SystemExit(0)
+
+if len(candidates) == 1:
+    path, _ = candidates[0]
+    print(json.dumps({"status": "workspace-single", "markerPath": str(path), "reason": "single-workspace-candidate"}, ensure_ascii=False))
+    raise SystemExit(0)
+if len(candidates) > 1:
+    print(json.dumps({"status": "ambiguous", "markerPath": "", "reason": "multiple-candidates-for-workspace"}, ensure_ascii=False))
+    raise SystemExit(0)
+
+print(json.dumps(result, ensure_ascii=False))
+PY
+}
+
+marker_is_stale() {
+  local marker_file="$1"
+  local ttl_seconds="${2:-43200}"
+  python3 - "$marker_file" "$ttl_seconds" <<'PY'
+from pathlib import Path
+import sys
+import time
+
+marker = Path(sys.argv[1])
+ttl = int(sys.argv[2])
+if not marker.exists():
+    print("false")
+    raise SystemExit(0)
+age = time.time() - marker.stat().st_mtime
+print("true" if age > ttl else "false")
+PY
+}
+
+build_vault_block() {
+  local hot_block=""
+  local focus_block=""
+  if [ -f "$HOT_FILE" ]; then
+    hot_block=$(read_limited_file "$HOT_FILE" 12000)
+  fi
+  if [ -f "$FOCUS_FILE" ]; then
+    focus_block=$(read_limited_file "$FOCUS_FILE" 12000)
+  fi
+  if [ -n "$hot_block" ] || [ -n "$focus_block" ]; then
+    printf '🧠 VAULT CONTINUITY (Obsidian second brain):\n\n'
+    if [ -n "$hot_block" ]; then
+      printf '### wiki/hot.md\n%s\n\n' "$hot_block"
+    fi
+    if [ -n "$focus_block" ]; then
+      printf '### wiki/meta/current-focus.md\n%s\n' "$focus_block"
+    fi
+  fi
+}
+
+build_project_block() {
+  local plan_text=""
+  local state_text=""
+  local handoff_text=""
+  local prefix="${SECTION_PREFIX:-проект}"
+  if [ "$IS_BROAD_ROOT" = "true" ]; then
+    return
+  fi
+  if [ -f "$PLAN_FILE" ]; then
+    plan_text=$(read_limited_file "$PLAN_FILE" 16000)
+  fi
+  if [ -f "$STATE_FILE" ]; then
+    state_text=$(read_limited_file "$STATE_FILE" 16000)
+  fi
+  if [ -f "$HANDOFF_FILE" ]; then
+    handoff_text=$(read_limited_file "$HANDOFF_FILE" 12000)
+  fi
+  if [ -n "$plan_text" ] || [ -n "$state_text" ] || [ -n "$handoff_text" ]; then
+    if [ -n "$plan_text" ]; then
+      printf '### %s / implementation_plan.md\n%s\n\n' "$prefix" "$plan_text"
+    fi
+    if [ -n "$state_text" ]; then
+      printf '### %s / cline_docs/project-state.md\n%s\n\n' "$prefix" "$state_text"
+    fi
+    if [ -n "$handoff_text" ]; then
+      printf '### %s / cline_docs/handoff-summary.md\n%s\n' "$prefix" "$handoff_text"
+    fi
+  fi
+}
+
+task_id=$(echo "$input" | jq -r '.taskId // ""' 2>/dev/null)
+user_id=$(echo "$input" | jq -r '.userId // ""' 2>/dev/null)
+workspace=$(echo "$input" | jq -r '.workspacePath // ""' 2>/dev/null)
+PROJECT_HELPER=$(home_path Documents Cline Hooks scripts project_identity.py)
+
+PROJECT_JSON='{}'
+if command -v python3 >/dev/null 2>&1 && [ -f "$PROJECT_HELPER" ]; then
+  PROJECT_JSON=$(python3 "$PROJECT_HELPER" "$workspace" 2>/dev/null || echo '{}')
+fi
+
+workspace_realpath=$(printf '%s' "$PROJECT_JSON" | jq -r '.workspaceRealpath // ""' 2>/dev/null)
+if [ -z "$workspace_realpath" ]; then
+  workspace_realpath="$(resolve_realpath "$workspace")"
+fi
+BACKUP_DIR=$(home_path Documents Cline Logs compaction)
+AMBIGUOUS_LOG=$(home_path Documents Cline Logs context-guard-ambiguous.log)
+LEGACY_MARKER_FILE="$BACKUP_DIR/needs_restore.json"
+TASK_MARKER_DIR="$BACKUP_DIR/by-task"
+STATE_FILE="$workspace/cline_docs/project-state.md"
+HANDOFF_FILE="$workspace/cline_docs/handoff-summary.md"
+PLAN_FILE="$workspace/implementation_plan.md"
+HOT_FILE="$workspace/wiki/hot.md"
+FOCUS_FILE="$workspace/wiki/meta/current-focus.md"
+TTL_SECONDS=43200
+PROJECT_LABEL=$(printf '%s' "$PROJECT_JSON" | jq -r '.projectLabel // ""' 2>/dev/null)
+PROJECT_SOURCE=$(printf '%s' "$PROJECT_JSON" | jq -r '.projectIdentitySource // ""' 2>/dev/null)
+MULTIPLE_RULE_MARKERS=$(printf '%s' "$PROJECT_JSON" | jq -r '(.multipleRuleMarkers // false) | tostring' 2>/dev/null)
+PROJECT_FOCUS_NOTE=""
+SECTION_PREFIX="${PROJECT_LABEL:-проект}"
+IS_BROAD_ROOT=$(printf '%s' "$PROJECT_JSON" | jq -r '(.isBroadRoot // false) | tostring' 2>/dev/null)
+
+if [ -n "$PROJECT_LABEL" ] && [ "$IS_BROAD_ROOT" != "true" ] && [ "$PROJECT_SOURCE" != "workspace-basename-fallback" ]; then
+  PROJECT_FOCUS_NOTE="Текущий проект: \`$PROJECT_LABEL\`"
+elif [ -n "$PROJECT_LABEL" ] && [ "$IS_BROAD_ROOT" != "true" ]; then
+  PROJECT_FOCUS_NOTE="Текущий проект (fallback): \`$PROJECT_LABEL\`. Зафиксируй строку \`Проект:\` в .clinerules/*.md или continuity-файле."
+elif [ "$IS_BROAD_ROOT" != "true" ]; then
+  PROJECT_FOCUS_NOTE="Project label не найден автоматически. Если это project-specific workspace, предложи создать .clinerules/{project-name}.md и зафиксировать строку \`Проект:\`."
+fi
+
+if [ "$MULTIPLE_RULE_MARKERS" = "true" ] && [ "$IS_BROAD_ROOT" != "true" ]; then
+  if [ -n "$PROJECT_FOCUS_NOTE" ]; then
+    PROJECT_FOCUS_NOTE="${PROJECT_FOCUS_NOTE}"$'\n'"⚠️ Найдено несколько .clinerules/*.md с маркером \`Проект:\`. Оставь один канонический marker."
+  else
+    PROJECT_FOCUS_NOTE="⚠️ Найдено несколько .clinerules/*.md с маркером \`Проект:\`. Оставь один канонический marker."
+  fi
+fi
+
+VAULT_BLOCK="$(build_vault_block)"
+PROJECT_BLOCK="$(build_project_block)"
+CONTEXT_BLOCK=""
+MARKER_APPLIES="false"
+MARKER_STATUS="none"
+MARKER_REASON=""
+SELECTED_MARKER=""
+
+cleanup_task_markers "$TASK_MARKER_DIR" "$TTL_SECONDS" >/dev/null 2>&1 || true
+
+SELECTION_JSON=$(select_task_marker "$TASK_MARKER_DIR" "$task_id" "$workspace" "$workspace_realpath" "$user_id")
+MARKER_STATUS=$(printf '%s' "$SELECTION_JSON" | jq -r '.status // "none"' 2>/dev/null)
+MARKER_REASON=$(printf '%s' "$SELECTION_JSON" | jq -r '.reason // ""' 2>/dev/null)
+SELECTED_MARKER=$(printf '%s' "$SELECTION_JSON" | jq -r '.markerPath // ""' 2>/dev/null)
+
+if [ "$MARKER_STATUS" = "ambiguous" ]; then
+  timestamp_now=$(date +"%Y-%m-%d %H:%M:%S")
+  printf "%s | task:%s | user:%s | workspace:%s | reason:%s\n" "$timestamp_now" "${task_id:-<missing>}" "${user_id:-<missing>}" "${workspace_realpath:-$workspace}" "$MARKER_REASON" >> "$AMBIGUOUS_LOG"
+fi
+
+if [ "$MARKER_STATUS" = "exact" ] || [ "$MARKER_STATUS" = "workspace-single" ]; then
+  MARKER_APPLIES="true"
+elif [ -f "$LEGACY_MARKER_FILE" ]; then
+  legacy_stale=$(marker_is_stale "$LEGACY_MARKER_FILE" "$TTL_SECONDS")
+  if [ "$legacy_stale" = "true" ]; then
+    rm -f "$LEGACY_MARKER_FILE"
+    echo "[SessionStart] Removed stale legacy restore marker" >&2
+  elif [ -z "$task_id" ]; then
+    legacy_workspace=$(jq -r '.workspace // ""' "$LEGACY_MARKER_FILE" 2>/dev/null)
+    legacy_workspace_real=$(jq -r '.workspaceRealpath // ""' "$LEGACY_MARKER_FILE" 2>/dev/null)
+    legacy_user=$(jq -r '.userId // ""' "$LEGACY_MARKER_FILE" 2>/dev/null)
+    if { [ -n "$workspace_realpath" ] && [ -n "$legacy_workspace_real" ] && [ "$workspace_realpath" = "$legacy_workspace_real" ]; } || { [ -n "$workspace" ] && [ -n "$legacy_workspace" ] && [ "$workspace" = "$legacy_workspace" ]; }; then
+      if [ -z "$user_id" ] || [ -z "$legacy_user" ] || [ "$user_id" = "$legacy_user" ]; then
+        MARKER_APPLIES="true"
+        MARKER_STATUS="legacy"
+        MARKER_REASON="legacy-workspace-fallback"
+        SELECTED_MARKER="$LEGACY_MARKER_FILE"
+      fi
+    fi
+  fi
+fi
+
+if [ "$MARKER_APPLIES" = "true" ] && [ -n "$SELECTED_MARKER" ] && [ -f "$SELECTED_MARKER" ]; then
+  prev_tokens=$(jq -r '.tokensBeforeCompact // "unknown"' "$SELECTED_MARKER" 2>/dev/null)
+  prev_time=$(jq -r '.timestamp // "unknown"' "$SELECTED_MARKER" 2>/dev/null)
+  risk_level=$(jq -r '.riskLevel // "unknown"' "$SELECTED_MARKER" 2>/dev/null)
+  summary_path=$(jq -r '.recoverySummaryPath // ""' "$SELECTED_MARKER" 2>/dev/null)
+  rm -f "$SELECTED_MARKER"
+  echo "[SessionStart] Post-compaction restore via ${MARKER_STATUS} marker (${MARKER_REASON}) for task=${task_id:-<missing>} workspace=${workspace_realpath:-$workspace}" >&2
+
+  RECOVERY_BLOCK=""
+  if [ -n "$summary_path" ] && [ -f "$summary_path" ]; then
+    RECOVERY_BLOCK=$(read_limited_file "$summary_path" 12000)
+  fi
+
+  CONTEXT_BLOCK="🔄 ВОССТАНОВЛЕНИЕ ПОСЛЕ COMPACTION\n\nПредыдущая сессия была сжата ($prev_time, было $prev_tokens токенов, риск: $risk_level)."
+  if [ -n "$RECOVERY_BLOCK" ]; then
+    CONTEXT_BLOCK="${CONTEXT_BLOCK}"$'\n\n'"### Recovery bundle"$'\n'"${RECOVERY_BLOCK}"
+  fi
+  if [ -n "$PROJECT_BLOCK" ]; then
+    CONTEXT_BLOCK="${CONTEXT_BLOCK}"$'\n\n'"### Актуальное состояние проекта"$'\n'"${PROJECT_BLOCK}"
+  fi
+  if [ -n "$VAULT_BLOCK" ]; then
+    CONTEXT_BLOCK="${CONTEXT_BLOCK}"$'\n\n'"${VAULT_BLOCK}"
+  fi
+  CONTEXT_BLOCK="${CONTEXT_BLOCK}"$'\n\n'"Продолжай работу с актуального состояния выше."
+elif [ -n "$PROJECT_BLOCK" ]; then
+  echo "[SessionStart] Loading project continuity for workspace ${workspace_realpath:-$workspace}" >&2
+  if [ "$MARKER_STATUS" = "ambiguous" ]; then
+    echo "[SessionStart] Task marker restore skipped: ambiguous workspace candidates" >&2
+  fi
+  CONTEXT_BLOCK="📋 СОСТОЯНИЕ ПРОЕКТА (загружено при старте):\n\n${PROJECT_BLOCK}"
+  if [ -n "$VAULT_BLOCK" ]; then
+    CONTEXT_BLOCK="${CONTEXT_BLOCK}"$'\n\n'"${VAULT_BLOCK}"
+  fi
+elif [ -n "$VAULT_BLOCK" ]; then
+  echo "[SessionStart] Loading Obsidian vault continuity from workspace ${workspace_realpath:-$workspace}" >&2
+  CONTEXT_BLOCK="$VAULT_BLOCK"
+else
+  if [ "$MARKER_STATUS" = "ambiguous" ]; then
+    echo "[SessionStart] Ambiguous task markers for workspace; clean start instead of unsafe restore" >&2
+  else
+    echo "[SessionStart] No state file, clean start" >&2
+  fi
+  echo '{"contextModification": ""}'
+  exit 0
+fi
+
+if [ -n "$PROJECT_FOCUS_NOTE" ] && [ -n "$CONTEXT_BLOCK" ]; then
+  CONTEXT_BLOCK="🎯 PROJECT FOCUS\n${PROJECT_FOCUS_NOTE}\n\n${CONTEXT_BLOCK}"
+fi
+
+jq -nc --arg ctx "$CONTEXT_BLOCK" '{contextModification:$ctx}'

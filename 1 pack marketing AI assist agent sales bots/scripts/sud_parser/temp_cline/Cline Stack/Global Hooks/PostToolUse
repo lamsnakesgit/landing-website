@@ -1,0 +1,192 @@
+#!/bin/bash
+# PostToolUse Hook
+# Логирование метрик использования инструментов + накопительная telemetry для context guard.
+# Поддерживает старую и новую schema PostToolUse payload (`tool`/`toolName`, `durationMs`/`executionTimeMs`).
+# Soft reminders для Obsidian включаются только внутри реального vault workspace.
+
+INPUT=$(cat)
+
+home_path() {
+  python3 - "$@" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path.home()
+for part in sys.argv[1:]:
+    path /= part
+print(path)
+PY
+}
+
+if ! command -v jq >/dev/null 2>&1; then
+  echo '{"cancel":false}'
+  exit 0
+fi
+
+append_message() {
+  local message="$1"
+  if [ -z "$message" ]; then
+    return
+  fi
+  if [ -z "$CONTEXT_MESSAGE" ]; then
+    CONTEXT_MESSAGE="$message"
+  else
+    CONTEXT_MESSAGE="${CONTEXT_MESSAGE}"$'\n\n'"${message}"
+  fi
+}
+
+is_write_like_tool() {
+  case "$1" in
+    write_to_file|create_file|apply_patch)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+is_obsidian_workspace() {
+  local workspace="$1"
+  if [ -z "$workspace" ]; then
+    return 1
+  fi
+  if [ -d "$workspace/.obsidian" ]; then
+    return 0
+  fi
+  if [ -f "$workspace/wiki/hot.md" ] && [ -f "$workspace/wiki/meta/current-focus.md" ] && { [ -d "$workspace/raw" ] || [ -f "$workspace/wiki/index.md" ]; }; then
+    return 0
+  fi
+  return 1
+}
+
+collect_touched_paths() {
+  case "$TOOL" in
+    write_to_file|create_file)
+      printf '%s\n' "$(printf '%s' "$INPUT" | jq -r '.postToolUse.parameters.path // .postToolUse.parameters.absolutePath // ""' 2>/dev/null)"
+      ;;
+    apply_patch)
+      printf '%s' "$INPUT" | jq -r '.postToolUse.parameters.input // ""' 2>/dev/null | \
+        grep -oE '\*\*\* (Add|Update|Delete) File: [^[:cntrl:]]+' | \
+        sed -E 's/^\*\*\* (Add|Update|Delete) File: //' || true
+      ;;
+  esac
+}
+
+build_obsidian_message() {
+  local touched_raw="$1"
+  local touched_wiki="$2"
+  local touched_hot="$3"
+  local touched_focus="$4"
+  local parts=()
+  local message="🧠 Хук:"
+
+  if [ "$touched_raw" = "true" ] && [ "$touched_wiki" != "true" ]; then
+    parts+=("в raw/ появились изменения")
+  fi
+
+  if [ "$touched_wiki" = "true" ]; then
+    parts+=("затронут wiki/ слой")
+  fi
+
+  if [ ${#parts[@]} -gt 0 ]; then
+    message+=" ${parts[*]}."
+  fi
+
+  if [ "$touched_raw" = "true" ]; then
+    message+=" Если это новый источник для second brain, следующим шагом прогоняй ingest."
+  fi
+
+  if [ "$touched_hot" != "true" ]; then
+    message+=" Если knowledge continuity изменилась — обнови wiki/hot.md."
+  fi
+
+  if [ "$touched_focus" != "true" ]; then
+    message+=" Если сменился активный приоритет или thread — обнови wiki/meta/current-focus.md."
+  fi
+
+  printf '%s' "$message"
+}
+
+TOOL=$(printf '%s' "$INPUT" | jq -r '.postToolUse.tool // .postToolUse.toolName // ""')
+SUCCESS=$(printf '%s' "$INPUT" | jq -r 'if (.postToolUse | has("success")) then (.postToolUse.success | tostring) else "unknown" end')
+DURATION=$(printf '%s' "$INPUT" | jq -r '.postToolUse.durationMs // .postToolUse.executionTimeMs // 0')
+TASK_ID=$(printf '%s' "$INPUT" | jq -r '.taskId // "unknown"')
+WORKSPACE=$(printf '%s' "$INPUT" | jq -r '.workspacePath // ""')
+PROJECT_HELPER=$(home_path Documents Cline Hooks scripts project_identity.py)
+LOG_DIR=$(home_path Documents Cline Logs)
+LOG_FILE="$LOG_DIR/tool-usage.log"
+GUARD_LOG="$LOG_DIR/context-guard.log"
+GUARD_SCRIPT=$(home_path Documents Cline Hooks scripts context_guard.py)
+CONTEXT_MESSAGE=""
+mkdir -p "$LOG_DIR"
+
+PROJECT_JSON='{}'
+if command -v python3 >/dev/null 2>&1 && [ -f "$PROJECT_HELPER" ]; then
+  PROJECT_JSON=$(python3 "$PROJECT_HELPER" "$WORKSPACE" 2>/dev/null || echo '{}')
+fi
+PROJECT_LABEL=$(printf '%s' "$PROJECT_JSON" | jq -r '.projectLabel // ""' 2>/dev/null)
+PROJECT_SLUG=$(printf '%s' "$PROJECT_JSON" | jq -r '.projectSlug // ""' 2>/dev/null)
+
+TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
+echo "${TIMESTAMP} | task:${TASK_ID} | tool:${TOOL} | success:${SUCCESS} | duration:${DURATION}ms" >> "$LOG_FILE"
+
+if command -v python3 >/dev/null 2>&1 && [ -f "$GUARD_SCRIPT" ]; then
+  GUARD_OUTPUT=$(printf '%s' "$INPUT" | CLINE_PROJECT_LABEL="$PROJECT_LABEL" CLINE_PROJECT_SLUG="$PROJECT_SLUG" python3 "$GUARD_SCRIPT" post-tool-use 2>> "$GUARD_LOG" || echo '{}')
+  printf '%s\n' "$GUARD_OUTPUT" >> "$GUARD_LOG"
+  GUARD_WARNING=$(printf '%s' "$GUARD_OUTPUT" | jq -r '.warningMessage // ""' 2>/dev/null)
+  append_message "$GUARD_WARNING"
+fi
+
+if [ "$DURATION" -gt 60000 ] 2>/dev/null; then
+  SECONDS=$((DURATION / 1000))
+  append_message "⏱️ Хук: последняя операция ${TOOL:-<unknown tool>} заняла ${SECONDS}с. Рассмотри оптимизацию."
+fi
+
+if [ "$SUCCESS" = "false" ] && [ "$TOOL" = "execute_command" ]; then
+  append_message "❌ Хук: команда завершилась с ошибкой. Проверь логи и попробуй другой подход."
+fi
+
+if is_write_like_tool "$TOOL" && [ "$SUCCESS" != "false" ] && is_obsidian_workspace "$WORKSPACE"; then
+  TOUCHED_PATHS=$(collect_touched_paths)
+  TOUCHED_WIKI="false"
+  TOUCHED_RAW="false"
+  TOUCHED_HOT="false"
+  TOUCHED_FOCUS="false"
+
+  if printf '%s\n' "$TOUCHED_PATHS" | grep -qE '(^|[\\/])wiki/'; then
+    TOUCHED_WIKI="true"
+  fi
+  if printf '%s\n' "$TOUCHED_PATHS" | grep -qE '(^|[\\/])raw/'; then
+    TOUCHED_RAW="true"
+  fi
+  if printf '%s\n' "$TOUCHED_PATHS" | grep -qE '(^|[\\/])wiki/hot\.md$'; then
+    TOUCHED_HOT="true"
+  fi
+  if printf '%s\n' "$TOUCHED_PATHS" | grep -qE '(^|[\\/])wiki/meta/current-focus\.md$'; then
+    TOUCHED_FOCUS="true"
+  fi
+
+  ACTION_NEEDED="false"
+  if [ "$TOUCHED_RAW" = "true" ]; then
+    ACTION_NEEDED="true"
+  fi
+  if [ "$TOUCHED_WIKI" = "true" ] && [ "$TOUCHED_HOT" != "true" ]; then
+    ACTION_NEEDED="true"
+  fi
+  if [ "$TOUCHED_WIKI" = "true" ] && [ "$TOUCHED_FOCUS" != "true" ]; then
+    ACTION_NEEDED="true"
+  fi
+
+  if [ "$ACTION_NEEDED" = "true" ]; then
+    OBSIDIAN_MESSAGE=$(build_obsidian_message "$TOUCHED_RAW" "$TOUCHED_WIKI" "$TOUCHED_HOT" "$TOUCHED_FOCUS")
+    append_message "$OBSIDIAN_MESSAGE"
+  fi
+fi
+
+if [ -n "$CONTEXT_MESSAGE" ]; then
+  jq -nc --arg msg "$CONTEXT_MESSAGE" '{cancel:false,contextModification:$msg}'
+  exit 0
+fi
+
+echo '{"cancel":false}'

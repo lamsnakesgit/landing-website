@@ -1,0 +1,81 @@
+#!/bin/bash
+#
+# PreToolUse Hook
+# Защита от опасных операций: блокирует запись .js в TS-проектах,
+# защищает критичные файлы от удаления/перезаписи,
+# мягко блокирует очевидные giant-input кейсы.
+#
+# Input: { taskId, preToolUse: { tool: string, parameters: object }, ... }
+# Output: { cancel: boolean, errorMessage?: string, contextModification?: string }
+
+INPUT=$(cat)
+
+if ! command -v jq &> /dev/null; then
+  echo '{"cancel":false}'
+  exit 0
+fi
+
+emit_allow() {
+  echo '{"cancel":false}'
+  exit 0
+}
+
+emit_block() {
+  local message="$1"
+  jq -nc --arg msg "$message" '{cancel:true,errorMessage:$msg}'
+  exit 0
+}
+
+emit_context() {
+  local message="$1"
+  jq -nc --arg msg "$message" '{cancel:false,contextModification:$msg}'
+  exit 0
+}
+
+TOOL=$(printf '%s' "$INPUT" | jq -r '.preToolUse.tool // ""')
+WORKSPACE=$(printf '%s' "$INPUT" | jq -r '.workspacePath // ""')
+GUARD_SCRIPT="$HOME/Documents/Cline/Hooks/scripts/context_guard.py"
+
+# --- Правило 1: Блокировать создание .js файлов если есть tsconfig.json ---
+if [ "$TOOL" = "write_to_file" ] || [ "$TOOL" = "create_file" ]; then
+  FILE_PATH=$(printf '%s' "$INPUT" | jq -r '.preToolUse.parameters.path // .preToolUse.parameters.absolutePath // ""')
+
+  if [[ "$FILE_PATH" == *.js ]] && [ -f "${WORKSPACE}/tsconfig.json" ]; then
+    emit_block "В этом проекте используется TypeScript. Используй .ts/.tsx вместо .js/.jsx"
+  fi
+fi
+
+# --- Правило 2: Защита критичных файлов от удаления ---
+if [ "$TOOL" = "execute_command" ]; then
+  COMMAND=$(printf '%s' "$INPUT" | jq -r '.preToolUse.parameters.command // ""')
+
+  if echo "$COMMAND" | grep -qE 'rm[[:space:]]+(-rf?|--recursive)[[:space:]]+(/|/etc|/usr|/var|/home)\b'; then
+    emit_block "Заблокировано: попытка удалить системную директорию"
+  fi
+
+  if echo "$COMMAND" | grep -q 'sudo'; then
+    emit_context "⚠️ Хук: обнаружена команда с sudo. Убедись, что это необходимо."
+  fi
+fi
+
+# --- Правило 3: Защита .env файлов от записи в git ---
+if [ "$TOOL" = "execute_command" ]; then
+  COMMAND=$(printf '%s' "$INPUT" | jq -r '.preToolUse.parameters.command // ""')
+
+  if echo "$COMMAND" | grep -qE 'git[[:space:]]+add.*\.env'; then
+    emit_block "Заблокировано: .env файлы не должны добавляться в git. Добавь .env в .gitignore"
+  fi
+fi
+
+# --- Правило 4: Soft guard против очевидных giant-input кейсов ---
+if command -v python3 &> /dev/null && [ -f "$GUARD_SCRIPT" ]; then
+  GUARD_OUTPUT=$(printf '%s' "$INPUT" | python3 "$GUARD_SCRIPT" pre-tool-use 2>/dev/null || echo '{}')
+  DECISION=$(printf '%s' "$GUARD_OUTPUT" | jq -r '.decision // "allow"' 2>/dev/null)
+  REASON=$(printf '%s' "$GUARD_OUTPUT" | jq -r '.reason // ""' 2>/dev/null)
+
+  if [ "$DECISION" = "block" ] && [ -n "$REASON" ]; then
+    emit_block "$REASON"
+  fi
+fi
+
+emit_allow

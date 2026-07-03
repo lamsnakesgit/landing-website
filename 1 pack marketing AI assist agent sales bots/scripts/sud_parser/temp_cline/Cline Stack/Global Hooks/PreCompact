@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+# Хук PreCompact: сохраняет recovery bundle и инжектит continuity checkpoint перед compaction.
+# Variant B: restore marker остаётся task-scoped (`compaction/by-task/<taskId>.json`),
+# а project identity определяется по явному маркеру `Проект:` и используется для prefixed artifacts.
+
+input=$(cat)
+
+home_path() {
+  python3 - "$@" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path.home()
+for part in sys.argv[1:]:
+    path /= part
+print(path)
+PY
+}
+
+resolve_realpath() {
+  local target="$1"
+  if [ -z "$target" ]; then
+    return
+  fi
+  python3 - "$target" <<'PY'
+import os
+import sys
+
+p = sys.argv[1]
+print(os.path.realpath(p) if os.path.exists(p) else os.path.abspath(os.path.expanduser(p)))
+PY
+}
+
+read_limited_file() {
+  local path="$1"
+  local max_chars="${2:-16000}"
+  python3 - "$path" "$max_chars" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+max_chars = int(sys.argv[2])
+if not path.exists():
+    raise SystemExit(0)
+text = path.read_text(errors='ignore')
+if len(text) > max_chars:
+    text = text[:max_chars].rstrip() + "\n\n[... обрезано для compaction checkpoint ...]"
+print(text)
+PY
+}
+
+safe_name() {
+  printf '%s' "$1" | LC_ALL=C tr -cs 'A-Za-z0-9._-' '_'
+}
+
+tokens=$(echo "$input" | jq -r '.preCompact.estimatedTokens // "unknown"' 2>/dev/null)
+conv_length=$(echo "$input" | jq -r '.preCompact.conversationLength // "unknown"' 2>/dev/null)
+task_id=$(echo "$input" | jq -r '.taskId // ""' 2>/dev/null)
+user_id=$(echo "$input" | jq -r '.userId // ""' 2>/dev/null)
+workspace=$(echo "$input" | jq -r '.workspacePath // ""' 2>/dev/null)
+timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+PROJECT_HELPER=$(home_path Documents Cline Hooks scripts project_identity.py)
+
+PROJECT_JSON='{}'
+if command -v python3 >/dev/null 2>&1 && [ -f "$PROJECT_HELPER" ]; then
+  PROJECT_JSON=$(python3 "$PROJECT_HELPER" "$workspace" 2>/dev/null || echo '{}')
+fi
+
+workspace_realpath=$(printf '%s' "$PROJECT_JSON" | jq -r '.workspaceRealpath // ""' 2>/dev/null)
+if [ -z "$workspace_realpath" ]; then
+  workspace_realpath="$(resolve_realpath "$workspace")"
+fi
+BACKUP_DIR=$(home_path Documents Cline Logs compaction)
+MARKER_DIR="$BACKUP_DIR/by-task"
+mkdir -p "$BACKUP_DIR" "$MARKER_DIR"
+GUARD_SCRIPT=$(home_path Documents Cline Hooks scripts context_guard.py)
+SUMMARY_PATH=""
+RISK_LEVEL="unknown"
+PROJECT_LABEL=$(printf '%s' "$PROJECT_JSON" | jq -r '.projectLabel // ""' 2>/dev/null)
+PROJECT_SLUG=$(printf '%s' "$PROJECT_JSON" | jq -r '.projectSlug // ""' 2>/dev/null)
+PROJECT_SOURCE=$(printf '%s' "$PROJECT_JSON" | jq -r '.projectIdentitySource // ""' 2>/dev/null)
+MULTIPLE_RULE_MARKERS=$(printf '%s' "$PROJECT_JSON" | jq -r '(.multipleRuleMarkers // false) | tostring' 2>/dev/null)
+SECTION_PREFIX="${PROJECT_LABEL:-проект}"
+IS_BROAD_ROOT=$(printf '%s' "$PROJECT_JSON" | jq -r '(.isBroadRoot // false) | tostring' 2>/dev/null)
+
+if command -v python3 >/dev/null 2>&1 && [ -f "$GUARD_SCRIPT" ]; then
+  GUARD_OUTPUT=$(printf '%s' "$input" | CLINE_PROJECT_LABEL="$PROJECT_LABEL" CLINE_PROJECT_SLUG="$PROJECT_SLUG" python3 "$GUARD_SCRIPT" pre-compact 2>/dev/null || echo '{}')
+  SUMMARY_PATH=$(printf '%s' "$GUARD_OUTPUT" | jq -r '.summaryPath // ""' 2>/dev/null)
+  RISK_LEVEL=$(printf '%s' "$GUARD_OUTPUT" | jq -r '.riskLevel // "unknown"' 2>/dev/null)
+fi
+
+echo "[$timestamp] PreCompact | taskId: ${task_id:-<missing>} | userId: ${user_id:-<missing>} | workspace: ${workspace_realpath:-$workspace} | project: ${PROJECT_LABEL:-<unnamed>} | tokens: $tokens | messages: $conv_length | risk: $RISK_LEVEL" >> "$BACKUP_DIR/compaction.log" 2>/dev/null
+
+if [ -n "$task_id" ] && [ "$task_id" != "unknown" ] && { [ -n "$workspace" ] || [ -n "$workspace_realpath" ]; }; then
+  MARKER_FILE="$MARKER_DIR/$(safe_name "$task_id").json"
+  cat >"$MARKER_FILE" <<EOF
+{
+  "timestamp": "$timestamp",
+  "taskId": "$task_id",
+  "userId": "$user_id",
+  "tokensBeforeCompact": "$tokens",
+  "conversationLength": "$conv_length",
+  "workspace": "$workspace",
+  "workspaceRealpath": "$workspace_realpath",
+  "projectLabel": "$PROJECT_LABEL",
+  "projectSlug": "$PROJECT_SLUG",
+  "projectIdentitySource": "$PROJECT_SOURCE",
+  "riskLevel": "$RISK_LEVEL",
+  "recoverySummaryPath": "$SUMMARY_PATH"
+}
+EOF
+else
+  echo "[PreCompact] Task-scoped restore marker not written (taskId/workspace missing)" >&2
+fi
+
+STATE_FILE="$workspace/cline_docs/project-state.md"
+HANDOFF_FILE="$workspace/cline_docs/handoff-summary.md"
+PLAN_FILE="$workspace/implementation_plan.md"
+CONTEXT_BLOCK=""
+PLAN_TEXT=""
+STATE_TEXT=""
+HANDOFF_TEXT=""
+
+if [ "$MULTIPLE_RULE_MARKERS" = "true" ] && [ "$IS_BROAD_ROOT" != "true" ]; then
+  echo "[PreCompact] Multiple .clinerules markers found; using first sorted marker for project identity" >&2
+fi
+
+if [ "$IS_BROAD_ROOT" = "true" ]; then
+  CONTEXT_BLOCK="⚠️ COMPACTION (${tokens} токенов, риск: ${RISK_LEVEL}). Широкий workspace root (${workspace_realpath:-$workspace}) detected, поэтому root-level project continuity auto-skip включён. После сжатия продолжай через явный project workspace или уточни у пользователя текущий фокус задачи."
+elif [ -f "$PLAN_FILE" ]; then
+  PLAN_TEXT=$(read_limited_file "$PLAN_FILE" 16000)
+fi
+
+if [ "$IS_BROAD_ROOT" != "true" ] && [ -f "$STATE_FILE" ]; then
+  STATE_TEXT=$(read_limited_file "$STATE_FILE" 16000)
+fi
+
+if [ "$IS_BROAD_ROOT" != "true" ] && [ -f "$HANDOFF_FILE" ]; then
+  HANDOFF_TEXT=$(read_limited_file "$HANDOFF_FILE" 12000)
+fi
+
+if [ -n "$PLAN_TEXT" ] || [ -n "$STATE_TEXT" ] || [ -n "$HANDOFF_TEXT" ]; then
+  CONTEXT_BLOCK=$(cat <<EOF
+🚨 COMPACTION CHECKPOINT — СОХРАНИ ЭТО В SUMMARY 🚨
+
+Состояние проекта перед сжатием (${tokens} токенов, ${conv_length} сообщений, риск: ${RISK_LEVEL}):
+EOF
+)
+  if [ -n "$PLAN_TEXT" ]; then
+    CONTEXT_BLOCK="${CONTEXT_BLOCK}"$'\n\n'"### ${SECTION_PREFIX} / implementation_plan.md"$'\n'"${PLAN_TEXT}"
+  fi
+  if [ -n "$STATE_TEXT" ]; then
+    CONTEXT_BLOCK="${CONTEXT_BLOCK}"$'\n\n'"### ${SECTION_PREFIX} / cline_docs/project-state.md"$'\n'"${STATE_TEXT}"
+  fi
+  if [ -n "$HANDOFF_TEXT" ]; then
+    CONTEXT_BLOCK="${CONTEXT_BLOCK}"$'\n\n'"### ${SECTION_PREFIX} / cline_docs/handoff-summary.md"$'\n'"${HANDOFF_TEXT}"
+  fi
+  CONTEXT_BLOCK="${CONTEXT_BLOCK}"$'\n\n'"🚨 КОНЕЦ CHECKPOINT — После compaction продолжай с актуального phase / next exact step выше 🚨"
+  echo "[PreCompact] Project continuity injected for ${workspace_realpath:-$workspace}" >&2
+else
+  if [ -n "$PROJECT_LABEL" ] && [ "$PROJECT_SOURCE" = "workspace-basename-fallback" ]; then
+    CONTEXT_BLOCK="⚠️ COMPACTION (${tokens} токенов, риск: ${RISK_LEVEL}). Continuity files не найдены. Project label явно не зафиксирован; временно используется \`${PROJECT_LABEL}\`. После сжатия уточни у пользователя текущий статус задачи и зафиксируй строку \`Проект:\` для project-specific workspace."
+  else
+    CONTEXT_BLOCK="⚠️ COMPACTION (${tokens} токенов, риск: ${RISK_LEVEL}). Continuity files не найдены: $PLAN_FILE / $STATE_FILE / $HANDOFF_FILE. После сжатия уточни у пользователя текущий статус задачи."
+  fi
+  echo "[PreCompact] Continuity files not found for workspace ${workspace_realpath:-$workspace}" >&2
+fi
+
+jq -nc --arg ctx "$CONTEXT_BLOCK" '{cancel:false,contextModification:$ctx}'

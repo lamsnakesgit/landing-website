@@ -1,0 +1,108 @@
+#!/bin/bash
+# TaskStart Hook
+# Загружает memory-bank/, implementation_plan.md и cline_docs/project-state.md при старте задачи.
+# Для широкого workspace-root (например, Desktop) root-level continuity не подмешивается автоматически,
+# чтобы не загрязнять несвязанные задачи чужим state.
+
+INPUT=$(cat)
+
+if ! command -v jq >/dev/null 2>&1; then
+  echo '{"cancel":false}'
+  exit 0
+fi
+
+TASK=$(printf '%s' "$INPUT" | jq -r '.taskStart.taskMetadata.initialTask // ""')
+TASK_ID=$(printf '%s' "$INPUT" | jq -r '.taskId // "unknown"')
+TIMESTAMP=$(printf '%s' "$INPUT" | jq -r '.timestamp // "0"')
+WORKSPACE=$(printf '%s' "$INPUT" | jq -r '.workspacePath // ""')
+
+resolve_realpath() {
+  local target="$1"
+  if [ -z "$target" ]; then
+    return
+  fi
+  python3 - <<'INNERPY' "$target"
+import os, sys
+p = sys.argv[1]
+print(os.path.realpath(p) if os.path.exists(p) else os.path.abspath(os.path.expanduser(p)))
+INNERPY
+}
+
+format_timestamp() {
+  local ts_ms="$1"
+  if [[ -n "$ts_ms" && "$ts_ms" != "0" ]]; then
+    local ts_s=$((ts_ms / 1000))
+    if date -u -r "$ts_s" +"%Y-%m-%dT%H:%M:%SZ" >/dev/null 2>&1; then
+      date -u -r "$ts_s" +"%Y-%m-%dT%H:%M:%SZ"; return
+    fi
+    if date -u -d @"$ts_s" +"%Y-%m-%dT%H:%M:%SZ" >/dev/null 2>&1; then
+      date -u -d @"$ts_s" +"%Y-%m-%dT%H:%M:%SZ"; return
+    fi
+  fi
+  date -u +"%Y-%m-%dT%H:%M:%SZ"
+}
+
+read_limited_file() {
+  local path="$1"
+  local label="$2"
+  local max_chars="${3:-12000}"
+  python3 - <<'INNERPY' "$path" "$label" "$max_chars"
+from pathlib import Path
+import sys
+path = Path(sys.argv[1])
+label = sys.argv[2]
+max_chars = int(sys.argv[3])
+if not path.exists():
+    raise SystemExit(0)
+text = path.read_text(errors='ignore')
+truncated = len(text) > max_chars
+if truncated:
+    text = text[:max_chars].rstrip() + "\n\n[... обрезано для стартового continuity preview ...]"
+print(f"### {label}\n{text}\n")
+INNERPY
+}
+
+append_context_file() {
+  local path="$1"
+  local label="$2"
+  local max_chars="${3:-12000}"
+  if [ -f "$path" ]; then
+    local content
+    content=$(read_limited_file "$path" "$label" "$max_chars")
+    if [ -n "$content" ]; then
+      CONTEXT_PARTS="$CONTEXT_PARTS\n\n${content}"
+      echo "[TaskStart] Loaded ${label} from $path" >&2
+    fi
+  fi
+}
+
+WORKSPACE_REALPATH=$(resolve_realpath "$WORKSPACE")
+DESKTOP_REALPATH=$(resolve_realpath "$HOME/Desktop")
+TIMESTAMP_ISO=$(format_timestamp "$TIMESTAMP")
+echo "[TaskStart] id=$TASK_ID task=${TASK:-<empty>} started_at=$TIMESTAMP_ISO workspace=${WORKSPACE_REALPATH:-$WORKSPACE}" >&2
+
+IS_BROAD_ROOT="false"
+if [ -n "$WORKSPACE_REALPATH" ] && [ -n "$DESKTOP_REALPATH" ] && [ "$WORKSPACE_REALPATH" = "$DESKTOP_REALPATH" ]; then
+  IS_BROAD_ROOT="true"
+fi
+
+CONTEXT_PARTS="Задача запущена: $TIMESTAMP_ISO"
+
+MEMORY_BANK_DIR="$WORKSPACE/memory-bank"
+if [ -d "$MEMORY_BANK_DIR" ]; then
+  append_context_file "$MEMORY_BANK_DIR/activeContext.md" "memory-bank/activeContext.md" 12000
+  append_context_file "$MEMORY_BANK_DIR/progress.md" "memory-bank/progress.md" 12000
+fi
+
+STATE_FILE="$WORKSPACE/cline_docs/project-state.md"
+PLAN_FILE="$WORKSPACE/implementation_plan.md"
+
+if [ "$IS_BROAD_ROOT" = "true" ]; then
+  echo "[TaskStart] Broad root workspace detected; skipping root-level project-state/implementation_plan autoload" >&2
+else
+  append_context_file "$PLAN_FILE" "implementation_plan.md" 16000
+  append_context_file "$STATE_FILE" "cline_docs/project-state.md" 16000
+fi
+
+CONTEXT_JSON=$(printf '%s' "$CONTEXT_PARTS" | jq -Rs .)
+jq -nc --argjson ctx "$CONTEXT_JSON" '{cancel:false,contextModification:$ctx,errorMessage:""}'

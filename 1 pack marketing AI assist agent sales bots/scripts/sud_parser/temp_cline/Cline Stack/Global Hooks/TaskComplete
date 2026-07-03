@@ -1,0 +1,114 @@
+#!/bin/bash
+# TaskComplete Hook
+# 1. Отправляет уведомление в Telegram, если TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID заданы в env.
+# 2. Корректно экранирует HTML и использует data-urlencode.
+# 3. Мягко напоминает обновить continuity-файлы проекта и сохранить project header.
+
+INPUT=$(cat)
+
+home_path() {
+  python3 - "$@" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path.home()
+for part in sys.argv[1:]:
+    path /= part
+print(path)
+PY
+}
+
+PROJECT_HELPER=$(home_path Documents Cline Hooks scripts project_identity.py)
+
+if command -v jq >/dev/null 2>&1; then
+  RESULT=$(echo "$INPUT" | jq -r '.taskComplete.taskMetadata.result // "Задача завершена"')
+  TASK_ID=$(echo "$INPUT" | jq -r '.taskId // "unknown"')
+  MODEL=$(echo "$INPUT" | jq -r '.model.slug // ""')
+  WORKSPACE=$(echo "$INPUT" | jq -r '.workspacePath // ""')
+else
+  RESULT="Задача завершена"
+  TASK_ID="unknown"
+  MODEL=""
+  WORKSPACE=""
+fi
+
+PROJECT_JSON='{}'
+if command -v python3 >/dev/null 2>&1 && [ -f "$PROJECT_HELPER" ]; then
+  PROJECT_JSON=$(python3 "$PROJECT_HELPER" "$WORKSPACE" 2>/dev/null || echo '{}')
+fi
+PROJECT_LABEL=$(printf '%s' "$PROJECT_JSON" | jq -r '.projectLabel // ""' 2>/dev/null)
+PROJECT_SOURCE=$(printf '%s' "$PROJECT_JSON" | jq -r '.projectIdentitySource // ""' 2>/dev/null)
+
+html_escape() {
+  if command -v python3 >/dev/null 2>&1; then
+    python3 -c 'import html, sys; print(html.escape(sys.stdin.read()), end="")'
+  else
+    cat
+  fi
+}
+
+BOT_TOKEN="${TELEGRAM_BOT_TOKEN:-}"
+CHAT_ID="${TELEGRAM_CHAT_ID:-}"
+SHORT_RESULT=$(printf '%s' "$RESULT" | head -c 3500)
+ESCAPED_RESULT=$(printf '%s' "$SHORT_RESULT" | html_escape)
+ESCAPED_MODEL=$(printf '%s' "$MODEL" | html_escape)
+ESCAPED_PROJECT=$(printf '%s' "$PROJECT_LABEL" | html_escape)
+
+if [ -n "$BOT_TOKEN" ] && [ -n "$CHAT_ID" ] && command -v curl >/dev/null 2>&1; then
+  MESSAGE="<b>[VS Code Cline]</b>"
+  MESSAGE="${MESSAGE}"$'\n'"✅ Задача завершена"
+  if [ -n "$PROJECT_LABEL" ]; then
+    MESSAGE="${MESSAGE}"$'\n'"📁 <b>Проект:</b> ${ESCAPED_PROJECT}"
+  fi
+  MESSAGE="${MESSAGE}"$'\n\n'"${ESCAPED_RESULT}"
+  if [ -n "$MODEL" ]; then
+    MESSAGE="${MESSAGE}"$'\n\n'"🤖 ${ESCAPED_MODEL}"
+  fi
+  curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+    --data-urlencode "chat_id=${CHAT_ID}" \
+    --data-urlencode "text=${MESSAGE}" \
+    --data-urlencode "parse_mode=HTML" >/dev/null 2>&1 || true
+else
+  echo "[TaskComplete] Telegram env vars not set; notification skipped" >&2
+fi
+
+STATE_FILE="$WORKSPACE/cline_docs/project-state.md"
+PROJECT_NOTE=""
+
+if [ -n "$PROJECT_LABEL" ] && [ "$PROJECT_SOURCE" != "workspace-basename-fallback" ]; then
+  PROJECT_NOTE="Текущий проект: \`$PROJECT_LABEL\`."
+elif [ -n "$PROJECT_LABEL" ]; then
+  PROJECT_NOTE="Текущий проект (fallback): \`$PROJECT_LABEL\`. Зафиксируй строку \`Проект:\` явно."
+fi
+
+if [ -f "$STATE_FILE" ]; then
+  CONTEXT=$(cat <<EOF
+Задача завершена.
+
+${PROJECT_NOTE}
+Проверь continuity-файлы проекта:
+- cline_docs/project-state.md: done / next exact step / modified files / key decisions
+- cline_docs/handoff-summary.md: короткая resume-выжимка для следующей сессии
+- implementation_plan.md: обновляй только если изменилась фаза, scope, milestone или strategy
+- Во всех continuity-файлах сохраняй header \`Проект: ...\`
+
+Предложи пользователю: "Обновить continuity-файлы проекта?"
+EOF
+)
+else
+  CONTEXT=$(cat <<EOF
+Задача завершена.
+
+${PROJECT_NOTE}
+State file не найден. Предложи создать минимум continuity-базу:
+- cline_docs/project-state.md
+- cline_docs/handoff-summary.md
+- при отсутствии workspace rule: .clinerules/{project-name}.md с явной строкой \`Проект: ...\`
+
+Команда-заготовка:
+mkdir -p $WORKSPACE/cline_docs $WORKSPACE/.clinerules
+EOF
+)
+fi
+
+jq -nc --arg ctx "$CONTEXT" '{cancel:false,contextModification:$ctx}'

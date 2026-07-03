@@ -1,0 +1,145 @@
+#!/bin/bash
+# TaskStart Hook
+# Загружает memory-bank/, implementation_plan.md, cline_docs/project-state.md и cline_docs/handoff-summary.md при старте задачи.
+# Project identity определяется по явному маркеру `Проект:`. Если маркер не найден,
+# используется fallback от basename workspace и добавляется reminder зафиксировать проект явно.
+
+INPUT=$(cat)
+
+if ! command -v jq >/dev/null 2>&1; then
+  echo '{"cancel":false}'
+  exit 0
+fi
+
+home_path() {
+  python3 - "$@" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path.home()
+for part in sys.argv[1:]:
+    path /= part
+print(path)
+PY
+}
+
+resolve_realpath() {
+  local target="$1"
+  if [ -z "$target" ]; then
+    return
+  fi
+  python3 - "$target" <<'PY'
+import os
+import sys
+
+p = sys.argv[1]
+print(os.path.realpath(p) if os.path.exists(p) else os.path.abspath(os.path.expanduser(p)))
+PY
+}
+
+format_timestamp() {
+  local ts_ms="$1"
+  if [[ -n "$ts_ms" && "$ts_ms" != "0" ]]; then
+    local ts_s=$((ts_ms / 1000))
+    if date -u -r "$ts_s" +"%Y-%m-%dT%H:%M:%SZ" >/dev/null 2>&1; then
+      date -u -r "$ts_s" +"%Y-%m-%dT%H:%M:%SZ"
+      return
+    fi
+    if date -u -d @"$ts_s" +"%Y-%m-%dT%H:%M:%SZ" >/dev/null 2>&1; then
+      date -u -d @"$ts_s" +"%Y-%m-%dT%H:%M:%SZ"
+      return
+    fi
+  fi
+  date -u +"%Y-%m-%dT%H:%M:%SZ"
+}
+
+read_limited_file() {
+  local path="$1"
+  local label="$2"
+  local max_chars="${3:-12000}"
+  python3 - "$path" "$label" "$max_chars" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+label = sys.argv[2]
+max_chars = int(sys.argv[3])
+if not path.exists():
+    raise SystemExit(0)
+text = path.read_text(errors='ignore')
+if len(text) > max_chars:
+    text = text[:max_chars].rstrip() + "\n\n[... обрезано для стартового continuity preview ...]"
+print(f"### {label}\n{text}\n")
+PY
+}
+
+append_block() {
+  local block="$1"
+  if [ -z "$block" ]; then
+    return
+  fi
+  if [ -n "$CONTEXT_PARTS" ]; then
+    CONTEXT_PARTS="${CONTEXT_PARTS}"$'\n\n'"${block}"
+  else
+    CONTEXT_PARTS="$block"
+  fi
+}
+
+TASK=$(printf '%s' "$INPUT" | jq -r '.taskStart.taskMetadata.initialTask // ""')
+TASK_ID=$(printf '%s' "$INPUT" | jq -r '.taskId // "unknown"')
+TIMESTAMP=$(printf '%s' "$INPUT" | jq -r '.timestamp // "0"')
+WORKSPACE=$(printf '%s' "$INPUT" | jq -r '.workspacePath // ""')
+PROJECT_HELPER=$(home_path Documents Cline Hooks scripts project_identity.py)
+
+PROJECT_JSON='{}'
+if command -v python3 >/dev/null 2>&1 && [ -f "$PROJECT_HELPER" ]; then
+  PROJECT_JSON=$(python3 "$PROJECT_HELPER" "$WORKSPACE" 2>/dev/null || echo '{}')
+fi
+
+WORKSPACE_REALPATH=$(printf '%s' "$PROJECT_JSON" | jq -r '.workspaceRealpath // ""')
+if [ -z "$WORKSPACE_REALPATH" ]; then
+  WORKSPACE_REALPATH=$(resolve_realpath "$WORKSPACE")
+fi
+TIMESTAMP_ISO=$(format_timestamp "$TIMESTAMP")
+echo "[TaskStart] id=$TASK_ID task=${TASK:-<empty>} started_at=$TIMESTAMP_ISO workspace=${WORKSPACE_REALPATH:-$WORKSPACE}" >&2
+
+IS_BROAD_ROOT=$(printf '%s' "$PROJECT_JSON" | jq -r '(.isBroadRoot // false) | tostring')
+PROJECT_LABEL=$(printf '%s' "$PROJECT_JSON" | jq -r '.projectLabel // ""')
+PROJECT_SOURCE=$(printf '%s' "$PROJECT_JSON" | jq -r '.projectIdentitySource // ""')
+MULTIPLE_RULE_MARKERS=$(printf '%s' "$PROJECT_JSON" | jq -r '(.multipleRuleMarkers // false) | tostring')
+
+CONTEXT_PARTS="Задача запущена: $TIMESTAMP_ISO"
+
+MEMORY_BANK_DIR="$WORKSPACE/memory-bank"
+if [ -d "$MEMORY_BANK_DIR" ]; then
+  append_block "$(read_limited_file "$MEMORY_BANK_DIR/activeContext.md" "memory-bank/activeContext.md" 12000)"
+  append_block "$(read_limited_file "$MEMORY_BANK_DIR/progress.md" "memory-bank/progress.md" 12000)"
+fi
+
+STATE_FILE="$WORKSPACE/cline_docs/project-state.md"
+HANDOFF_FILE="$WORKSPACE/cline_docs/handoff-summary.md"
+PLAN_FILE="$WORKSPACE/implementation_plan.md"
+
+if [ "$IS_BROAD_ROOT" != "true" ]; then
+  if [ -n "$PROJECT_LABEL" ] && [ "$PROJECT_SOURCE" != "workspace-basename-fallback" ]; then
+    CONTEXT_PARTS="${CONTEXT_PARTS}"$'\n'"Текущий проект: \`$PROJECT_LABEL\`"
+  elif [ -n "$PROJECT_LABEL" ]; then
+    CONTEXT_PARTS="${CONTEXT_PARTS}"$'\n'"Project label явно не зафиксирован. Временно использую \`$PROJECT_LABEL\` (fallback от имени workspace). Добавь строку \`Проект:\` в .clinerules/*.md или continuity-файл проекта."
+  else
+    CONTEXT_PARTS="${CONTEXT_PARTS}"$'\n'"Project label не найден автоматически. Если задача относится к конкретному проекту, сначала зафиксируй \`Проект: ...\` и предложи создать .clinerules/{project-name}.md при отсутствии workspace rule."
+  fi
+
+  if [ "$MULTIPLE_RULE_MARKERS" = "true" ]; then
+    CONTEXT_PARTS="${CONTEXT_PARTS}"$'\n'"⚠️ Найдено несколько .clinerules/*.md с маркером \`Проект:\`. Сейчас выбран первый по сортировке; лучше оставить один канонический marker."
+  fi
+fi
+
+if [ "$IS_BROAD_ROOT" = "true" ]; then
+  echo "[TaskStart] Broad root workspace detected; skipping root-level project-state/implementation_plan autoload" >&2
+else
+  append_block "$(read_limited_file "$PLAN_FILE" "implementation_plan.md" 16000)"
+  append_block "$(read_limited_file "$STATE_FILE" "cline_docs/project-state.md" 16000)"
+  append_block "$(read_limited_file "$HANDOFF_FILE" "cline_docs/handoff-summary.md" 12000)"
+fi
+
+jq -nc --arg ctx "$CONTEXT_PARTS" '{cancel:false,contextModification:$ctx,errorMessage:""}'

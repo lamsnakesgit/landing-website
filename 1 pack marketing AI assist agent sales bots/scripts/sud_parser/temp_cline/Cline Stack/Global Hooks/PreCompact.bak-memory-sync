@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+# Хук PreCompact: сохраняет recovery bundle и инжектит continuity checkpoint перед compaction.
+# Variant B: restore marker теперь task-scoped (`compaction/by-task/<taskId>.json`).
+# Это позволяет безопаснее переживать режим двух окон, особенно в одном workspace.
+
+input=$(cat)
+
+tokens=$(echo "$input" | jq -r '.preCompact.estimatedTokens // "unknown"' 2>/dev/null)
+conv_length=$(echo "$input" | jq -r '.preCompact.conversationLength // "unknown"' 2>/dev/null)
+task_id=$(echo "$input" | jq -r '.taskId // ""' 2>/dev/null)
+user_id=$(echo "$input" | jq -r '.userId // ""' 2>/dev/null)
+workspace=$(echo "$input" | jq -r '.workspacePath // ""' 2>/dev/null)
+timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
+resolve_realpath() {
+  local target="$1"
+  if [ -z "$target" ]; then
+    return
+  fi
+  python3 - <<'INNERPY' "$target"
+import os, sys
+p = sys.argv[1]
+print(os.path.realpath(p) if os.path.exists(p) else os.path.abspath(os.path.expanduser(p)))
+INNERPY
+}
+
+read_limited_file() {
+  local path="$1"
+  local max_chars="${2:-16000}"
+  python3 - <<'INNERPY' "$path" "$max_chars"
+from pathlib import Path
+import sys
+path = Path(sys.argv[1])
+max_chars = int(sys.argv[2])
+if not path.exists():
+    raise SystemExit(0)
+text = path.read_text(errors='ignore')
+if len(text) > max_chars:
+    text = text[:max_chars].rstrip() + "\n\n[... обрезано для compaction checkpoint ...]"
+print(text)
+INNERPY
+}
+
+safe_name() {
+  printf '%s' "$1" | LC_ALL=C tr -cs 'A-Za-z0-9._-' '_'
+}
+
+workspace_realpath="$(resolve_realpath "$workspace")"
+desktop_realpath="$(resolve_realpath "$HOME/Desktop")"
+
+BACKUP_DIR="$HOME/Documents/Cline/Logs/compaction"
+MARKER_DIR="$BACKUP_DIR/by-task"
+mkdir -p "$BACKUP_DIR" "$MARKER_DIR"
+GUARD_SCRIPT="$HOME/Documents/Cline/Hooks/scripts/context_guard.py"
+SUMMARY_PATH=""
+RISK_LEVEL="unknown"
+
+if command -v python3 &> /dev/null && [ -f "$GUARD_SCRIPT" ]; then
+  GUARD_OUTPUT=$(printf '%s' "$input" | python3 "$GUARD_SCRIPT" pre-compact 2>/dev/null || echo '{}')
+  SUMMARY_PATH=$(printf '%s' "$GUARD_OUTPUT" | jq -r '.summaryPath // ""' 2>/dev/null)
+  RISK_LEVEL=$(printf '%s' "$GUARD_OUTPUT" | jq -r '.riskLevel // "unknown"' 2>/dev/null)
+fi
+
+echo "[$timestamp] PreCompact | taskId: ${task_id:-<missing>} | userId: ${user_id:-<missing>} | workspace: ${workspace_realpath:-$workspace} | tokens: $tokens | messages: $conv_length | risk: $RISK_LEVEL" >> "$BACKUP_DIR/compaction.log" 2>/dev/null
+
+if [ -n "$task_id" ] && [ "$task_id" != "unknown" ] && { [ -n "$workspace" ] || [ -n "$workspace_realpath" ]; }; then
+  MARKER_FILE="$MARKER_DIR/$(safe_name "$task_id").json"
+  cat > "$MARKER_FILE" <<MARKER
+{
+  "timestamp": "$timestamp",
+  "taskId": "$task_id",
+  "userId": "$user_id",
+  "tokensBeforeCompact": "$tokens",
+  "conversationLength": "$conv_length",
+  "workspace": "$workspace",
+  "workspaceRealpath": "$workspace_realpath",
+  "riskLevel": "$RISK_LEVEL",
+  "recoverySummaryPath": "$SUMMARY_PATH"
+}
+MARKER
+else
+  echo "[PreCompact] Task-scoped restore marker not written (taskId/workspace missing)" >&2
+fi
+
+STATE_FILE="$workspace/cline_docs/project-state.md"
+PLAN_FILE="$workspace/implementation_plan.md"
+CONTEXT_BLOCK=""
+PLAN_TEXT=""
+STATE_TEXT=""
+IS_BROAD_ROOT="false"
+if [ -n "$workspace_realpath" ] && [ -n "$desktop_realpath" ] && [ "$workspace_realpath" = "$desktop_realpath" ]; then
+  IS_BROAD_ROOT="true"
+fi
+
+if [ "$IS_BROAD_ROOT" = "true" ]; then
+  CONTEXT_BLOCK="⚠️ COMPACTION (${tokens} токенов, риск: ${RISK_LEVEL}). Широкий workspace root (${workspace_realpath:-$workspace}) detected, поэтому root-level project continuity auto-skip включён. После сжатия продолжай через явный project workspace или уточни у пользователя текущий фокус задачи."
+elif [ -f "$PLAN_FILE" ]; then
+  PLAN_TEXT=$(read_limited_file "$PLAN_FILE" 16000)
+fi
+
+if [ "$IS_BROAD_ROOT" != "true" ] && [ -f "$STATE_FILE" ]; then
+  STATE_TEXT=$(read_limited_file "$STATE_FILE" 16000)
+fi
+
+if [ -n "$PLAN_TEXT" ] || [ -n "$STATE_TEXT" ]; then
+  CONTEXT_BLOCK="🚨 COMPACTION CHECKPOINT — СОХРАНИ ЭТО В SUMMARY 🚨\n\nСостояние проекта перед сжатием (${tokens} токенов, ${conv_length} сообщений, риск: ${RISK_LEVEL}):"
+  if [ -n "$PLAN_TEXT" ]; then
+    CONTEXT_BLOCK="$CONTEXT_BLOCK\n\n### implementation_plan.md\n${PLAN_TEXT}"
+  fi
+  if [ -n "$STATE_TEXT" ]; then
+    CONTEXT_BLOCK="$CONTEXT_BLOCK\n\n### cline_docs/project-state.md\n${STATE_TEXT}"
+  fi
+  CONTEXT_BLOCK="$CONTEXT_BLOCK\n\n🚨 КОНЕЦ CHECKPOINT — После compaction продолжай с актуального phase / next exact step выше 🚨"
+  echo "[PreCompact] Project continuity injected for ${workspace_realpath:-$workspace}" >&2
+elif [ -z "$CONTEXT_BLOCK" ]; then
+  CONTEXT_BLOCK="⚠️ COMPACTION (${tokens} токенов, риск: ${RISK_LEVEL}). Continuity files не найдены: $PLAN_FILE / $STATE_FILE. После сжатия уточни у пользователя текущий статус задачи."
+  echo "[PreCompact] Continuity files not found for workspace ${workspace_realpath:-$workspace}" >&2
+fi
+
+CONTEXT_JSON=$(printf '%s' "$CONTEXT_BLOCK" | jq -Rs .)
+printf '{"cancel":false,"contextModification":%s}\n' "$CONTEXT_JSON"
