@@ -24,13 +24,36 @@ def upload_file(file_path, folder_id):
     file_path = Path(file_path)
     if not file_path.exists(): return None
     
-    metadata = {"name": file_path.name, "parents": [folder_id]}
-    mime = "application/pdf" if file_path.suffix == ".pdf" else ("application/vnd.openxmlformats-officedocument.wordprocessingml.document" if file_path.suffix == ".docx" else "text/html")
+    # Check magic bytes to determine real file type
+    real_ext = file_path.suffix
+    mime = "application/octet-stream"
+    try:
+        with open(file_path, "rb") as f:
+            head = f.read(4)
+        if head.startswith(b"%PDF"):
+            mime = "application/pdf"
+            real_ext = ".pdf"
+        elif head.startswith(b"PK\x03\x04"):
+            mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            real_ext = ".docx"
+        elif file_path.suffix == ".html":
+            mime = "text/html"
+            real_ext = ".html"
+    except Exception:
+        pass
+
+    # Fix the filename if the extension is wrong
+    final_name = file_path.stem
+    if final_name.endswith(".pdf"):
+        final_name = final_name[:-4] # if it's named something.pdf.docx, remove .pdf
+    final_name += real_ext
+    
+    metadata = {"name": final_name, "parents": [folder_id]}
     
     with open(file_path, "rb") as f:
         files = {
             "metadata": (None, json.dumps(metadata), "application/json"),
-            "file": (file_path.name, f, mime)
+            "file": (final_name, f, mime)
         }
         resp = requests.post(url, headers={"Authorization": f"Bearer {MATON_API_KEY}"}, files=files)
     
