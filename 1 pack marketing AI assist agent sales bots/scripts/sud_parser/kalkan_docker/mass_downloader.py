@@ -65,14 +65,35 @@ def do_auth(session):
     return False
 
 def search_category(session, category_code, category_name, year, page=1):
+    import time
     for attempt in range(5):
         try:
             print(f"📡 Запрашиваем: {category_name} ({category_code}) за {year} год (стр. {page}). Попытка {attempt+1}...")
             resp_index = session.get(f"{BASE_URL}/form/courtActs/index.xhtml", headers=HEADERS, timeout=60)
-            view_state_match = re.search(r'id="j_id1:javax.faces.ViewState:\d+"\s+value="([^"]+)"', resp_index.text)
+            
+            html_soup = BeautifulSoup(resp_index.text, "html.parser")
+            
+            view_state_match = html_soup.find("input", {"name": "javax.faces.ViewState"})
             if not view_state_match:
-                view_state_match = re.search(r'name="javax\.faces\.ViewState"[^>]*value="([^"]+)"', resp_index.text)
-            view_state = view_state_match.group(1)
+                print("Не найден ViewState!")
+                return []
+            view_state = view_state_match.get("value")
+            
+            category_select = html_soup.find("select", {"name": re.compile(r'edit-category$')})
+            if not category_select:
+                print("Не найден селект категории!")
+                return []
+            cat_name_attr = category_select.get("name")
+            prefix = cat_name_attr.replace(":edit-category", "")
+            
+            # Ищем кнопку "Найти"
+            btn = html_soup.find(lambda tag: tag.name in ["button", "a", "input"] and ("Найти" in tag.text or "Найти" in tag.get("value", "") or "Найти" in tag.get("title", "")))
+            if btn:
+                btn_id = btn.get("id") or btn.get("name")
+            else:
+                # Fallback, если не нашли кнопку по тексту
+                btn_id = f"{prefix}:j_idt138" # Старый дефолт
+                print("⚠️ Кнопка 'Найти' не найдена, используем дефолтный ID:", btn_id)
             
             ajax_headers = HEADERS.copy()
             ajax_headers["Faces-Request"] = "partial/ajax"
@@ -80,21 +101,21 @@ def search_category(session, category_code, category_name, year, page=1):
             
             data = {
                 "javax.faces.partial.ajax": "true",
-                "javax.faces.source": "j_idt35:j_idt40:j_idt41:j_idt138",
+                "javax.faces.source": btn_id,
                 "javax.faces.partial.execute": "@all",
                 "javax.faces.partial.render": "@all",
-                "j_idt35:j_idt40:j_idt41:j_idt138": "j_idt35:j_idt40:j_idt41:j_idt138",
-                "j_idt35:j_idt40:j_idt41": "j_idt35:j_idt40:j_idt41",
-                "j_idt35:j_idt40:j_idt41:edit-category": category_code,
-                "j_idt35:j_idt40:j_idt41:edit-period": year,
+                btn_id: btn_id,
+                prefix: prefix,
+                f"{prefix}:edit-category": category_code,
+                f"{prefix}:edit-period": year,
                 "javax.faces.ViewState": view_state
             }
             
             resp_search = session.post(f"{BASE_URL}/form/courtActs/index.xhtml", headers=ajax_headers, data=data, timeout=60)
             resp_list = session.get(f"{BASE_URL}/form/courtActs/lawsuitList.xhtml", headers=HEADERS, timeout=60)
             
-            html_soup = BeautifulSoup(resp_list.text, "html.parser")
-            rows = html_soup.find_all('tr', {"onclick": lambda x: x and "viewSelectedLawsuit" in x})
+            list_soup = BeautifulSoup(resp_list.text, "html.parser")
+            rows = list_soup.find_all('tr', {"onclick": lambda x: x and "viewSelectedLawsuit" in x})
             cases = []
             for row in rows:
                 cells = row.find_all(['td', 'th'])
