@@ -1,5 +1,13 @@
 # Журнал разработки (Progress & Dev Diary)
 
+## [14.07.2026] Верификация ежедневного сбора контактов и генерации офферов (Pipeline Verification & Output Structure Audit)
+**Достижения (Wins):**
+- Проведена верификация работы ежедневного сбора контактов со всех источников (adata.kz, hh.ru, hh.kz, threads.net).
+- Проверен запуск пайплайна через `run_pipeline.py`. Все шаги (Playwright скрапинг, ИИ-обогащение через Vertex AI fallback) отработали успешно.
+- Подтверждена правильная структура сохранения результатов: индивидуальные карточки лидов с драфтами первого сообщения и предложением услуг сохраняются в папку `03_Marketing_and_Sales/daily_leads/YYYY-MM-DD/details/` в формате Markdown.
+- Проверен планировщик `launchd` (`com.higherpower.daily_leadgen`), настроенный на ежедневный автоматический запуск в 09:00 утра.
+- [EN] Verified the daily lead generation pipeline for all sources (adata.kz, hh.ru, hh.kz, threads.net). Verified structured output directories containing custom pitches and business offers at `03_Marketing_and_Sales/daily_leads/YYYY-MM-DD/details/`. Confirmed launchd scheduler is properly configured for daily 09:00 AM execution.
+
 ## [08.07.2026] Стабилизация судебного парсера и успешный тестовый прогон пайплайна
 
 **Достижения (Wins):**

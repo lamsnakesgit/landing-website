@@ -1,4 +1,15 @@
 
+## 2026-07-14: Верификация ежедневного сбора контактов и генерации офферов (Pipeline Verification & Output Structure Audit)
+**Победы (Wins):**
+- Проведена верификация работы ежедневного сбора контактов со всех источников (adata.kz, hh.ru, hh.kz, threads.net).
+- Проверен запуск пайплайна через `run_pipeline.py`. Все шаги (Playwright скрапинг, ИИ-обогащение через Vertex AI fallback) отработали успешно.
+- Подтверждена правильная структура сохранения результатов: индивидуальные карточки лидов с драфтами первого сообщения и предложением услуг сохраняются в папку `03_Marketing_and_Sales/daily_leads/YYYY-MM-DD/details/` в формате Markdown.
+- Проверен планировщик `launchd` (`com.higherpower.daily_leadgen`), настроенный на ежедневный автоматический запуск в 09:00 утра.
+- [EN] Verified the daily lead generation pipeline for all sources (adata.kz, hh.ru, hh.kz, threads.net). Verified structured output directories containing custom pitches and business offers at `03_Marketing_and_Sales/daily_leads/YYYY-MM-DD/details/`. Confirmed launchd scheduler is properly configured for daily 09:00 AM execution.
+
+**Ошибки и как решили (Problems & Solutions):**
+- Все тесты прошли успешно, критических ошибок и зависаний в работе парсеров и Vertex AI не обнаружено.
+
 ## 2026-07-13: Исправление зависаний сети, автоматический фолбек на Vertex AI и восстановление Playwright
 **Победы (Wins):**
 - Добавлена жесткая защита от сетевых зависаний в `daily_leadgen.py` с помощью `socket.setdefaulttimeout(35)` и явного таймаута в запросах (25 сек). Это полностью решило проблему бесконечного ожидания ответа от API.
