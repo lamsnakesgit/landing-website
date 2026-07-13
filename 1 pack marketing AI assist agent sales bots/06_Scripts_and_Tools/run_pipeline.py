@@ -171,9 +171,12 @@ def main():
 
     logger.info("⚡ Начинаем выполнение полного пайплайна лидогенерации...")
     
+    quick_mode = "--quick" in sys.argv
+    
     # Шаг 1. Сбор свежих лидов с HH.ru, HH.kz, Adata.kz и Threads.net с помощью Playwright
     python_bin = sys.executable
-    playwright_cmd = f'"{python_bin}" scripts/playwright_leadgen.py'
+    playwright_flags = " --quick" if quick_mode else ""
+    playwright_cmd = f'"{python_bin}" scripts/playwright_leadgen.py{playwright_flags}'
     step1_success = run_step(playwright_cmd, "Сбор лидов через Playwright (HH + Adata + Threads)")
     
     # Шаг 1.5. Сбор судебных дел из Судебного кабинета по трудовым спорам
@@ -184,7 +187,8 @@ def main():
         logger.warning("⚠️ Не удалось собрать судебные дела (возможно, устарела сессия), продолжаем без них...")
 
     # Шаг 2. ИИ-обогащение, генерация оферов, драфтов сообщений и отправка отчетов
-    leadgen_cmd = f'"{python_bin}" 06_Scripts_and_Tools/daily_leadgen.py'
+    leadgen_flags = " --limit=2" if quick_mode else ""
+    leadgen_cmd = f'"{python_bin}" 06_Scripts_and_Tools/daily_leadgen.py{leadgen_flags}'
     step2_success = run_step(leadgen_cmd, "ИИ-обогащение, генерация офферов и отправка отчетов")
     
     if step2_success:

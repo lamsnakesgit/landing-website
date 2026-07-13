@@ -18,19 +18,45 @@ except AttributeError:
 os.makedirs("logs", exist_ok=True)
 logger.add("logs/playwright_leadgen.log", rotation="10 MB", retention="7 days", level="INFO")
 
-def safe_goto(page, url, wait_until="domcontentloaded", timeout=30000, max_retries=3):
+CACHE_FILE = "06_Scripts_and_Tools/company_contacts_cache.json"
+company_cache = {}
+
+def load_company_cache():
+    global company_cache
+    if os.path.exists(CACHE_FILE):
+        try:
+            with open(CACHE_FILE, "r", encoding="utf-8") as f:
+                company_cache = json.load(f)
+            logger.info(f"Загружен кэш контактов компаний: {len(company_cache)} записей.")
+        except Exception as e:
+            logger.warning(f"Не удалось загрузить кэш компаний: {e}")
+    else:
+        logger.info("Кэш контактов компаний не найден, создаем новый.")
+
+def save_company_cache():
+    try:
+        os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
+        with open(CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(company_cache, f, indent=4, ensure_ascii=False)
+    except Exception as e:
+        logger.error(f"Не удалось сохранить кэш контактов компаний: {e}")
+
+
+def safe_goto(page, url, wait_until="domcontentloaded", timeout=20000, max_retries=3):
     """Выполняет безопасный переход на страницу с повторными попытками при таймаутах"""
     for attempt in range(1, max_retries + 1):
         try:
             logger.info(f"Переход на {url} (попытка {attempt}/{max_retries})...")
+            page.set_default_navigation_timeout(timeout)
             page.goto(url, wait_until=wait_until, timeout=timeout)
             return True
         except Exception as e:
             logger.warning(f"Ошибка при переходе на {url} (попытка {attempt}): {e}")
             if attempt == max_retries:
                 raise e
-            time.sleep(attempt * 3)
+            time.sleep(attempt * 2)
     return False
+
 
 def search_hh_web(page, query, area_id):
     """Ищет вакансии на hh.ru/hh.kz через браузер Playwright без использования API"""
@@ -112,6 +138,18 @@ def get_adata_company_info(page, company_name):
     
     # Очищаем название компании от лишних символов для поиска
     clean_name = re.sub(r'["\'«»]|ТОО|ИП|АО', '', company_name).strip()
+    cache_key = clean_name.lower()
+    
+    # Проверка кэша по имени компании
+    if cache_key in company_cache:
+        cached = company_cache[cache_key]
+        if cached:
+            logger.info(f"Компания '{company_name}' найдена в кэше по имени: {cached}")
+            return cached
+        else:
+            logger.info(f"В кэше отмечено, что для '{company_name}' нет контактов. Пропускаем.")
+            return None
+            
     logger.info(f"Ищем контакты для {company_name} (запрос: {clean_name}) на pk.adata.kz")
     
     try:
@@ -120,19 +158,31 @@ def get_adata_company_info(page, company_name):
         # Находим все ссылки на страницы компаний по data-test-id
         cards = page.query_selector_all('a[data-test-id^="pk-results-page-company-card-"]')
         company_url = None
+        bin_num = None
         for card in cards:
             href = card.get_attribute("href") or ""
-            match = re.search(r'/company/\d{12}', href)
+            match = re.search(r'/company/(\d{12})', href)
             if match:
                 company_url = href
+                bin_num = match.group(1)
                 break
                 
         if company_url:
             if not company_url.startswith("http"):
                 company_url = f"https://pk.adata.kz{company_url}"
             
+            # Проверка кэша по БИН, если нашли БИН на странице результатов
+            if bin_num and bin_num in company_cache:
+                cached = company_cache[bin_num]
+                if cached:
+                    logger.info(f"Компания '{company_name}' (БИН {bin_num}) найдена в кэше по БИН.")
+                    # Также сохраняем по имени для будущих поисков
+                    company_cache[cache_key] = cached
+                    save_company_cache()
+                    return cached
+            
             logger.info(f"Переходим на страницу компании: {company_url}")
-            safe_goto(page, company_url, wait_until="domcontentloaded", timeout=25000)
+            safe_goto(page, company_url, wait_until="domcontentloaded", timeout=20000)
             time.sleep(3)
             
             body_text = page.inner_text("body")
@@ -153,12 +203,25 @@ def get_adata_company_info(page, company_name):
             phone = valid_phones[0] if valid_phones else ""
             
             logger.info(f"Найденные контакты на pk.adata.kz для {company_name}: Тел: {phone}, Email: {email}")
-            return {"phone": phone, "email": email, "adata_url": company_url}
+            result = {"phone": phone, "email": email, "adata_url": company_url}
+            
+            # Сохраняем в кэш под обоими ключами
+            company_cache[cache_key] = result
+            if bin_num:
+                company_cache[bin_num] = result
+            save_company_cache()
+            
+            return result
+        else:
+            # Записываем в кэш пустой результат, чтобы не искать повторно
+            company_cache[cache_key] = None
+            save_company_cache()
             
     except Exception as e:
         logger.error(f"Ошибка при парсинге pk.adata.kz для {company_name}: {e}")
         
     return None
+
 
 def search_adata_web(page, query):
     """Ищет компании на pk.adata.kz по запросу и собирает контакты"""
@@ -187,9 +250,29 @@ def search_adata_web(page, query):
         # Переходим в топ-3 компании для сбора контактов
         for comp in company_links[:3]:
             try:
+                bin_num = comp["bin"]
                 comp_url = comp["url"]
+                
+                # Проверяем кэш по БИН
+                if bin_num in company_cache:
+                    cached = company_cache[bin_num]
+                    if cached:
+                        logger.info(f"Компания с БИН {bin_num} найдена в кэше. Пропускаем переход.")
+                        leads.append({
+                            "name": cached.get("name", "Представитель компании"),
+                            "company_name": cached.get("company_name", "Неизвестно"),
+                            "phone": cached.get("phone", ""),
+                            "email": cached.get("email", ""),
+                            "url": comp_url,
+                            "description": f"Компания найдена на adata.kz по запросу: {query}. БИН: {bin_num}",
+                            "source": "adata.kz",
+                            "city": cached.get("city", "Казахстан"),
+                            "query": query
+                        })
+                        continue
+                
                 logger.info(f"Переходим на страницу компании {comp['bin']}: {comp_url}")
-                safe_goto(page, comp_url, wait_until="domcontentloaded", timeout=25000)
+                safe_goto(page, comp_url, wait_until="domcontentloaded", timeout=20000)
                 time.sleep(3)
                 
                 body_text = page.inner_text("body")
@@ -229,7 +312,7 @@ def search_adata_web(page, query):
                 if city_match:
                     city = city_match.group(1).strip()
                 
-                leads.append({
+                result = {
                     "name": lpr_name,
                     "company_name": company_name,
                     "phone": phone,
@@ -239,7 +322,17 @@ def search_adata_web(page, query):
                     "source": "adata.kz",
                     "city": city,
                     "query": query
-                })
+                }
+                
+                leads.append(result)
+                
+                # Сохраняем в кэш
+                company_cache[bin_num] = result
+                # Также сохраняем по названию компании
+                clean_comp_name = re.sub(r'["\'«»]|ТОО|ИП|АО', '', company_name).strip().lower()
+                company_cache[clean_comp_name] = result
+                save_company_cache()
+                
                 time.sleep(3)
                 
             except Exception as e:
@@ -249,6 +342,7 @@ def search_adata_web(page, query):
         logger.error(f"Ошибка при работе с adata.kz по запросу {query}: {e}")
         
     return leads
+
 
 def search_threads_web(page, query):
     """Ищет профили на threads.net по ключевому слову через Yahoo Search"""
@@ -344,12 +438,26 @@ def search_threads_web(page, query):
 
 def main():
     logger.info("=== Запуск устойчивого Playwright-парсера ===")
+    load_company_cache()
     
     queries = ["ии", "разработка", "боты", "маркетинг", "контекстная реклама", "ии контент"]
-    
     # 40 - Казахстан (hh.kz), 1 - Москва (hh.ru)
     regions = [40, 1]
     
+    # Парсинг аргументов командной строки
+    quick_mode = "--quick" in sys.argv
+    headless_mode = True
+    
+    for arg in sys.argv:
+        if arg.startswith("--headless="):
+            val = arg.split("=")[1].lower()
+            headless_mode = (val == "true")
+            
+    if quick_mode:
+        logger.info("Запуск в быстром режиме (--quick). Ограничиваем запросы.")
+        queries = ["ии"]
+        regions = [40]
+        
     all_hh_leads = []
     all_threads_leads = []
     all_adata_leads = []
@@ -358,7 +466,7 @@ def main():
         with sync_playwright() as p:
             # Запускаем браузер с эмуляцией реального пользователя и стабильными флагами для headless
             browser = p.chromium.launch(
-                headless=True,
+                headless=headless_mode,
                 args=[
                     "--disable-disable-blink-features",
                     "--disable-blink-features=AutomationControlled",
@@ -374,8 +482,10 @@ def main():
             )
             page = context.new_page()
             
-            # Обходим детекты автоматизации
+            # Обходим детекты автоматизации и автоматически отклоняем все диалоги
             page.evaluate("() => { Object.defineProperty(navigator, 'webdriver', { get: () => undefined }) }")
+            page.on("dialog", lambda dialog: dialog.dismiss())
+
             
             # 1. Собираем вакансии с HH
             for area in regions:
