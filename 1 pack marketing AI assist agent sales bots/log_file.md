@@ -1,4 +1,25 @@
 
+## 2026-07-13: Исправление зависаний сети, автоматический фолбек на Vertex AI и восстановление Playwright
+**Победы (Wins):**
+- Добавлена жесткая защита от сетевых зависаний в `daily_leadgen.py` с помощью `socket.setdefaulttimeout(35)` и явного таймаута в запросах (25 сек). Это полностью решило проблему бесконечного ожидания ответа от API.
+- Реализована автоматическая проверка работоспособности ключа OpenAI/AIHubMix на старте скрипта. Если API возвращает ошибку 401 (ключ отключен), пайплайн мгновенно переключается на Vertex AI, исключая задержки и падения на середине процесса.
+- Успешно установлены недостающие бинарные файлы браузеров Playwright (`python3 -m playwright install`), из-за отсутствия которых скрапер падал с ошибкой.
+- Внедрен сквозной флаг `--quick` в `run_pipeline.py` и `playwright_leadgen.py`, позволяющий запускать пайплайн с лимитом запросов и лидов для мгновенного локального smoke-тестирования.
+- Успешно проведен сквозной тестовый прогон всего пайплайна (`run_pipeline.py --force --quick`), подтвердивший стабильность сбора, ИИ-обогащения через Vertex AI, генерации отчетов и отправки в Telegram.
+- [EN] Fixed networking hangs in `daily_leadgen.py` via global socket timeouts (35s) and explicit requests.post timeouts (25s). Added instant OpenAI/AIHubMix key pre-flight check with auto-fallback to Vertex AI on 401 error. Restored missing Playwright browser binaries and added a `--quick` smoke-test mode across the pipeline, verifying everything with a successful end-to-end dry run.
+
+**Ошибки и как решили (Problems & Solutions):**
+- Зависание пайплайна: Vertex AI/OpenAI API запросы висели бесконечно. Решено добавлением таймаутов сокета на уровне Python.
+- Ошибка Playwright "Executable doesn't exist": Восстановлена целостность окружения запуском `python3 -m playwright install`.
+
+## 2026-07-08: Оптимизация судебного парсера и сквозная верификация пайплайна (Court Parser Optimization & End-to-End Pipeline Verification)
+**Победы (Wins):**
+- Полностью переработан механизм авторизации и навигации в судебном парсере `scripts/sud_parser/parser_tk.py`. Полностью отключен интерактивный режим (`headless=False`), настроены жесткие таймауты перехода (20 секунд) и авто-закрытие всплывающих диалоговых окон. Это исключило любые зависания в фоновом режиме.
+- [EN] Redesigned authentication and navigation in the court parser (`scripts/sud_parser/parser_tk.py`). Completely disabled GUI interactive mode (`headless=False`), configured strict 20s transition timeouts, and added automated dialog dismissal to eliminate background hangs.
+- Проведен успешный сквозной принудительный запуск пайплайна (`run_pipeline.py --force`). Собрано и обогащено **73 лида** (HH, Adata, Threads).
+- [EN] Successfully performed a force run of the full pipeline. Scraped and enriched **73 leads** from all sources.
+- Проверена работа автоматического переключения на Vertex AI (Gemini 2.5 Flash по HTTP) при ошибке 401 для ключей AIHubMix/OpenAI. Все лиды были успешно проанализированы, офферы и персональные питчи сохранены локально, а отчет отправлен в Telegram.
+- [EN] Confirmed robust failover to Vertex AI (Gemini 2.5 Flash over HTTP) when OpenAI/AIHubMix API keys returned 401. All leads were analyzed, pitches generated, and the Telegram summary sent.
 
 ## 2026-07-01: Верификация ежедневной лидогенерации (Leadgen Verification)
 **Победы (Wins):**
@@ -49,3 +70,12 @@
 
 
 
+
+## Анализ судебных дел (ai lawyer output) - 04 Июля 2026
+**Wins / Успехи:**
+- Успешно извлечены и проанализированы 20 судебных документов (.docx) из папки `output/pdfs`.
+- Выявлено, что часть файлов являются дубликатами. Смогли точно определить победителей.
+
+**Problems issues / Проблемы и решения:**
+- API ключ Gemini оказался нерабочим (HTTP 403 Forbidden) для генерации контента.
+- **Решение:** Написан кастомный скрипт для извлечения текста напрямую из XML-структуры .docx файлов, после чего произведен семантический анализ результатов.

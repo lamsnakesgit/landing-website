@@ -89,30 +89,36 @@ export async function POST(req: Request) {
 
     const { token, projectId } = await getVertexToken();
 
-    // Process each slide sequentially (or parallel, but Gemini might have rate limits)
-    const finalSlides = await Promise.all(slides.map(async (slide: any) => {
+    // Process each slide sequentially to avoid Vertex AI rate limits
+    const finalSlides: any[] = [];
+    for (const [index, slide] of slides.entries()) {
       let backgroundUrl = slide.backgroundUrl || '';
       
       if (!backgroundUrl) {
         if (modelChoice === 'presentation') {
            backgroundUrl = `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&h=1350&fit=crop&auto=format`;
         } else {
-          // Here we build the prompt including the user's style preference
           let promptWithStyle = slide.imagePrompt;
           if (imageStyle) {
             promptWithStyle += `\n\nVisual Style and Target Audience: ${imageStyle}`;
           }
           const aspectPrompt = `\n\nGenerate this image in ${aspectRatio} aspect ratio.`;
-          const img = await generateImage(projectId, token as string, promptWithStyle + aspectPrompt, modelChoice, aspectRatio, referenceImage);
-          backgroundUrl = img || `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&h=1350&fit=crop&auto=format`;
+
+          try {
+            const img = await generateImage(projectId, token as string, promptWithStyle + aspectPrompt, modelChoice, aspectRatio, referenceImage);
+            backgroundUrl = img || `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&h=1350&fit=crop&auto=format`;
+          } catch (slideError) {
+            console.warn(`[Slide ${index + 1}] Generation failed, using fallback:`, slideError instanceof Error ? slideError.message : slideError);
+            backgroundUrl = `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&h=1350&fit=crop&auto=format`;
+          }
         }
       }
 
-      return {
+      finalSlides.push({
         ...slide,
         backgroundUrl
-      };
-    }));
+      });
+    }
 
     return NextResponse.json({ slides: finalSlides });
 

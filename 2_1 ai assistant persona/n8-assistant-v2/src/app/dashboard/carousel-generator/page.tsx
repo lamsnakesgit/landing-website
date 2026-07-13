@@ -170,7 +170,13 @@ export default function CarouselGeneratorPage() {
     for (let i = 0; i < slideElements.length; i++) {
       const element = slideElements[i] as HTMLElement
       try {
-        const dataUrl = await htmlToImage.toPng(element, { quality: 1.0, pixelRatio: 2 })
+        const dataUrl = await htmlToImage.toPng(element, {
+          quality: 1.0,
+          pixelRatio: 2,
+          width: dims.w,
+          height: dims.h,
+          style: { transform: 'none', margin: '0' },
+        })
         images.push(dataUrl)
       } catch (err) {
         console.error('Failed to render slide', i, err)

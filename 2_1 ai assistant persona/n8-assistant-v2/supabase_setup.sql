@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS public.users (
     username TEXT,
     first_name TEXT,
     tokens INTEGER DEFAULT 500,
+    referred_by TEXT, -- Can be a telegram_id of another user, or an admin campaign code
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

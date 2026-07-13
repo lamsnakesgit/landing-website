@@ -50,6 +50,7 @@
 - Удалось обойти блокировку YouTube (403 Forbidden) с помощью обновления yt-dlp и использования android-клиента.
 - Gemini API (gemini-flash-latest) успешно проанализировал 5-минутное видео и выбрал эстетичный момент (шпагат).
 - Нарезка через ffmpeg прошла мгновенно.
+- Итоговый артефакт подтвержден: `clip_result.mp4` существует и валиден (`15s`, `640x360`, `H.264/AAC`).
 
 **Problems:**
 - Начальные попытки скачивания через yt-dlp блокировались YouTube.
@@ -58,3 +59,24 @@
 
 **Russian Duplicate:**
 Автоматизирована нарезка клипа. Решены проблемы с 403 ошибкой YouTube и галлюцинациями таймкодов Gemini. Итоговый клип (15 сек) готов.
+
+## [2026-05-12] Veo API Preparation
+
+### Wins
+- **Veo Prompting**: Developed a high-quality cinematic prompt for Veo 3.1 following the "Master Guide" (Action-First, Arri Alexa, etc.).
+- **Infrastructure**: Prepared [generate_veo.py](file:///Users/higherpower/.gemini/antigravity/brain/a6c94722-8126-458a-b4c0-9ac0cfe26a8e/scratch/generate_veo.py) for automated generation.
+- **Commit**: Committed all changes, including deleted temporary files.
+
+### Problems & Issues
+- **Quota Limit**: Primary API key hit `RESOURCE_EXHAUSTED` for Veo models.
+- **Permission Denied**: New API key provided by user is `API_KEY_SERVICE_BLOCKED` for Generative Language API. Needs manual activation in GCP Console.
+
+### Duplicate in Russian
+#### Победы
+- **Veo Промптинг**: Разработан качественный кинематографичный промпт для Veo 3.1 по «Золотой формуле» (Action-First, Arri Alexa и т.д.).
+- **Инфраструктура**: Подготовлен скрипт `generate_veo.py` для автоматической генерации.
+- **Commit**: Все изменения зафиксированы в Git, включая удаление временных файлов.
+
+#### Проблемы
+- **Лимит квот**: Основной ключ — `RESOURCE_EXHAUSTED`.
+- **Доступ заблокирован**: Второй ключ — `API_KEY_SERVICE_BLOCKED` (нужно включить API в GCP).

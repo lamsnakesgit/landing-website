@@ -79,18 +79,38 @@ def parse_labor_cases(max_pages=5):
     court_leads = []
 
     with sync_playwright() as p:
-        # Пробуем сначала headless режим
-        headless_mode = True
         print("🌐 Попытка зайти в Банк судебных актов в фоновом режиме (headless=True)...")
-        browser = p.chromium.launch(headless=headless_mode, args=["--ignore-certificate-errors"])
+        browser = p.chromium.launch(
+            headless=True, 
+            args=[
+                "--disable-disable-blink-features",
+                "--disable-blink-features=AutomationControlled",
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-gpu",
+                "--disable-dev-shm-usage",
+                "--ignore-certificate-errors"
+            ]
+        )
         context = browser.new_context(
             storage_state="sud_state.json" if os.path.exists("sud_state.json") else None, 
             ignore_https_errors=True,
-            user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+            user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            viewport={"width": 1280, "height": 800}
         )
         page = context.new_page()
-        page.goto("https://office.sud.kz/form/courtActs/index.xhtml")
-        page.wait_for_timeout(5000)
+        # Автоматически закрываем все диалоговые окна
+        page.on("dialog", lambda dialog: dialog.dismiss())
+        
+        # Переход с жестким таймаутом в 20 секунд
+        try:
+            page.set_default_navigation_timeout(20000)
+            page.goto("https://office.sud.kz/form/courtActs/index.xhtml", wait_until="domcontentloaded", timeout=20000)
+            page.wait_for_timeout(3000)
+        except Exception as e:
+            print(f"❌ Ошибка перехода на судебный кабинет (таймаут или сайт недоступен): {e}")
+            browser.close()
+            return False
         
         # Проверяем, авторизованы ли мы
         current_url = page.url
@@ -98,32 +118,12 @@ def parse_labor_cases(max_pages=5):
         is_logged_in = "courtActs" in current_url and "j_idt70:auth" not in content and page.locator("input[value='Войти']").count() == 0
         
         if not is_logged_in:
-            print("⚠️ Сессия недействительна или отсутствует. Переключаемся в интерактивный режим (headless=False) для авторизации...")
+            print("❌ Ошибка: Сессия в sud_state.json недействительна или отсутствует.")
+            print("Пожалуйста, запустите python scripts/sud_parser/auth_stealth.py для повторной авторизации через ЭЦП!")
             browser.close()
+            return False
             
-            # Запускаем в видимом режиме
-            headless_mode = False
-            browser = p.chromium.launch(headless=headless_mode, args=["--ignore-certificate-errors"])
-            context = browser.new_context(
-                ignore_https_errors=True,
-                user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-            )
-            page = context.new_page()
-            page.goto("https://office.sud.kz/form/courtActs/index.xhtml")
-            
-            print("⏳ Ожидание авторизации через ЭЦП в открывшемся окне браузера (у вас есть 2 минуты)...")
-            # Ждем появления кнопки расширенного поиска #filter-button, что свидетельствует об успешном входе
-            try:
-                page.wait_for_selector("#filter-button", timeout=120000)
-                print("✅ Успешная авторизация обнаружена! Сохраняем сессию...")
-                context.storage_state(path="sud_state.json")
-                page.wait_for_timeout(2000)
-            except Exception:
-                print("❌ Превышено время ожидания авторизации. Завершение работы.")
-                browser.close()
-                return False
-        else:
-            print("✅ Авторизация успешна (сессия восстановлена).")
+        print("✅ Авторизация успешна (сессия восстановлена).")
         
         # Закрываем модальное окно, если оно есть
         try:

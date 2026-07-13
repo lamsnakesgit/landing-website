@@ -57,6 +57,11 @@ async def upsert_companies(companies: list[dict]) -> int:
             "category": c.get("category", ""),
             "source": c.get("source", ""),
             "hh_url": c.get("hh_url", "") or c.get("maps_url", ""),
+            "draft_pitch": c.get("draft_pitch", ""),
+            "outreach_angle": c.get("outreach_angle", ""),
+            "pain_points": json.dumps(c.get("pain_points", [])),
+            "offer": c.get("offer", ""),
+            "outreach_status": c.get("outreach_status", "pending")
         })
     async with httpx.AsyncClient(timeout=30) as client:
         resp = await client.post(

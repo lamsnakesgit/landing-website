@@ -51,6 +51,41 @@
 - визуал должен усиливать смысл: контраст, стрелки, формулы, числа, ограниченные места, таймер, waitlist, sold out;
 - не делать «красиво ради красиво» — каждый визуальный элемент должен помогать дочитать карусель.
 
+## External MiMo subagent rule
+
+Для экономии дорогих токенов Cline/Claude на рутинных задачах по этому проекту можно использовать внешний read-only subagent через локальный `opencode` и бесплатную модель MiMo:
+
+```bash
+opencode run -m opencode/mimo-v2.5-free '...задача...'
+```
+
+Использовать MiMo в первую очередь для:
+
+- первичного анализа файлов и логов;
+- поиска гипотез по багам;
+- генерации черновиков, вариантов текста и boilerplate;
+- сравнения простых подходов;
+- подготовки краткого JSON-резюме для последующего решения в Cline.
+
+Ограничения:
+
+- MiMo external subagent не заменяет встроенный `use_subagents` Cline и не управляет его моделью;
+- по умолчанию давать MiMo read-only контракт: `ничего не меняй`, `не запускай destructive commands`, `верни краткий JSON`;
+- финальные правки, архитектурные решения, security-sensitive действия и production-fixes проверяет и выполняет Cline/Claude;
+- если MiMo зависает дольше 30–60 секунд, читать background log и при необходимости останавливать процесс `pkill -f "opencode run -m opencode/mimo-v2.5-free"`.
+
+Проверенный smoke-test:
+
+```bash
+opencode run -m opencode/mimo-v2.5-free 'Ответь одной строкой JSON: {"ok":true,"model":"mimo"}. Не читай файлы и ничего не меняй.'
+```
+
+Ожидаемый ответ:
+
+```json
+{"ok":true,"model":"mimo"}
+```
+
 ## Current carousel artifact
 
 - `n8-assistant-v2/public/carousels/hormozi-offers-carousel.html`

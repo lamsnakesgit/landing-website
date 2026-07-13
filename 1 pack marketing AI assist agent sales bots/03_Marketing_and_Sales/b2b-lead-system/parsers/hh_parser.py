@@ -8,10 +8,14 @@ import asyncio
 import argparse
 import json
 import re
+import os
 import time
 import logging
 from typing import Optional
 from urllib.parse import quote_plus
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
@@ -25,15 +29,19 @@ AREA_MAP = {
     "актау": "167",
     "атырау": "168",
     "казахстан": "40",  # вся страна
+    "россия": "113",  # вся Россия
 }
 
 HEADERS = {
-    "User-Agent": "b2b-lead-parser/1.0 (contact: your@email.com)",
+    "User-Agent": "AIAgentOutreach/1.0 (info@aiconicvibe.store)",
     "Accept": "application/json",
     "Accept-Language": "ru-RU,ru;q=0.9",
-    "HH-User-Agent": "b2b-lead-parser/1.0",
 }
 
+hh_cookie = os.getenv("HH_COOKIE")
+if hh_cookie:
+    HEADERS["Cookie"] = hh_cookie
+    log.info("Найден HH_COOKIE в .env. Будем запрашивать данные как авторизованный пользователь.")
 
 def get_area_id(city: str) -> str:
     return AREA_MAP.get(city.lower(), "40")

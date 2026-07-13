@@ -460,6 +460,7 @@ body {
     align-items: center;
     gap: 20px;
     margin: 20px 0 30px;
+    width: 100%;
 }
 
 .rhythm-circle {
@@ -473,12 +474,15 @@ body {
     align-items: center;
     background: rgba(255, 255, 255, 0.05);
     animation: slowPulse 3s infinite ease-in-out;
+    text-align: center;
 }
 
 .rhythm-time {
     font-family: var(--font-serif);
     font-size: 32px;
     font-weight: 300;
+    text-align: center;
+    width: 100%;
 }
 
 .rhythm-time .small-text {
@@ -493,6 +497,8 @@ body {
     text-transform: uppercase;
     opacity: 0.7;
     margin-top: 4px;
+    text-align: center;
+    width: 100%;
 }
 
 .rhythm-text {
@@ -541,7 +547,7 @@ body {
 .f2f-outro {
     font-size: 12px;
     line-height: 1.6;
-    text-align: center;
+    text-align: left;
     margin-bottom: 24px;
 }
 
@@ -599,7 +605,7 @@ body {
 }
 
 .cta-button:hover svg {
-    transform: translateX(4px);
+    transform: translateY(4px);
 }
 
 /* Индикаторные точки внизу */
@@ -809,8 +815,203 @@ body.export-mode .progress-bar-container,
 body.export-mode .nav-btn,
 body.export-mode .slide-dots,
 body.export-mode .swipe-hint,
+body.export-mode .slide-footer,
 body.export-mode .download-container {
     display: none !important;
+}
+
+/* Отменяем принудительное растягивание высоты и разрешаем авто-высоту */
+body.export-mode .slide-content {
+    height: auto !important;
+    justify-content: center !important;
+}
+
+body.export-mode .slide-image-wrapper {
+    flex-shrink: 0 !important;
+}
+
+/* Компактный режим для картинок карусели (высота вьюпорта 450px) */
+@media (max-height: 500px) {
+    /* Для слайдов с контентом уменьшаем паддинги, чтобы текст и картинки влезали свободно */
+    body.export-mode .slide {
+        padding: 25px 25px 25px !important; 
+        justify-content: center !important;
+    }
+
+    body.export-mode .slide-title {
+        font-size: 21px !important;
+        margin-bottom: 8px !important;
+    }
+
+    body.export-mode .slide-description {
+        font-size: 11.5px !important;
+        margin-bottom: 12px !important;
+        line-height: 1.5 !important;
+    }
+
+    body.export-mode .highlight-box {
+        padding: 8px 12px !important;
+        font-size: 11px !important;
+        margin-top: auto !important; /* Прижимаем к низу контента */
+    }
+
+    /* СЛАЙД 1: Обложка (должна идеально вписываться в центральный квадрат 1:1) */
+    body.export-mode #slide-1 {
+        padding: 60px 30px 60px !important; /* Увеличенный паддинг сверху/снизу гарантирует безопасную зону */
+        justify-content: center !important;
+    }
+
+    body.export-mode #slide-1 .watermark-logo {
+        top: 60px !important; /* Ниже линии обрезки Y=45px */
+        right: 30px !important;
+    }
+
+    body.export-mode #slide-1 .watermark-logo svg {
+        width: 45px !important;
+        height: 45px !important;
+    }
+
+    body.export-mode #slide-1 .slide-image-wrapper {
+        height: 110px !important;
+        margin-bottom: 12px !important;
+    }
+
+    body.export-mode #slide-1 .brand-top-label {
+        margin-bottom: 6px !important;
+        font-size: 8.5px !important;
+    }
+
+    body.export-mode #slide-1 .main-title {
+        font-size: 25px !important;
+        margin-bottom: 6px !important;
+        line-height: 1.15 !important;
+    }
+
+    body.export-mode #slide-1 .divider {
+        margin-bottom: 6px !important;
+    }
+
+    body.export-mode #slide-1 .main-subtitle {
+        font-size: 12px !important;
+    }
+
+    /* СЛАЙД 2: Шаг 1 */
+    body.export-mode #slide-2 .tips-grid {
+        gap: 6px !important;
+        margin-bottom: 12px !important;
+    }
+
+    body.export-mode #slide-2 .tip-card {
+        padding: 8px 12px !important;
+        gap: 10px !important;
+    }
+
+    body.export-mode #slide-2 .tip-text {
+        font-size: 11px !important;
+    }
+
+    /* СЛАЙД 3: Шаг 2 */
+    body.export-mode #slide-3 .slide-image-wrapper.compact {
+        height: 70px !important;
+        margin-bottom: 10px !important;
+    }
+
+    body.export-mode #slide-3 .magnesium-info {
+        gap: 8px !important;
+        margin-bottom: 10px !important;
+    }
+
+    body.export-mode #slide-3 .info-block h3 {
+        font-size: 13px !important;
+        margin-bottom: 4px !important;
+        padding-bottom: 2px !important;
+    }
+
+    body.export-mode #slide-3 .styled-list {
+        gap: 4px !important;
+    }
+
+    body.export-mode #slide-3 .styled-list li {
+        font-size: 10px !important;
+    }
+
+    body.export-mode #slide-3 .tag-container {
+        gap: 4px !important;
+    }
+
+    body.export-mode #slide-3 .tag {
+        padding: 2px 6px !important;
+        font-size: 9px !important;
+    }
+
+    /* СЛАЙД 4: Шаг 3 */
+    body.export-mode #slide-4 .rhythm-visual {
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 8px 0 12px !important;
+    }
+
+    body.export-mode #slide-4 .rhythm-circle {
+        width: 80px !important;
+        height: 80px !important;
+    }
+
+    body.export-mode #slide-4 .rhythm-time {
+        font-size: 20px !important;
+    }
+
+    body.export-mode #slide-4 .rhythm-time .small-text {
+        font-size: 10px !important;
+    }
+
+    body.export-mode #slide-4 .rhythm-text {
+        text-align: center !important;
+        font-size: 11px !important;
+    }
+
+    /* СЛАЙД 5: Итоги */
+    body.export-mode #slide-5 .slide-image-wrapper.compact {
+        height: 70px !important;
+        margin-bottom: 10px !important;
+    }
+
+    body.export-mode #slide-5 .benefits-list {
+        gap: 6px !important;
+        margin-bottom: 10px !important;
+    }
+
+    body.export-mode #slide-5 .benefit-item {
+        padding-bottom: 4px !important;
+        gap: 8px !important;
+    }
+
+    body.export-mode #slide-5 .benefit-num {
+        font-size: 14px !important;
+    }
+
+    body.export-mode #slide-5 .benefit-text {
+        font-size: 10px !important;
+    }
+
+    body.export-mode #slide-5 .f2f-outro {
+        margin-bottom: 10px !important;
+        font-size: 10px !important;
+        line-height: 1.5 !important;
+    }
+
+    body.export-mode #slide-5 .cta-container {
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important;
+        margin-top: auto !important;
+    }
+
+    body.export-mode #slide-5 .cta-button {
+        width: 100% !important;
+        padding: 10px 15px !important;
+        font-size: 8.5px !important;
+        justify-content: center !important;
+    }
 }
 
 

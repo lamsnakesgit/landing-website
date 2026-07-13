@@ -22,3 +22,7 @@ n8n_data/
 evolution_data/
 traefik_data/
 backups/
+
+# ECP Keys
+keys/
+*.p12

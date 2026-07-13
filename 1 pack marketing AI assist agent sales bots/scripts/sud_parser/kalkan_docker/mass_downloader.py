@@ -41,24 +41,37 @@ def do_auth(session):
             xml_to_sign = html_lib.unescape(re.search(r'id="xmlToSign0"[^>]*value="([^"]+)"', html).group(1))
             view_state = re.search(r'name="javax\.faces\.ViewState"[^>]*value="([^"]+)"', html).group(1)
             
-            parts = re.search(r'name="(j_idt[^"]*signedXml)"', html).group(1).split(":")
+            signed_field = re.search(r'name="(j_idt[^"]*signedXml)"', html).group(1)
+            parts = signed_field.split(":")
             eds_form = f"{parts[0]}:{parts[1]}"
-            signed_field = f"{parts[0]}:{parts[1]}:signedXml"
 
             signed_xml = sign_xml(xml_to_sign)
+            
+            # Находим ID кнопки входа. Она обычно находится в первом RichFaces.ajax или можно найти по паттерну.
+            # Если первый RichFaces.ajax - это кнопка проверки NCALayer, возможно нам нужен другой.
+            # Но попробуем взять первый ajax, который внутри eds_form.
+            ajax_matches = re.findall(r'RichFaces\.ajax\("([^"]+)"', html)
+            ajax_source = next((m for m in ajax_matches if m.startswith(eds_form)), ajax_matches[0])
+            
             payload = {
                 eds_form: eds_form,
                 signed_field: signed_xml,
                 "javax.faces.ViewState": view_state,
                 "javax.faces.partial.ajax": "true",
-                "javax.faces.source": re.search(r'RichFaces\.ajax\("([^"]+)"', html).group(1),
+                "javax.faces.source": ajax_source,
                 "javax.faces.partial.execute": "@all",
                 "javax.faces.partial.render": "@all",
+                ajax_source: ajax_source
             }
-            payload[payload["javax.faces.source"]] = payload["javax.faces.source"]
             
-            session.post(f"{BASE_URL}/index.xhtml", data=payload, headers={"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8", "Faces-Request": "partial/ajax"}, timeout=60)
-            return True
+            resp_post = session.post(f"{BASE_URL}/index.xhtml", data=payload, headers={"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8", "Faces-Request": "partial/ajax"}, timeout=60)
+            
+            if "redirect url" in resp_post.text:
+                print("✅ Авторизация успешна (получен редирект)!")
+                return True
+            else:
+                print(f"❌ Авторизация не удалась. Сервер не вернул редирект.")
+                return False
         except Exception as e:
             print(f"❌ Ошибка авторизации (попытка {attempt+1}): {e}")
             time.sleep(5)
@@ -81,7 +94,10 @@ def search_category(session, category_code, category_name, year, page=1):
             
             category_select = html_soup.find("select", {"name": re.compile(r'edit-category$')})
             if not category_select:
-                print("Не найден селект категории!")
+                print("⚠️ Не найден селект категории! Возможно сессия истекла или изменилась верстка.")
+                with open("/data/debug_index.html", "w", encoding="utf-8") as f:
+                    f.write(resp_index.text)
+                print("Смотрите HTML страницы в /data/debug_index.html")
                 return []
             cat_name_attr = category_select.get("name")
             prefix = cat_name_attr.replace(":edit-category", "")

@@ -68,3 +68,48 @@
 > - `KANBAN.md` (все задачи системы разложены по этапам)
 > - `.clinerules` (лимиты отправок WhatsApp и правила кода)
 > - `docs/WHATSAPP_PARSING_RULES.md` (документация: почему сбор номеров из групп больше не работает из-за LIDs).
+
+---
+
+## 4. Обновление от 2026-06-29 (Результаты и Решенные Проблемы)
+
+### Победы (Wins):
+1. **Успешный запуск пайплайна:** Пайплайн лидогенерации `daily_leadgen.py` успешно завершил обработку всех **79 лидов** (с hh.ru, hh.kz, adata.kz, threads.net).
+2. **Интеграция ИИ и создание предложений:** Все лиды успешно обогащены персонализированными предложениями и драфтами сообщений (по Nick Saraev Outreach Strategy). Результаты сохранены в [leads_report.md](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-06-29/leads_report.md) и [leads_summary.csv](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-06-29/leads_summary.csv). Папка с детализированными офферами: [details](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-06-29/details).
+3. **Отправка отчета:** Итоговый отчет об успешном запуске и собранной статистике успешно отправлен в Telegram.
+
+### Проблемы и Решения (Issues & Solutions):
+* **Проблема:** AIHubMix API выдал ошибку `403 insufficient_user_quota` (баланс аккаунта исчерпан). Пайплайн автоматически переключился на фоллбэк Vertex AI (Gemini 2.5 Flash), однако gRPC-клиент Vertex AI зависал бесконечно при некоторых запросах из-за отсутствия сетевых таймаутов, что останавливало весь пайплайн.
+* **Решение:** 
+  1. Вызов Vertex AI SDK был заменен на прямые HTTP-запросы через библиотеку `requests` с жестким таймаутом `timeout=25`.
+  2. Проведена оптимизация: авторизация, генерация токена Google Cloud OAuth2, URL и заголовки теперь кэшируются на уровне модуля при первом вызове. Это убрало оверхед на повторный рефреш токенов для каждого лида, ускорив ИИ-анализ в несколько раз и предотвратив повторные зависания.
+
+---
+
+## 4. Update from 2026-06-29 (Results and Solved Issues) - English Translation
+
+### Wins:
+1. **Successful Pipeline Run:** The lead generation pipeline `daily_leadgen.py` completed successfully, processing all **79 leads** (from hh.ru, hh.kz, adata.kz, threads.net).
+2. **AI Enrichment & Pitch Generation:** All leads were successfully enriched with personalized hooks and service pitches (Nick Saraev style). Output saved in [leads_report.md](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-06-29/leads_report.md) and [leads_summary.csv](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-06-29/leads_summary.csv). Detailed files located in: [details](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-06-29/details).
+3. **Notification Sent:** A summary notification was successfully delivered via Telegram Bot API.
+
+### Issues & Solutions:
+* **Issue:** OpenAI/AIHubMix API returned a `403 insufficient_user_quota` (exhausted balance). The pipeline automatically fell back to Vertex AI (Gemini 2.5 Flash), but the Vertex AI gRPC SDK got stuck indefinitely on certain requests due to missing network timeouts, halting the pipeline.
+* **Solution:**
+  1. Replaced the Vertex AI SDK client with direct HTTP requests using the `requests` library and a strict `timeout=25` seconds.
+  2. Optimized HTTP authentication: credentials generation, Google Cloud OAuth2 token refreshing, target URL, and headers are now cached at the module level on the first call. This eliminates token refresh overhead for subsequent leads, making the enrichment process multiple times faster and highly stable.
+
+---
+
+## 5. Обновление от 2026-07-13 (Восстановление стабильности и Тестирование)
+
+### Победы (Wins):
+1. **Защита от зависания сети:** Добавлен глобальный таймаут сокета (`socket.setdefaulttimeout(35)`) на уровне Python, что исключило бесконечное ожидание при сетевых сбоях на этапе ИИ-обогащения.
+2. **Pre-flight проверка ключей OpenAI:** Скрипт `daily_leadgen.py` теперь автоматически тестирует ключ OpenAI/AIHubMix при запуске. Если ключ невалиден (ошибка 401), происходит моментальный переход на Vertex AI.
+3. **Восстановление Playwright:** В виртуальное окружение установлены недостающие исполняемые файлы браузеров Playwright Chromium.
+4. **Удобный отладочный режим:** Внедрен флаг `--quick` (ограничение запросов и лидов) во все скраперы и оркестратор, позволяющий совершать быструю сквозную отладку.
+5. **Сквозной тест:** Полный запуск пайплайна (`run_pipeline.py --force --quick`) успешно отработал за 2 минуты: лиды собраны, обогащены по Vertex AI, отчет отправлен в Telegram.
+
+### Issues & Solutions:
+* **Проблема:** Пайплайн зависал из-за отсутствия сетевых таймаутов, а скрапер падал из-за отсутствия браузеров в Playwright.
+* **Решение:** Прописаны глобальные сокет-таймауты в Python, в requests.post добавлен таймаут 25с, выполнена переустановка браузеров Playwright Chromium.

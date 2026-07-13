@@ -1,6 +1,6 @@
 # 📋 KANBAN — AI Outreach & Sales System
 
-> Последнее обновление: 2026-04-15
+> Последнее обновление: 2026-06-20
 > Правило: Cline/агент ПЕРЕД работой берёт 1 задачу → In Progress → по завершении → Done
 
 ---
@@ -20,7 +20,6 @@
 - [ ] `PARSE-03` Зарегать приложение HH.ru API (dev.hh.ru)
 - [ ] `PARSE-04` Python парсер: HH.ru → компании ищущие маркетологов/РОП
 - [ ] `PARSE-05` Интеграция Adata.kz — проверка размера компании, налоги
-- [ ] `PARSE-06` WA группы → извлечь участников через Evolution API (findGroupMembers)
 - [ ] `PARSE-07` Фильтрация участников групп по описанию/категориям (AI)
 
 ### Обогащение
@@ -57,9 +56,11 @@
 <!-- Формат: - [/] `ID` Описание — Начато: YYYY-MM-DD -->
 
 - [/] `HERMES-01` Архитектура Hermes Telegram Assistant (личный + бизнес ассистент с памятью, мультимодальностью и интеграциями) — Начато: 2026-05-16
-- [/] `INFRA-07` Установить и подключить MCP servers для Cline (Vapi / Exa / GitHub / Context7) — Начато: 2026-05-14
-
+- [/] `INFRA-07` Установить и подключить MCP servers для Cline (Vapiшоен  / Exa / GitHub / Context7) — Начато: 2026-05-14
+- [/] `INFRA-08` Мониторинг Evolution instance + Telegram alert при дисконнекте/падении — Начато: 2026-06-04
+- [/] `PARSE-06` WA группы → извлечь участников через Evolution API (findGroupMembers) — Начато: 2026-06-27
 ### Прогресс по активным задачам
+- `INFRA-08`: добавлен Python-монитор `06_Scripts_and_Tools/evolution_instance_monitor.py` с polling `/instance/fetchInstances`, Telegram alert, cooldown, recovery-alert и инструкцией под systemd/Coolify в `docs/EVOLUTION_MONITORING.md` — Обновлено: 2026-06-04
 - `HERMES-01`: проведён быстрый аудит существующих Telegram / Fathom / memory / summary артефактов в репозитории; подтверждено, что лучший путь — Hermes как Telegram-facing ассистент, n8n как orchestration/integration слой, Supabase как память и база артефактов — Обновлено: 2026-05-16
 - `INFRA-07`: подключён Exa MCP server (`github.com/exa-labs/exa-mcp-server`) в `cline_mcp_settings.json`, создана локальная папка `/Users/higherpower/Documents/Cline/MCP/github.com/exa-labs/exa-mcp-server`, выполнен тест инструмента Exa search — Обновлено: 2026-05-14
 - `INFRA-07`: добавлены `github.com/github/github-mcp-server` и `github.com/upstash/context7` в `cline_mcp_settings.json`, созданы локальные директории под оба MCP, GitHub token убран из JSON и переведён на runtime-чтение через `gh auth token`, Context7 smoke test успешен, GitHub MCP требует запущенный Docker daemon — Обновлено: 2026-05-15
@@ -75,6 +76,12 @@
 ## 🟢 Done
 
 <!-- Формат: - [x] `ID` Описание — Завершено: YYYY-MM-DD -->
+- [x] `N8N-06` Аудит n8n workflow в `05_N8N_Automations/workflows/prod/`: исправлены 3 workflow (`Test_Fallback`, `Google_Assistant_Low_Cost_Fallback`, `AI_Agent_Multi_Provider`) — Завершено: 2026-06-20
+- [x] `N8N-05` Google Assistant — Low Cost LLM Fallback workflow: отдельный n8n агент с GRSai → AIHubMix fallback, webhook `google-assistant-low-cost`, workflow ID `GCSB651nMg5r1Qee` — Завершено: 2026-06-19
+- [x] `MEDIA-05` Анализ ролика `8626_ar_ref_final_perfect (1).mp4`: shot-by-shot раскадровка (14 сцен), b-roll picklist (7 сегментов), Remotion-компонент `Episode8626.tsx`, конвертер JSON → runtime — Завершено: 2026-06-08
+- [x] `MEDIA-04` Первый 8-секундный клип в стиле Кайсара через Veo с last frame для продолжения — Завершено: 2026-06-03
+- [x] `MEDIA-03` Remotion MVP: эпизод 1 вертикального motion-comic ролика — Завершено: 2026-05-26
+- [x] `DAILY-LEADGEN` Автоматизированный ежедневный сбор контактов с adata.kz, hh.ru/hh.kz и threads.net + генерация ИИ-офферов и драфтов сообщений — Завершено: 2026-05-23
 - [x] `PLAN-01` Стратегический план Outreach Pipeline — Завершено: 2026-04-15
 - [x] `N8N-04` Копирование воркфлоу Zoom Call Summary и интеграция Telegram-бота с Whisper STT — Завершено: 2026-05-23
 - [x] `PLAN-02` Глоссарий AI-концепций (Specs/API/MCP/Skills/Workflows/Rules/Subagents) — Завершено: 2026-04-15
