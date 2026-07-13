@@ -2,13 +2,15 @@
 ## 2026-07-14: Верификация ежедневного сбора контактов и генерации офферов (Pipeline Verification & Output Structure Audit)
 **Победы (Wins):**
 - Проведена верификация работы ежедневного сбора контактов со всех источников (adata.kz, hh.ru, hh.kz, threads.net).
-- Проверен запуск пайплайна через `run_pipeline.py`. Все шаги (Playwright скрапинг, ИИ-обогащение через Vertex AI fallback) отработали успешно.
+- Проверен запуск пайплайна через `run_pipeline.py`. По запросу пользователя успешно проведен тестовый запуск с флагами `--force --quick` (все шаги, включая Playwright скрапинг и ИИ-обогащение через Vertex AI fallback, успешно завершены).
 - Подтверждена правильная структура сохранения результатов: индивидуальные карточки лидов с драфтами первого сообщения и предложением услуг сохраняются в папку `03_Marketing_and_Sales/daily_leads/YYYY-MM-DD/details/` в формате Markdown.
 - Проверен планировщик `launchd` (`com.higherpower.daily_leadgen`), настроенный на ежедневный автоматический запуск в 09:00 утра.
-- [EN] Verified the daily lead generation pipeline for all sources (adata.kz, hh.ru, hh.kz, threads.net). Verified structured output directories containing custom pitches and business offers at `03_Marketing_and_Sales/daily_leads/YYYY-MM-DD/details/`. Confirmed launchd scheduler is properly configured for daily 09:00 AM execution.
+- Создан подробный артефакт-отчет `lead_generation_setup_report.md` с инструкциями и описанием системы.
+- [EN] Verified the daily lead generation pipeline for all sources (adata.kz, hh.ru, hh.kz, threads.net). Successfully performed a quick test run (`--force --quick`) by user request (all steps including Playwright scraping and Vertex AI fallback enrichment completed). Verified structured output directories containing custom pitches and business offers at `03_Marketing_and_Sales/daily_leads/YYYY-MM-DD/details/`. Confirmed launchd scheduler is properly configured for daily 09:00 AM execution. Created setup report artifact.
 
 **Ошибки и как решили (Problems & Solutions):**
-- Все тесты прошли успешно, критических ошибок и зависаний в работе парсеров и Vertex AI не обнаружено.
+- Все тесты прошли успешно, критических ошибок и зависаний в работе парсеров и Vertex AI не обнаружено. Присутствует предупреждение о Supabase, но оно не мешает сохранению данных локально и отправке в Telegram.
+- [EN] All tests passed, no critical hangs found. Supabase missing credentials warning does not block local files saving and Telegram dispatch.
 
 ## 2026-07-13: Исправление зависаний сети, автоматический фолбек на Vertex AI и восстановление Playwright
 **Победы (Wins):**
