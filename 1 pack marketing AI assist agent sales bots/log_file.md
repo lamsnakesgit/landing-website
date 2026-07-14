@@ -1,4 +1,16 @@
 
+## 2026-07-15: Успешный запуск пайплайна лидогенерации и проверка устойчивости API (E2E Leadgen & API Resilience Verification)
+**Победы (Wins):**
+- **Успешный запуск сбора:** Проведен тестовый прогон пайплайна `run_pipeline.py --force --quick` за 15.07.2026. Сбор лидов со всех 4 источников (adata.kz, hh.ru, hh.kz, threads.net) по всем 6 нишам сработал без ошибок.
+- **Интеграция ИИ с автоповторами (Retry resilience):** Обогащение лидов отработало через Vertex AI (Gemini 2.5 Flash). Успешно обработана временная ошибка `429 Too Many Requests` от Vertex AI API с помощью автоматического повтора (retry) через 3 секунды, что гарантирует завершение пайплайна в любых условиях.
+- **Генерация офферов и отчетов:** Создана сводка лидов `leads_report.md` и индивидуальные md-карточки лидов с офферами и питчами.
+- **Telegram Notification:** Сводка отправлена в Telegram пользователя.
+- [EN] Executed E2E quick pipeline test (`run_pipeline.py --force --quick`) for 2026-07-15. Verified scraping, automated retry logic handling Vertex AI API `429 Too Many Requests` errors, local report generation, and Telegram notification dispatch.
+
+**Ошибки и как решили (Problems & Solutions):**
+- **Проблема (Issue):** Временная ошибка `429 Too Many Requests` от Vertex AI API при первом запросе обогащения лида "ИП Pride consulting".
+- **Решение (Solution):** Встроенный механизм автоповторов (retries) в `daily_leadgen.py` успешно перехватил ошибку, подождал 3 секунды и выполнил повторный запрос, который завершился успешно.
+
 ## 2026-07-14: Финальное подтверждение работы пайплайна ежедневной лидогенерации (E2E Leadgen Pipeline Final Verification)
 **Победы (Wins):**
 - **Подтверждена полная работоспособность пайплайна:** Запущен быстрый тестовый прогон `run_pipeline.py --force --quick`. Пайплайн успешно отработал, собрал лиды со всех источников (adata.kz, hh.ru, hh.kz, threads.net).
