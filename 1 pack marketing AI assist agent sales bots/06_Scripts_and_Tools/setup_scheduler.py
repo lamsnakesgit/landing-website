@@ -62,9 +62,10 @@ echo "$(date): === Конвейер daily_leadgen успешно заверше�
     <string>{plist_label}</string>
     <key>ProgramArguments</key>
     <array>
-        <string>osascript</string>
-        <string>-e</string>
-        <string>tell application "Terminal" to do script "{wrapper_path}"</string>
+        <string>open</string>
+        <string>-a</string>
+        <string>Terminal</string>
+        <string>{wrapper_path}</string>
     </array>
     <key>StartCalendarInterval</key>
     <dict>

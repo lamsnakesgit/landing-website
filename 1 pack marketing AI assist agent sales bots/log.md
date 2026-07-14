@@ -8,6 +8,17 @@
 - Ошибка тайм-аута при выборе категории: Playwright не мог кликнуть на `<select>` из-за подмены элемента плагином Selectize.js. Решение: инжект JavaScript кода, который напрямую работает с объектом `selectize.setValue()` и отправляет событие `change`.
 - Ложное срабатывание проверки сессии: Изначально скрипт искал кнопку 'Шығу' (Выход), которой нет на главной странице Банка актов. Решение: изменена логика проверки. Если сессия истекла, сайт делает редирект на 'auth.sud.kz' или 'login'. Теперь мы проверяем `page.url`.
 
+## 2026-07-14: Устранение ошибок TCC в планировщике launchd (TCC Automation Blocks Fix)
+**Победы (Wins) / Победы:**
+- **Устранена проблема TCC Automation в macOS:** Решена ошибка `PermissionError: [Errno 1] Operation not permitted` при фоновом запуске launchd-агента.
+- **Внедрение `open -a Terminal`:** Заменили вызов `osascript` во wrapper-скрипте и plist на стандартный `open -a Terminal`. Это позволяет открывать интерактивное окно Терминала в сессии Aqua без блокировок безопасности TCC.
+- **Сквозное тестирование:** Успешно пересоздали plist, удалили маркер `.last_run` и проверили запуск через `launchctl start com.higherpower.daily_leadgen`. Пайплайн запустился в Терминале, отображает лог и успешно собирает лиды со всех 4 источников по всем 6 ключевым запросам.
+- [EN] Fixed TCC Automation block (`Operation not permitted`) by replacing `osascript` in wrapper script and launchd plist with `open -a Terminal`. Re-generated the agent plist, cleared `.last_run` marker and verified manual execution via `launchctl start com.higherpower.daily_leadgen`. The pipeline successfully launched in the Terminal and is actively scraping leads in real-time.
+
+**Ошибки и решения (Problems & Solutions) / Ошибки и решения:**
+- **Проблема (Issue):** `osascript` возвращал код ошибки 78 (или PermissionError) из-за системной политики macOS TCC (System Preferences -> Privacy & Security -> Automation).
+- **Решение (Solution):** Метод `open -a Terminal` не требует прав "Automation", так как не пытается управлять внутренностями Terminal.app через AppleScript, а просто просит Launch Services открыть скрипт в новом терминальном сеансе.
+
 ## 2026-07-14: Исправление Зависания Судебного Парсера (Court Parser Timeout Fix)
 **Победы (Wins) / Победы:**
 - Успешно исправлена проблема с бесконечным ожиданием (таймаутом) кнопки фильтра в судебном парсере.

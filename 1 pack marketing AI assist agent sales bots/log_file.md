@@ -1,4 +1,15 @@
 
+## 2026-07-14: Устранение ошибок TCC в планировщике launchd (TCC Automation Blocks Fix)
+**Победы (Wins):**
+- **Устранена проблема TCC Automation в macOS:** Решена ошибка `PermissionError: [Errno 1] Operation not permitted` при фоновом запуске launchd-агента.
+- **Внедрение `open -a Terminal`:** Заменили вызов `osascript` во wrapper-скрипте и plist на стандартный `open -a Terminal`. Это позволяет открывать интерактивное окно Терминала в сессии Aqua без блокировок безопасности TCC.
+- **Сквозное тестирование:** Успешно пересоздали plist, удалили маркер `.last_run` и проверили запуск через `launchctl start com.higherpower.daily_leadgen`. Пайплайн запустился в Терминале, отображает лог и успешно собирает лиды со всех 4 источников по всем 6 ключевым запросам.
+- [EN] Fixed TCC Automation block (`Operation not permitted`) by replacing `osascript` in wrapper script and launchd plist with `open -a Terminal`. Re-generated the agent plist, cleared `.last_run` marker and verified manual execution via `launchctl start com.higherpower.daily_leadgen`. The pipeline successfully launched in the Terminal and is actively scraping leads in real-time.
+
+**Ошибки и как решили (Problems & Solutions):**
+- **Проблема (Issue):** `osascript` возвращал код ошибки 78 (или PermissionError) из-за системной политики macOS TCC (System Preferences -> Privacy & Security -> Automation).
+- **Решение (Solution):** Метод `open -a Terminal` не требует прав "Automation", так как не пытается управлять внутренностями Terminal.app через AppleScript, а просто просит Launch Services открыть скрипт в новом терминальном сеансе.
+
 ## 2026-07-14: Верификация ежедневного сбора контактов и генерации офферов (Pipeline Verification & Output Structure Audit)
 **Победы (Wins):**
 - Проведена верификация работы ежедневного сбора контактов со всех источников (adata.kz, hh.ru, hh.kz, threads.net).

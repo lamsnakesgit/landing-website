@@ -1,6 +1,15 @@
 # Журнал разработки (Progress & Dev Diary)
 
+## [14.07.2026] Устранение ошибок TCC в macOS и стабилизация планировщика launchd
+
+**Достижения (Wins):**
+- **Устранение TCC Automation блоков:** Решена проблема `PermissionError: [Errno 1] Operation not permitted` при вызове `osascript` из-под демона `launchd`. В macOS Ventura/Sonoma система безопасности TCC блокирует программное управление интерфейсом (AppleScript `tell application "Terminal"`) из фоновых процессов без явного разрешения пользователя в Системных настройках.
+- **Новая архитектура запуска через `open`:** Заменили логику вызова во wrapper-скрипте и plist. Теперь вместо `osascript` для открытия окна терминала используется стандартный macOS `open -a Terminal /Users/higherpower/run_daily_pipeline_wrapper.sh`. Этот метод использует системную службу Launch Services, не вызывает срабатывания ограничений TCC Automation и работает абсолютно надежно.
+- **Обновление инсталлятора планировщика:** Обновлен скрипт `06_Scripts_and_Tools/setup_scheduler.py`. Он перегенерировал LaunchAgent `com.higherpower.daily_leadgen.plist` и скрипт-обертку.
+- **Успешная верификация запуска:** Удален маркер `.last_run` для проверки и выполнен ручной запуск агента через `launchctl start com.higherpower.daily_leadgen`. Пайплайн успешно инициализировался, открыл видимое окно Терминала и в реальном времени начал сбор лидов со всех 4 источников по всем ключевым словам без флага `--quick`.
+
 ## [14.07.2026] Верификация ежедневного сбора контактов и генерации офферов (Pipeline Verification & Output Structure Audit)
+
 **Достижения (Wins):**
 - Проведена верификация работы ежедневного сбора контактов со всех источников (adata.kz, hh.ru, hh.kz, threads.net).
 - Проверен запуск пайплайна через `run_pipeline.py`. Все шаги (Playwright скрапинг, ИИ-обогащение через Vertex AI fallback) отработали успешно.
