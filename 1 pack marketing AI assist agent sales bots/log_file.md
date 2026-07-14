@@ -1,4 +1,16 @@
 
+## 2026-07-14: Верификация и тестовый запуск ежедневного пайплайна лидогенерации (E2E Quick Test & Pipeline Audit)
+**Победы (Wins):**
+- **Успешный сквозной тест пайплайна:** Запущен и успешно завершен быстрый тестовый прогон `run_pipeline.py --force --quick` на локальном Mac.
+- **Интеграция Vertex AI & OpenAI:** Сборщик успешно получил контакты и передал их на ИИ-обогащение. Вся логика генерации офферов, углов захода и питчей сработала без ошибок с использованием Vertex AI (Gemini 2.5 Flash) в качестве отказоустойчивого ИИ-движка.
+- **Подтверждено сохранение результатов:** Все файлы (общие сводки `leads_summary.csv` и `leads_report.md`, а также индивидуальные md-карточки лидов со структурированными драфтами первых сообщений) успешно записаны в папку [03_Marketing_and_Sales/daily_leads/2026-07-14/](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-07-14/).
+- **Работа планировщика macOS launchd:** Проверен статус фонового планировщика (`com.higherpower.daily_leadgen`), он успешно зарегистрирован и будет автоматически запускаться каждый день в 09:00, запуская обертку `/Users/higherpower/run_daily_pipeline_wrapper.sh`.
+- [EN] Successfully verified the daily leadgen pipeline execution. Ran E2E quick test `run_pipeline.py --force --quick` on the local Mac. Scraped contacts, generated AI pitches using Vertex AI (Gemini 2.5 Flash), and saved outputs to the daily leads directory. Confirmed macOS launchd scheduler status is loaded and active for 09:00 AM daily execution.
+
+**Ошибки и как решили (Problems & Solutions):**
+- **Проблема (Issue):** В логах отображается предупреждение о нехватке ключей Supabase, из-за чего запись в облачную БД пропускается.
+- **Решение (Solution):** Данное поведение является задокументированным и ожидаемым (fallback-режим). Пайплайн успешно завершается, сохраняя все файлы локально на диске и отправляя уведомление/топ-лидов в Telegram.
+
 ## 2026-07-14: Устранение ошибок TCC в планировщике launchd (TCC Automation Blocks Fix)
 **Победы (Wins):**
 - **Устранена проблема TCC Automation в macOS:** Решена ошибка `PermissionError: [Errno 1] Operation not permitted` при фоновом запуске launchd-агента.

@@ -1,5 +1,14 @@
 # Журнал разработки (Progress & Dev Diary)
 
+## [14.07.2026] Успешное выполнение тестового прогона пайплайна лидогенерации (E2E Quick Run Success)
+
+**Достижения (Wins):**
+- **Успешный сквозной прогон:** Проверен и завершен быстрый тестовый запуск пайплайна с флагами `--force --quick`. Процесс отработал корректно, собрав тестовые лиды и обогатив их.
+- **Работа Vertex AI Fallback:** Генерация офферов и драфтов первых сообщений выполнена через Gemini 2.5 Flash с локальным OAuth2-токеном Vertex AI.
+- **Верификация файлов результатов:** Сгенерированы файлы `leads_summary.csv` и `leads_report.md`, а также индивидуальные карточки лидов (ИП Pride consulting, ПК AKASHI Data Center PLC, ТОО ByFly) в папке [03_Marketing_and_Sales/daily_leads/2026-07-14/details/](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-07-14/details/).
+- **Telegram-уведомление:** Отчет отправлен в Telegram пользователя (TG_CHAT_ID_MAIN).
+- [EN] Successfully completed E2E quick pipeline test execution (`--force --quick`). Generated CSV, Markdown reports, and individual lead cards at `03_Marketing_and_Sales/daily_leads/2026-07-14/details/`. Confirmed Telegram notifications were sent successfully.
+
 ## [14.07.2026] Устранение ошибок TCC в macOS и стабилизация планировщика launchd
 
 **Достижения (Wins):**
