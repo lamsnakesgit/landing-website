@@ -113,13 +113,13 @@ def parse_labor_cases(max_pages=5):
             return False
         
         # Проверяем, авторизованы ли мы
-        current_url = page.url
         content = page.content()
-        is_logged_in = "courtActs" in current_url and "j_idt70:auth" not in content and page.locator("input[value='Войти']").count() == 0
+        is_logged_in = "Выход" in content or "Шығу" in content
         
         if not is_logged_in:
             print("❌ Ошибка: Сессия в sud_state.json недействительна или отсутствует.")
-            print("Пожалуйста, запустите python scripts/sud_parser/auth_stealth.py для повторной авторизации через ЭЦП!")
+            print("Пожалуйста, перейдите на страницу https://office.sud.kz/ и выполните вход с помощью ЭЦП,")
+            print("предварительно запустив скрипт авторизации: python scripts/sud_parser/auth_stealth.py")
             browser.close()
             return False
             
@@ -327,4 +327,7 @@ def parse_labor_cases(max_pages=5):
     return True
 
 if __name__ == "__main__":
-    parse_labor_cases(max_pages=5)
+    import sys
+    success = parse_labor_cases(max_pages=5)
+    if not success:
+        sys.exit(1)
