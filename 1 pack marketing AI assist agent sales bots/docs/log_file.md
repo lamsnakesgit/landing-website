@@ -604,5 +604,29 @@
 - Победы: Интегрирован сбор судебных дел с `office.sud.kz` (Трудовые споры) в качестве Шага 1.5 в общий пайплайн `run_pipeline.py`. Логика обогащения лидов в `daily_leadgen.py` теперь считывает файл `court_leads.json`, дедуплицирует компании и судебные дела, а также проводит ИИ-анализ болей и формирует драфты первого сообщения с помощью резервного канала Vertex AI (Gemini 2.5 Flash).
 - Проблемы: Не обнаружено. Система работает стабильно.
 
+---
+
+## 2026-07-14 — Верификация и стабилизация планировщика лидогенерации
+
+### Current Status
+- Conducted a comprehensive audit of the daily leadgen scheduler, launchd task (`com.higherpower.daily_leadgen`), shell wrapper (`run_daily_pipeline_wrapper.sh`), and the main orchestrator (`run_pipeline.py`).
+- Verified that the scheduler successfully triggers execution at 09:00 AM daily via terminal emulator integration, preventing macOS TCC permission constraints.
+- Confirmed Vertex AI (Gemini 2.5 Flash) acts as a robust and stable fallback for lead enrichment via `vertex_sa.json`, successfully bypassing OpenAI/AIHubMix authentication issues (401 errors).
+- Deduplication and local caching (`enrichment_cache.json`, `company_contacts_cache.json`) are fully functional, preventing duplicate processing and optimizing API token consumption.
+
+### Wins
+- The daily execution pipeline is verified and fully operational in headless mode.
+- Pre-flight credentials verification successfully prevents pipeline crashes on expired or invalid OpenAI keys by falling back instantly to Google Cloud.
+- Automatic rotation (deleting log directories older than 7 days) functions properly, maintaining free disk space on the host machine.
+
+### Problems / Issues
+- OpenAI/AIHubMix credentials in `.env` are currently invalid, causing 401 errors (silently bypassed via Vertex AI fallback). To use GPT models, the user must update their `.env` credentials.
+- Supabase database persistence is skipped due to missing `SUPABASE_URL` and `SUPABASE_KEY` variables in `.env`.
+
+### Duplicate in Russian / Дубликат на русском
+- **Победы**: Проведена комплексная проверка планировщика `launchd`, скрипта-обертки `run_daily_pipeline_wrapper.sh` и оркестратора `run_pipeline.py`. Подтверждена стабильная работа ежедневного запуска в 09:00 утра на macOS (через `osascript` для обхода TCC). ИИ-обогащение через Vertex AI (Gemini 2.5 Flash) с сервисным аккаунтом `vertex_sa.json` работает корректно как резервный канал при 401 ошибках OpenAI. Кэширование лидов и ротация логов (удаление старше 7 дней) работают исправно.
+- **Проблемы**: Ключ OpenAI/AIHubMix в `.env` недействителен (возвращает 401), поэтому пайплайн автоматически использует Vertex AI. Запись в Supabase пропускается, так как в `.env` не настроены переменные `SUPABASE_URL` и `SUPABASE_KEY`.
+
+
 
 
