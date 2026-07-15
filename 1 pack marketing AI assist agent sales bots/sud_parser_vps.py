@@ -18,32 +18,26 @@ import subprocess
 import html as html_lib
 import requests
 from datetime import datetime
+import csv
 from typing import Optional
 
 KEY_PATH = "/keys"
 SIGN_BIN = "/app/kalkan_sign"
 ECP_PASS = os.environ.get("ECP_PASSWORD", "Prioritize_resource3!")
 BASE_URL = "https://office.sud.kz"
-# Год поиска — можно передать через ENV
 YEAR = os.environ.get("PARSE_YEAR", "2026")
-
-def send_tg_message(text: str):
-    bot_token = os.environ.get("ANTIGRAVITY_BOT_TOKEN")
-    chat_id = os.environ.get("TG_CHAT_ID_MAIN")
-    if bot_token and chat_id:
-        try:
-            requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", data={"chat_id": chat_id, "text": text}, timeout=10)
-        except Exception as e:
-            print(f"TG Error: {e}")
+MATON_API_KEY = os.environ.get("MATON_API_KEY", "")
 
 OUTPUT_FILE = f"/output/cases_{YEAR}.json"
 LABOR_CASES_FILE = f"/output/labor_cases_{YEAR}.json"
 PDF_DIR = "/output/pdfs"
+DOWNLOAD_LOG_CSV = f"/output/download_log_{YEAR}.csv"
 
 # Задержка между скачиваниями (сек) — защита от блокировки по IP
 DOWNLOAD_DELAY = 2
 
-
+# Глобальный буфер для сообщений в Telegram
+tg_links_buffer = []
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -60,6 +54,133 @@ AJAX_HEADERS = {
     "Origin": BASE_URL,
     "Referer": f"{BASE_URL}/form/courtActs/lawsuitList.xhtml",
 }
+
+def send_tg_message(text: str):
+    bot_token = os.environ.get("ANTIGRAVITY_BOT_TOKEN")
+    chat_id = os.environ.get("TG_CHAT_ID_MAIN")
+    if bot_token and chat_id:
+        try:
+            requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", data={"chat_id": chat_id, "text": text}, timeout=10)
+        except Exception as e:
+            print(f"TG Error: {e}")
+
+def log_to_csv(case_num, category, file_path, gdrive_link):
+    """Логируем в локальный CSV файл на VPS"""
+    file_exists = os.path.isfile(DOWNLOAD_LOG_CSV)
+    with open(DOWNLOAD_LOG_CSV, "a", newline="", encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile)
+        if not file_exists:
+            writer.writerow(["Дата", "Номер дела", "Категория", "Локальный путь", "Google Drive Ссылка"])
+        writer.writerow([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), case_num, category, file_path, gdrive_link])
+
+# --- Maton AI Google Drive Integration ---
+def create_folder(name, parent_id=None):
+    """Создание папки на Google Drive через maton.ai"""
+    if not MATON_API_KEY:
+        return None
+    url = "https://gateway.maton.ai/google-drive/drive/v3/files"
+    data = {
+        "name": name,
+        "mimeType": "application/vnd.google-apps.folder"
+    }
+    if parent_id:
+        data["parents"] = [parent_id]
+    
+    resp = requests.post(
+        url,
+        headers={
+            "Authorization": f"Bearer {MATON_API_KEY}",
+            "Content-Type": "application/json"
+        },
+        json=data,
+        timeout=30
+    )
+    if resp.status_code in [200, 201]:
+        return resp.json().get("id")
+    print(f"⚠️ Ошибка создания папки GDrive '{name}': {resp.text}")
+    return None
+
+def upload_file_to_drive(file_path, folder_id=None, as_gdoc=False):
+    """Загрузка файла на Google Drive через maton.ai.
+       Если as_gdoc=True, файл конвертируется в Google Документ (OCR для PDF, конвертация для Word)."""
+    if not MATON_API_KEY:
+        return None
+    url = "https://gateway.maton.ai/google-drive/upload/drive/v3/files"
+    
+    metadata = {"name": os.path.basename(file_path)}
+    if folder_id:
+        metadata["parents"] = [folder_id]
+    
+    # Конвертация в Google Docs
+    if as_gdoc:
+        metadata["mimeType"] = "application/vnd.google-apps.document"
+    
+    try:
+        with open(file_path, "rb") as f:
+            files = {
+                "metadata": (None, json.dumps(metadata), "application/json"),
+                "file": (os.path.basename(file_path), f, "application/octet-stream")
+            }
+            resp = requests.post(
+                f"{url}?uploadType=multipart&fields=id,webViewLink",
+                headers={"Authorization": f"Bearer {MATON_API_KEY}"},
+                files=files,
+                timeout=120
+            )
+            if resp.status_code == 200:
+                return resp.json()
+            print(f"⚠️ Ошибка загрузки файла в GDrive (as_gdoc={as_gdoc}): {resp.text}")
+    except Exception as e:
+        print(f"⚠️ Исключение при загрузке в GDrive: {e}")
+    return None
+
+def share_folder(folder_id):
+    """Сделать папку доступной по ссылке (reader anyone)"""
+    if not MATON_API_KEY:
+        return None
+    url = f"https://gateway.maton.ai/google-drive/drive/v3/files/{folder_id}/permissions"
+    data = {
+        "role": "reader",
+        "type": "anyone"
+    }
+    resp = requests.post(
+        url,
+        headers={
+            "Authorization": f"Bearer {MATON_API_KEY}",
+            "Content-Type": "application/json"
+        },
+        json=data,
+        timeout=30
+    )
+    return resp.status_code == 200
+
+def get_or_create_gdrive_structure(cat_name):
+    """Создает структуру папок Банк судебных актов -> 2026 -> Категория
+       И дублирующую структуру для Google Docs. Возвращает (original_cat_id, gdocs_cat_id)"""
+    if not MATON_API_KEY:
+        return None, None
+    print("☁️ Подготовка папок в Google Drive...")
+    
+    # 1. Оригинальные файлы (PDF/Word)
+    root_id = create_folder("Банк судебных актов")
+    cat_id = None
+    if root_id:
+        share_folder(root_id)
+        year_id = create_folder(YEAR, parent_id=root_id)
+        if year_id:
+            cat_id = create_folder(cat_name, parent_id=year_id)
+            
+    # 2. Конвертированные файлы (Google Docs)
+    root_docs_id = create_folder("Банк судебных актов (Google Docs)")
+    gdocs_cat_id = None
+    if root_docs_id:
+        share_folder(root_docs_id)
+        year_docs_id = create_folder(YEAR, parent_id=root_docs_id)
+        if year_docs_id:
+            gdocs_cat_id = create_folder(cat_name, parent_id=year_docs_id)
+            
+    return cat_id, gdocs_cat_id
+# ----------------------------------------
 
 
 def find_key() -> str:
@@ -218,8 +339,6 @@ def extract_view_state(html_or_xml: str) -> Optional[str]:
 
 def find_next_page_btn(soup: BeautifulSoup) -> Optional[str]:
     """Ищет кнопку ► (следующая страница) в RichFaces пагинаторе."""
-    # Реальный ID из HTML: j_idt33:j_idt35:j_idt36:j_idt90
-    # Признак: onclick содержит 'thisPage' и текст ► или >
     for tag in soup.find_all('a'):
         onclick = tag.get('onclick', '')
         txt = tag.get_text(strip=True)
@@ -266,17 +385,13 @@ def navigate_to_next_page(session: requests.Session, view_state: str, list_form_
     }
     resp = session.post(f"{BASE_URL}/form/courtActs/lawsuitList.xhtml", headers=AJAX_HEADERS, data=data)
     new_vs = extract_view_state(resp.text) or view_state
-    # После AJAX — получаем обновлённую страницу
     resp2 = session.get(f"{BASE_URL}/form/courtActs/lawsuitList.xhtml", headers=HEADERS)
     new_vs = extract_view_state(resp2.text) or new_vs
     return resp2.text, new_vs
 
 
 def download_case_docs(session: requests.Session, param1: str, view_state: str, case_num: str) -> list[str]:
-    """
-    Открывает карточку дела, находит документы и скачивает PDF/DOCX.
-    Возвращает список путей к скачанным файлам.
-    """
+    """Открывает карточку дела, скачивает PDF/DOCX и возвращает список локальных путей."""
     downloaded = []
     ajax_h = {**AJAX_HEADERS, "Referer": f"{BASE_URL}/form/courtActs/lawsuitList.xhtml"}
 
@@ -293,34 +408,26 @@ def download_case_docs(session: requests.Session, param1: str, view_state: str, 
     }
     session.post(f"{BASE_URL}/form/courtActs/lawsuitList.xhtml", headers=ajax_h, data=data_case)
 
-    # Страница со списком документов — retry при SSL/сетевых ошибках
+    # Страница со списком документов
     for attempt in range(4):
         try:
             resp_docs = session.get(f"{BASE_URL}/form/courtActs/documentList.xhtml", headers=HEADERS)
-            print(f"    DEBUG: Creating PDF_DIR={PDF_DIR}")
             os.makedirs(PDF_DIR, exist_ok=True)
             html_path = os.path.join(PDF_DIR, f"{YEAR}_{case_num.replace('/', '_').replace(chr(92), '_')}_case.html")
-            print(f"    DEBUG: Opening file: {html_path}")
             with open(html_path, "w", encoding="utf-8") as f:
                 f.write(resp_docs.text)
-            print(f"    🖥  Сохранен HTML: {os.path.basename(html_path)}")
             break
         except Exception as e:
             if attempt == 3:
-                print(f"    ❌ Ошибка загрузки документов: {e}")
                 return []
             wait = 2 ** attempt
-            print(f"    ⚠️  SSL ошибка, повтор через {wait}с...", e)
             time.sleep(wait)
-            # Сбрасываем session и делаем GET заново
             session.get(f"{BASE_URL}/", headers=HEADERS, timeout=10)
     doc_soup = BeautifulSoup(resp_docs.text, "html.parser")
-
     doc_vs_input = doc_soup.find("input", {"name": "javax.faces.ViewState"})
     doc_view_state = doc_vs_input.get("value") if doc_vs_input else view_state
 
     docs_found = doc_soup.find_all("a", {"onclick": lambda x: x and "downloadSelectedDoc" in x})
-    print(f"    📄 Найдено документов: {len(docs_found)}")
 
     for doc_a in docs_found:
         doc_name = doc_a.get_text(strip=True)
@@ -332,7 +439,6 @@ def download_case_docs(session: requests.Session, param1: str, view_state: str, 
         d_p1, d_p2 = doc_m.group(1), doc_m.group(2)
         print(f"    ⬇️  Скачиваем: {doc_name}")
 
-        # Триггерим открытие модалки капчи
         data_prep = {
             "j_idt33:j_idt36:j_idt61": "j_idt33:j_idt36:j_idt61",
             "javax.faces.ViewState": doc_view_state,
@@ -353,13 +459,11 @@ def download_case_docs(session: requests.Session, param1: str, view_state: str, 
         if prep_vs:
             doc_view_state = prep_vs
 
-        # Решаем капчу (до 5 попыток)
         captcha_success = False
         for attempt_cap in range(5):
             captcha_val = solve_captcha(session)
             time.sleep(0.5)
 
-            # Сабмитим капчу
             data_captcha = {
                 "j_idt33:j_idt36:captchaForm": "j_idt33:j_idt36:captchaForm",
                 "javax.faces.ViewState": doc_view_state,
@@ -382,44 +486,27 @@ def download_case_docs(session: requests.Session, param1: str, view_state: str, 
             if n_m and u_m:
                 n_val = html_lib.unescape(n_m.group(1))
                 u_val = html_lib.unescape(u_m.group(1))
-                print(f"    ✅ Капча OK, скачиваем файл ...")
-
+                
                 download_data = {"n": n_val, "u": u_val, "page": "/courtActs/documentList", "b64": "none", "inline": ""}
                 resp_pdf = session.post(f"{BASE_URL}/ticket/fileDownload", data=download_data, headers=HEADERS)
 
                 if resp_pdf.status_code == 200 and len(resp_pdf.content) > 0:
-                    os.makedirs(PDF_DIR, exist_ok=True)
                     safe_name = re.sub(r"[^a-zA-Z0-9а-яА-ЯёЁ_\-\.]", "_", doc_name)[:80]
-                    # Определяем тип по magic bytes, а не по Content-Type (сервер врёт)
                     magic = resp_pdf.content[:4]
-                    if magic[:2] == b'PK':
-                        ext = ".docx"  # ZIP-архив = DOCX/XLSX
-                    elif magic == b'%PDF':
-                        ext = ".pdf"
+                    if magic[:2] == b'PK': ext = ".docx"
+                    elif magic == b'%PDF': ext = ".pdf"
                     else:
-                        # Fallback на Content-Type
                         ct = resp_pdf.headers.get("Content-Type", "")
-                        if "word" in ct or "docx" in ct:
-                            ext = ".docx"
-                        else:
-                            ext = ".pdf"
+                        ext = ".docx" if "word" in ct or "docx" in ct else ".pdf"
+                    
                     pdf_path = f"{PDF_DIR}/{YEAR}_{case_num.replace('/', '_').replace(chr(92), '_')}_{safe_name}{ext}"
-                    print(f"    DEBUG: Opening pdf file: {pdf_path}")
                     with open(pdf_path, "wb") as f:
                         f.write(resp_pdf.content)
-                    print(f"    💾 Сохранён: {os.path.basename(pdf_path)} ({len(resp_pdf.content)} байт)")
+                    print(f"    💾 Сохранён: {os.path.basename(pdf_path)}")
                     downloaded.append(pdf_path)
                     captcha_success = True
-                    break # Успешно скачали файл, выходим из цикла попыток капчи
-                else:
-                    print(f"    ❌ Пустой ответ ({resp_pdf.status_code})")
-            else:
-                print(f"    ⚠️  Капча не прошла (попытка {attempt_cap+1}/5), обновляем...")
-                # Немного ждем перед новой капчей
-                time.sleep(1)
-
-        if not captcha_success:
-            print(f"    ❌ Капча так и не прошла для документа {doc_name}, пропускаем")
+                    break
+            time.sleep(1)
 
         time.sleep(DOWNLOAD_DELAY)
 
@@ -427,7 +514,8 @@ def download_case_docs(session: requests.Session, param1: str, view_state: str, 
 
 
 def search_and_download_all(session: requests.Session, cat_name: str, category_id: str):
-    """Главный цикл: поиск + обход всех страниц + скачивание всех документов."""
+    """Поиск + обход всех страниц + скачивание + Google Drive"""
+    global tg_links_buffer
     print(f"\n🔍 Открываем Банк судебных актов (категория: {cat_name}, год: {YEAR}) ...")
     resp = session.get(f"{BASE_URL}/form/courtActs/index.xhtml", headers=HEADERS)
 
@@ -456,24 +544,18 @@ def search_and_download_all(session: requests.Session, cat_name: str, category_i
         data=data_search,
     )
 
-    # Загружаем первую страницу результатов
     resp_list = session.get(f"{BASE_URL}/form/courtActs/lawsuitList.xhtml", headers=HEADERS)
-    with open("/output/lawsuitList.html", "w", encoding="utf-8") as f:
-        f.write(resp_list.text)
-
     list_soup = BeautifulSoup(resp_list.text, "html.parser")
     view_state = extract_view_state(resp_list.text) or view_state
 
-    # Определяем количество страниц
     total_pages = get_total_pages(list_soup)
     print(f"📊 Всего страниц: {total_pages}")
 
-    # Определяем ID формы списка и кнопки следующей страницы
-    list_form_input = list_soup.find("input", {"name": re.compile(r"j_idt\d+$")})
-    list_form_id = "j_idt33:j_idt111"  # Стандартный ID формы списка дел
-    next_btn_id = None
+    list_form_id = "j_idt33:j_idt111"
+    
+    # ☁️ Создаем папку категории на Google Drive
+    gdrive_cat_folder_id, gdrive_gdocs_cat_folder_id = get_or_create_gdrive_structure(cat_name)
 
-    # Загружаем уже скачанные (если скрипт запускается повторно)
     all_cases = []
     cat_file = f"/output/cases_{YEAR}_{category_id}.json"
     if os.path.exists(cat_file):
@@ -485,13 +567,11 @@ def search_and_download_all(session: requests.Session, cat_name: str, category_i
                 all_cases = []
 
     current_page = 1
-
     while True:
         print(f"\n{'='*50}")
         print(f"  📄 Страница {current_page}/{total_pages}")
         print(f"{'='*50}")
 
-        # Парсим строки таблицы
         rows = list_soup.find_all("tr", {"onclick": lambda x: x and "viewSelectedLawsuit" in x})
         print(f"  Дел на странице: {len(rows)}")
 
@@ -500,7 +580,6 @@ def search_and_download_all(session: requests.Session, cat_name: str, category_i
             clean_cells = [c.get_text(strip=True) for c in cells]
             case_num = clean_cells[0] if len(clean_cells) > 0 else "unknown"
 
-            # Пропускаем дела с медиацией
             if any("Медиация" in c for c in clean_cells):
                 continue
 
@@ -508,7 +587,6 @@ def search_and_download_all(session: requests.Session, cat_name: str, category_i
             m = re.search(r"viewSelectedLawsuit\('([^']+)'\)", onclick)
             param1 = m.group(1) if m else str(rows.index(row))
 
-            # Уникальный ключ = param1 + номер страницы
             unique_key = f"{current_page}:{param1}"
             already_done = any(c.get("unique_key") == unique_key for c in all_cases)
             if already_done:
@@ -517,7 +595,6 @@ def search_and_download_all(session: requests.Session, cat_name: str, category_i
 
             print(f"\n  📁 Дело {param1}: {' | '.join(clean_cells[:3])}")
 
-            # Скачиваем документы с retry
             docs = []
             for retry in range(3):
                 try:
@@ -525,47 +602,74 @@ def search_and_download_all(session: requests.Session, cat_name: str, category_i
                     break
                 except Exception as e:
                     wait = 3 * (retry + 1)
-                    print(f"  ⚠️  Ошибка дела, повтор {retry+1}/3 через {wait}с: {e}")
                     time.sleep(wait)
+
+            # Загрузка на Google Drive и логирование
+            gdrive_links = []
+            if gdrive_cat_folder_id:
+                for doc_path in docs:
+                    print(f"    ☁️ Загрузка оригинала на Google Drive: {os.path.basename(doc_path)}")
+                    upload_resp = upload_file_to_drive(doc_path, gdrive_cat_folder_id)
+                    
+                    if gdrive_gdocs_cat_folder_id:
+                        print(f"    ☁️ Конвертация в Google Docs: {os.path.basename(doc_path)}")
+                        upload_file_to_drive(doc_path, gdrive_gdocs_cat_folder_id, as_gdoc=True)
+
+                    if upload_resp and "webViewLink" in upload_resp:
+                        link = upload_resp["webViewLink"]
+                        gdrive_links.append(link)
+                        log_to_csv(case_num, cat_name, doc_path, link)
+                        print(f"    ✅ Загружено в GDrive: {link}")
+                    else:
+                        log_to_csv(case_num, cat_name, doc_path, "Ошибка загрузки")
+            else:
+                for doc_path in docs:
+                    log_to_csv(case_num, cat_name, doc_path, "GDrive отключен")
 
             case_data = {
                 "unique_key": unique_key,
                 "param1": param1,
                 "data": clean_cells,
                 "docs": docs,
+                "gdrive_links": gdrive_links,
                 "page": current_page,
                 "parsed_at": datetime.now().isoformat(),
             }
             all_cases.append(case_data)
 
-            # Сохраняем после каждого дела
             with open(cat_file, "w", encoding="utf-8") as f:
                 json.dump(all_cases, f, ensure_ascii=False, indent=2)
             
-            # Уведомляем в ТГ
-            send_tg_message(f"✅ Скачано дело ({cat_name}): {param1}\nДокументов: {len(docs)}")
+            # Добавляем в буфер ТГ
+            if gdrive_links:
+                tg_links_buffer.append(f"📄 {case_num}: {gdrive_links[0]}")
+            else:
+                tg_links_buffer.append(f"📄 {case_num}: Скачано на диск (нет GDrive)")
+            
+            # Отправляем в ТГ каждые 10 дел
+            if len(tg_links_buffer) >= 10:
+                text = f"📂 Категория: {cat_name}\nНовые скачанные дела (10 шт):\n\n" + "\n".join(tg_links_buffer)
+                send_tg_message(text)
+                tg_links_buffer.clear()
 
         if current_page >= total_pages:
             print(f"\n✅ Все {total_pages} страниц обработаны!")
+            if len(tg_links_buffer) > 0:
+                text = f"📂 Категория: {cat_name}\nПоследние дела ({len(tg_links_buffer)} шт):\n\n" + "\n".join(tg_links_buffer)
+                send_tg_message(text)
+                tg_links_buffer.clear()
             break
 
-        # Переходим на следующую страницу
         next_btn_id = find_next_page_btn(list_soup)
         next_page_num = get_next_page_num(list_soup)
 
         if not next_btn_id or not next_page_num:
-            print("  ⚠️  Кнопка следующей страницы не найдена — останавливаемся")
             break
 
-
-
-        # Всегда идём на current_page+1, не доверяем HTML
         next_target = current_page + 1
-        print(f"\n  ➡️  Переходим на страницу {next_target} ...")
         try:
             new_html, view_state = navigate_to_next_page(session, view_state, list_form_id, next_btn_id, next_target)
         except Exception as e:
-            print(f"  ⚠️  Ошибка перехода: {e} — переавторизуемся и повторяем...")
             time.sleep(5)
             page_data = get_login_page(session)
             if page_data:
@@ -580,7 +684,6 @@ def search_and_download_all(session: requests.Session, cat_name: str, category_i
 
         time.sleep(1)
 
-    print(f"\n📊 Итого скачано дел: {len(all_cases)}")
     return all_cases
 
 
@@ -589,6 +692,9 @@ def main():
     print("  ПАРСЕР СУДЕБНЫХ ДЕЛ — office.sud.kz (ТК РК)")
     print(f"  Год: {YEAR}")
     print("==================================================")
+
+    if not MATON_API_KEY:
+        print("⚠️ MATON_API_KEY не установлен! Загрузка в Google Drive будет пропущена.")
 
     max_restarts = 5
     for attempt in range(max_restarts):
@@ -604,7 +710,7 @@ def main():
                 continue
 
             if login_with_eds(session, page_data):
-                send_tg_message(f"🚀 Запуск парсера на VPS. Год: {YEAR}")
+                send_tg_message(f"🚀 Запуск парсера на VPS. Год: {YEAR}\nБэкап в Google Drive: {'✅ Да' if MATON_API_KEY else '❌ Нет'}")
                 categories = {
                     "Трудовые споры": "142030000100000000",
                     "Договор подряда": "142030001200070000",
@@ -615,6 +721,11 @@ def main():
                         search_and_download_all(session, c_name, c_id)
                     except Exception as e:
                         print(f"❌ Ошибка парсинга {c_name}: {e}")
+                
+                if len(tg_links_buffer) > 0:
+                    send_tg_message("Остаток ссылок:\n" + "\n".join(tg_links_buffer))
+                    tg_links_buffer.clear()
+                    
                 print(f"\n✅ Готово! Скрипт завершил работу без критических сбоев.")
                 send_tg_message(f"🏁 Парсинг всех категорий за {YEAR} завершен!")
                 break
