@@ -6,11 +6,13 @@ import time
 import csv
 import signal
 import socket
+import threading
 from datetime import datetime
 from dotenv import load_dotenv
 from loguru import logger
 import requests
 from openai import OpenAI
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Установка глобального таймаута для всех сокетов
 socket.setdefaulttimeout(35)
@@ -203,6 +205,60 @@ use_vertex_directly = False
 _vertex_credentials = None
 _vertex_headers = None
 _vertex_url = None
+vertex_lock = threading.Lock()
+
+def init_vertex_ai():
+    global _vertex_credentials, _vertex_headers, _vertex_url
+    with vertex_lock:
+        if _vertex_headers is not None:
+            return True
+        
+        from google.oauth2 import service_account
+        from google.auth.transport.requests import Request
+        
+        sa_path = "vertex_sa.json"
+        if not os.path.exists(sa_path):
+            import glob
+            sa_files = glob.glob("vertex_sa*.json")
+            if sa_files:
+                sa_path = sa_files[0]
+                logger.info(f"Файл vertex_sa.json не найден, используем найденный по маске: {sa_path}")
+        
+        if os.path.exists(sa_path):
+            try:
+                with open(sa_path, "r") as f:
+                    sa_info = json.load(f)
+                    project_id = sa_info.get("project_id")
+                
+                _vertex_credentials = service_account.Credentials.from_service_account_file(
+                    sa_path,
+                    scopes=['https://www.googleapis.com/auth/cloud-platform']
+                )
+                
+                class CustomRequest(Request):
+                    def __call__(self, *args, **kwargs):
+                        kwargs['timeout'] = 15
+                        return super().__call__(*args, **kwargs)
+                        
+                logger.info("Обновляем токен доступа Google Cloud OAuth2...")
+                _vertex_credentials.refresh(CustomRequest())
+                
+                location = "us-central1"
+                model_name = "gemini-2.5-flash"
+                _vertex_url = f"https://{location}-aiplatform.googleapis.com/v1/projects/{project_id}/locations/{location}/publishers/google/models/{model_name}:generateContent"
+                
+                _vertex_headers = {
+                    "Authorization": f"Bearer {_vertex_credentials.token}",
+                    "Content-Type": "application/json"
+                }
+                logger.info("Авторизация Vertex AI успешно инициализирована.")
+                return True
+            except Exception as e:
+                logger.error(f"Не удалось инициализировать Vertex AI: {e}")
+                return False
+        else:
+            logger.error("Файл авторизации Vertex AI (vertex_sa.json) не найден.")
+            return False
 
 def enrich_lead_with_ai(lead, openai_client):
     """Использует OpenAI для генерации персонализированного оффера и сообщения с автоматическим фоллбэком на Vertex AI"""
@@ -264,46 +320,10 @@ def enrich_lead_with_ai(lead, openai_client):
     if not success:
         try:
             if _vertex_headers is None:
-                from google.oauth2 import service_account
-                from google.auth.transport.requests import Request
+                init_vertex_ai()
                 
-                sa_path = "vertex_sa.json"
-                if not os.path.exists(sa_path):
-                    import glob
-                    sa_files = glob.glob("vertex_sa*.json")
-                    if sa_files:
-                        sa_path = sa_files[0]
-                        logger.info(f"Файл vertex_sa.json не найден, используем найденный по маске: {sa_path}")
-                
-                if os.path.exists(sa_path):
-                    with open(sa_path, "r") as f:
-                        sa_info = json.load(f)
-                        project_id = sa_info.get("project_id")
-                    
-                    _vertex_credentials = service_account.Credentials.from_service_account_file(
-                        sa_path,
-                        scopes=['https://www.googleapis.com/auth/cloud-platform']
-                    )
-                    
-                    class CustomRequest(Request):
-                        def __call__(self, *args, **kwargs):
-                            kwargs['timeout'] = 15
-                            return super().__call__(*args, **kwargs)
-                            
-                    logger.info("Обновляем токен доступа Google Cloud OAuth2...")
-                    _vertex_credentials.refresh(CustomRequest())
-                    
-                    location = "us-central1"
-                    model_name = "gemini-2.5-flash"
-                    _vertex_url = f"https://{location}-aiplatform.googleapis.com/v1/projects/{project_id}/locations/{location}/publishers/google/models/{model_name}:generateContent"
-                    
-                    _vertex_headers = {
-                        "Authorization": f"Bearer {_vertex_credentials.token}",
-                        "Content-Type": "application/json"
-                    }
-                    logger.info("Авторизация Vertex AI успешно инициализирована и кэширована.")
-                else:
-                    raise FileNotFoundError("Файл vertex_sa.json не найден")
+            if _vertex_headers is None:
+                raise FileNotFoundError("Файл vertex_sa.json не найден или авторизация не удалась")
             
             body = {
                 "contents": [{
@@ -347,8 +367,6 @@ def enrich_lead_with_ai(lead, openai_client):
                         time.sleep(wait_time)
                     else:
                         raise exc
-            else:
-                raise FileNotFoundError("Файл vertex_sa.json не найден")
         except Exception as ve:
             logger.error(f"Ошибка фоллбэка Vertex AI для лида {lead['company_name']}: {ve}")
             lead.update({
@@ -704,28 +722,54 @@ def main():
     cache = load_enrichment_cache(date_str)
     logger.info(f"Загружено {len(cache)} лидов из кэша обогащения.")
     
+    # Разделяем лиды на кэшированные и новые
+    leads_to_enrich = []
     for idx, l in enumerate(all_leads):
         url = l.get("url", "")
-        has_contacts = bool(l.get("phone") or l.get("email"))
-        
-        # Проверяем, есть ли лид в кэше и имеет ли он сгенерированный питч
         if url and url in cache and cache[url].get("generated_pitch"):
             l.update(cache[url])
             logger.info(f"[{idx+1}/{len(all_leads)}] Лид {l['company_name']} восстановлен из кэша.")
         else:
-            enrich_lead_with_ai(l, openai_client)
+            leads_to_enrich.append(l)
+            
+    if leads_to_enrich:
+        logger.info(f"Начинаем параллельное ИИ-обогащение {len(leads_to_enrich)} лидов в 10 потоков...")
+        
+        # Если используем Vertex AI, инициализируем его до запуска потоков
+        if use_vertex_directly or not openai_client:
+            init_vertex_ai()
+            
+        cache_lock = threading.Lock()
+        
+        def process_lead(lead):
+            enrich_lead_with_ai(lead, openai_client)
+            url = lead.get("url", "")
             if url:
-                cache[url] = {
-                    "role_guess": l.get("role_guess"),
-                    "pain_hypothesis": l.get("pain_hypothesis"),
-                    "offer_angle": l.get("offer_angle"),
-                    "personal_hook": l.get("personal_hook"),
-                    "generated_pitch": l.get("generated_pitch"),
-                    "offer_details": l.get("offer_details"),
-                    "ai_score": l.get("ai_score")
-                }
-                save_enrichment_cache(cache, date_str)
-            time.sleep(0.2)
+                with cache_lock:
+                    cache[url] = {
+                        "role_guess": lead.get("role_guess"),
+                        "pain_hypothesis": lead.get("pain_hypothesis"),
+                        "offer_angle": lead.get("offer_angle"),
+                        "personal_hook": lead.get("personal_hook"),
+                        "generated_pitch": lead.get("generated_pitch"),
+                        "offer_details": lead.get("offer_details"),
+                        "ai_score": lead.get("ai_score")
+                    }
+                    save_enrichment_cache(cache, date_str)
+                    
+        max_workers = 10
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(process_lead, lead): lead for lead in leads_to_enrich}
+            
+            completed_count = 0
+            for future in as_completed(futures):
+                lead = futures[future]
+                completed_count += 1
+                try:
+                    future.result()
+                    logger.info(f"Progress: [{completed_count}/{len(leads_to_enrich)}] Лид {lead['company_name']} успешно обработан.")
+                except Exception as e:
+                    logger.error(f"Исключение при обработке лида {lead['company_name']}: {e}")
         
     # Нормализация ai_score для всех лидов (включая восстановленные из кэша)
     for l in all_leads:
