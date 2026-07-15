@@ -1,4 +1,12 @@
 
+## 2026-07-15: Верификация устойчивости API и E2E-тест пайплайна (API Resilience & E2E Pipeline Verification)
+**Победы (Wins) / Победы:**
+- **Успешный проверочный E2E-запуск:** Выполнен быстрый тестовый запуск пайплайна с флагами `--force --quick` для подтверждения целостности системы. Процесс сбора, обогащения и отправки отчетов прошел успешно.
+- **Подтверждение устойчивости ИИ-модуля:** При возникновении ошибки 401 (API-ключ OpenAI/AIHubMix отключен) система мгновенно и без потерь переключилась на Vertex AI (Gemini 2.5 Flash).
+- **Кэширование и отчеты:** Успешно протестировано восстановление данных лидов из локального кэша обогащения (`enrichment_cache.json`), что позволило сэкономить ресурсы API и сократить время прогона. Сводный отчет сохранен в `leads_report.md` и `leads_summary.csv`.
+- **Telegram-уведомление:** Сводный отчет с топ-лидами успешно отправлен в Telegram.
+- [EN] Executed an E2E verification run (`run_pipeline.py --force --quick`). Confirmed automatic fallback to Vertex AI (Gemini 2.5 Flash) upon encountering a 401 error from the OpenAI/AIHubMix API key. Verified local lead data recovery from `enrichment_cache.json`, report generation, and Telegram notification delivery.
+
 ## 2026-07-15: Полный успешный запуск пайплайна лидогенерации (E2E Full Pipeline Execution & Integration Success)
 **Победы (Wins) / Победы:**
 - **Полный цикл сбора лидов:** Выполнен полноценный запуск пайплайна `run_pipeline.py --force`. Всего собрано **93 лида** со всех 4 источников (adata.kz, hh.ru, hh.kz, threads.net) по всем 6 ключевым запросам.
@@ -7,6 +15,7 @@
 - **Генерация офферов и отчетов:** Создана сводка лидов `leads_report.md`, сводный CSV-файл `leads_summary.csv` и 93 индивидуальные карточки лидов с офферами и питчами в папке `details/`.
 - **Telegram Notification:** Сводка лидов и карточки ТОП-5 самых горячих лидов с контактными данными отправлены в Telegram-канал пользователя.
 - [EN] Executed full E2E pipeline (`run_pipeline.py --force`) for 2026-07-15. Collected 93 leads across all 4 sources (30 from hh.ru, 32 from adata.kz, 25 from threads.net, 6 from hh.kz) across all 6 niches. Enriched all leads via Vertex AI (Gemini 2.5 Flash) with retry logic handling. Generated reports and 93 detailed lead files. Dispatched top 5 hot leads to the user's Telegram channel.
+
 
 
 ## 2026-07-14: Финальное подтверждение работы пайплайна ежедневной лидогенерации (E2E Leadgen Pipeline Final Verification)

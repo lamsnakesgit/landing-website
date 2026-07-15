@@ -1,11 +1,13 @@
 
 ## 2026-07-15: Успешный запуск пайплайна лидогенерации и проверка устойчивости API (E2E Leadgen & API Resilience Verification)
 **Победы (Wins):**
-- **Успешный запуск сбора:** Проведен тестовый прогон пайплайна `run_pipeline.py --force --quick` за 15.07.2026. Сбор лидов со всех 4 источников (adata.kz, hh.ru, hh.kz, threads.net) по всем 6 нишам сработал без ошибок.
-- **Интеграция ИИ с автоповторами (Retry resilience):** Обогащение лидов отработало через Vertex AI (Gemini 2.5 Flash). Успешно обработана временная ошибка `429 Too Many Requests` от Vertex AI API с помощью автоматического повтора (retry) через 3 секунды, что гарантирует завершение пайплайна в любых условиях.
-- **Генерация офферов и отчетов:** Создана сводка лидов `leads_report.md` и индивидуальные md-карточки лидов с офферами и питчами.
+- **Успешный полный сбор (93 лида):** Запущен полный сбор `run_pipeline.py --force`, который нашел и обогатил 93 лида со всех платформ (hh.ru, adata.kz, threads.net, hh.kz).
+- **Верификация устойчивости к сбоям API (E2E Quick Test):** Проведен быстрый проверочный запуск пайплайна `run_pipeline.py --force --quick`. Проверена интеграция и подтвержден автоматический фоллбек на Vertex AI (Gemini 2.5 Flash) при возврате ошибки 401 (invalid key) от основного OpenAI/AIHubMix API. Пайплайн успешно завершился без падений.
+- **Оптимизация повторов (Retry resilience):** Успешно обработана временная ошибка `429 Too Many Requests` от Vertex AI API с помощью автоматического повтора (retry) через 3 секунды, что гарантирует завершение пайплайна в любых условиях.
+- **Генерация офферов и отчетов:** Создана сводка лидов `leads_report.md` и индивидуальные md-карточки лидов с офферами и питчами в папке `details/`.
 - **Telegram Notification:** Сводка отправлена в Telegram пользователя.
-- [EN] Executed E2E quick pipeline test (`run_pipeline.py --force --quick`) for 2026-07-15. Verified scraping, automated retry logic handling Vertex AI API `429 Too Many Requests` errors, local report generation, and Telegram notification dispatch.
+- [EN] Executed E2E pipeline test and full 93-leads collection (`run_pipeline.py --force`). Verified automatic fallback to Vertex AI (Gemini 2.5 Flash) upon receiving a 401 error from the OpenAI/AIHubMix API. Tested API retry mechanism on 429 status codes, generated Markdown/CSV reports, and sent updates to Telegram.
+
 
 **Ошибки и как решили (Problems & Solutions):**
 - **Проблема (Issue):** Временная ошибка `429 Too Many Requests` от Vertex AI API при первом запросе обогащения лида "ИП Pride consulting".
