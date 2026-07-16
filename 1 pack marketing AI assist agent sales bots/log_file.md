@@ -190,3 +190,17 @@
 **Problems issues / Проблемы и решения:**
 - API ключ Gemini оказался нерабочим (HTTP 403 Forbidden) для генерации контента.
 - **Решение:** Написан кастомный скрипт для извлечения текста напрямую из XML-структуры .docx файлов, после чего произведен семантический анализ результатов.
+
+## 2026-07-16: Полный запуск пайплайна и восстановление целостности отчетов
+**Победы (Wins):**
+- Успешно завершен повторный принудительный запуск полного пайплайна сбора контактов за 16 июля с флагом `--force`. Собрано и обработано **102 лида** (hh.ru — 30, uchet.kz — 34, threads.net — 33, hh.kz — 5).
+- Восстановлена целостность отчетов на диске (`leads_report.md`, `leads_summary.csv`) и созданы индивидуальные карточки лидов с офферами в `03_Marketing_and_Sales/daily_leads/2026-07-16/details/`.
+- Успешно отправлен ежедневный отчет в Telegram с топ-5 самыми горячими контактами.
+- Подтверждена работоспособность кэширования обогащения лидов (Vertex AI не тратит квоты и время на повторный анализ уже обработанных сегодня компаний).
+- [EN] Successfully finished full leadgen pipeline force run for 2026-07-16. Processed **102 leads** (hh.ru — 30, uchet.kz — 34, threads.net — 33, hh.kz — 5). Restored daily summary files (`leads_report.md`, `leads_summary.csv`) and generated details pitches at `03_Marketing_and_Sales/daily_leads/2026-07-16/details/`. Verified Vertex AI caching layer saves API quotas on duplicated runs. Sent Telegram update.
+
+**Ошибки и как решили (Problems & Solutions):**
+- Сводный отчет за сегодня был перезаписан быстрым локальным smoke-тестом и содержал всего 2 лида вместо 102.
+- **Решение:** Проведен принудительный запуск пайплайна с флагом `--force` для повторного сканирования и генерации сводных файлов.
+- [EN] Daily report files were overwritten by a fast `--quick` smoke-test and held only 2 leads. Resolved by running the pipeline with `--force` flag.
+
