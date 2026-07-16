@@ -1,4 +1,16 @@
 
+## 2026-07-16: Миграция на pk.uchet.kz и исправление KeyError при обогащении контактов (Migration to pk.uchet.kz & KeyError Safe Fix)
+**Победы (Wins):**
+- **Успешный переход с adata.kz на pk.uchet.kz:** Парсер `playwright_leadgen.py` переведен на извлечение данных о компаниях и контактах (БИН, ЛПР) с надежного источника `pk.uchet.kz`.
+- **Интеграция с автоматической очисткой диска:** В `run_pipeline.py` добавлена ротация старых временных `.png` скриншотов и `.html` файлов отладки с сохранением важных ресурсов, снижая нагрузку на накопитель.
+- **Успешный полный прогон пайплайна:** Запуск `run_pipeline.py --quick --force` прошел без единой ошибки и завершился успехом.
+- [EN] Migrated company/contact extraction in `playwright_leadgen.py` from `adata.kz` to `pk.uchet.kz`. Added periodic cleanup of debug `.png` and `.html` files in `run_pipeline.py` while keeping essential templates/stickers. Verified the entire flow with a successful `run_pipeline.py --quick --force` test run.
+
+**Ошибки и как решили (Problems & Solutions):**
+- **Проблема (Issue):** Падение пайплайна с ошибкой `KeyError: 'name'` при ИИ-обогащении лидов с HH.kz из старого кэша `adata.kz`, где отсутствовало поле `name`.
+- **Решение (Solution):** Извлечение полей контактов из кэша в `playwright_leadgen.py` заменено на безопасный метод `.get()` с дефолтными значениями (например, `"Представитель компании"` для имени).
+- [EN] Fixed a `KeyError: 'name'` crash during HH.kz leads enrichment by changing raw dict key access to `.get()` method in `playwright_leadgen.py`.
+
 ## 2026-07-16: Верификация сегодняшнего сбора и предоставление отчета (Daily Leadgen Verification & Audit Report)
 **Победы (Wins):**
 - **Проверена структура папок и файлы результатов:** Сводный отчет [leads_report.md](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-07-16/leads_report.md) и папка с деталями [details/](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-07-16/details/) проверены. Все 98 лидов успешно собраны и обогащены.
