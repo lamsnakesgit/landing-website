@@ -109,6 +109,7 @@ def cleanup_old_data(retention_days=7):
     
     from datetime import datetime, timedelta
     import shutil
+    import glob
     
     cutoff_date = datetime.now() - timedelta(days=retention_days)
     
@@ -146,6 +147,45 @@ def cleanup_old_data(retention_days=7):
                             f.write(f"--- Log truncated at {datetime.now()} ---\n")
                 except Exception as e:
                     logger.error(f"Не удалось обработать лог {log_path}: {e}")
+
+    # 3. Очистка временных скриншотов и HTML-файлов отладки в корне и scratch
+    temp_patterns = [
+        # Корневая папка
+        "*.png", "*.jpg", "*.jpeg", "*.html",
+        # Папка scratch
+        "scratch/*.png", "scratch/*.jpg", "scratch/*.jpeg", "scratch/*.html",
+        "**/scratch/*.png", "**/scratch/*.html"
+    ]
+    
+    # Файлы, которые нельзя удалять (важные ассеты/скрипты)
+    keep_files = {
+        "sticker_01.png", "sticker_tongue.png", "sticker_tongue_emoji.png",
+        "temp_sticker.png", "vibe_coding_sticker.png", "vygody_megaphone.png",
+        "vygody_tongue.png", "reference_face.png", "raw_promo_pill.png",
+        "youtube_live_thumbnail.png", "homepage.html", "chat2.html", "debug_form.html"
+    }
+
+    for pattern in temp_patterns:
+        for file_path in glob.glob(pattern, recursive=True):
+            if os.path.isfile(file_path):
+                file_name = os.path.basename(file_path)
+                if file_name in keep_files:
+                    continue
+                
+                # Дополнительная проверка, чтобы удалять только временные файлы
+                is_debug_file = any(word in file_name.lower() for word in [
+                    "test", "screenshot", "error", "uchet", "adata", "sud", 
+                    "debug", "results", "temp", "page", "search", "lawsuit", "court"
+                ])
+                
+                if is_debug_file:
+                    try:
+                        mtime = datetime.fromtimestamp(os.path.getmtime(file_path))
+                        if mtime < cutoff_date:
+                            logger.info(f"Удаляем старый временный файл: {file_path}")
+                            os.remove(file_path)
+                    except Exception as e:
+                        logger.error(f"Не удалось удалить временный файл {file_path}: {e}")
 
 def main():
     # Проверка на повторный запуск в тот же день
