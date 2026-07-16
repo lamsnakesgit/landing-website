@@ -1,5 +1,34 @@
 # Журнал разработки (Progress & Dev Diary)
 
+## [16.07.2026] Контрольное E2E-тестирование и финальная верификация стабильности (Final E2E Verification & Scheduler Audit)
+
+**Достижения (Wins):**
+- **Успешный контрольный запуск пайплайна:** Запущен и успешно завершен быстрый проверочный прогон (`run_pipeline.py --quick --force`). Скрипт корректно выполнил парсинг, ИИ-анализ лидов через отказоустойчивую Vertex AI схему и отправил отчет в Telegram.
+- **Подтверждение устойчивости к сбоям:** Проверена обработка ошибок и логика фоллбэка на Vertex AI в случае недействительного ключа AIHubMix/OpenAI. Переключение на Gemini 2.5 Flash по HTTP отрабатывает мгновенно и без зависаний.
+- **Анализ расписания и TCC-правка:** Проверен демон `launchd` (`com.higherpower.daily_leadgen.plist`) и шелл-обертка (`run_daily_pipeline_wrapper.sh`). Подтверждена регулярная ежедневная активность демона (последние успешные запуски зафиксированы в логах за июль), а TCC-блокировка решена благодаря запуску через графический `open -a Terminal`.
+- **Локальное сохранение:** Подтверждена генерация сводного CSV-файла, Markdown-отчета и папки `details` с индивидуальными карточками лидов.
+
+**Проблемы и сложности (Problems & Issues):**
+- **Отсутствие ключей Supabase в `.env`:** Обнаружено, что в файле `.env` отсутствуют переменные для Supabase (`SUPABASE_URL`, `SUPABASE_KEY`). Система корректно обрабатывает это событие в блоке try-except, логирует предупреждение и продолжает работу, сохраняя результаты в локальные файлы. Это штатное поведение при отсутствии базы данных.
+- **TCC ограничения macOS:** Запуск скриптов по расписанию через launchd может сталкиваться с ограничениями TCC на доступ к защищенным папкам (например, `Desktop`), если родительские процессы не имеют прав "Full Disk Access" или если сессия пользователя не активна. Текущее решение через `open -a Terminal` является оптимальным воркэраундом, запускающим интерактивное окно в сессии пользователя.
+
+---
+*English version of the status (duplicate in English):*
+
+## [16.07.2026] Final E2E Verification & Scheduler Audit
+
+**Wins:**
+- **Successful E2E Run:** Verified the system via a quick manual run (`run_pipeline.py --quick --force`), which completed successfully: scraping, Vertex AI fallback, local report generation, and Telegram notification.
+- **Robust Fallback:** Confirmed the OpenAI-to-Vertex-AI fallback mechanism works properly when the OpenAI key is invalid. Gemini 2.5 Flash via HTTP handles processing instantly.
+- **Launchd Reliability:** Confirmed the scheduler plist runs daily at 09:00 AM. Access permissions (TCC restrictions) are successfully bypassed using the `open -a Terminal` wrapper.
+- **Structured Output:** Confirmed that the output files (CSV summaries and individual Markdown cards) are properly structured and stored.
+
+**Problems & Issues:**
+- **Missing Supabase Environment Variables:** No Supabase keys were found in `.env`. The system logs a warning and stores results locally as designed.
+- **macOS TCC Access:** Access to the `Desktop` directory under launchd requires valid desktop sessions. The graphical terminal wrapper correctly mitigates this limitation.
+
+---
+
 ## [16.07.2026] Верификация работы ежедневного сбора лидов по запросу пользователя (Daily Leadgen Pipeline E2E Verification)
 
 **Достижения (Wins):**
