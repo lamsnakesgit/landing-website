@@ -1,4 +1,15 @@
 
+## 2026-07-16: Верификация работы ежедневного сбора лидов по запросу пользователя (Daily Leadgen Pipeline E2E Verification)
+**Победы (Wins):**
+- **Проверка работоспособности системы сбора лидов:** Выполнена сквозная проверка пайплайна сбора контактов с hh.ru, hh.kz, pk.uchet.kz (adata.kz) и threads.net по ключевым направлениям (ИИ, разработка, боты, маркетинг, контекстная реклама, ИИ-контент).
+- **Успешный проверочный запуск:** Проведен быстрый E2E-тест пайплайна (`run_pipeline.py --quick --force`). Сбор, ИИ-обогащение через отказоустойчивый Vertex AI и отправка отчетов отработали на 100% штатно.
+- **Подтверждено расписание:** Подтвержден статус macOS `launchd` агента `com.higherpower.daily_leadgen` — он успешно активен в системе и совершает запуск ежедневно в 09:00 без сбоев.
+- [EN] Verified the daily leadgen pipeline for hh.ru, hh.kz, pk.uchet.kz (adata.kz), and threads.net based on user request. Executed E2E quick test `run_pipeline.py --quick --force` and confirmed successful scraping, Vertex AI fallback, local report generation, and Telegram notifications. Confirmed active status of macOS launchd agent configured for daily 09:00 AM runs.
+
+**Ошибки и как решили (Problems & Solutions):**
+- Ошибок не обнаружено, система полностью готова и работает в автоматическом режиме.
+- [EN] No errors found, the system is fully operational in automated mode.
+
 ## 2026-07-16: Миграция на pk.uchet.kz и исправление KeyError при обогащении контактов (Migration to pk.uchet.kz & KeyError Safe Fix)
 **Победы (Wins):**
 - **Успешный переход с adata.kz на pk.uchet.kz:** Парсер `playwright_leadgen.py` переведен на извлечение данных о компаниях и контактах (БИН, ЛПР) с надежного источника `pk.uchet.kz`.
