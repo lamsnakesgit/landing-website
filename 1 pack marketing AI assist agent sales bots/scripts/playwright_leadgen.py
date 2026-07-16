@@ -524,10 +524,10 @@ def main():
                 if lead["source"] == "hh.kz":
                     contacts = get_uchet_company_info(page, lead["company_name"])
                     if contacts:
-                        lead["phone"] = contacts["phone"]
-                        lead["email"] = contacts["email"]
-                        lead["url"] = contacts["adata_url"]
-                        lead["name"] = contacts["name"]
+                        lead["phone"] = contacts.get("phone", "")
+                        lead["email"] = contacts.get("email", "")
+                        lead["url"] = contacts.get("adata_url", "")
+                        lead["name"] = contacts.get("name", "Представитель компании")
                         lead["source"] = "uchet.kz"  # Меняем источник на uchet.kz, так как данные обогащены оттуда
                 enriched_leads.append(lead)
                 time.sleep(2)
