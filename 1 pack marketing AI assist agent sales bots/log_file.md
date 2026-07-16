@@ -204,3 +204,13 @@
 - **Решение:** Проведен принудительный запуск пайплайна с флагом `--force` для повторного сканирования и генерации сводных файлов.
 - [EN] Daily report files were overwritten by a fast `--quick` smoke-test and held only 2 leads. Resolved by running the pipeline with `--force` flag.
 
+## 2026-07-16: Верификация ежедневного сбора контактов и планировщика, создание инструкции по запуску (Leadgen Pipeline Verification & Instructions)
+**Победы (Wins):**
+- **Полная верификация сбора за сегодня:** Подтверждена целостность сбора 102 лидов, все Markdown-карточки лидов с драфтами сообщений успешно записаны в папку `03_Marketing_and_Sales/daily_leads/2026-07-16/details/`.
+- **Проверка статуса демона:** С помощью launchctl подтверждено, что macOS-агент `com.higherpower.daily_leadgen` активен, загружен и настроен на ежедневное выполнение в 09:00 утра.
+- **Создание подробного отчета-инструкции:** Написан артефакт `lead_generation_setup_report.md` с описанием архитектуры системы, прямыми ссылками на результаты и пошаговыми командами для ручного запуска и редактирования ключевых запросов.
+- [EN] Verified today's collection of 102 leads and their Markdown pitch cards. Confirmed via launchctl that the macOS launchd background agent `com.higherpower.daily_leadgen` is active and scheduled for 09:00 AM daily. Created a user-friendly instruction report artifact (`lead_generation_setup_report.md`) with direct file links and manual run commands.
+
+**Ошибки и как решили (Problems & Solutions):**
+- Ошибок не обнаружено, все скрипты, селекторы и ИИ-обогатитель работают в абсолютно штатном режиме.
+- [EN] No errors found, scraping selectors and Vertex AI enrichment operate nominally.
