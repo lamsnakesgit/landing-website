@@ -115,29 +115,30 @@ def search_hh_web(page, query, area_id):
         
     return leads
 
-def perform_adata_search(page, query):
-    """Выполняет поиск на pk.adata.kz и возвращает страницу результатов"""
-    logger.info(f"Выполняем ввод запроса '{query}' на pk.adata.kz...")
-    safe_goto(page, "https://pk.adata.kz/", wait_until="domcontentloaded", timeout=30000)
+def perform_uchet_search(page, query):
+    """Выполняет поиск на pk.uchet.kz и возвращает страницу результатов"""
+    logger.info(f"Выполняем ввод запроса '{query}' на pk.uchet.kz...")
+    safe_goto(page, "https://pk.uchet.kz/search/", wait_until="domcontentloaded", timeout=30000)
     time.sleep(3)
     
-    input_selector = 'input[data-test-id="pk-main-page-company-search-input"]'
+    # Находим поле ввода
+    input_selector = 'input'
     page.wait_for_selector(input_selector, timeout=10000)
     page.click(input_selector)
     page.fill(input_selector, query)
     time.sleep(1)
     
-    button_selector = 'button[data-test-id="pk-main-page-company-find-button"]'
-    page.click(button_selector)
-    time.sleep(4)
+    # Нажимаем Enter для поиска
+    page.press(input_selector, 'Enter')
+    time.sleep(5)
 
-def get_adata_company_info(page, company_name):
-    """Ищет компанию на pk.adata.kz и извлекает контакты (телефон, email, БИН)"""
+def get_uchet_company_info(page, company_name):
+    # Ищет компанию на pk.uchet.kz и извлекает контакты (телефон, email, БИН, ЛПР)
     if company_name == "Не указано" or not company_name:
         return None
     
     # Очищаем название компании от лишних символов для поиска
-    clean_name = re.sub(r'["\'«»]|ТОО|ИП|АО', '', company_name).strip()
+    clean_name = re.sub(r'["\'«»]|ТОО|ИП|АО|товарищество с ограниченной ответственностью', '', company_name, flags=re.IGNORECASE).strip()
     cache_key = clean_name.lower()
     
     # Проверка кэша по имени компании
@@ -150,65 +151,71 @@ def get_adata_company_info(page, company_name):
             logger.info(f"В кэше отмечено, что для '{company_name}' нет контактов. Пропускаем.")
             return None
             
-    logger.info(f"Ищем контакты для {company_name} (запрос: {clean_name}) на pk.adata.kz")
+    logger.info(f"Ищем контакты для {company_name} (запрос: {clean_name}) на pk.uchet.kz")
     
     try:
-        perform_adata_search(page, clean_name)
+        perform_uchet_search(page, clean_name)
         
-        # Находим все ссылки на страницы компаний по data-test-id
-        cards = page.query_selector_all('a[data-test-id^="pk-results-page-company-card-"]')
-        company_url = None
-        bin_num = None
-        for card in cards:
-            href = card.get_attribute("href") or ""
-            match = re.search(r'/company/(\d{12})', href)
-            if match:
-                company_url = href
-                bin_num = match.group(1)
-                break
-                
-        if company_url:
-            if not company_url.startswith("http"):
-                company_url = f"https://pk.adata.kz{company_url}"
-            
-            # Проверка кэша по БИН, если нашли БИН на странице результатов
-            if bin_num and bin_num in company_cache:
+        # Извлекаем БИНы со страницы поиска
+        text_content = page.content()
+        bins = re.findall(r'(?:БИН|ИИН):\s*(\d{12})', text_content)
+        bins = list(dict.fromkeys(bins))
+        
+        bin_num = bins[0] if bins else None
+        
+        if bin_num:
+            # Проверка кэша по БИН
+            if bin_num in company_cache:
                 cached = company_cache[bin_num]
                 if cached:
                     logger.info(f"Компания '{company_name}' (БИН {bin_num}) найдена в кэше по БИН.")
-                    # Также сохраняем по имени для будущих поисков
                     company_cache[cache_key] = cached
                     save_company_cache()
                     return cached
             
+            company_url = f"https://pk.uchet.kz/search/bin/{bin_num}"
             logger.info(f"Переходим на страницу компании: {company_url}")
             safe_goto(page, company_url, wait_until="domcontentloaded", timeout=20000)
             time.sleep(3)
             
             body_text = page.inner_text("body")
             
-            # Поиск email с фильтрацией контактов самого сервиса adata.kz
+            # Поиск email и телефонов
             emails = re.findall(r'[\w\.-]+@[\w\.-]+\.\w+', body_text)
-            valid_emails = [e for e in emails if not ("adata" in e.lower() or e.endswith("adata.kz"))]
+            valid_emails = [e for e in emails if not ("uchet" in e.lower() or e.endswith("uchet.kz"))]
             email = valid_emails[0] if valid_emails else ""
             
-            # Поиск телефонов Казахстана (+7 или 8) с фильтрацией поддержки Adata (+7 747 120 34 67)
             phones = re.findall(r'(?:\+7|8)[\s\-]?\(?[7][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}', body_text)
-            valid_phones = []
-            for p in phones:
-                norm_p = re.sub(r'\D', '', p)
-                if "7471203467" in norm_p or "7471203468" in norm_p:
-                    continue
-                valid_phones.append(p)
-            phone = valid_phones[0] if valid_phones else ""
+            phone = phones[0] if phones else ""
             
-            logger.info(f"Найденные контакты на pk.adata.kz для {company_name}: Тел: {phone}, Email: {email}")
-            result = {"phone": phone, "email": email, "adata_url": company_url}
+            # Извлекаем ЛПР по селектору
+            lpr_locator = page.locator("span:has-text('Руководитель:') + span").first
+            lpr = lpr_locator.inner_text().strip() if lpr_locator.count() > 0 else ""
+            
+            # Если по селектору не нашли, пробуем мета-тег
+            if not lpr:
+                try:
+                    meta_desc = page.locator("meta[name='description']").get_attribute("content")
+                    lpr_match = re.search(r'Руководитель:\s*([^.]+)', meta_desc)
+                    if lpr_match:
+                        lpr = lpr_match.group(1).strip()
+                except:
+                    pass
+            
+            if not lpr:
+                lpr = "Представитель компании"
+                
+            logger.info(f"Найденные контакты на pk.uchet.kz для {company_name}: ЛПР: {lpr}, Тел: {phone}, Email: {email}")
+            result = {
+                "name": lpr,
+                "phone": phone,
+                "email": email,
+                "adata_url": company_url
+            }
             
             # Сохраняем в кэш под обоими ключами
             company_cache[cache_key] = result
-            if bin_num:
-                company_cache[bin_num] = result
+            company_cache[bin_num] = result
             save_company_cache()
             
             return result
@@ -218,40 +225,30 @@ def get_adata_company_info(page, company_name):
             save_company_cache()
             
     except Exception as e:
-        logger.error(f"Ошибка при парсинге pk.adata.kz для {company_name}: {e}")
+        logger.error(f"Ошибка при парсинге pk.uchet.kz для {company_name}: {e}")
         
     return None
 
 
-def search_adata_web(page, query):
-    """Ищет компании на pk.adata.kz по запросу и собирает контакты"""
-    logger.info(f"Adata: Поиск компаний по запросу '{query}'...")
+def search_uchet_web(page, query):
+    # Ищет компании на pk.uchet.kz по запросу и собирает контакты
+    logger.info(f"Uchet: Поиск компаний по запросу '{query}'...")
     leads = []
     
     try:
-        perform_adata_search(page, query)
+        perform_uchet_search(page, query)
         
-        # Находим все ссылки на карточки компаний по data-test-id
-        cards = page.query_selector_all('a[data-test-id^="pk-results-page-company-card-"]')
-        company_links = []
-        for card in cards:
-            href = card.get_attribute("href") or ""
-            match = re.search(r'/company/(\d{12})', href)
-            if match:
-                bin_num = match.group(1)
-                if bin_num not in [c['bin'] for c in company_links]:
-                    company_links.append({
-                        "bin": bin_num,
-                        "url": f"https://pk.adata.kz/company/{bin_num}"
-                    })
+        # Извлекаем БИНы со страницы поиска
+        text_content = page.content()
+        bins = re.findall(r'(?:БИН|ИИН):\s*(\d{12})', text_content)
+        bins = list(dict.fromkeys(bins))
                         
-        logger.info(f"Найдено уникальных компаний на pk.adata.kz по запросу '{query}': {len(company_links)}")
+        logger.info(f"Найдено уникальных компаний на pk.uchet.kz по запросу '{query}': {len(bins)}")
         
         # Переходим в топ-3 компании для сбора контактов
-        for comp in company_links[:3]:
+        for bin_num in bins[:3]:
             try:
-                bin_num = comp["bin"]
-                comp_url = comp["url"]
+                comp_url = f"https://pk.uchet.kz/search/bin/{bin_num}"
                 
                 # Проверяем кэш по БИН
                 if bin_num in company_cache:
@@ -264,53 +261,62 @@ def search_adata_web(page, query):
                             "phone": cached.get("phone", ""),
                             "email": cached.get("email", ""),
                             "url": comp_url,
-                            "description": f"Компания найдена на adata.kz по запросу: {query}. БИН: {bin_num}",
-                            "source": "adata.kz",
+                            "description": f"Компания найдена на pk.uchet.kz по запросу: {query}. БИН: {bin_num}",
+                            "source": "uchet.kz",
                             "city": cached.get("city", "Казахстан"),
                             "query": query
                         })
                         continue
                 
-                logger.info(f"Переходим на страницу компании {comp['bin']}: {comp_url}")
+                logger.info(f"Переходим на страницу компании {bin_num}: {comp_url}")
                 safe_goto(page, comp_url, wait_until="domcontentloaded", timeout=20000)
                 time.sleep(3)
                 
                 body_text = page.inner_text("body")
                 
-                # Поиск email с фильтрацией контактов самого сервиса adata.kz
+                # Поиск email и телефонов
                 emails = re.findall(r'[\w\.-]+@[\w\.-]+\.\w+', body_text)
-                valid_emails = [e for e in emails if not ("adata" in e.lower() or e.endswith("adata.kz"))]
+                valid_emails = [e for e in emails if not ("uchet" in e.lower() or e.endswith("uchet.kz"))]
                 email = valid_emails[0] if valid_emails else ""
                 
-                # Поиск телефонов Казахстана (+7 или 8) с фильтрацией поддержки Adata (+7 747 120 34 67)
                 phones = re.findall(r'(?:\+7|8)[\s\-]?\(?[7][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}', body_text)
-                valid_phones = []
-                for p in phones:
-                    norm_p = re.sub(r'\D', '', p)
-                    if "7471203467" in norm_p or "7471203468" in norm_p:
-                        continue
-                    valid_phones.append(p)
-                phone = valid_phones[0] if valid_phones else ""
+                phone = phones[0] if phones else ""
                 
-                # Название компании
+                # Название компании из h1 или h2
                 company_name = "Неизвестно"
-                h1_elem = page.query_selector("h1")
-                if h1_elem:
-                    company_name = h1_elem.inner_text().strip()
+                h2_elem = page.locator("h2").first
+                if h2_elem.count() > 0:
+                    company_name = h2_elem.inner_text().strip()
+                else:
+                    h1_elem = page.locator("h1").first
+                    if h1_elem.count() > 0:
+                        company_name = h1_elem.inner_text().strip()
                 
-                # Поиск руководителя
-                lpr_name = "Представитель компании"
-                lpr_match = re.search(r'Руководитель:?\s*([А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+)', body_text, re.IGNORECASE) or \
-                           re.search(r'Руководитель:?\s*([А-ЯЁа-яё\s]+)', body_text, re.IGNORECASE)
-                if lpr_match:
-                    lpr_name = lpr_match.group(1).strip()
+                # Извлекаем ЛПР по селектору
+                lpr_locator = page.locator("span:has-text('Руководитель:') + span").first
+                lpr_name = lpr_locator.inner_text().strip() if lpr_locator.count() > 0 else ""
+                
+                if not lpr_name:
+                    try:
+                        meta_desc = page.locator("meta[name='description']").get_attribute("content")
+                        lpr_match = re.search(r'Руководитель:\s*([^.]+)', meta_desc)
+                        if lpr_match:
+                            lpr_name = lpr_match.group(1).strip()
+                    except:
+                        pass
+                
+                if not lpr_name:
+                    lpr_name = "Представитель компании"
                     
                 # Ищем город в адресе
                 city = "Казахстан"
-                city_match = re.search(r'город\s+([А-Яа-яЁё]+)', body_text, re.IGNORECASE) or \
-                             re.search(r'г\.\s*([А-Яа-яЁё]+)', body_text, re.IGNORECASE)
-                if city_match:
-                    city = city_match.group(1).strip()
+                addr_locator = page.locator("span:has-text('Юридический адрес:') + span").first
+                if addr_locator.count() > 0:
+                    addr_text = addr_locator.inner_text()
+                    city_match = re.search(r'город\s+([А-Яа-яЁё]+)', addr_text, re.IGNORECASE) or \
+                                 re.search(r'г\.\s*([А-Яа-яЁё]+)', addr_text, re.IGNORECASE)
+                    if city_match:
+                        city = city_match.group(1).strip()
                 
                 result = {
                     "name": lpr_name,
@@ -318,8 +324,8 @@ def search_adata_web(page, query):
                     "phone": phone,
                     "email": email,
                     "url": comp_url,
-                    "description": f"Компания найдена на adata.kz по запросу: {query}. БИН: {comp['bin']}",
-                    "source": "adata.kz",
+                    "description": f"Компания найдена на pk.uchet.kz по запросу: {query}. БИН: {bin_num}",
+                    "source": "uchet.kz",
                     "city": city,
                     "query": query
                 }
@@ -329,17 +335,17 @@ def search_adata_web(page, query):
                 # Сохраняем в кэш
                 company_cache[bin_num] = result
                 # Также сохраняем по названию компании
-                clean_comp_name = re.sub(r'["\'«»]|ТОО|ИП|АО', '', company_name).strip().lower()
+                clean_comp_name = re.sub(r'["\'«»]|ТОО|ИП|АО|товарищество с ограниченной ответственностью', '', company_name, flags=re.IGNORECASE).strip().lower()
                 company_cache[clean_comp_name] = result
                 save_company_cache()
                 
                 time.sleep(3)
                 
             except Exception as e:
-                logger.error(f"Ошибка при парсинге страницы компании {comp['bin']}: {e}")
+                logger.error(f"Ошибка при парсинге страницы компании {bin_num}: {e}")
                 
     except Exception as e:
-        logger.error(f"Ошибка при работе с adata.kz по запросу {query}: {e}")
+        logger.error(f"Ошибка при работе с pk.uchet.kz по запросу {query}: {e}")
         
     return leads
 
@@ -460,7 +466,7 @@ def main():
         
     all_hh_leads = []
     all_threads_leads = []
-    all_adata_leads = []
+    all_uchet_leads = []
     
     try:
         with sync_playwright() as p:
@@ -504,24 +510,25 @@ def main():
                 
             logger.info(f"Всего собрано лидов с Threads.net: {len(all_threads_leads)}")
             
-            # 3. Собираем компании напрямую с Adata.kz по ключевым запросам
+            # 3. Собираем компании напрямую с pk.uchet.kz по ключевым запросам
             for query in queries:
-                leads = search_adata_web(page, query)
-                all_adata_leads.extend(leads)
+                leads = search_uchet_web(page, query)
+                all_uchet_leads.extend(leads)
                 time.sleep(3)
                 
-            logger.info(f"Всего собрано лидов напрямую с adata.kz: {len(all_adata_leads)}")
+            logger.info(f"Всего собрано лидов напрямую с pk.uchet.kz: {len(all_uchet_leads)}")
             
-            # 4. Обогащаем контактами из Adata.kz для казахстанских компаний с HH
+            # 4. Обогащаем контактами из pk.uchet.kz для казахстанских компаний с HH
             enriched_leads = []
             for lead in all_hh_leads:
                 if lead["source"] == "hh.kz":
-                    contacts = get_adata_company_info(page, lead["company_name"])
+                    contacts = get_uchet_company_info(page, lead["company_name"])
                     if contacts:
                         lead["phone"] = contacts["phone"]
                         lead["email"] = contacts["email"]
                         lead["url"] = contacts["adata_url"]
-                        lead["source"] = "adata.kz"  # Меняем источник на adata.kz, так как данные обогащены оттуда
+                        lead["name"] = contacts["name"]
+                        lead["source"] = "uchet.kz"  # Меняем источник на uchet.kz, так как данные обогащены оттуда
                 enriched_leads.append(lead)
                 time.sleep(2)
                 
@@ -537,9 +544,9 @@ def main():
     output_path_hh = "06_Scripts_and_Tools/hh_leads.json"
     
     try:
-        # Внешние лиды включают adata.kz (прямые + обогащенные) и threads.net
-        external_data = [l for l in enriched_leads if l["source"] == "adata.kz"] + all_adata_leads + all_threads_leads
-        hh_data = [l for l in enriched_leads if l["source"] != "adata.kz"]
+        # Внешние лиды включают uchet.kz (прямые + обогащенные) и threads.net
+        external_data = [l for l in enriched_leads if l["source"] == "uchet.kz"] + all_uchet_leads + all_threads_leads
+        hh_data = [l for l in enriched_leads if l["source"] != "uchet.kz"]
         
         with open(output_path_external, "w", encoding="utf-8") as f:
             json.dump(external_data, f, indent=4, ensure_ascii=False)
