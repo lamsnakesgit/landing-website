@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация AI Lawyer через NCALayer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #0F172A;
+            --surface-color: rgba(30, 41, 59, 0.7);
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --error: #EF4444;
+            --success: #10B981;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--surface-color);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), #8B5CF6);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 32px;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 12px;
+            background: linear-gradient(to right, #fff, #94A3B8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.5;
+            margin: 0 0 32px;
+        }
+
+        .status-box {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--error);
+            box-shadow: 0 0 10px var(--error);
+            transition: all 0.3s ease;
+        }
+
+        .dot.connected {
+            background-color: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary), #6366F1);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px rgba(79, 70, 229, 0.4);
+            background: linear-gradient(135deg, var(--primary-hover), #4F46E5);
+        }
+
+        button:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #message {
+            margin-top: 20px;
+            font-size: 14px;
+            min-height: 20px;
+        }
+        
+        .error-text { color: var(--error); }
+        .success-text { color: var(--success); }
+        
+        .steps {
+            text-align: left;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .steps ol {
+            padding-left: 20px;
+            margin: 10px 0 0;
+        }
+        .steps li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo">⚖️</div>
+        <h1>Безопасный Вход</h1>
+        <p>Авторизация в системе AI Lawyer для доступа к материалам судебных дел через ЭЦП (NCALayer).</p>
+
+        <div class="steps">
+            <strong>Как это работает:</strong>
+            <ol>
+                <li>Убедитесь, что приложение <b>NCALayer</b> запущено на вашем ПК.</li>
+                <li>Нажмите "Авторизоваться".</li>
+                <li>Выберите ключ AUTH_RSA в появившемся окне.</li>
+                <li>Введите пароль. Ваш ключ не передается на сервер.</li>
+            </ol>
+        </div>
+
+        <div class="status-box">
+            <span style="font-size: 14px; color: var(--text-muted);">Статус NCALayer:</span>
+            <div class="status-indicator">
+                <div class="dot" id="nca-dot"></div>
+                <span id="nca-status">Проверка...</span>
+            </div>
+        </div>
+
+        <button id="auth-btn" disabled onclick="startAuth()">
+            <span id="btn-text">Авторизоваться</span>
+            <div class="loader" id="btn-loader"></div>
+        </button>
+
+        <div id="message"></div>
+    </div>
+
+    <script>
+        const wsUrl = "wss://127.0.0.1:13579/";
+        let webSocket = null;
+        let isConnected = false;
+
+        // Инициализация соединения с NCALayer
+        function initNCALayer() {
+            webSocket = new WebSocket(wsUrl);
+            
+            webSocket.onopen = function() {
+                isConnected = true;
+                document.getElementById('nca-dot').classList.add('connected');
+                document.getElementById('nca-status').textContent = 'Подключено';
+                document.getElementById('nca-status').style.color = 'var(--success)';
+                document.getElementById('auth-btn').disabled = false;
+            };
+
+            webSocket.onclose = function() {
+                isConnected = false;
+                document.getElementById('nca-dot').classList.remove('connected');
+                document.getElementById('nca-status').textContent = 'Не найдено';
+                document.getElementById('nca-status').style.color = 'var(--error)';
+                document.getElementById('auth-btn').disabled = true;
+                showMessage('Запустите NCALayer и обновите страницу', 'error-text');
+                
+                // Попытка переподключения через 3 секунды
+                setTimeout(initNCALayer, 3000);
+            };
+
+            webSocket.onmessage = function(event) {
+                const response = JSON.parse(event.data);
+                handleNCAResponse(response);
+            };
+        }
+
+        // Показываем сообщения пользователю
+        function showMessage(text, className) {
+            const msgEl = document.getElementById('message');
+            msgEl.textContent = text;
+            msgEl.className = className;
+        }
+
+        // Изменение состояния кнопки
+        function setButtonLoading(loading) {
+            const btn = document.getElementById('auth-btn');
+            const txt = document.getElementById('btn-text');
+            const ldr = document.getElementById('btn-loader');
+            
+            if (loading) {
+                btn.disabled = true;
+                txt.style.display = 'none';
+                ldr.style.display = 'block';
+            } else {
+                btn.disabled = false;
+                txt.style.display = 'block';
+                ldr.style.display = 'none';
+            }
+        }
+
+        // Запуск процесса авторизации
+        function startAuth() {
+            if (!isConnected) {
+                showMessage("NCALayer не подключен", "error-text");
+                return;
+            }
+            
+            setButtonLoading(true);
+            showMessage("Ожидание выбора ЭЦП...", "");
+
+            // Формируем случайный токен для подписи
+            const nonce = "AI_LAWYER_AUTH_" + Math.random().toString(36).substring(2, 15);
+            // Сохраняем nonce в localStorage
+            localStorage.setItem("auth_nonce", nonce);
+            
+            // Кодируем nonce в Base64 (в браузере btoa поддерживает только ASCII)
+            const base64Nonce = btoa(unescape(encodeURIComponent(nonce)));
+
+            // Отправляем команду в NCALayer на подпись
+            const request = {
+                "module": "kz.gov.pki.knca.commonUtils",
+                "method": "createCAdESFromBase64",
+                "args": ["PKCS12", base64Nonce, "true"]
+            };
+            
+            webSocket.send(JSON.stringify(request));
+        }
+
+        // Обработка ответа от NCALayer
+        function handleNCAResponse(response) {
+            if (response.code === "500") {
+                setButtonLoading(false);
+                showMessage("Авторизация отменена пользователем или ошибка выбора", "error-text");
+                return;
+            }
+
+            if (response.code === "200" && response.responseObject) {
+                const signature = response.responseObject;
+                showMessage("Подпись получена, отправка на сервер...", "success-text");
+                
+                // Отправляем подпись на наш бэкенд
+                sendSignatureToServer(signature);
+            }
+        }
+
+        // Отправка подписи на FastAPI бэкенд
+        async function sendSignatureToServer(signature) {
+            const nonce = localStorage.getItem("auth_nonce");
+            
+            // Получаем user_id из URL параметров, если есть
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('user_id') || "anonymous";
+
+            try {
+                const res = await fetch("/api/v1/auth/ncalayer", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        signature: signature,
+                        nonce: nonce,
+                        user_id: userId
+                    })
+                });
+
+                const data = await res.json();
+                
+                setButtonLoading(false);
+
+                if (res.ok && data.success) {
+                    showMessage("Успешная авторизация! Вы можете закрыть это окно.", "success-text");
+                    document.getElementById('auth-btn').style.display = 'none';
+                    // Здесь можно сделать редирект или отправить сообщение родительскому окну/боту
+                } else {
+                    showMessage(data.detail || "Ошибка проверки подписи на сервере", "error-text");
+                }
+            } catch (error) {
+                setButtonLoading(false);
+                showMessage("Сетевая ошибка при связи с сервером", "error-text");
+            }
+        }
+
+        // Запускаем подключение при загрузке страницы
+        window.onload = initNCALayer;
+    </script>
+</body>
+</html>

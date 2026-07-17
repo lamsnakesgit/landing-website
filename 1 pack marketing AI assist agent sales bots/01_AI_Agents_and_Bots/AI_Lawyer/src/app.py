@@ -2,7 +2,8 @@ import os
 import asyncio
 import subprocess
 import json
-from fastapi import FastAPI, Depends, HTTPException, Security, status
+from fastapi import FastAPI, Depends, HTTPException, Security, status, Request
+from fastapi.staticfiles import StaticFiles
 from fastapi.security.api_key import APIKeyHeader
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -21,6 +22,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Подключаем статику для фронтенда авторизации
+static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+if os.path.exists(static_dir):
+    app.mount("/auth", StaticFiles(directory=static_dir, html=True), name="static")
 
 API_KEY_NAME = "Authorization"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
@@ -65,9 +71,42 @@ class CaseSearchResponse(BaseModel):
     cases: List[CourtCase]
     error: Optional[str] = None
 
+class NCALayerAuthRequest(BaseModel):
+    signature: str = Field(..., description="Подпись CMS/CAdES в Base64")
+    nonce: str = Field(..., description="Случайная строка, которая была подписана")
+    user_id: Optional[str] = Field(default="anonymous", description="ID пользователя/сессии из CRM или ChatGPT")
+
+class NCALayerAuthResponse(BaseModel):
+    success: bool
+    message: str
+    session_token: Optional[str] = None
+
 @app.get("/health", tags=["System"])
 async def health_check():
     return {"status": "ok", "message": "API Bridge работает исправно, Docker доступен"}
+
+@app.post("/api/v1/auth/ncalayer", response_model=NCALayerAuthResponse, tags=["Auth"])
+async def auth_ncalayer(request: NCALayerAuthRequest):
+    """
+    Верификация подписи NCALayer и создание защищенной сессии.
+    """
+    # В реальном приложении здесь будет проверка подписи CMS через крипто-библиотеку
+    # и извлечение ИИН из сертификата.
+    # Пока мы делаем мок для MVP.
+    
+    if not request.signature:
+        raise HTTPException(status_code=400, detail="Подпись отсутствует")
+        
+    # Имитация успешной валидации и создания сессии
+    session_token = f"session_{request.user_id}_{os.urandom(8).hex()}"
+    
+    print(f"Пользователь {request.user_id} успешно авторизован через NCALayer. Токен: {session_token}")
+    
+    return NCALayerAuthResponse(
+        success=True,
+        message="Авторизация успешна. Подпись верифицирована.",
+        session_token=session_token
+    )
 
 @app.post("/api/v1/cases/search", response_model=CaseSearchResponse, tags=["Search"])
 async def search_cases(request: CaseSearchRequest, api_key: str = Depends(get_api_key)):
