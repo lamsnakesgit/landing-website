@@ -1,0 +1,735 @@
+<!DOCTYPE html><html><head id="j_idt1">
+        <link rel="stylesheet" href="/resources/css/default-theme.css">
+        <meta charset="UTF-8">
+        <title>Сот кабинеті</title>
+        <meta name="viewport" content="width=device-width, user-scalable=no">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="false">
+        <link rel="stylesheet" href="/resources/css/google.css">
+        <link rel="stylesheet" href="/resources/css/position.css">
+        <link rel="stylesheet" href="/resources/css/main.css">
+        <link rel="stylesheet" href="/resources/jquery-ui/jquery-ui.css">
+        <link rel="stylesheet" href="/resources/selectize/selectize.min.css">
+        <link rel="stylesheet" href="/resources/selectize/selectize.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/resources/css/tab.css"><link type="text/css" rel="stylesheet" href="/org.richfaces.resources/javax.faces.resource/org.richfaces.staticResource/4.5.17.Final/PackedCompressed/DEFAULT/org.richfaces.css/skinning_classes.css"><script type="text/javascript" src="/javax.faces.resource/jsf.js.xhtml?ln=javax.faces"></script><script type="text/javascript" src="/org.richfaces.resources/javax.faces.resource/org.richfaces.staticResource/4.5.17.Final/PackedCompressed/org.richfaces/jquery.js"></script><script type="text/javascript" src="/org.richfaces.resources/javax.faces.resource/org.richfaces.staticResource/4.5.17.Final/PackedCompressed/packed/packed.js"></script><link type="text/css" rel="stylesheet" href="/org.richfaces.resources/javax.faces.resource/org.richfaces.staticResource/4.5.17.Final/PackedCompressed/DEFAULT/packed/packed.css"></head><body style="padding-top: 45px">
+        <link rel="stylesheet" href="/resources/css/components.css">
+        <span class="loader flex-center flex-col d-none">
+        <div class="flex pt-30 card loader-card flex flex-center" style="padding-bottom:20px; width: ; height: ; ">
+                <img src="/resources/img/load.gif" width="100px">
+                <p style="color: white">Күтіңіз. Сауал орындалуда...</p>
+        </div>
+        </span>
+        <header class="flex flex-center">
+            <div class="header-content flex flex-jc-between flex-ai-center">
+                <a href="/">
+        <div class="logo m-10 flex flex-jc-start flex-ai-center">
+            <img src="/resources/img/logo.png" width="43px" alt="#">
+            <div class="flex flex-col flex-jc-center flex-ai-start">
+                <p>ЖОҒАРҒЫ СОТ</p>
+                <span>СОТ КАБИНЕТІ</span>
+            </div>
+        </div>
+                </a>
+<form id="j_idt19:j_idt20" name="j_idt19:j_idt20" method="post" action="/index.xhtml" class="find-in-site-input-container ml-10" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt19:j_idt20" value="j_idt19:j_idt20">
+<select id="j_idt19:j_idt20:j_idt21" name="j_idt19:j_idt20:j_idt21" class="fytd selectized" size="1" onchange="mojarra.ab(this,event,'valueChange','@form',0)" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control fytd single"><div class="selectize-input items not-full"><input type="text" autocomplete="off" tabindex="" id="j_idt19:j_idt20:j_idt21-selectized" placeholder="Сайт бойынша іздеу" style="width: 149.062px;"></div><div class="selectize-dropdown single fytd" style="display: none; width: 400px; top: 32px; left: 0px;"><div class="selectize-dropdown-content"></div></div></div>
+            <i class="fa fa-search"></i><input type="hidden" name="j_idt19:j_idt20:j_idt25"><input type="submit" name="j_idt19:j_idt20:j_idt27" value="" style="display: none" class="submit"><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:0" value="-837998601160257438:-3823471748898814318" autocomplete="off">
+</form>
+        <script>
+            $(document).ready(function () {
+                $(".fytd").selectize({
+                    create: addQuestion,
+                    highlight: false,
+                    openOnFocus: false
+                });
+            })
+            function addQuestion(text) {
+                $(".newQuestion").value=text;
+                $(".submit").click();
+            }
+        </script>
+        <a href="https://sud.gov.kz" class="link-to-system ml-10 flex flex-ai-center flex-jc-center m-10" target="_blank">
+            <img class="m5" height="34px" src="/resources/img/logoSud.png">
+            <p class="secondory uppercase">ҚР Жоғарғы Сотының сайты</p>
+        </a>
+        <a href="https://t.me/smartsot_bot" class="link-to-system m-10 flex flex-ai-center flex-jc-center m-10" target="_blank">
+            <img class="m5" height="20px" src="/resources/img/icon-telegram.png">
+            <p class="primary uppercase">SMART-СОТ КӨМЕК</p>
+        </a>
+                    <div class="lang flex flex-center" style="padding: 0 10px">
+                        <a class="active" href="#" onclick="selectLanguageKk(window.location); return false;">ҚАЗ</a>|
+                        <a href="#" onclick="selectLanguageRu(window.location); return false;">РУС</a>
+                    </div>
+            </div>
+        </header>
+
+        <div class="full-width">
+            
+            
+            
+            
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+        </div>
+        <section class="flex flex-ai-center flex-jc-center flex-col">
+            <div class="content flex flex-col flex-jc-start flex-ai-center">
+        <style>
+            .services > a > .card {
+                justify-content: space-evenly;
+            }
+            .auth-form-container entryform {
+                width: auto;
+                margin: 0 auto;
+                border-collapse: collapse;
+            }
+        </style>
+        <div class="flex flex-col flex-ai-center flex-jc-start">
+                <div class="scrolled-container">
+                    <center>
+                        <div class="services flex flex-row flex-jc-start flex-ai-center" style="padding-left: 215px"><a href="/gis/index.xhtml">
+        <div type="vertical" class="flex pt-30 card flex-col flex-jc-start flex-ai-center" style="padding-bottom:20px; width: 170px; height: 240px; ">
+                                    <div>
+                                        <img src="/resources/img/courts-GIS.png" width="32px" height="32px">
+                                    </div>
+                                    <p>Соттар-GIS</p>
+        </div></a><a href="/legitimacy/index.xhtml">
+        <div type="vertical" class="flex pt-30 card flex-col flex-jc-start flex-ai-center" style="padding-bottom:20px; width: 170px; height: 240px; ">
+                                    <div>
+                                        <img src="/resources/img/legitimacy.png" width="32px" height="32px">
+                                    </div>
+                                    <p>Сот актісінің заңдылығын тексеру</p>
+        </div></a><a href="/courtDocuments/form.xhtml">
+        <div type="vertical" class="flex pt-30 card flex-col flex-jc-start flex-ai-center" style="padding-bottom:20px; width: 170px; height: 240px; ">
+                                    <div>
+                                        <img src="/resources/img/requests.svg" width="32px" height="32px">
+                                    </div>
+                                    <p>Шақырумен/хабарламамен танысу </p>
+        </div></a><a href="https://sud.gov.kz/rus/electronic-appointment">
+        <div type="vertical" class="flex pt-30 card flex-col flex-jc-start flex-ai-center" style="padding-bottom:20px; width: 170px; height: 240px; ">
+                                    <div>
+                                        <img src="/resources/img/appoinment.svg" width="32px" height="32px">
+                                    </div>
+                                    <p>Жеке қабылдауға жазылу</p>
+        </div></a><a href="/scheduleOfCases/index.xhtml">
+        <div type="vertical" class="flex pt-30 card flex-col flex-jc-start flex-ai-center" style="padding-bottom:20px; width: 170px; height: 240px; ">
+                                    <div>
+                                        <img src="/resources/img/charts.png" width="32px" height="32px">
+                                    </div>
+                                    <p>Сот істерін қарау кестелері</p>
+        </div></a>
+                        </div>
+                    </center>
+                </div>
+        <div class="flex pt-30 card " style="padding-bottom:20px; width: ; height: auto; margin-top: 30px;">
+                <div class="auth-form-container flex flex-col flex-ai-center" style="width: 900px">
+                    <h2>Сот кабинеті</h2><span style="text-align: center; color: #6E839C; font-style: italic; padding: 10px">Сот кабинеті Қазақстан Республикасы сот органдарының электрондық сервистеріне қол жеткізуге арналған бірыңғай терезе болып табылады.</span>
+                    <table width="500px">
+                        <tbody><tr>
+                            <td>
+                                <div class="tab flex flex-col flex-jc-center" style="width: 130px; margin-top: 20px">
+                                    <div id="tab-qr" class="tab-header-item">
+                                        <div class="tab-side-block" style="display:flex; flex-direction:column; align-items:center; margin-top:20px">
+                                            <div class="tab-side-image">
+                                                <img src="/resources/img/mobile/iPhone.jpg" style="width:160px; height:auto; object-fit:contain">
+                                            </div>
+                                            <div class="tab-side-text" style="margin-bottom:4px; font-weight:bold; text-align:center">
+                                                iPhone қолданбасын жүктеп алыңыз
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="tab flex flex-col flex-jc-center" style="width:300px; margin-top: 20px">
+                                    <div class="tab-header flex flex-row flex-jc-between">
+                                        <div id="tab-xin" class="tab-header-item active">ЖСН(БСН)/Құпия сөз</div>
+                                        <div id="tab-eds" class="tab-header-item">ЭЦҚ арқылы кіру</div>
+                                        <div id="tab-qr" class="tab-header-item" onclick="authByQr();">QR</div>
+                                    </div>
+                                    <div class="tab-content">
+                                        <div id="tab-xin-content" class="tab-content-item active">
+<form id="j_idt69:auth" name="j_idt69:auth" method="post" action="/index.xhtml" class="" enctype="application/x-www-form-urlencoded" style="margin: 20px; width: 320px">
+<input type="hidden" name="j_idt69:auth" value="j_idt69:auth">
+<span id="j_idt69:auth:j_idt74" class="flex flex-jc-center flex-ai-center flex-col"><input id="j_idt69:auth:xin" name="j_idt69:auth:xin" maxlength="12" style="width: 320px; margin: 8px" placeholder="ЖСН/БСН" type="email"><input id="j_idt69:auth:password" name="j_idt69:auth:password" value="" style="width: 320px; margin: 8px" placeholder="Құпия сөз" type="password"><span class="rf-msgs error" id="j_idt69:auth:j_idt77"></span>
+                                                    <div class="flex flex-row flex-wrap flex-ai-center mt-15 flex-jc-between w100"><input id="j_idt69:auth:j_idt80" name="j_idt69:auth:j_idt80" onclick="RichFaces.ajax(&quot;j_idt69:auth:j_idt80&quot;,event,{&quot;incId&quot;:&quot;1&quot;} );return false;" value="Кіру" class="button button-primary" type="submit">
+                                                        <a href="/registration/confirmPage.xhtml" class="button button-secondary">
+                                                            Тіркелу
+                                                        </a>
+                                                    </div>
+                                                    <a href="https://idp.egov.kz/idp/oauth/authorize?response_type=code&amp;client_id=office_sud&amp;redirect_uri=https://office.sud.kz/new/redirect.xhtml&amp;state=office_sud&amp;scope=user:basic:read&amp;lang=kk" class="flex flex-col flex-wrap flex-ai-center mt-15 flex-jc-center w100">
+                                                        <img src="/resources/img/egov.png" width="90px" style="padding: 5px">
+                                                            <p>арқылы кіріңіз</p>
+                                                    </a></span><span id="j_idt69:auth:j_idt88"><span style="display:none" class="rf-st-start"></span><span class="rf-st-stop"></span><script type="text/javascript">new RichFaces.ui.Status("j_idt69:auth:j_idt88",{"onstart":function(event){showLoader();},"onstop":function(event){hideLoader();}} )</script></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:1" value="-837998601160257438:-3823471748898814318" autocomplete="off">
+</form>
+                                        </div>
+                                        <div class="tab-content-item" id="tab-eds-content">
+<form id="j_idt69:j_idt90" name="j_idt69:j_idt90" method="post" action="/index.xhtml" class="flex flex-col flex-jc-center flex-ai-center" enctype="application/x-www-form-urlencoded" style="padding: 30px">
+<input type="hidden" name="j_idt69:j_idt90" value="j_idt69:j_idt90">
+
+      <input type="hidden" id="storagePath">
+      <input type="hidden" id="storageAlias">
+      <input type="hidden" id="keyAlias">
+      <input type="hidden" id="password">
+      <input type="hidden" id="keyType" value="SIGN">
+      <input type="hidden" id="xmlToSign0" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;&lt;loginInfoForSign xmlns:ns2=&quot;http://office.sud.kz&quot;&gt;7d76ff20-fb82-419e-87ac-f02b520d83d4&lt;/loginInfoForSign&gt;">
+      <input type="hidden" id="elementNameToSign0">
+      <div id="signPnlSignedXMLS" style="visibility: hidden;"><input id="j_idt69:j_idt90:j_idt91:signedXml" type="hidden" name="j_idt69:j_idt90:j_idt91:signedXml">
+      </div>
+      <script src="/resources/js/sign.js"></script>
+      <div id="signAppletLoadingPnl" class="region region-help alert alert-info" style="display: none;">
+         <section class="block block-system clearfix">
+            <p class="loading">Өтінеміз, апплет жүктелгенше күтіңіз... <span id="appletLoading1text">(Жүктелу уақыты шамамен 2 минут)</span><span id="appletLoading2text" style="display: none;">(Жүктелу уақыты шамамен 1 минут)</span></p>
+         </section>
+      </div>
+      <div id="signAppletErrorPnl" class="region region-help alert alert-danger" style="display: none;">
+         <section class="block block-system clearfix">Сізге жұмысты жалғастыру үшін  Java-ны орнату немесе ағымдағы нұсқасын жаңарту керек.
+         </section>
+      </div>
+      <div id="edsExpired" class="region region-help alert alert-danger color-red" style="display: none;">
+         <section class="block block-system clearfix">Сіздің сертификатыңыздың жарамдылық мерзімі өтіп кетті.
+         </section>
+      </div>
+      <div id="edsExpiredSoon" class="region region-help alert alert-danger color-red" style="display: none;">
+         <section class="block block-system clearfix">
+         </section>
+      </div>
+
+      <script type="text/javascript">
+         var cmpSelectCertStore;
+         $(document).ready(function () {
+            cmpSelectCertStore = document.getElementById('selectCertStore');
+         });
+      </script><span id="j_idt69:j_idt90:j_idt91:j_idt108" style="display: none;"><script type="text/javascript">sendToServer=function(){RichFaces.ajax("j_idt69:j_idt90:j_idt91:j_idt108",null,{"incId":"1"} )};</script></span>
+
+      <input type="button" value="Сертификатты таңдау" class="button button-primary" onclick="showLoader(); selectSignType(); return false;"><span id="j_idt69:j_idt90:j_idt111"><span style="display:none" class="rf-st-start"></span><span class="rf-st-stop"></span><script type="text/javascript">new RichFaces.ui.Status("j_idt69:j_idt90:j_idt111",{"onstart":function(event){showLoader();},"onstop":function(event){hideLoader();}} )</script></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:2" value="-837998601160257438:-3823471748898814318" autocomplete="off">
+</form>
+                                        </div>
+                                        <div class="tab-content-item" id="tab-qr-content">
+<form id="j_idt69:j_idt113" name="j_idt69:j_idt113" method="post" action="/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt69:j_idt113" value="j_idt69:j_idt113">
+<span id="j_idt69:j_idt113:j_idt114:pushTopics"><script type="text/javascript">RichFaces.push.setPushResourceUrl("/rfRes/org.richfaces.resource.PushResource.xhtml");RichFaces.push.setPushHandlerUrl("/__richfaces_push");RichFaces.jQuery(document.getElementById('j_idt69:j_idt113:j_idt114:pushTopics')).richpush({"push":function(event){return jsf.util.chain(this, event, 'addData(event.rf.data);','RichFaces.ajax(this,event,{"sourceId":this,"parameters":{"javax.faces.behavior.event":"dataavailable","org.richfaces.ajax.component":"j_idt69:j_idt113:j_idt114:pushTopics"} } )')}} );</script></span><span id="j_idt69:j_idt113:j_idt114:j_idt115" style="display: none;"><script type="text/javascript">authByQr=function(){RichFaces.ajax("j_idt69:j_idt113:j_idt114:j_idt115",null,{"incId":"1"} )};</script></span>
+        <div class="qr-form flex flex-jc-center flex-ai-center flex-col"><input id="j_idt69:j_idt113:j_idt114:signedXml" type="hidden" name="j_idt69:j_idt113:j_idt114:signedXml">
+
+            <h2>QR кодымен қол қою</h2>
+            <div id="qrcode"><canvas width="256" height="256"></canvas><img style="display: none;"></div>
+        </div>
+        <script>
+            $(document).ready(function (){
+                setQrImage();
+            });
+
+            function setQrImage(){
+                new QRCode(document.getElementById("qrcode"), "");
+            }
+            function addData(data) {
+                $("[id $= ':signedXml']").val(data[0]);
+                $("[id $= ':signedBlank']").val(data[1]);
+                sendToServer();
+                try {
+                    $("#qrSignModalDialog").modal("hide");
+                }catch (e){}
+            }
+        </script><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:3" value="-837998601160257438:-3823471748898814318" autocomplete="off">
+</form>
+                                        </div>
+                                        <div class="tab-content-item" id="tab-idp-content">
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="tab flex flex-col flex-jc-center" style="width:150px; margin-top: 20px">
+                                    <div id="tab-qr" class="tab-header-item">
+                                        <div class="tab-side-block" style="display:flex; flex-direction:column; align-items:center; margin-top:20px">
+                                            <div class="tab-side-image">
+                                                <img src="/resources/img/mobile/android.jpg" style="width:160px; height:auto; object-fit:contain">
+                                            </div>
+                                            <div class="tab-side-text" style="margin-bottom:4px; font-weight:bold; text-align:center">
+                                                Android қолданбасын жүктеп алыңыз
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody></table>
+                </div>
+        </div>
+        </div>
+            </div>
+
+        </section>
+
+        <script src="/resources/js/plugins.js"></script>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
+        <script src="/resources/js/bootstrap.min.js"></script>
+        <script type="application/javascript" src="/resources/js/scripts.js"></script>
+        <script type="application/javascript" src="/resources/js/selectize.min.js"></script>
+        <script type="application/javascript" src="/resources/jquery-ui/jquery-ui.js"></script>
+        <script type="application/javascript" src="/resources/js/datepicker-kk.js"></script>
+        <script type="application/javascript" src="/resources/js/datepicker-ru.js"></script>
+        <script type="application/javascript" src="/resources/js/maskedinput.js"></script>
+        <script type="application/javascript" src="/resources/js/qrcode.js"></script>
+<form id="f_l_temp" name="f_l_temp" method="post" action="/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="f_l_temp" value="f_l_temp">
+<span id="f_l_temp:js_temp_1" style="display: none;"><script type="text/javascript">selectLanguageRu=function(param1){RichFaces.ajax("f_l_temp:js_temp_1",null,{"incId":"1","begin":"$.cookie('locale', 'ru', {expires: 365, path: '\/'});","parameters":{"param1":param1} } )};</script></span><span id="f_l_temp:js_temp_2" style="display: none;"><script type="text/javascript">selectLanguageKk=function(param1){RichFaces.ajax("f_l_temp:js_temp_2",null,{"incId":"1","begin":"$.cookie('locale', 'kk', {expires: 365, path: '\/'});","parameters":{"param1":param1} } )};</script></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:4" value="-837998601160257438:-3823471748898814318" autocomplete="off">
+</form>
+        <script type="application/javascript" src="/resources/js/tab.js"></script>
+        <span>
+    <div id="feedbackModalDialog" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+<form id="j_idt132" name="j_idt132" method="post" action="/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt132" value="j_idt132">
+<div id="j_idt132:feedbackDialogPanel" style="width: 900px;" class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                        <strong>Пікірлер мен ұсыныстар</strong>
+                    </div>
+                    <div class="modal-body"><p style="text-align: justify;"><b>Құрметті келуші!</b><br>«Пікірлер мен ұсыныстар» тек қана соттардың ресми сайттарының жұмысын жақсарту үшін арналғандығына көңіліңізді бөлеміз. Шешілу тәртібі әкімшілік құқық бұзушылықтар туралы заңнамамен, қылмыстық-процессуалдық, азаматтық-процессуалдық және басқа да заңнамамен орнатылған азаматтардың жолданымдары, сондай-ақ анонимдік жолданымдар мен мәселенің мән-жайы көрсетілмеген жолданымдар қарастырылмайды. Соттар заңнаманы қолдану бойынша заңды кеңес бере алмайтындығын және нақты істің мәні бойынша кеңес беруге құқығы жоқ екендігін ескеруіңізді сұраймыз. Барлық пікірлер мен ұсыныстар сайтты дамыту кезінде ескеріледі.</p><p class="note">Сот кабинетінің жұмысына байланысты туындаған сұрақтар бойынша Техникалық қолдау қызметінің <a href="mailto:office@sud.kz">office@sud.kz</a> электрондық адресіне жазу керек</p>
+
+                        <div class="pure-form pure-form-stacked">
+                            <legend></legend><label for="j_idt132:user-fio" style="display: inline-block" class="needAddRedStar">Т.А.Ә.</label><span class="rf-msg " id="j_idt132:j_idt139"></span><input id="j_idt132:user-fio" type="text" name="j_idt132:user-fio" class="form-control form-text" maxlength="255" style="width: 100%;"><label for="j_idt132:user-email" style="display: inline-block" class="needAddRedStar">E-mail</label><span class="rf-msg " id="j_idt132:j_idt142"></span><input id="j_idt132:user-email" type="text" name="j_idt132:user-email" class="form-control form-text" maxlength="255" style="width: 100%;"><label for="j_idt132:feedback" style="display: inline-block" class="needAddRedStar">Хабарлама</label><span class="rf-msg " id="j_idt132:j_idt144"></span><textarea id="j_idt132:feedback" name="j_idt132:feedback" class="form-control form-text" rows="4" style="width: 100%; height: inherit;"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer"><span id="j_idt132:sendErrorMessage" style="padding-right: 10px;"></span><input id="j_idt132:j_idt147" name="j_idt132:j_idt147" onclick="jsf.util.chain(this,event,&quot;hideFeedbackModalDialog(); return false;&quot;,&quot;RichFaces.ajax(\&quot;j_idt132:j_idt147\&quot;,event,{\&quot;incId\&quot;:\&quot;1\&quot;} )&quot;);return false;" value="Болдырмау" class="pure-button" type="submit"><input id="j_idt132:j_idt148" name="j_idt132:j_idt148" onclick="RichFaces.ajax(&quot;j_idt132:j_idt148&quot;,event,{&quot;incId&quot;:&quot;1&quot;} );return false;" value="Жіберу" class="pure-button pure-button-primary" type="submit">
+                    </div>
+                </div></div><span id="j_idt132:afterSendFeedbackPanel">
+                <script type="text/javascript">
+                    function afterSendFeedback() {
+                        if(true) {
+                            if(true) {
+                                hideFeedbackModalDialog();
+                                showSendFeedbackAlert();
+                            }
+                        }
+                    }
+                </script></span><span id="j_idt132:j_idt151"><span style="display:none" class="rf-st-start"></span><span class="rf-st-stop"></span><script type="text/javascript">new RichFaces.ui.Status("j_idt132:j_idt151",{"onstart":function(event){showLoadingPnl();},"onstop":function(event){hideLoadingPnl();}} )</script></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:5" value="-837998601160257438:-3823471748898814318" autocomplete="off">
+</form>
+    </div>
+    <div id="sendFeedbackAlert" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">Пікіріңіз үшін рақмет
+                </div>
+                <div class="modal-footer">
+                    <input type="button" value="OK" class="pure-button pure-button-primary" onclick="hideSendFeedbackAlert(); return false;">
+                </div>
+            </div>
+        </div>
+    </div>
+<form id="j_idt155" name="j_idt155" method="post" action="/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt155" value="j_idt155">
+<span id="j_idt155:j_idt156" style="display: none;"><script type="text/javascript">showFeedbackModalDialog=function(){RichFaces.ajax("j_idt155:j_idt156",null,{"incId":"1"} )};</script></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:6" value="-837998601160257438:-3823471748898814318" autocomplete="off">
+</form>
+    <script type="text/javascript">
+        function hideFeedbackModalDialog() {
+            $('#feedbackModalDialog').modal('hide');
+        }
+
+        function showSendFeedbackAlert() {
+            $('#sendFeedbackAlert').modal('show');
+        }
+
+        function hideSendFeedbackAlert() {
+            $('#sendFeedbackAlert').modal('hide');
+        }
+
+        $(document).ready(function () {
+            $('#feedbackModalDialog').modal({
+                backdrop: 'static',
+                show: false
+            }).on('shown.bs.modal', function() {$("#feedbackModalDialog").find(".needAddRedStar").append("<span class='form-required' title='Толтырылуы міндетті жол.'\> *</span>");});
+            $('#sendFeedbackAlert').modal({
+                backdrop: 'static',
+                show: false
+            });
+        });
+    </script>
+    <style>
+        .letter{
+
+        }
+        .letter p{
+            margin: 0px;
+            text-indent: 32px;
+            line-height: 1.4;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+    </style>
+    <div id="letterModalDialog" class="modal fade" style="display: none; z-index: 999999;">
+<form id="j_idt159" name="j_idt159" method="post" action="/index.xhtml" class="mmodal" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt159" value="j_idt159">
+<span id="j_idt159:letterModalDialogPanel">
+                <div class="modal-body">
+                    <div class="letter">
+                        <p>Бауырлар, амансыздар ма!</p>
+                        <p>Бұл хаттың себебі – әрбіреуіңе ортақ бір мәселе. Ол ағаның сендерге қалдырған мұрасы. Бірден айтайын, араласуға менің ешқандай қақым жоқ. Менікі – тек ой бөліссем, ақыл қоссам деген шын ниет.</p>
+                        <p>Марқұм ағам өмір бойы адал еңбек етті. Балаларым үшін деп тыным таппай жүгіріп жүретін. Жұмыс-жұмыс деп, тіпті денсаулығына да қараған жоқ. Маңдай терімен артына біраз дүние жинап кетті. Бизнесі бар. Еңбегінің қызығын көретін кезде қайтыс болғаны өте өкінішті, әрине.</p>
+                        <p>Енді қайтқанына жарты жыл болып қалды. Тірі адам тіршілігін жасай береді ғой. Наследство деген мәселе тұр алдарыңда. Бұл таза ішкі сұрақтарың. Соны ақылмен, адамгершілікпен, әділ шешесіңдер деген сенімдемін.</p>
+                        <p>Жалғыз өтінішім – сол мүліктің соңында жүріп, ағамның атына кір келтіріп алмайықшы. Әке-шешелеріңіздің әруағы тыныш болсын.</p>
+                        <p>Ертең араларың бүлініп жатса, ұяты сендерге де, маған да келеді. «Сен неге қарамадың, неге айтпадың? Туыстығыңды көрсетіп, неге жол сілтемедің?» дейді ғой жұрт.</p>
+                        <p>Тағы айтайын, араласуға ешқандай правам жоқ. Бірақ, «жоқ, өзіміз шеше алмаймыз, бізге ақыл қосатын адам керек» десеңіздер, қолдауға, көмектесуге, сөйлесуге, ақылдасуға дайынмын. Әрине, бәріңіз оған келісіп жатсаңыздар.</p>
+                        <p>Мұның барлығын осы әулетке жақын, жанашыр адам ретінде айтып отырмын. Қандай сұрақ болса да ақылмен, сабырмен шешкен дұрыс қой. Ешқайсымыз сол дүниені өзімізбен бірге алып кетпейміз. Оның бәрі ертең қалады. Бес күндік өмірде сыйластық, бауырластықтан қымбат нәрсе жоқ. Соны есте ұстайық бәріміз.</p>
+                        <p>Ал, «жоқ, өзіміз шешеміз, ешқандай проблема жоқ, бір бітімге, бір келісімге келеміз» деп жатсаңыздар, тіпті жақсы. Онда менде де еш уайым болмайды.</p>
+                        <p>Тағы айтайын, ешбір дүние бауырдан артық емес. Бүгін бастарың піспей қалса, оның зардабын ертең өздерің көресіңдер, балалар көреді. Араласуды қояды. Сонда немерелерге қандай өнеге көрсетеміз?</p>
+                        <p>Құдалар да әулеттегі жағдайды көріп, ойланып қалады ғой. «Мыналар ұйымшыл емес екен, ағайын болса да араздасып жүргені несі» дейді. Күйеу балалар, болашақ келіндер де сылтау қылып, «бізді сөккенше, өздерін жөндеп алмай ма?» десе қайтеміз. Көзге көрініп тұрған нәрсені айтпайды емес, айтады.</p>
+                        <p>Осылай тура айтып отырғаныма ренжімеңіздер. Екінші жағынан, оны айтпай, бұғып қалсам, «сырт көз – сыншы, кезінде неге ескертпедің?» деген өкпе болуы мүмкін ғой.</p>
+                        <p>Бар тілегім – ағайын тату болса, бір-бірлеріңе деген бұрынғыдай қамқорлық үзілмесе, бәрімізге де жақсы болар еді. Кіші інілеріңді де ойлағанымыз жөн. Жағдайлары онша мәз емес, оны білесіздер.</p>
+                        <p>Айтқанымды таразылап, ортаға салып, ақылмен, байыппен, шыдаммен шешесіңдер деп сенемін.</p>
+                        
+                    </div>
+                </div>
+                <div class="mline"><input id="j_idt159:j_idt163" name="j_idt159:j_idt163" onclick="jsf.util.chain(this,event,&quot;hideLetterModalDialog(); return false;&quot;,&quot;RichFaces.ajax(\&quot;j_idt159:j_idt163\&quot;,event,{\&quot;incId\&quot;:\&quot;1\&quot;} )&quot;);return false;" value="Жабу" class="btn btn-default" style="float: right; margin-left: 8px" type="button">
+                    <a href="/resources/files/letter.docx" class="btn btn-default">Басып шығару</a>
+                </div></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:7" value="-837998601160257438:-3823471748898814318" autocomplete="off">
+</form>
+
+    </div>
+
+    <script type="text/javascript">
+        function showLetterModalDialog() {
+            $('#letterModalDialog').modal('show');
+        }
+
+        function hideLetterModalDialog() {
+            $('#letterModalDialog').modal('hide');
+        }
+
+        // $(document).ready(function () {
+        //     $('#letterModalDialog').modal({
+        //         backdrop: 'static',
+        //         show: false
+        //     }).on('shown.bs.modal', function () {
+        //         if (true) {
+        //             $("#letterModalDialog").find(".needAddRedStar").append("<span class='form-required' title='Толтырылуы міндетті жол.'\> *</span>");
+        //         }
+        //     });
+        // });
+
+    </script>
+    <style>
+        .statement{
+
+        }
+        .statement p{
+            margin: 0px;
+            text-indent: 32px;
+            line-height: 1.4;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+    </style>
+    <div id="statementModalDialog" class="modal fade" style="display: none; z-index: 999999;">
+<form id="j_idt167" name="j_idt167" method="post" action="/index.xhtml" class="mmodal" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt167" value="j_idt167">
+<span id="j_idt167:statementModalDialogPanel">
+                <div class="modal-body">
+                    <div class="statement">
+                        <p>Справедливость в <b>гражданском процессе.</b></p>
+                        <p>Не так оформил иск, не подал встречный, указал не ту норму, что-то не приложил, разводим руками: «это ваше процессуальное упущение». Ошибся в мелочи, всё - спорить бесполезно. Получается, цель суда – формально соблюсти ГПК, а не решить спор.</p>
+                        <p>А как в Германии? Судья ведёт беседу с истцом и ответчиком и узнаёт - кто чего хочет. Допустим, иск не так написан, нет доказательств или иск должен быть к иному лицу. Судья об этом говорит и делает всё, чтобы решить спор. У наших судей таких прав нет. Он ограничен рамками иска и пассивен. Оценивает, что дали стороны и никаких инициатив.</p>
+                        <p>Другая «беда». «Лабиринт» процедур. Пройдя «круги ада» нашей бюрократии и даже выиграв дело - будут ли считать такое мытарство справедливым?</p>
+                        <p>Одна женщина писала в Фейсбуке, как судилась в Англии. Подала иск онлайн. Простенькая форма: имя - адрес - суть иска - согласна ли на медиацию. Согласилась. Позвонил медиатор и уточнил требования. Затем он переговорил с ответчиком.</p>
+                        <p>Полчаса и спор решён. Медиатор скинул на емэйл одобренное сторонами соглашение, а копию - в суд. Не надо никуда идти, ничего подписывать. Всё удивительно просто, и, главное, по-человечески.</p>
+                        <p>Во вторник был в Сарыаркинском суде. Судьи просили дать им процессуальную активность, чтобы сами могли докопаться до истины. Стыдно перед людьми, говорят. В их глазах – мы формалисты.</p>
+                        <br>
+                        <p><b>КАМЕНЬ ТРЕТИЙ - ЭФФЕКТИВНОСТЬ ПРАВОСУДИЯ.</b></p>
+                        <p>Азаматтық істер қатты көбейіп келеді. 5 жылда 2 есе. 2013 жылы 560 мың іс болса, былтыр 900 мың.</p>
+                        <p>Алматының Әуезов ауданында бір судья күніне 12 іс пен материал қарапты. Төрт жылда жүктеме 3 есе өсті. Судьялар қағазға көмілуде. Адам тағдырын конвейерге айналдырсақ, сапа қайдан болсын?</p>
+                        <p>Әр іс бойынша кемінде екі тарап. Сонда 2 млндай адам сот әуресінде жүр. Оған сот аппаратын, прокурорларды, адвокаттарды, эксперттерді, сот орындаушыларды қосыңыз. Бұл бюджетке үлкен салмақ. Дамуымызға үлкен кедергі.</p>
+                        <p>Арызданып жүргендер бала-шаға, қалшылдаған қарт емес. Көбісі бизнес жасап, жұмыс орындарын ашып, елге пайда келтіріп жүргендер. Кәсібін ысырып қойып, алтын уақыттарын соттасуға жұмсауда.</p>
+                        <p>Біреу меншігін даулайды, екіншісі қарызын талап етеді, үшіншісі еңбекақысын өндіргісі келеді. Үйдегі проблемасын сотта шешемін деушілер де көп - ағасы інісімен, әкесі баласымен соттасып жатқан жағдай аз емес. Кәсіпкерден «жағдай қалай?» деп сұрай қалсаң, соттасып жатырмын дегенді жиі естисің.</p>
+                        <p>Сонда қалай, табиғатынан сабырлы, жанжалды жақтырмайтын халқымыз дауға құмар болып кеткені ме? Басымыз піспей қалса, дереу сотқа жүгіреміз. Қит етсек сол. Екі арадағы дауды сот аренаға шығарып, айқай-шумен шешкіміз келеді. Бітімге келу, татуласу, келісу мәдениетіміз қайда жоғалып кетті?</p>
+                        <p>Сотқа арызды бермей жатып, таныс іздей бастаймыз. «Сотта ағам бар, көкем бар» деп қорқытамыз. Сондағы мақсат - әділдік емес, оппоненттен өш алу, абыройын айрандай төгу.</p>
+                        <p>Сондықтан Елбасымыз дамуымызға кедергі болатын осындай жағымсыз әдеттерден құтылуымыз қажет деп шегелеп айтқан. Рухани жаңғырамыз десек, соның негізгі бір шарты осы.</p>
+                        <p>Әрине, даулар кез-келген қоғамда бар. Бірақ, олардың барлығын сотта шешу мүмкін емес. Сот екі жақты бірдей қанағаттандыра алмайды.</p>
+                        <p>Ең тиімді жол - дауды сотсыз шешетін институттарды дамыту. 2017 жылы бітіммен аяқталған даулардың үлесі 4-ақ пайыз. Бірақ, оған да сені қиын. Өйткені, статистикада жалғандық көп.</p>
+                        <p>Тараптарды бітімге келтіру - біз үшін жаңалық емес. Билер сотының түпкі мақсаты - екі жақты татуластыру, табыстыру болған. «Дау мұраты - біту» деген нақыл сөз осыдан қалған.</p>
+                        <p>Екінші жағынан, бұл әлемдік тренд. Дамыған елдерде тартысты шешетін балама институттар көп.</p>
+                        <p>АҚШ-та, дамыған елдерде даудың көбісі соттан тыс жерде шешіледі. Қытайда таластардың 30%, Словенияда 40% бітіммен соттың өзінде аяқталады.</p>
+                        <p>Дауды тек сот шешеді деген көзқарас бізде қатып қалған. Кейде басында ашуға беріліп, сотқа жүгініп, кейін басылып, «қатты кеткен жоқпын ба, алдыма келсе шешу жолын іздер едім қой» деп жатамыз.</p>
+                        <p>Соттар осындай бейбіт жолды көрсететін, ұрыс-керіссіз, бір-бірін тыңдап, бір мәмілеге келуіне жағдай жасайтын алтын көпір болуы тиіс. Сот, әкімдер, Ассамблея, партиялар болып осыны қолға алсақ.</p>
+                        <p>Қай кезде де сөзге тоқтаған халықпыз ғой. Бітімнің, татуласудың бар пайдасын жылы, сүйегіне өтетіндей, жүрегіне жететіндей сөздермен айтып үйренсек, онда қоғамда шағым да азаяды, жалпы ахуал да жақсарады. Соттасып, тартысып, араздасып жүрген адамдарда қандай көңіл болсын?</p>
+                        <p>Осының барлығын не үшін айтып отырмын?</p>
+                        <p>Отырысқа облыс әкімдерінің орынбасарлары қатысып отыр. Сіздерге өтініш - айтысып жүрген ағайындарымызды компромисске келтіретін, бітімге шақыратын, оның артықшылығын, ұтымды жағын ашып көрсететін, сотқа жеткізбей татуластыратын бір тиімді орын жасасақ. Оған мықты мамандарды дайындасақ - медиатор, психолог, конфликтолог, отставкадағы судьяларды және сөзге шешен, ойы жүйрік, халықпен тікелей сөйлесе білетін, тілін табатын, көндіре алатын тұлғаларды тартсақ.</p>
+                        <p>Мың адамға шаққанда даудың көбісі Алматы, Астана, Орал, Қарағанды, Павлодарда. Шымкентте даулар Алматыға қарағанда 5 есе аз екен.</p>
+                        <p>«Жұмыла көтерген жүк жеңіл» дегендей, бар күшімізді осыған салсақ. Сонда дау да қысқарады, билікке де өкпе азаяды, соттарға да сенім өседі.</p>
+                    </div>
+                </div>
+                <div class="mline"><input id="j_idt167:j_idt172" name="j_idt167:j_idt172" onclick="jsf.util.chain(this,event,&quot;hideStatementModalDialog(); return false;&quot;,&quot;RichFaces.ajax(\&quot;j_idt167:j_idt172\&quot;,event,{\&quot;incId\&quot;:\&quot;1\&quot;} )&quot;);return false;" value="Жабу" class="btn btn-default" style="float: right; margin-left: 8px" type="button">
+                    <a href="/resources/files/statement.docx" class="btn btn-default">Басып шығару</a>
+                </div></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:8" value="-837998601160257438:-3823471748898814318" autocomplete="off">
+</form>
+
+    </div>
+
+    <script type="text/javascript">
+        function showStatementModalDialog() {
+            $('#statementModalDialog').modal('show');
+        }
+
+        function hideStatementModalDialog() {
+            $('#statementModalDialog').modal('hide');
+        }
+    </script>
+    <div id="qrCodeModalDialog" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+<form id="j_idt179" name="j_idt179" method="post" action="/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt179" value="j_idt179">
+<div id="j_idt179:qrCodeModalDialogPanel" style="width: 650px;" class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="pure-form pure-form-stacked">
+                            <img src="/resources/img/qr-code-A4.png" style="width: 600px; ">
+                        </div>
+                    </div>
+                    <div class="modal-footer"><input id="j_idt179:j_idt183" name="j_idt179:j_idt183" onclick="jsf.util.chain(this,event,&quot;hideQrCodeModalDialog(); return false;&quot;,&quot;RichFaces.ajax(\&quot;j_idt179:j_idt183\&quot;,event,{\&quot;incId\&quot;:\&quot;1\&quot;} )&quot;);return false;" value="Болдырмау" class="pure-button" type="submit">
+                    </div>
+                </div></div><span id="j_idt179:j_idt185"><span style="display:none" class="rf-st-start"></span><span class="rf-st-stop"></span><script type="text/javascript">new RichFaces.ui.Status("j_idt179:j_idt185",{"onstart":function(event){showLoadingPnl();},"onstop":function(event){hideLoadingPnl();}} )</script></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:9" value="-837998601160257438:-3823471748898814318" autocomplete="off">
+</form>
+    </div>
+<form id="j_idt187" name="j_idt187" method="post" action="/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt187" value="j_idt187">
+<span id="j_idt187:j_idt188" style="display: none;"><script type="text/javascript">showQrModalDialog=function(){RichFaces.ajax("j_idt187:j_idt188",null,{"incId":"1"} )};</script></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:10" value="-837998601160257438:-3823471748898814318" autocomplete="off">
+</form>
+    <script type="text/javascript">
+        function hideQrCodeModalDialog() {
+            $('#qrCodeModalDialog').modal('hide');
+        }
+
+        $(document).ready(function () {
+            $('#qrCodeModalDialog').modal({
+                backdrop: 'static',
+                show: false
+            }).on('shown.bs.modal', function() {$("#qrCodeModalDialog").find(".needAddRedStar").append("<span class='form-required' title='Толтырылуы міндетті жол.'\> *</span>");});
+
+        });
+    </script>
+    <div id="availabilityCourtCasesModal" class="modal fade">
+<form id="j_idt191" name="j_idt191" method="post" action="/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt191" value="j_idt191">
+<span id="j_idt191:j_idt192"><span style="display:none" class="rf-st-start"></span><span class="rf-st-stop"></span><script type="text/javascript">new RichFaces.ui.Status("j_idt191:j_idt192",{"onstart":function(event){showLoadingPnl();},"onstop":function(event){hideLoadingPnl();}} )</script></span><div id="j_idt191:availabilityCourtCasesModalPanel" class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header"><span style="font-size: 18px; font-weight: bold;">Сот істері және материалдардың бар болуын тексеру</span>
+                    </div>
+                    <div class="modal-body">
+                            <div class="form-wrapper form-group">
+                                <div class="form-type-textfield form-item form-group"><label for="j_idt191:xinHid" class="needAddRedStar">ЖСН</label><span class="rf-msg " id="j_idt191:j_idt199"></span><input id="j_idt191:xinHid" type="text" name="j_idt191:xinHid" class="form-control">
+                                </div>
+                            </div>
+                    </div>
+                    <div class="modal-footer"><input id="j_idt191:j_idt222" name="j_idt191:j_idt222" onclick="RichFaces.ajax(&quot;j_idt191:j_idt222&quot;,event,{&quot;incId&quot;:&quot;1&quot;} );return false;" value="Жабу" class="btn btn-default" type="submit"><input id="j_idt191:j_idt223" name="j_idt191:j_idt223" onclick="RichFaces.ajax(&quot;j_idt191:j_idt223&quot;,event,{&quot;incId&quot;:&quot;1&quot;} );return false;" value="Тексеру" class="btn btn-primary" type="submit"><span id="j_idt191:j_idt224" style="display: none;"><script type="text/javascript">reRender=function(){RichFaces.ajax("j_idt191:j_idt224",null,{"incId":"1"} )};</script></span><span id="j_idt191:j_idt225" style="display: none;"><script type="text/javascript">backAction=function(){RichFaces.ajax("j_idt191:j_idt225",null,{"incId":"1"} )};</script></span>
+                    </div>
+                </div></div><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:11" value="-837998601160257438:-3823471748898814318" autocomplete="off">
+</form>
+    </div>
+
+    <script type="text/javascript">
+        function availabilityCourtCasesModalShow() {
+            $('#availabilityCourtCasesModal').modal('show');
+        }
+
+        function availabilityCourtCasesModalHide() {
+            $('#availabilityCourtCasesModal').modal('hide');
+        }
+
+        $(document).ready(function () {
+            $('#availabilityCourtCasesModal').modal({
+                backdrop: 'static',
+                show: false
+            }).on('shown.bs.modal', function () {
+
+                hideLoadingPnl();
+            });
+        });
+
+        function updateNeedAddRedStar() {
+            $(".needAddRedStar:not(:has('span.form-required'))").append("<span class='form-required' title='Толтырылуы міндетті жол.'\> *</span>");
+        }
+    </script>
+    <div id="mediationAsnwerDialog" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+<form id="j_idt229" name="j_idt229" method="post" action="/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt229" value="j_idt229">
+
+            <style>
+                .modal-body table tr td{
+                    padding-left: 16px;
+                }
+            </style><div id="j_idt229:mediationAsnwerDialogPanel" class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">Вы уверены, что не хотите Медиацию?
+                    </div>
+                    <div class="modal-body"><table id="j_idt229:j_idt236" style="padding: 16px">
+	<tbody><tr>
+<td>
+<input type="radio" checked="checked" name="j_idt229:j_idt236" id="j_idt229:j_idt236:0" value="DONT_KNOW" onclick="RichFaces.ajax(this,event,{&quot;sourceId&quot;:this,&quot;parameters&quot;:{&quot;javax.faces.behavior.event&quot;:&quot;valueChange&quot;,&quot;org.richfaces.ajax.component&quot;:&quot;j_idt229:j_idt236&quot;} } )"><label for="j_idt229:j_idt236:0"> Медиация не екенің білмеймін</label></td>
+<td>
+<input type="radio" name="j_idt229:j_idt236" id="j_idt229:j_idt236:1" value="NOT_TRUST" onclick="RichFaces.ajax(this,event,{&quot;sourceId&quot;:this,&quot;parameters&quot;:{&quot;javax.faces.behavior.event&quot;:&quot;valueChange&quot;,&quot;org.richfaces.ajax.component&quot;:&quot;j_idt229:j_idt236&quot;} } )"><label for="j_idt229:j_idt236:1"> Медиаторға сенбеймін</label></td>
+<td>
+<input type="radio" name="j_idt229:j_idt236" id="j_idt229:j_idt236:2" value="TRUST_THE_COURT" onclick="RichFaces.ajax(this,event,{&quot;sourceId&quot;:this,&quot;parameters&quot;:{&quot;javax.faces.behavior.event&quot;:&quot;valueChange&quot;,&quot;org.richfaces.ajax.component&quot;:&quot;j_idt229:j_idt236&quot;} } )"><label for="j_idt229:j_idt236:2"> Сотқа сенемін</label></td>
+	</tr>
+</tbody></table><table>
+	<tbody><tr>
+	</tr>
+</tbody></table>
+                    </div>
+                    <div class="modal-footer"><span class="rf-msgs errorMsg" id="j_idt229:j_idt239"></span><input id="j_idt229:j_idt240" name="j_idt229:j_idt240" onclick="RichFaces.ajax(&quot;j_idt229:j_idt240&quot;,event,{&quot;incId&quot;:&quot;1&quot;} );return false;" value="Ары қарай" class="btn btn-primary" type="submit">
+                    </div>
+                </div></div><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:12" value="-837998601160257438:-3823471748898814318" autocomplete="off">
+</form>
+    </div>
+    <script type="text/javascript">
+        function goNextRequest() {
+            if(true){
+                sendRequest();
+                return false;
+            }
+        }
+        function showmediationAsnwerDialog() {
+            $('#mediationAsnwerDialog').modal('show');
+        }
+
+        function hidemediationAsnwerDialog() {
+            $('#mediationAsnwerDialog').modal('hide');
+        }
+        $(document).ready(function () {
+            $('#mediationAsnwerDialog').modal({
+                backdrop: 'static',
+                show: false
+            });
+        });
+    </script>
+    <div id="edsConnectionError" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body"><span style="font-size: 14px; color: red; font-weight: bold;">NCALayer қосылу кезінде қателік туындады.&lt;br/&gt;Бағдарламаның қосылғанын тексеріп, қайта көріңіз.</span>
+                </div>
+                <div class="modal-footer">
+                    <input type="button" value="OK" class="button button-primary" onclick="hideEdsConnectionError(); return false;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function showEdsConnectionError() {
+            $('#edsConnectionError').modal('show');
+        }
+
+        function hideEdsConnectionError() {
+            $('#edsConnectionError').modal('hide');
+        }
+
+        $(document).ready(function () {
+            $('#edsConnectionError').modal({
+                backdrop: 'static',
+                show: false
+            });
+        });
+    </script>
+    
+    
+    
+    
+    <div id="videoDialog" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" style="max-width: 90%; width: 1200px;">
+            <div class="modal-content">
+                <div class="modal-body" id="video-container"></div>
+                <div class="modal-footer"><input id="j_idt248" name="j_idt248" onclick="jsf.util.chain(this,event,&quot;hideVideoDialog(); return false;&quot;,&quot;RichFaces.ajax(\&quot;j_idt248\&quot;,event,{\&quot;incId\&quot;:\&quot;1\&quot;} )&quot;);return false;" value="Жабу" class="btn btn-default" type="submit">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function showVideoDialog() {
+            var html = '<iframe id="video-frame" width="557" height="320" src="" frameborder="0"></iframe>';
+            $(html).appendTo('#video-container');//добавляем видео
+
+            var caption = "";
+            var sourceUrl = "";
+            if(caption || sourceUrl) {//если есть Заголовок или Источник, то надо добавить div заголовка
+                var div = '<div class="modal-header" id="video-header"></div>';
+                $(div).insertBefore('#video-container');
+                if(caption) {
+                    $('<span>' + caption + '</span>').appendTo('#video-header');
+                }
+                if(sourceUrl) {
+                    $('<span class="video-dialog-header-source"><a href="' + sourceUrl                             + '" target="_blank">Дереккөзі</a></span>').appendTo('#video-header');
+                }
+            }
+
+            $('#videoDialog').modal('show');
+        }
+
+        $(document).ready(function () {
+            $('#videoDialog').modal({
+                backdrop: 'static',
+                show: false
+            });
+        });
+    </script>
+    <div id="foundErrorModal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+<form id="j_idt254" name="j_idt254" method="post" action="/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt254" value="j_idt254">
+<div id="j_idt254:foundErrorModalPanel" class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="flex w100 flex-col flex-jc-start"><span id="j_idt254:j_idt257:cause" style="width: " class="select-one-item-panel "><label for="j_idt254:j_idt257:cause-filed" class="">Қатені сипаттаңыз</label><textarea name="j_idt254:j_idt257:j_idt258"></textarea></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer"><input id="j_idt254:j_idt261" name="j_idt254:j_idt261" onclick="jsf.util.chain(this,event,&quot;hideFoundErrorModal(); return false;&quot;,&quot;RichFaces.ajax(\&quot;j_idt254:j_idt261\&quot;,event,{\&quot;incId\&quot;:\&quot;1\&quot;} )&quot;);return false;" value="Болдырмау" class="btn btn-default" type="submit"><input id="j_idt254:j_idt262" name="j_idt254:j_idt262" onclick="RichFaces.ajax(&quot;j_idt254:j_idt262&quot;,event,{&quot;incId&quot;:&quot;1&quot;} );return false;" value="Жіберу" class="btn btn-primary" type="submit">
+                    </div>
+                </div></div><span id="j_idt254:j_idt264"><span style="display:none" class="rf-st-start"></span><span class="rf-st-stop"></span><script type="text/javascript">new RichFaces.ui.Status("j_idt254:j_idt264",{"onstart":function(event){showLoader();},"onstop":function(event){hideLoader();}} )</script></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:13" value="-837998601160257438:-3823471748898814318" autocomplete="off">
+</form>
+    </div>
+    <script type="text/javascript">
+        function showFoundErrorModal() {
+            $('#foundErrorModal').modal('show');
+        }
+
+        function hideFoundErrorModal() {
+            $('#foundErrorModal').modal('hide');
+        }
+
+        $(document).ready(function () {
+            $('#foundErrorModal').modal({
+                backdrop: 'static',
+                show: false
+            })
+        });
+    </script>
+    <button class="button button-primary" style="position: fixed; right: 30px; bottom: 50px" onclick="showFoundErrorModal()">
+        Қате таптыңыз ба?
+    </button>
+        </span><script type="text/javascript">RichFaces.jQuery(document).ready(function() {
+new RichFaces.ui.Message("j_idt69:auth:j_idt77",{"globalOnly":true,"isMessages":true} )
+new RichFaces.ui.Message("j_idt132:j_idt139",{"forComponentId":"j_idt132:user\u002Dfio","showSummary":false,"showDetail":true} )
+new RichFaces.ui.Message("j_idt132:j_idt142",{"forComponentId":"j_idt132:user\u002Demail","showSummary":false,"showDetail":true} )
+new RichFaces.ui.Message("j_idt132:j_idt144",{"forComponentId":"j_idt132:feedback","showSummary":false,"showDetail":true} )
+new RichFaces.ui.Message("j_idt191:j_idt199",{"forComponentId":"j_idt191:xinHid","showSummary":false,"showDetail":true} )
+new RichFaces.ui.Message("j_idt229:j_idt239",{"globalOnly":true,"isMessages":true} )
+});
+</script></body></html>

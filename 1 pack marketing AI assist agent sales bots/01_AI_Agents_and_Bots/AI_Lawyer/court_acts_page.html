@@ -1,0 +1,1013 @@
+<!DOCTYPE html><html><head><meta http-equiv="origin-trial" content="A7vZI3v+Gz7JfuRolKNM4Aff6zaGuT7X0mf3wtoZTnKv6497cVMnhy03KDqX7kBz/q/iidW7srW31oQbBt4VhgoAAACUeyJvcmlnaW4iOiJodHRwczovL3d3dy5nb29nbGUuY29tOjQ0MyIsImZlYXR1cmUiOiJEaXNhYmxlVGhpcmRQYXJ0eVN0b3JhZ2VQYXJ0aXRpb25pbmczIiwiZXhwaXJ5IjoxNzU3OTgwODAwLCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><script type="text/javascript" async="" charset="utf-8" src="https://www.gstatic.com/recaptcha/releases/TnA7HacJFoBWt9hnlunBlYfK/recaptcha__en.js" crossorigin="anonymous" integrity="sha384-r0+0DCYB9Tdq4Rpy9IvL6ouvcnluWOWNg9jAIO3yJA2C6v7nklWcHe/NE5zIDHbA"></script><script src="https://www.google.com/recaptcha/api.js"></script>
+        <link rel="stylesheet" href="/resources/css/default-theme.css">
+        <meta charset="UTF-8">
+        <title>Сот кабинеті</title>
+        <meta name="viewport" content="width=device-width, user-scalable=no">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="false">
+        <link rel="stylesheet" href="/resources/css/google.css">
+        <link rel="stylesheet" href="/resources/css/position.css">
+        <link rel="stylesheet" href="/resources/css/main.css">
+        <link rel="stylesheet" href="/resources/jquery-ui/jquery-ui.css">
+        <link rel="stylesheet" href="/resources/selectize/selectize.min.css">
+        <link rel="stylesheet" href="/resources/selectize/selectize.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"><link type="text/css" rel="stylesheet" href="/org.richfaces.resources/javax.faces.resource/org.richfaces.staticResource/4.5.17.Final/PackedCompressed/DEFAULT/org.richfaces.css/skinning_classes.css"><script type="text/javascript" src="/javax.faces.resource/jsf.js.xhtml?ln=javax.faces"></script><script type="text/javascript" src="/org.richfaces.resources/javax.faces.resource/org.richfaces.staticResource/4.5.17.Final/PackedCompressed/org.richfaces/jquery.js"></script><script type="text/javascript" src="/org.richfaces.resources/javax.faces.resource/org.richfaces.staticResource/4.5.17.Final/PackedCompressed/packed/packed.js"></script><link type="text/css" rel="stylesheet" href="/org.richfaces.resources/javax.faces.resource/org.richfaces.staticResource/4.5.17.Final/PackedCompressed/DEFAULT/packed/packed.css"></head><body style="padding-top: 45px">
+        <link rel="stylesheet" href="/resources/css/components.css">
+        <span class="loader flex-center flex-col d-none">
+        <div class="flex pt-30 card loader-card flex flex-center" style="padding-bottom:20px; width: ; height: ; ">
+                <img src="/resources/img/load.gif" width="100px">
+                <p style="color: white">Күтіңіз. Сауал орындалуда...</p>
+        </div>
+        </span>
+        <header class="flex flex-center">
+            <div class="header-content flex flex-jc-between flex-ai-center">
+                <a href="/">
+        <div class="logo m-10 flex flex-jc-start flex-ai-center">
+            <img src="/resources/img/logo.png" width="43px" alt="#">
+            <div class="flex flex-col flex-jc-center flex-ai-start">
+                <p>ЖОҒАРҒЫ СОТ</p>
+                <span>СОТ КАБИНЕТІ</span>
+            </div>
+        </div>
+                </a>
+<form id="j_idt16:j_idt17" name="j_idt16:j_idt17" method="post" action="/courtActs/index.xhtml" class="find-in-site-input-container ml-10" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt16:j_idt17" value="j_idt16:j_idt17">
+<select id="j_idt16:j_idt17:j_idt18" name="j_idt16:j_idt17:j_idt18" class="fytd selectized" size="1" onchange="mojarra.ab(this,event,'valueChange','@form',0)" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control fytd single"><div class="selectize-input items not-full"><input type="text" autocomplete="off" tabindex="" id="j_idt16:j_idt17:j_idt18-selectized" placeholder="Сайт бойынша іздеу" style="width: 155.766px;"></div><div class="selectize-dropdown single fytd" style="display: none; width: 400px; top: 34px; left: 0px;"><div class="selectize-dropdown-content"></div></div></div>
+            <i class="fa fa-search"></i><input type="hidden" name="j_idt16:j_idt17:j_idt22"><input type="submit" name="j_idt16:j_idt17:j_idt23" value="" style="display: none" class="submit"><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:0" value="-1981003707951077025:-259851155083925549" autocomplete="off">
+</form>
+        <script>
+            $(document).ready(function () {
+                $(".fytd").selectize({
+                    create: addQuestion,
+                    highlight: false,
+                    openOnFocus: false
+                });
+            })
+            function addQuestion(text) {
+                $(".newQuestion").value=text;
+                $(".submit").click();
+            }
+        </script>
+        <a href="https://sud.gov.kz" class="link-to-system ml-10 flex flex-ai-center flex-jc-center m-10" target="_blank">
+            <img class="m5" height="34px" src="/resources/img/logoSud.png">
+            <p class="secondory uppercase">ҚР Жоғарғы Сотының сайты</p>
+        </a>
+        <a href="https://t.me/smartsot_bot" class="link-to-system m-10 flex flex-ai-center flex-jc-center m-10" target="_blank">
+            <img class="m5" height="20px" src="/resources/img/icon-telegram.png">
+            <p class="primary uppercase">SMART-СОТ КӨМЕК</p>
+        </a>
+                    <div class="lang flex flex-center" style="padding: 0 10px">
+                        <a class="active" href="#" onclick="selectLanguageKk(window.location); return false;">ҚАЗ</a>|
+                        <a href="#" onclick="selectLanguageRu(window.location); return false;">РУС</a>
+                    </div>
+            </div>
+        </header>
+
+        <div class="full-width">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+        <section class="flex flex-ai-center flex-jc-center flex-col">
+            <div class="content flex flex-col flex-jc-start flex-ai-center">
+        <div class="container">
+            <div class="col-lg-8 col-lg-offset-2 col-sm-12 col-xs-12">
+                <h2>Сот актілерінің банкі</h2>
+                <p style="text-indent: 0px">Құрметті пайдаланушы! Іздеу сервисінде 2009-2025 жылдары соттар шығарған заңды күшіне енген сот актілері (шешімдері, қаулылары, үкімдері) қолжетімді.</p>
+        <link rel="stylesheet" href="/resources/css/inner.css?b=20170815">
+        <link rel="stylesheet" type="text/css" href="/resources/css/courtActs.css">
+        <link rel="stylesheet" href="/resources/jquery-ui/jquery-ui.css">
+        <link rel="stylesheet" href="/resources/selectize/css/selectize.min.css">
+        <link rel="stylesheet" href="/resources/selectize/css/selectize.bootstrap3.min.css">
+        <style>
+            .grecaptcha-badge{
+                display: none !important;
+                box-shadow: none !important;
+            }
+        </style><script type="text/javascript" src="/javax.faces.resource/jquery-ui.js.xhtml?ln=jquery-ui"></script><script type="text/javascript" src="/javax.faces.resource/datepicker-ru.js.xhtml?ln=javascripts"></script><script type="text/javascript" src="/javax.faces.resource/datepicker-kk.js.xhtml?ln=javascripts"></script><script type="text/javascript" src="/javax.faces.resource/datepicker-en.js.xhtml?ln=javascripts"></script><script type="text/javascript" src="/javax.faces.resource/maskedinput.js.xhtml?ln=javascripts"></script>
+        <script src="/resources/selectize/js/standalone/selectize.min.js"></script>
+<form id="j_idt43" name="j_idt43" method="post" action="/courtActs/index.xhtml" enctype="application/x-www-form-urlencoded" style="padding-bottom: 100px">
+<input type="hidden" name="j_idt43" value="j_idt43">
+<span id="j_idt43:j_idt44"><span style="display:none" class="rf-st-start"></span><span class="rf-st-stop"></span><script type="text/javascript">new RichFaces.ui.Status("j_idt43:j_idt44",{"onstart":function(event){showLoadingPnl();},"onstop":function(event){hideLoadingPnl();}} )</script></span><span id="j_idt43:selectCasePanel" class="flex full-width between bg-white">
+                <div class="flex">
+                    <a class="case-item active" href="#civil" onclick="civilLoad(); return false">Азаматтық істер</a>
+                    <a class="case-item " href="#criminal" onclick="criminalLoad(); return false">Қылмыстық істер</a>
+                    <a class="case-item  " href="#adm" onclick="administrativeLoad(); return false">Әкімшілік істер</a>
+                    <a class="case-item  " href="#adm" onclick="appkLoad(); return false">Әкімшілік сот ісін жүргізу (ҚРӘРПК)</a>
+                </div><a href="#" id="j_idt43:j_idt46" name="j_idt43:j_idt46" onclick="jsf.util.chain(this,event,&quot;showHelpModalDialog()&quot;,&quot;RichFaces.ajax(\&quot;j_idt43:j_idt46\&quot;,event,{\&quot;incId\&quot;:\&quot;1\&quot;} )&quot;);return false;">Іздеуде көмек</a><span id="j_idt43:j_idt47" style="display: none;"><script type="text/javascript">civilLoad=function(){RichFaces.ajax("j_idt43:j_idt47",null,{"incId":"1"} )};</script></span><span id="j_idt43:j_idt48" style="display: none;"><script type="text/javascript">criminalLoad=function(){RichFaces.ajax("j_idt43:j_idt48",null,{"incId":"1"} )};</script></span><span id="j_idt43:j_idt49" style="display: none;"><script type="text/javascript">administrativeLoad=function(){RichFaces.ajax("j_idt43:j_idt49",null,{"incId":"1"} )};</script></span><span id="j_idt43:j_idt50" style="display: none;"><script type="text/javascript">appkLoad=function(){RichFaces.ajax("j_idt43:j_idt50",null,{"incId":"1"} )};</script></span></span>
+            <fieldset class="panel panel-default form-wrapper" style="margin-bottom: 0px">
+                <legend class="panel-heading full-width">
+                    <div class="panel-title fieldset-legend">Қарапайым іздеу</div>
+                </legend>
+                <div class="panel-body">
+                    <div class="form-wrapper"><span id="j_idt43:periodPanel" class="form-type-textfield form-disabled form-item form-group"><label for="j_idt43:edit-period">Есептік жыл</label><span class="rf-msg " id="j_idt43:j_idt53"></span><select id="j_idt43:edit-period" name="j_idt43:edit-period" class="form-control bg-white" size="1" onchange="RichFaces.ajax(this,event,{&quot;sourceId&quot;:this,&quot;parameters&quot;:{&quot;javax.faces.behavior.event&quot;:&quot;change&quot;,&quot;org.richfaces.ajax.component&quot;:&quot;j_idt43:edit\u002Dperiod&quot;} } )">	<option value="">-- Таңдаңыз --</option>
+	<option value="2026" selected="selected">2026</option>
+	<option value="2025">2025</option>
+	<option value="2024">2024</option>
+	<option value="2023">2023</option>
+	<option value="2022">2022</option>
+	<option value="2021">2021</option>
+	<option value="2020">2020</option>
+	<option value="2019">2019</option>
+	<option value="2018">2018</option>
+	<option value="2017">2017</option>
+	<option value="2016">2016</option>
+	<option value="2015">2015</option>
+	<option value="2014">2014</option>
+	<option value="2013">2013</option>
+	<option value="2012">2012</option>
+	<option value="2011">2011</option>
+	<option value="2010">2010</option>
+	<option value="2009">2009</option>
+</select></span><div id="j_idt43:instancePanel" style="margin-top: 20px" class="form-type-textfield form-disabled form-item form-group"><table id="j_idt43:edit-participantTypeCheckbox" class="form-check-inline">
+	<tbody><tr>
+<td>
+<input name="j_idt43:edit-participantTypeCheckbox" id="j_idt43:edit-participantTypeCheckbox:0" value="FIRSTINSTANCE" type="checkbox" checked="checked"><label for="j_idt43:edit-participantTypeCheckbox:0" class=""> Бірінші саты</label></td>
+<td>
+<input name="j_idt43:edit-participantTypeCheckbox" id="j_idt43:edit-participantTypeCheckbox:1" value="APPEAL" type="checkbox"><label for="j_idt43:edit-participantTypeCheckbox:1" class=""> Апелляциялық саты</label></td>
+<td>
+<input name="j_idt43:edit-participantTypeCheckbox" id="j_idt43:edit-participantTypeCheckbox:2" value="CASSATION" type="checkbox"><label for="j_idt43:edit-participantTypeCheckbox:2" class=""> Кассациялық саты</label></td>
+<td>
+<input name="j_idt43:edit-participantTypeCheckbox" id="j_idt43:edit-participantTypeCheckbox:3" value="SUPERVISION" type="checkbox"><label for="j_idt43:edit-participantTypeCheckbox:3" class=""> Жоғарғы Сот</label></td>
+	</tr>
+</tbody></table><span class="rf-msg " id="j_idt43:j_idt58"></span></div><span id="j_idt43:unicalSearchPanel" class="form-type-textfield form-disabled form-item form-group"><label for="j_idt43:edit-participant">Негізгі сөз бойынша іздеу</label>
+                            <div class="input-group">
+                                <img src="/resources/img/help.png" title="«Негізгі сөз бойынша іздеу» сот актілерінің қарарлық бөлігінде қамтылатын сөздер және процесс қатысушылары бойынша іздеуді жүзеге асырады">
+                                <img class="big-icon" onclick="clearUnicalWord(); return false;" src="/resources/img/x.png" title="«Негізгі сөз бойынша іздеу» сот актілерінің қарарлық бөлігінде қамтылатын сөздер және процесс қатысушылары бойынша іздеуді жүзеге асырады"><input id="j_idt43:edit-participant" type="text" name="j_idt43:edit-participant" class="form-control">
+                            </div><span id="j_idt43:j_idt64" style="display: none;"><script type="text/javascript">clearUnicalWord=function(){RichFaces.ajax("j_idt43:j_idt64",null,{"incId":"1"} )};</script></span></span>
+
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="panel panel-default form-wrapper">
+                <legend class="panel-heading full-width" id="filter-button">
+                    <div class="panel-title fieldset-legend">
+                        <i id="filter-icon" class="icon-plus-squared-alt"></i>Кеңейтілген іздеу
+                    </div>
+                </legend>
+                <div class="panel-body">
+                    <div id="filter-content" class="form-wrapper form-group hidden"><span id="j_idt43:categoryPanel">
+                            <div class="form-type-textfield form-disabled form-item form-group"><label for="j_idt43:edit-category">Іс санаты</label>
+                                <div class="input-group">
+                                    <img src="/resources/img/help.png" alt="?" title="Іс санатын таңдаңыз">
+                                    <img class="big-icon" onclick="clearCategory(); return false;" src="/resources/img/x.png"><select id="j_idt43:edit-category" name="j_idt43:edit-category" class="form-control" size="1">	<option value="" selected="selected">-- Таңдаңыз --</option>
+	<option value="142010000200000000"> Жеке тұлғалардан салық және бюджетке төленетін басқа да міндетті төлемдер бойынша бересіні және өсімпұлдарды, сондай-ақ кеден төлемдері, салықтар мен өсімпұлдар бойынша берешекті өндіріп алу туралы</option>
+	<option value="142010000300000000">Қызметкерге есептелген, бірақ төленбеген жалақы мен өзге де төлемдерді өндіріп алу туралы, оның ішінде Бірыңғай жинақтаушы зейнетақы қорына міндетті зейнетақы аударымдарын аудару туралы </option>
+	<option value="142010000500000000">Нотариат куәландырған мәмілеге негізделген міндеттемелерді орындау туралы</option>
+	<option value="142010000600000000">Орындау мерзімі жеткен және міндеттеменің орындалмауын борышкер мойындаған, оның ішінде дауды сотқа дейін реттеу тәртібімен өндіріп алушыға жіберілген кінә қоюға жауапта мойындаған жазбаша мәмілеге негізделген міндеттемені орындау туралы</option>
+	<option value="142010000700000000">Төленбеген вексельдің наразылығына, акцептінің болмауына және нотариус жасаған акцептінің күні белгіленбеуіне негізделген міндеттемені орындау туралы</option>
+	<option value="142010000800000000">Лизинг шартына немесе Қазақстан Республикасының заңдарына сәйкес лизинг затын талап ету туралы</option>
+	<option value="142010000900000000">Ломбард кепіл беруші-борышкерге ұсынған кредитті қайтару мерзімі өткеннен кейін өндіріп алуды кепіл затына аудару туралы</option>
+	<option value="142010001000000000">Қосымша шығыстарды өндіріп алу туралы талаптарды қоспағанда, «Тұрғын үй қатынастары туралы» ҚР Заңында бекітілген кондоминиум объектісінің ортақ мүлкін күтіп-ұстауға арналған міндетті шығыстарға қатысудан жалтарған үй-жайлардың (пәтерлердің) меншік иелерінен берешекті өндіріп алу туралы</option>
+	<option value="142010001200000000">Келісімшарт әскери қызметшінің бастамасы бойынша мерзімінен бұрын бұзылған жағдайда, әскери қызметті өткеру туралы келісімшартта көзделген біржолғы ақшалай сыйақыны өндіріп алу туралы</option>
+	<option value="142010001300000000">Оқуды не қызметті өткеруді өз қалауы бойынша тоқтатқан, сондай-ақ Қазақстан Республикасының заңнамасында көзделген негіздер бойынша шартта көзделген мерзім өткенге дейін жұмыстан босатылған немесе оқудан шығарылған оқу орындарының курсанттарын оқытуға жұмсалған сомаларды өндіріп алу туралы</option>
+	<option value="142030000100000000">Еңбек даулары </option>
+	<option value="142030000100010000">Қызметтен босатылғандарды жұмысқа қайта орналастыру туралы еңбек даулары</option>
+	<option value="142030000100010010">Қызметтен босатылғандарды жұмысқа қайта орналастыру, оның ішінде жалақыны төлей отырып қайта орналастыру туралы еңбек даулары</option>
+	<option value="142030000100020000">Жалақыны және өзге де төлемдерді төлеу туралы еңбек даулары</option>
+	<option value="142030000100020010">Жалақы төлеу туралы оның ішінде пайдаланылмаған еңбек демалысының  өтемақысы еңбек даулары</option>
+	<option value="142030000200000000">Неке-отбасылық қатынастардан туындайтын даулар</option>
+	<option value="142030000200040000">Жұбайын (зайыбын) асырауға арналған алименттерді өндіру туралы неке-отбасылық қатынастардан туындайтын даулар </option>
+	<option value="142030000200050000">Ата-ананы асырауға арналған алименттерді өндіру туралы неке-отбасылық қатынастардан туындайтын даулар</option>
+	<option value="142030000200130000">Ерлі-зайыптылар арасында мүлікті бөлу туралы Неке-отбасылық қатынастардан туындайтын даулар</option>
+	<option value="142030000200140000"> Неке шартымен байланысты даулар неке-отбасылық қатынастардан туындайтын даулар</option>
+	<option value="142030000300000000">Зиянды өтеу</option>
+	<option value="142030000300010000">Зиянды өтеу туралы, оның ішінде моральдық зиянды өтеу туралы</option>
+	<option value="142030000300020000">Зиянды өтеу туралы,  денсаулыққа зақым келтіру немесе азаматтың қайтыс болуы</option>
+	<option value="142030000300020010">Зиянды өтеу туралы,  денсаулыққа зақым келтіру немесе азаматтың қайтыс болуы, оның ішінде еңбек міндеттерін орындауға байланысты</option>
+	<option value="142030000300020020">Зиянды өтеу туралы,  денсаулыққа зақым келтіру немесе азаматтың қайтыс болуы, оның ішінде жол қозғалысы ережесін бұзумен және көліктегі апаттармен байланысты </option>
+	<option value="142030000300030000">Заңсыз әрекеттермен, оның ішінде анықтау, алдын ала тергеу, прокуратура, сот органдарының заңсыз әрекеттерімен келітірілген зиянды өтеу туралы  </option>
+	<option value="142030000300030040">Заңсыз әрекеттермен келітірілген зиянды өтеу туралы, оның ішінде регресс тәртібінде</option>
+	<option value="142030000300030050">Заңсыз әрекеттермен келітірілген  зиянды өтеу туралы, оның ішінде оңалту істері бойынша </option>
+	<option value="142030000300030060">заңсыз әрекеттермен келітірілген  зиянды өтеу туралы, оның ішінде сотта ақталғандардың істері бойынша  </option>
+	<option value="142030000300030070">Зиянды өтеу туралы  оның ішінде азаматтық құқық бұзу туралы істер бойынша</option>
+	<option value="142030000300030080">Заңсыз іс-әрекеттерімен келтірілген зиянды өтеу туралы оның ішінде азаптаумен байланысты істер бойынша</option>
+	<option value="142030000400000000">Мүлікке меншік құқығы туралы даулар </option>
+	<option value="142030000400010000">Мүлікке меншік құқығы туралы даулар   Тұрғын үйге </option>
+	<option value="142030000400020000">Мүлікті тыйым салудан босату туралы мүлікке меншік құқығы туралы даулар</option>
+	<option value="142030000400030000">Мүлкін бағалау нәтижелерін дау білдіру туралы Мүлікке меншік құқығы туралы даулар </option>
+	<option value="142030000400050000">Жеке және заңды тұлғалардың мүліктерін заңсыз тартып алу туралы Мүлікке меншік құқығы туралы даулар</option>
+	<option value="142030000400070000"> Тұрғын үйге және коммуналдық қызметтерге төлемдерді өндіріп алу туралы тұрғын үй құқықтық қатынастардан туындайтын даулар</option>
+	<option value="142030000400080000"> Азаматтарды басқа тұрғын үй берусіз тұрғын үйден шығару туралы тұрғын үй қарым қатынастарынан туындайтын даулар</option>
+	<option value="142030000400090000"> Заңсыз иеленіп отырған тұрғын емес үй-жайды босатуға міндеттеу туралы мүлікке меншік құқығы туралы даулар</option>
+	<option value="142030000400100000">Мүліктен үлес бөлу туралы Мүлікке меншік құқығы туралы даулар</option>
+	<option value="142030000400110000">Бөтеннің заңсыз иеленуінен талап ету туралы мүлікке меншік құқығы туралы даулар</option>
+	<option value="142030000400120000"> Меншік құқығын тоқтату туралы мүлікке меншік құқығы туралы даулар</option>
+	<option value="142030000500000000"> Жерге қатысты құқықтық қатынастардан туындайтын даулар</option>
+	<option value="142030000500010000">Мемлекеттік қажеттіліктер үшін жер телімдерін алып қою жерге қатысты құқықтық қатынастардан туындайтын даулар</option>
+	<option value="142030000500020000">Сервитут белгілеу (тоқтату) туралы жерге қатысты құқықтық қатынастардан туындайтын даулар</option>
+	<option value="142030000500030000">Жер учаскесіне және жер пайдалануға меншік құқығын даулау туралы Жерге қатысты құқықтық қатынастардан туындайтын даулар</option>
+	<option value="142030000600000000">Тұтынушылардың құқықтарын қорғау</option>
+	<option value="142030000600010000">Сауда, қызмет көрсету саласындағы шарттардан Тұтынушының құқықтарын қорғау туралы</option>
+	<option value="142030000700000000">Зиянды өтеу туралы даулар</option>
+	<option value="142030000700020000"> Жол-көлік оқиғасы нұқсанын өтеу туралы даулар</option>
+	<option value="142030000800000000">Лицензиялық қызметке байланысты даулар </option>
+	<option value="142030000800010000"> Лицензияны кері қайтарумен Лицензиялық қызметпен байланысты даулар </option>
+	<option value="142030000800020000">Лицензияны тоқтата тұрумен лицензиялық қызметпен байланысты даулар</option>
+	<option value="142030000900000000"> Бағалы қағаздармен байланысты даулар </option>
+	<option value="142030000900010000">Бағалы  қағаздарды тіркеуден бас тарту немесе заңсыз тіркеумен Бағалы қағаздармен байланысты даулар </option>
+	<option value="142030001000000000">Мемлекеттік сатып алу саласындағы заңдарды бұзумен байланысты даулар</option>
+	<option value="142030001100000000">Ар-намысты, қадір-қасиетті және іскерлік беделді қорғау туралы</option>
+	<option value="142030001100010000">Бұқаралық ақпараттар құралдарына Ар-намысты, қадір-қасиетті және іскерлік беделді қорғау туралы</option>
+	<option value="142030001100020000">Азаматтар мен заңды тұлғаларға Ар-намысты, қадір-қасиетті және іскерлік беделді қорғау туралы</option>
+	<option value="142030001100030000">Іскерлік беделді қорғау туралы заңды тұлғалардың талап-арыздары Ар-намысты, қадір-қасиетті және іскерлік беделді қорғау туралы</option>
+	<option value="142030001200000000">Шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар </option>
+	<option value="142030001200010000">Үлестік құрылыспен байланысты шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар </option>
+	<option value="142030001200020000">Экономикалық, технологиялық, ақпараттық қауіпсіздікпен шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар</option>
+	<option value="142030001200030000">Банк шарты бойынша  шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар </option>
+	<option value="142030001200030010">Банк шарты бойынша оның ішінде  жылжымайтын мүліктің ипотекасымен шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар </option>
+	<option value="142030001200030020">Банк шарты бойынша оның ішінде мүлікті өндіру өтінішімен Шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар</option>
+	<option value="142030001200040000">Жер қойнауын пайдалану шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар</option>
+	<option value="142030001200040010">Жер қойнауын пайдалануға байланысты, оның ішінде шетелдік адамдардың қатысуымен шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар </option>
+	<option value="142030001200050000">Алу-сату шарты бойынша  шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар</option>
+	<option value="142030001200060000"> Жеткізіп беру шарты бойынша шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар  </option>
+	<option value="142030001200070000">Мердігерлік шарт бойынша шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар</option>
+	<option value="142030001200090000">Лизинг шарты бойынша шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар</option>
+	<option value="142030001200100000">Қарыз шарты бойынша шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар  </option>
+	<option value="142030001200100010">Қарыз шарты бойынша оның ішінде жеке тұлғалардың арасындағы шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар </option>
+	<option value="142030001200110000">Сақтау шарты бойынша  Шартты (мәміле) бекітумен, өзгертумен, бұзумен және шарттық міндеттемелерді орындаумен байланысты даулар  </option>
+	<option value="142030001200120000">Сақтандыру шарты бойынша Шартты (мәміле) бекітумен, өзгертумен, бұзумен және шарттық міндеттемелерді орындаумен байланысты даулар </option>
+	<option value="142030001200130000">Тапсырма шарты бойынша Шартты (мәміле) бекітумен, өзгертумен, бұзумен және шарттық міндеттемелерді орындаумен байланысты даулар   </option>
+	<option value="142030001200140000">Комиссия шарты бойынша  шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар</option>
+	<option value="142030001200150000">Шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар, кәсіпкерлік қызметін іске асыратын заңды тұлғалардың, азаматтардың арасындағы даулар</option>
+	<option value="142030001200150010">Шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар, кәсіпкерлік қызметін іске асыратын заңды тұлғалардың, азаматтардың арасындағы даулар оның ішінде квазимемлекеттік сектордың қатысуымен</option>
+	<option value="142030001200150020">Кәсіпкерлік қызметін іске асыратын заңды тұлғалардың, азаматтардың арасындағы даулар оның ішінде мемлекеттік мекемелердің қатысуымен шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар </option>
+	<option value="142030001200160000">Мүлікті өндіру өтінішімен байланысты шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар  </option>
+	<option value="142030001200170000"> Сыйға тарту шарты бойынша шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар </option>
+	<option value="142030001200180000"> Айырбас шарты бойынша шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар </option>
+	<option value="142030001300000000">Зияткерлiк меншiкпен байланысты даулар</option>
+	<option value="142030001300010000">Авторлық құқықты қорғау туралы Зияткерлік меншікпен байланысты даулар</option>
+	<option value="142030001300020000">Тауар белгілері туралы зияткерлік меншікпен байланысты даулар </option>
+	<option value="142030001400000000">Қоршаған ортаны қорғауға байланысты даулар </option>
+	<option value="142030001400010000">Табиғат қорғау заңнамасын бұзғаны үшін нұқсанды өтеу туралы Қоршаған ортаны қорғаумен байланысты даулар</option>
+	<option value="142030001400020000">Қоршаған ортаны қорғауға байланысты даулар, жеке тұлғалардың талап-арыздары</option>
+	<option value="142030001400030000"> Қоғамдық экологиялық ұйымдардың талап-арыздары Қоршаған ортаны қорғаумен байланысты  даулар </option>
+	<option value="142030001500000000"> Интернет-ресурстармен байланысты даулар</option>
+	<option value="142030001600000000">Зейнетақы заңнамасының бұзылуымен байланысты даулар</option>
+	<option value="142030001700000000">Салық заңнамасын бұзумен байланысты даулар</option>
+	<option value="142030001700010000">Салық өндіру және жеке тұлғалардан жинақтау туралы салық органдарының талап-арыздары Салық заңнамасын бұзумен байланысты даулар</option>
+	<option value="142030001700020000">Салық өндіру және заңды тұлғалардан жинақтау туралы салық органдарының талап-арыздары Салық заңнамасын бұзумен байланысты даулар</option>
+	<option value="142030001700030000">Жеке тұлғалардың салық органдарына талап-арыздары Салық заңнамасын бұзумен байланысты даулар</option>
+	<option value="142030001700040000">Заңды тұлғалардың салық органдарына талап арыздары Салық заңнамасын бұзумен байланысты даулар</option>
+	<option value="142030001700050000"> Заңды тұлғаны тарату туралы (жеке кәсіпкердің қызметін тоқтату) Салық заңнамасын бұзумен байланысты даулар</option>
+	<option value="142030001800000000">Кеден заңдары саласындағы даулар </option>
+	<option value="142030001900000000">Мұралық құқық мәселелері бойынша даулар </option>
+	<option value="142030002000000000">Жалған кәсіпкерлік туралы </option>
+	<option value="142030002100000000">Бюджет заңнамасының бұзылуына байланысты даулар </option>
+	<option value="142030002200000000">Тұрғын үй құқықтық қатынастардан туындайтын даулар</option>
+	<option value="142030002200010000">Азаматтарды басқа тұрғын үй бере отырып, тұрғын үйден шығару туралы тұрғын үй құқықтық қатынастардан туындайтын даулар</option>
+	<option value="142030002200020000">Орналастыру туралы Тұрғын үй қарым қатынастарынан туындайтын даулар </option>
+	<option value="142030002200030000">Мүліктегі үлесті бөлу туралы тұрғын үй құқықтық қатынастардан туындайтын даулар </option>
+	<option value="142030002200040000">Тұрғын үйді (құрылысты) бұзу туралы Тұрғын үй құқықтық қатынастардан туындайтын даулар</option>
+	<option value="142030002200050000">Тұрғын үйге мұқтаждардың кезегіне қайта тұрғызу, жылжыту туралы Тұрғын үй құқықтық қатынастардан туындайтын даулар</option>
+	<option value="142030002300000000">Міндеттеу, мәжбүрлеу (орындау, талаптар, нұсқамалар) туралы </option>
+	<option value="142030002500000000">Ортақ жиналыс хаттамасын даулау туралы корпоративтік даулар</option>
+	<option value="142030002600000000">Заңды тұлғалар мен жеке кәсіпкерлердің қызметін тоқтата тұру туралы</option>
+	<option value="142030002700000000">Сенімхаттың күшімен байланысты даулар (тоқтату, жарамсыз деп тану)</option>
+	<option value="142030002900000000">Автокөлік құралын басқару құқығынан айыру (тоқтата тұру) туралы талап арыздар</option>
+	<option value="142030003000000000">Корпоративтік даулар</option>
+	<option value="142030003000010000">Үлесті бөлу, үлесті мәжбүрлеп сатып алу туралы корпоративтік даулар </option>
+	<option value="142030003200000000">Процестік шығындарды өндіріп алу туралы</option>
+	<option value="142030003300000000">Жәрдемақыларды, өтемақыларды  өндіріп алу туралы </option>
+	<option value="142030003500000000">Тыйым салынған заттарды жою туралы талап-арыздар</option>
+	<option value="142040000100000000">Сайлауға, республикалық референдумға қатысатын азаматтар мен қоғамдық бірлестіктердің сайлау құқықтарын қорғау туралы арыздар бойынша</option>
+	<option value="142040000300000000">Мемлекеттік биліктің, жергілікті өзін-өзі басқару органдарының, қоғамдық бірлестіктердің, ұйымдардың, лауазымды адамдар мен мемлекеттік қызметшілердің шешімдері мен әрекеттеріне (әрекетсіздігіне) дау білдіру туралы арыздар бойынша іс жүргізу</option>
+	<option value="142040000300010000">Сот орындаушыларының (жеке сот орындаушылары) әрекеттеріне (әрекетсіздігін) дау білдіру туралы мемлекеттік биліктің, жергілікті өзін-өзі басқару органдарының, қоғамдық бірлестіктердің, ұйымдардың, лауазымды адамдар мен мемлекеттік қызметшілердің шешімдері мен әрекеттеріне (әрекетсіздігіне) дау білдіру туралы істер бойынша іс жүргізу</option>
+	<option value="142040000300020000">Салық органдарының әрекеттеріне (әрекетсіздігіне) және шешімдеріне дау білдіру туралы  мемлекеттік биліктің, жергілікті өзін-өзі басқару органдарының, қоғамдық бірлестіктердің, ұйымдардың, лауазымды адамдар мен мемлекеттік қызметшілердің шешімдері мен әрекеттеріне (әрекетсіздігіне) дау білдіру туралы істер бойынша іс жүргізу </option>
+	<option value="142040000300030000">Кеден органдарының әрекеттеріне (әрекетсіздігіне) және шешімдеріне дау білдіру туралы мемлекеттік биліктің, жергілікті өзін-өзі басқару органдарының, қоғамдық бірлестіктердің, ұйымдардың, лауазымды адамдар мен мемлекеттік қызметшілердің шешімдері мен әрекеттеріне (әрекетсіздігіне) дау білдіру туралы істер бойынша іс жүргізу </option>
+	<option value="142040000300040000">Жергілікті атқарушы органдарының әрекеттеріне (әрекетсіздігіне) және шешімдеріне  дау білдіру туралы  Мемлекеттік биліктің, жергілікті өзін-өзі басқару органдарының, қоғамдық бірлестіктердің, ұйымдардың, лауазымды адамдар мен мемлекеттік қызметшілердің шешімдері мен әрекеттеріне (әрекетсіздігіне) дау білдіру туралы арыздар бойынша іс жүргізу </option>
+	<option value="142040000300040010">Жергілікті атқарушы органдарының әрекеттеріне (әрекетсіздігіне) және шешімдеріне дау білдіру туралы, оның ішінде жер учаскелерін беру бойынша  мемлекеттік органдардың актілердің заңдылығына  дау білдіру туралы   мемлекеттік биліктің, жергілікті өзін-өзі басқару органдарының, қоғамдық бірлестіктердің, ұйымдардың, лауазымды адамдар мен мемлекеттік қызметшілердің шешімдері мен әрекеттеріне (әрекетсіздігіне) дау білдіру туралы істер бойынша іс жүргізу</option>
+	<option value="142040000300040030">Жергілікті атқарушы органдардың әрекеттеріне (әрекетсіздігіне) және шешіміне дау білдіру туралы  оның ішінде объектілерді пайдаланымға қабылдаудан туындайтын мемлекеттік биліктің, жергілікті өзін-өзі басқару органдарының, қоғамдық бірлестіктердің, ұйымдардың, лауазымды адамдар мен мемлекеттік қызметшілердің шешімдері мен әрекеттеріне (әрекетсіздігіне) дау білдіру туралы істер бойынша іс жүргізу</option>
+	<option value="142040000400000000">Нормативтік құқықтық актілердің заңдылығына дау білдіру туралы істер бойынша </option>
+	<option value="142040000400010000">Нормативтік құқықтық актінің заңдылығына дау айту туралы істер бойынша, оның ішінде &nbsp;әділет органдарында тіркелген</option>
+	<option value="142040000500000000">Мемлекеттік сатып  саласындағы заңдардың сақталуын тексерудің нәтижелері бойынша тексеру актілеріне, уәкілетті органдардың әрекеттеріне шағым жасау</option>
+	<option value="142040000600000000">Жергілікті атқарушы органдардың азаматтардың алқаби ретінде қылмыстық сот ісін жүргізуге қатысты құқықтарын бұзатын шешімдеріне, әрекеттеріне (әрекетсіздігіне) дау білдіру туралы арыздар бойынша іс жүргізу </option>
+	<option value="142050000500000000">Қаржы ұйымын мен банк конгломератына бас ұйым ретінде кіретін және қаржы ұйымы болып табылмайтын ұйымды қайта құрылымдау туралы</option>
+	<option value="142050000600000000">Банкроттық туралы</option>
+	<option value="142050000600010000">Банкроттық туралы, оның ішінде заңды тұлғаның банкроттығы туралы</option>
+	<option value="142050000600020000">Банкроттығы туралы оның ішінде жеке кәсіпкердің</option>
+	<option value="142050000700000000">Оңалту туралы, соның ішінде Жеделдетілген оңалту туралы, несие берушілер талаптарының тізіліміне қосу (шығару) туралы </option>
+	<option value="142050000800000000">Жылжымалы затты иесіз деп тану және жылжымайтын мүлікке коммуналдық меншік құқығын тану</option>
+	<option value="142050000900000000">Заңдық маңызы бар фактілерді анықтау туралы</option>
+	<option value="142050000900010000">Заңдық маңызы бар фактілерді анықтау туралы,  оның ішінде адамдардың туыстық қатынастары</option>
+	<option value="142050000900020000">Заңдық маңызы бар фактілерді анықтау туралы,  оның ішінде адамның біреудің асырауында болуы</option>
+	<option value="142050000900040000">Заңдық маңызы бар фактілерді анықтау туралы, оның ішінде құқық белгілейтін құжаттардың (әскери құжаттарды, паспортты, жеке куәлікті және азаматтық хал актілерін жазу органдары беретін куәліктерді қоспағанда) адамға тиесілі екендігін</option>
+	<option value="142050000900050000">Заңдық маңызы бар фактілерді анықтау туралы, оның ішінде жылжымайтын мүлік объектілерін иеленуді, пайдалануды және (немесе) оларға билік етуді растайтын құжаттардың болуы </option>
+	<option value="142050000900060000">Заңдық маңызы бар фактілерді, оның ішінде жазатайым жағдайды анықтау туралы</option>
+	<option value="142050000900070000">Заңдық маңызы бар фактілерді анықтау туралы оның ішінде  азаматтық хал актілерін жазу органдары қайтыс болуды тіркеуден бас тартқан жағдайда, адамның белгілі бір уақытта белгілі бір мән-жайларда қайтыс болуы</option>
+	<option value="142050000900080000">Заңдық маңызы бар фактілерді анықтау туралы оның ішінде мұрагерлікті қабылдау және мұрагерліктің ашылу орны</option>
+	<option value="142050001000000000">Азаматты хабарсыз кетті деп тану туралы және азаматты қайтыс болды деп жариялау туралы&nbsp;</option>
+	<option value="142050001100000000">Бағалы қағаздарды көрсетуші адамның жоғалған бағалы қағаздар және ордерлік бағалы қағаздар (шақырту ісін жүргізу) бойынша құқықтарын қалпына келтіру туралы</option>
+	<option value="142050001200000000">Нотариаттық әрекеттерге немесе оларды жасаудан бас тартуға берілген шағымдар бойынша</option>
+	<option value="142050001800000000">Шетелдікті немесе азаматтығы жоқ адамды Қазақстан Республикасының заңнамасын бұзғаны үшін Қазақстан Республикасының шегінен шығарып жіберу туралы </option>
+	<option value="142050002100000000">Жоғалған сот ісін жүргізуді немесе атқарушылық іс жүргізуді қалпына келтіру бойынша іс жүргізу</option>
+	<option value="142050002300000000">Азаматты саяси қуғын-сүргіннің құрбаны деп тану туралы</option>
+	<option value="142050002400000000">Мұраны иесіз деп тану</option>
+	<option value="142060000000000000">Төрелік шешімнің күшін жою туралы өтінішхат бойынша іс жүргізу оның ішінде аралық соттардың</option>
+	<option value="142070000000000000">Төрелік шешімнің күшін жою туралы өтінішхат бойынша іс жүргізу</option>
+	<option value="142080001700000000">Мүліктік жалдау (жалға алу) шарты бойынша шартты (мәміле) жасауға, өзгертуге, бұзуға және шарттық міндеттемелерді орындауға байланысты даулар </option>
+	<option value="142080001800000000"> Банкроттық туралы соның ішінде несие берушілер талаптарының тізіліміне қосу (шығару) туралы</option>
+	<option value="142080002000000000">Мемлекеттік сатып алу саласындағы заңдарды бұзумен байланысты даулар оның ішінде шарт жасасқанға дейінгі даулар</option>
+	<option value="142080002100000000">Шарт жасасуға қатысты даулар бойынша мемлекеттік сатып алу саласындағы заңдарды бұзумен байланысты даулар</option>
+	<option value="142080002200000000">Мемлекеттік сатып алу саласындағы заңдардың бұзылуына байланысты даулар оның ішінде шартты орындау туралы даулар бойынша (мемлекеттік сатып алудың жосықсыз қатысушысы деп тану және тұрақсыздық төлемін өндіріп алу туралы)</option>
+	<option value="142080002300000000">Сыбайлас жемқорлық құқық бұзушылықтарын жасағаны үшін тәртіптік жазаға тарту туралы бұйрықтарды даулау туралы еңбек даулары </option>
+	<option value="142080002500000000"> ПИК (КСК ПК) әрекеттеріне (әрекетсіздіктеріне) шағымдану туралы  Тұрғын үй қарым қатынастарынан туындайтын даулар</option>
+	<option value="142080003000000000">Оқуын тоқтатқан не шет мемлекетте оқу орнын аяқтағаннан кейін Қазақстан Республикасына қайтып оралмаған немесе грантты қайтару жөніндегі шартта көзделген міндеттемені бұзған адамдардан мемлекеттік гранттарды өндіріп алу туралы</option>
+	<option value="142080003100000000">Ауылдық жерге жіберілген жас мамандар шарттар бойынша міндеттемелерді орындамаған немесе тиісті түрде орындамаған жағдайда олардан мемлекеттік гранттарды, көтерме жәрдемақыларды, жәрдемақыларды өндіріп алу туралы</option>
+	<option value="142080003200000000">Жалдау төлемдерінің жалдау шартында белгіленген мерзімдерде төленбеуіне байланысты оларды өндіріп алу туралы</option>
+	<option value="142080003300000000">Қылмыстық қудалау органы қысқартқан қылмыстық істер бойынша процестік шығындарды өндіріп алу туралы</option>
+	<option value="142080003400000000">Астық қабылдау кәсіпорнын немесе мақта өңдеу ұйымын уақытша басқаруды енгізу, ұзарту және мерзімінен бұрын аяқтау туралы</option>
+	<option value="142080003800000000">іс жүзінде тұтынылған қызметтер (электрмен, газбен, жылумен, сумен жабдықтау және басқалары) үшін жария шарттардың, сондай-ақ төлеу мерзімі жеткен, белгіленген тарифтерге сай көрсетілген қызметтер үшін өзге де шарттардың негізінде берешекті өндіріп алу туралы</option>
+	<option value="142080003900000000"> Сақтандыру шарты бойынша оның ішінде сақтандыру төлемдерін өндіріп алу шартты (мәміле) бекітумен, өзгертумен, бұзумен және шарттық міндеттемелерді орындаумен байланысты даулар</option>
+	<option value="142080004000000000">Тасымалдау шарты бойынша шартты (мәміле) бекітумен, өзгертумен, бұзумен және шарттық міндеттемелерді орындаумен байланысты даулар</option>
+	<option value="142080004200000000">Тұтынушының құқықтарын қорғау  оның ішінде медициналық қызметтің сапасымен байланысты талап-арыздар</option>
+	<option value="142080004300000000">Ереуілдерді заңсыз деп тану туралы талап арыздар</option>
+	<option value="142080004400000000"> Конкурстық міндеттемелер және тендерлер, аукциондар және сауданың өзге де нысандары негізінде туындайтын міндеттемелер оның ішінде оларды жарамды (жарамсыз) деп тану </option>
+	<option value="142080004800000000">Өзге де талап арыз</option>
+	<option value="142080004900000000">Басқа да ерекше іс жүргізу істері</option>
+</select>
+                                </div>
+                            </div><span id="j_idt43:j_idt76" style="display: none;"><script type="text/javascript">clearCategory=function(){RichFaces.ajax("j_idt43:j_idt76",null,{"incId":"1"} )};</script></span></span><span id="j_idt43:categoryTypePanel">
+                            <div class="form-type-textfield form-disabled form-item form-group">
+                            </div></span><span id="j_idt43:selectDistrictPanel">
+                            <div class="form-type-textfield form-disabled form-item form-group"><label for="j_idt43:edit-district">Облыс</label>
+                                <div class="input-group">
+                                    <img src="/resources/img/help.png" title="Облысты және сот органын таңдаңыз">
+                                    <img class="big-icon" onclick="clearDistrict(); return false;" src="/resources/img/x.png"><select id="j_idt43:edit-district" name="j_idt43:edit-district" class="form-control bg-white" size="1" onchange="RichFaces.ajax(this,event,{&quot;sourceId&quot;:this,&quot;parameters&quot;:{&quot;javax.faces.behavior.event&quot;:&quot;change&quot;,&quot;org.richfaces.ajax.component&quot;:&quot;j_idt43:edit\u002Ddistrict&quot;} } )">	<option value="">-- Таңдаңыз --</option>
+	<option value="2">Астана қаласы</option>
+	<option value="3">Алматы қаласы</option>
+	<option value="4">Ақмола облысы</option>
+	<option value="5">Ақтөбе облысы</option>
+	<option value="6">Алматы облысы</option>
+	<option value="7">Атырау облысы</option>
+	<option value="10">Батыс Қазақстан облысы</option>
+	<option value="9">Жамбыл облысы</option>
+	<option value="11">Қарағанды облысы</option>
+	<option value="12">Қостанай облысы</option>
+	<option value="13">Қызылорда облысы</option>
+	<option value="14">Маңғыстау облысы</option>
+	<option value="17">Түркістан облысы</option>
+	<option value="15">Павлодар облысы</option>
+	<option value="16">Солтүстік Қазақстан облысы</option>
+	<option value="8">Шығыс Қазақстан облысы</option>
+	<option value="18">Қазақстан Республикасының Әскери соты</option>
+	<option value="19">Шымкент қаласы</option>
+	<option value="20">Ұлытау облысы</option>
+	<option value="21">Абай облысы</option>
+	<option value="22">Жетісу облысы</option>
+</select>
+                                </div>
+                            </div><span id="j_idt43:j_idt89" style="display: none;"><script type="text/javascript">clearDistrict=function(){RichFaces.ajax("j_idt43:j_idt89",null,{"incId":"1"} )};</script></span></span><span id="j_idt43:selectCourtPanel">
+                            <div class="form-type-textfield form-disabled form-item form-group"><label for="j_idt43:edit-court">Сот органы</label>
+                                <div class="input-group">
+                                    <img src="/resources/img/help.png" title="Облысты және сот органын таңдаңыз">
+                                    <img class="big-icon" onclick="clearCourt(); return false;" src="/resources/img/x.png"><select id="j_idt43:edit-court" name="j_idt43:edit-court" class="form-control bg-white" size="1">	<option value="">-- Таңдаңыз --</option>
+</select>
+                                </div>
+                            </div><span id="j_idt43:j_idt96" style="display: none;"><script type="text/javascript">clearCourt=function(){RichFaces.ajax("j_idt43:j_idt96",null,{"incId":"1"} )};</script></span></span><span id="j_idt43:practicantsInfoPanel">
+                                <div class="form-type-textfield form-disabled form-item form-group"><label>Процесс тараптарының ИИН/БИН</label>
+                                    <div class="input-group">
+                                        <img class="icon" src="/resources/img/help.png" alt="?" title="Процесс тараптарының ИИН/БИН енгізіңіз"><input id="j_idt43:iinOrBin" type="text" name="j_idt43:iinOrBin" class="form-control">
+                                    </div>
+                                </div>
+                                    <div class="form-type-textfield form-disabled form-item form-group"><label class="label-width">Талап қоюшы</label>
+                                        <div class="input-group">
+                                            <img class="icon" src="/resources/img/help.png" alt="?" title="Талап қоюшының Т.А.Ә. енгізіңіз"><input id="j_idt43:plaintff" type="text" name="j_idt43:plaintff" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-type-textfield form-disabled form-item form-group"><label class="label-width">Жауапкер</label>
+                                        <div class="input-group">
+                                            <img class="icon" src="/resources/img/help.png" alt="?" title="Жауапкердің Т.А.Ә. енгізіңіз"><input id="j_idt43:defendant" type="text" name="j_idt43:defendant" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-type-textfield form-disabled form-item form-group"><label class="label-width">Адвокат</label>
+                                        <div class="input-group">
+                                            <img class="icon" src="/resources/img/help.png" alt="?" title="Адвокаттың Т.А.Ә. енгізіңіз"><input id="j_idt43:attorney" type="text" name="j_idt43:attorney" class="form-control">
+                                        </div>
+                                    </div></span><span id="j_idt43:caseResultPanel" class="form-type-textfield form-disabled form-item form-group"><label for="j_idt43:edit-consideration" class="label-width">Қарау нәтижесі</label>
+                            <div class="input-group">
+                                <img src="/resources/img/help.png" alt="?" title="Қарау нәтижесін таңдаңыз">
+                                <img class="big-icon" onclick="clearCaseResult(); return false;" src="/resources/img/x.png"><select id="j_idt43:edit-consideration" name="j_idt43:edit-consideration" class="form-control" size="1">	<option value="">-- Таңдаңыз --</option>
+	<option value="62012001">талап  (арыз, шағым) қанағаттандырылды</option>
+	<option value="62012002">талап  (арыз, шағым) ішінара қанағаттандырылды</option>
+	<option value="62012003">талапты (арызды, шағымды) қанағаттандырудан бас тартты</option>
+	<option value="62012004">бұйрық шығару арқылы қаралды</option>
+</select>
+                            </div><span id="j_idt43:j_idt131" style="display: none;"><script type="text/javascript">clearCaseResult=function(){RichFaces.ajax("j_idt43:j_idt131",null,{"incId":"1"} )};</script></span></span>
+                    </div>
+                </div>
+            </fieldset><span id="j_idt43:j_idt133">
+                <div class="tab__inner-bottom">
+                        <div class="g-recaptcha" data-sitekey="6LftPtAZAAAAAJ1TxEeHf0fXD0nHsbysfnTSN_EB"><div style="width: 304px; height: 78px;"><div><iframe title="reCAPTCHA" width="304" height="78" role="presentation" name="a-kugc16pvc1sz" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6LftPtAZAAAAAJ1TxEeHf0fXD0nHsbysfnTSN_EB&amp;co=aHR0cHM6Ly9vZmZpY2Uuc3VkLmt6OjQ0Mw..&amp;hl=en&amp;v=TnA7HacJFoBWt9hnlunBlYfK&amp;size=normal&amp;anchor-ms=20000&amp;execute-ms=30000&amp;cb=8iwuu786lzs"></iframe></div><textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea></div><iframe style="display: none;"></iframe></div><input id="j_idt43:j_idt137" name="j_idt43:j_idt137" onclick="jsf.util.chain(this,event,&quot;fillHideFields(); goNext(); return false;&quot;,&quot;RichFaces.ajax(\&quot;j_idt43:j_idt137\&quot;,event,{\&quot;incId\&quot;:\&quot;1\&quot;} )&quot;);return false;" value="Осы параметрлер бойынша іздеу" class="btn btn-primary" style="float: right" type="submit"><a href="#" id="j_idt43:j_idt138" name="j_idt43:j_idt138" onclick="RichFaces.ajax(&quot;j_idt43:j_idt138&quot;,event,{&quot;incId&quot;:&quot;1&quot;} );return false;" class="btn btn-primary" style="float: right; margin-right: 7px;">Іздеу параметрлерін қалпына келтіру</a><span class="rf-msgs errorMsg" id="j_idt43:j_idt139"></span><span id="j_idt43:j_idt140" style="display: none;"><script type="text/javascript">goNext=function(){RichFaces.ajax("j_idt43:j_idt140",null,{"incId":"1"} )};</script></span>
+                </div></span>
+            <script type="text/javascript">
+                function runScripts() {
+                    updateNeedAddRedStar();
+                    updateCalendarSelector();
+                    updateCaseTypeSelector();
+                    updateCategorySelector();
+                    updateCategoryOldSelector();
+                    updateInstanceSelector();
+                    updateConsiderationSelector();
+                }
+
+                $(document).ready(function () {
+                    $("#filter-button").click(function (e) {
+                        var icon = $("#filter-icon");
+                        var content = $("#filter-content");
+                        if (icon.hasClass("icon-plus-squared-alt")) {
+                            icon.removeClass("icon-plus-squared-alt");
+                            icon.addClass("icon-minus-squared-alt");
+                            content.removeClass("hidden");
+                        } else {
+                            icon.removeClass("icon-minus-squared-alt");
+                            icon.addClass("icon-plus-squared-alt");
+                            content.addClass("hidden");
+                        }
+                    });
+                    runScripts();
+                });
+
+                function fillHideFields() {
+                    $('[id $= ":edit-period-hide"]').val($("[id $= ':edit-period'] option:selected").val());
+                    $('[id $= ":edit-dateFrom-hid"]').val($('[id $= ":edit-dateFrom"]').val());
+                    $('[id $= ":edit-dateTo-hid"]').val($('[id $= ":edit-dateTo"]').val());
+                    $("[id $= ':edit-caseType-hide']").val($("[id $= ':edit-caseType'] option:selected").val());
+                    $("[id $= ':edit-instance-hide']").val($("[id $= ':edit-instance'] option:selected").val());
+                }
+
+                function updateNeedAddRedStar() {
+                    $(".needAddRedStar:not(:has('span.form-required'))").append("<span class='form-required' title='Толтырылуы міндетті жол.'\> *</span>");
+                }
+
+                function updateCalendarSelector() {
+                    var dpSet = $.datepicker.regional['kk'];
+                    var year = $("[id $= ':edit-period'] option:selected").val();
+                    if (year && year > 0) {
+                        dpSet.minDate = '01.01.2009 ';
+                        dpSet.maxDate = '31.12.'.concat(new Date().getFullYear());
+                    }
+                    $('[id $= ":edit-dateFrom"]').mask("99.99.9999").datepicker(dpSet);
+                    $('[id $= ":edit-dateTo"]').mask("99.99.9999").datepicker(dpSet);
+                }
+
+                function updateCaseTypeSelector() {
+                    $().selectize();
+                }
+
+                function updateCategorySelector() {
+                    $(document.getElementById('j_idt43:edit-category')).selectize();
+                }
+
+                function updateCategoryOldSelector() {
+                    $(document.getElementById('j_idt43:edit-category-old')).selectize();
+                }
+
+                function updateInstanceSelector() {
+                    $().selectize();
+                }
+
+                function updateConsiderationSelector() {
+                    $(document.getElementById('j_idt43:edit-consideration')).selectize();
+                }
+
+                function showHelpModalDialog() {
+                    $('#helpModalDialog').modal('show');
+                }
+            </script><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:1" value="-1981003707951077025:-259851155083925549" autocomplete="off">
+</form>
+            </div>
+        </div>
+            </div>
+        <div class="flex pt-30 card " style="padding-bottom:20px; width: ; height: auto; margin-top:20px">
+                    <div class="auth-form-container" style="width:1150px; display:flex; flex-direction:row; align-items:flex-start; gap:20px">
+                        
+                        <div class="left-columns" style="flex:2; display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start">
+                            <div class="flex flex-col pt-20 pl-20">
+                                <div class="flex flex-col pt-20 pl-30">
+                                    <h4>Көмек</h4>
+                                    <a href="/content/files/supportMailRules-kz.docx">Техникалық қолдау қызметіне сұранымдарды ресімдеу ережелері</a>
+                                    <a href="/content/files/pravila-kz.pdf">Соттарға құжаттарды электрондық құжат нысанында беру құралдарын техникалық қолдану, оларды тіркеу, өңдеу, олармен танысу қағидалары</a><a href="/content/files/Guide_kz.docx">Сот кабинетімен жұмыс жөніндегі анықтама</a>
+                                    
+                                    <a href="/content/files/v2000021065.29-07-2020.kaz.pdf">Электрондық құжатқа қойылатын техникалық талаптар және оның соттың автоматтандырылған ақпараттық жүйесінде айналыс қағидаралары</a><a href="/materials/privacy-policy.xhtml">Құпиялылық саясаты</a>
+                                </div>
+                                <div class="flex flex-col pt-20 pl-30">
+                                    <h4>Кері байланыс</h4>
+                                    <a href="#~" onclick="showFeedbackModalDialog();return false;">Пікірлер мен ұсыныстар</a>
+                                    <a href="mailto:office@sud.kz" onclick="showFoundErrorModal()"> Қолдау қызметіне жазу</a><a href="/layout/callSupport.xhtml">Call Center</a>
+                                </div>
+
+                            </div>
+                            <div class="flex flex-col pt-20 pl-20">
+                                <div class="flex flex-col pt-20 pl-30">
+                                    <h4>Пайдалы сілтемелер</h4><a href="https://zan.kz/kkz">"Әділет" АҚЖ</a><a href="/materials/requestSample.xhtml">Талап арыздардың және сотқа берілетін басқа да өтініштердің үлгілері</a><a href="/calculator/count.xhtml">Мемлекеттік баж салығын есептеуге арналған калькулятор</a><a href="/check/search.xhtml">Төлем чегін тексеру</a><a href="https://iac.aifc.kz/ru/">Халықаралық төрелік орталығы</a><a href="https://court.aifc.kz/ru/">"Астана" халықаралық қаржы орталығының соты</a>
+                                    <a href="#" id="videoInstructionLink" onclick="showLocalVideoDialog('http://office.sud.kz/content/video/videoGuide_kz.mp4'); return false;">Бейне нұсқаулық</a>
+                                </div>
+                                <div class="flex flex-col pt-20 pl-30 mb-20">
+                                    <h4>Сұрақтар</h4><a href="/materials/about.xhtml">Бұл қандай сайт?</a>
+                                    <a href="http://egov.kz/wps/portal/Content?contentPath=/egovcontent/getecp&amp;lang=ru" target="_blank">ЭЦҚ-ны қалай алуға болады?</a><a href="/materials/isk.xhtml">Егер талап арызды қабылдамаса, не істеу керек?</a><a href="/materials/faq.xhtml">Басқа сұрақтар&gt;&gt;
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        
+                        <div class="right-column flex flex-col pt-30 pl-20" style="flex:1; align-items:center">
+                            <div class="tab-side-block" style="display:flex; flex-direction:column; align-items:center; margin-bottom:20px">
+                                <div class="tab-side-image">
+                                    <img src="/resources/img/mobile/iPhone.jpg" style="width:130px; height:auto; object-fit:contain">
+                                </div>
+                                <div class="tab-side-text" style="margin-top:4px; font-weight:bold; text-align:center">
+                                    iPhone қолданбасын жүктеп алыңыз
+                                </div>
+                            </div>
+
+                            <div class="tab-side-block" style="display:flex; flex-direction:column; align-items:center; margin-bottom:20px">
+                                <div class="tab-side-image">
+                                    <img src="/resources/img/mobile/android.jpg" style="width:130px; height:auto; object-fit:contain">
+                                </div>
+                                <div class="tab-side-text" style="margin-top:4px; font-weight:bold; text-align:center">
+                                    Android қолданбасын жүктеп алыңыз
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        </div>
+        </section>
+
+        <script src="/resources/js/plugins.js"></script>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
+        <script src="/resources/js/bootstrap.min.js"></script>
+        <script type="application/javascript" src="/resources/js/scripts.js"></script>
+        <script type="application/javascript" src="/resources/js/selectize.min.js"></script>
+        <script type="application/javascript" src="/resources/jquery-ui/jquery-ui.js"></script>
+        <script type="application/javascript" src="/resources/js/datepicker-kk.js"></script>
+        <script type="application/javascript" src="/resources/js/datepicker-ru.js"></script>
+        <script type="application/javascript" src="/resources/js/maskedinput.js"></script>
+        <script type="application/javascript" src="/resources/js/qrcode.js"></script>
+<form id="f_l_temp" name="f_l_temp" method="post" action="/courtActs/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="f_l_temp" value="f_l_temp">
+<span id="f_l_temp:js_temp_1" style="display: none;"><script type="text/javascript">selectLanguageRu=function(param1){RichFaces.ajax("f_l_temp:js_temp_1",null,{"incId":"1","begin":"$.cookie('locale', 'ru', {expires: 365, path: '\/'});","parameters":{"param1":param1} } )};</script></span><span id="f_l_temp:js_temp_2" style="display: none;"><script type="text/javascript">selectLanguageKk=function(param1){RichFaces.ajax("f_l_temp:js_temp_2",null,{"incId":"1","begin":"$.cookie('locale', 'kk', {expires: 365, path: '\/'});","parameters":{"param1":param1} } )};</script></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:2" value="-1981003707951077025:-259851155083925549" autocomplete="off">
+</form>
+        <span>
+    <div id="feedbackModalDialog" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+<form id="j_idt189" name="j_idt189" method="post" action="/courtActs/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt189" value="j_idt189">
+<div id="j_idt189:feedbackDialogPanel" style="width: 900px;" class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                        <strong>Пікірлер мен ұсыныстар</strong>
+                    </div>
+                    <div class="modal-body"><p style="text-align: justify;"><b>Құрметті келуші!</b><br>«Пікірлер мен ұсыныстар» тек қана соттардың ресми сайттарының жұмысын жақсарту үшін арналғандығына көңіліңізді бөлеміз. Шешілу тәртібі әкімшілік құқық бұзушылықтар туралы заңнамамен, қылмыстық-процессуалдық, азаматтық-процессуалдық және басқа да заңнамамен орнатылған азаматтардың жолданымдары, сондай-ақ анонимдік жолданымдар мен мәселенің мән-жайы көрсетілмеген жолданымдар қарастырылмайды. Соттар заңнаманы қолдану бойынша заңды кеңес бере алмайтындығын және нақты істің мәні бойынша кеңес беруге құқығы жоқ екендігін ескеруіңізді сұраймыз. Барлық пікірлер мен ұсыныстар сайтты дамыту кезінде ескеріледі.</p><p class="note">Сот кабинетінің жұмысына байланысты туындаған сұрақтар бойынша Техникалық қолдау қызметінің <a href="mailto:office@sud.kz">office@sud.kz</a> электрондық адресіне жазу керек</p>
+
+                        <div class="pure-form pure-form-stacked">
+                            <legend></legend><label for="j_idt189:user-fio" style="display: inline-block" class="needAddRedStar">Т.А.Ә.<span class="form-required" title="Толтырылуы міндетті жол."> *</span></label><span class="rf-msg " id="j_idt189:j_idt194"></span><input id="j_idt189:user-fio" type="text" name="j_idt189:user-fio" class="form-control form-text" maxlength="255" style="width: 100%;"><label for="j_idt189:user-email" style="display: inline-block" class="needAddRedStar">E-mail<span class="form-required" title="Толтырылуы міндетті жол."> *</span></label><span class="rf-msg " id="j_idt189:j_idt196"></span><input id="j_idt189:user-email" type="text" name="j_idt189:user-email" class="form-control form-text" maxlength="255" style="width: 100%;"><label for="j_idt189:feedback" style="display: inline-block" class="needAddRedStar">Хабарлама<span class="form-required" title="Толтырылуы міндетті жол."> *</span></label><span class="rf-msg " id="j_idt189:j_idt198"></span><textarea id="j_idt189:feedback" name="j_idt189:feedback" class="form-control form-text" rows="4" style="width: 100%; height: inherit;"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer"><span id="j_idt189:sendErrorMessage" style="padding-right: 10px;"></span><input id="j_idt189:j_idt201" name="j_idt189:j_idt201" onclick="jsf.util.chain(this,event,&quot;hideFeedbackModalDialog(); return false;&quot;,&quot;RichFaces.ajax(\&quot;j_idt189:j_idt201\&quot;,event,{\&quot;incId\&quot;:\&quot;1\&quot;} )&quot;);return false;" value="Болдырмау" class="pure-button" type="submit"><input id="j_idt189:j_idt202" name="j_idt189:j_idt202" onclick="RichFaces.ajax(&quot;j_idt189:j_idt202&quot;,event,{&quot;incId&quot;:&quot;1&quot;} );return false;" value="Жіберу" class="pure-button pure-button-primary" type="submit">
+                    </div>
+                </div></div><span id="j_idt189:afterSendFeedbackPanel">
+                <script type="text/javascript">
+                    function afterSendFeedback() {
+                        if(true) {
+                            if(true) {
+                                hideFeedbackModalDialog();
+                                showSendFeedbackAlert();
+                            }
+                        }
+                    }
+                </script></span><span id="j_idt189:j_idt205"><span style="display:none" class="rf-st-start"></span><span class="rf-st-stop"></span><script type="text/javascript">new RichFaces.ui.Status("j_idt189:j_idt205",{"onstart":function(event){showLoadingPnl();},"onstop":function(event){hideLoadingPnl();}} )</script></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:3" value="-1981003707951077025:-259851155083925549" autocomplete="off">
+</form>
+    </div>
+    <div id="sendFeedbackAlert" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">Пікіріңіз үшін рақмет
+                </div>
+                <div class="modal-footer">
+                    <input type="button" value="OK" class="pure-button pure-button-primary" onclick="hideSendFeedbackAlert(); return false;">
+                </div>
+            </div>
+        </div>
+    </div>
+<form id="j_idt209" name="j_idt209" method="post" action="/courtActs/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt209" value="j_idt209">
+<span id="j_idt209:j_idt210" style="display: none;"><script type="text/javascript">showFeedbackModalDialog=function(){RichFaces.ajax("j_idt209:j_idt210",null,{"incId":"1"} )};</script></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:4" value="-1981003707951077025:-259851155083925549" autocomplete="off">
+</form>
+    <script type="text/javascript">
+        function hideFeedbackModalDialog() {
+            $('#feedbackModalDialog').modal('hide');
+        }
+
+        function showSendFeedbackAlert() {
+            $('#sendFeedbackAlert').modal('show');
+        }
+
+        function hideSendFeedbackAlert() {
+            $('#sendFeedbackAlert').modal('hide');
+        }
+
+        $(document).ready(function () {
+            $('#feedbackModalDialog').modal({
+                backdrop: 'static',
+                show: false
+            }).on('shown.bs.modal', function() {$("#feedbackModalDialog").find(".needAddRedStar").append("<span class='form-required' title='Толтырылуы міндетті жол.'\> *</span>");});
+            $('#sendFeedbackAlert').modal({
+                backdrop: 'static',
+                show: false
+            });
+        });
+    </script>
+    <style>
+        .letter{
+
+        }
+        .letter p{
+            margin: 0px;
+            text-indent: 32px;
+            line-height: 1.4;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+    </style>
+    <div id="letterModalDialog" class="modal fade" style="display: none; z-index: 999999;">
+<form id="j_idt213" name="j_idt213" method="post" action="/courtActs/index.xhtml" class="mmodal" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt213" value="j_idt213">
+<span id="j_idt213:letterModalDialogPanel">
+                <div class="modal-body">
+                    <div class="letter">
+                        <p>Бауырлар, амансыздар ма!</p>
+                        <p>Бұл хаттың себебі – әрбіреуіңе ортақ бір мәселе. Ол ағаның сендерге қалдырған мұрасы. Бірден айтайын, араласуға менің ешқандай қақым жоқ. Менікі – тек ой бөліссем, ақыл қоссам деген шын ниет.</p>
+                        <p>Марқұм ағам өмір бойы адал еңбек етті. Балаларым үшін деп тыным таппай жүгіріп жүретін. Жұмыс-жұмыс деп, тіпті денсаулығына да қараған жоқ. Маңдай терімен артына біраз дүние жинап кетті. Бизнесі бар. Еңбегінің қызығын көретін кезде қайтыс болғаны өте өкінішті, әрине.</p>
+                        <p>Енді қайтқанына жарты жыл болып қалды. Тірі адам тіршілігін жасай береді ғой. Наследство деген мәселе тұр алдарыңда. Бұл таза ішкі сұрақтарың. Соны ақылмен, адамгершілікпен, әділ шешесіңдер деген сенімдемін.</p>
+                        <p>Жалғыз өтінішім – сол мүліктің соңында жүріп, ағамның атына кір келтіріп алмайықшы. Әке-шешелеріңіздің әруағы тыныш болсын.</p>
+                        <p>Ертең араларың бүлініп жатса, ұяты сендерге де, маған да келеді. «Сен неге қарамадың, неге айтпадың? Туыстығыңды көрсетіп, неге жол сілтемедің?» дейді ғой жұрт.</p>
+                        <p>Тағы айтайын, араласуға ешқандай правам жоқ. Бірақ, «жоқ, өзіміз шеше алмаймыз, бізге ақыл қосатын адам керек» десеңіздер, қолдауға, көмектесуге, сөйлесуге, ақылдасуға дайынмын. Әрине, бәріңіз оған келісіп жатсаңыздар.</p>
+                        <p>Мұның барлығын осы әулетке жақын, жанашыр адам ретінде айтып отырмын. Қандай сұрақ болса да ақылмен, сабырмен шешкен дұрыс қой. Ешқайсымыз сол дүниені өзімізбен бірге алып кетпейміз. Оның бәрі ертең қалады. Бес күндік өмірде сыйластық, бауырластықтан қымбат нәрсе жоқ. Соны есте ұстайық бәріміз.</p>
+                        <p>Ал, «жоқ, өзіміз шешеміз, ешқандай проблема жоқ, бір бітімге, бір келісімге келеміз» деп жатсаңыздар, тіпті жақсы. Онда менде де еш уайым болмайды.</p>
+                        <p>Тағы айтайын, ешбір дүние бауырдан артық емес. Бүгін бастарың піспей қалса, оның зардабын ертең өздерің көресіңдер, балалар көреді. Араласуды қояды. Сонда немерелерге қандай өнеге көрсетеміз?</p>
+                        <p>Құдалар да әулеттегі жағдайды көріп, ойланып қалады ғой. «Мыналар ұйымшыл емес екен, ағайын болса да араздасып жүргені несі» дейді. Күйеу балалар, болашақ келіндер де сылтау қылып, «бізді сөккенше, өздерін жөндеп алмай ма?» десе қайтеміз. Көзге көрініп тұрған нәрсені айтпайды емес, айтады.</p>
+                        <p>Осылай тура айтып отырғаныма ренжімеңіздер. Екінші жағынан, оны айтпай, бұғып қалсам, «сырт көз – сыншы, кезінде неге ескертпедің?» деген өкпе болуы мүмкін ғой.</p>
+                        <p>Бар тілегім – ағайын тату болса, бір-бірлеріңе деген бұрынғыдай қамқорлық үзілмесе, бәрімізге де жақсы болар еді. Кіші інілеріңді де ойлағанымыз жөн. Жағдайлары онша мәз емес, оны білесіздер.</p>
+                        <p>Айтқанымды таразылап, ортаға салып, ақылмен, байыппен, шыдаммен шешесіңдер деп сенемін.</p>
+                        
+                    </div>
+                </div>
+                <div class="mline"><input id="j_idt213:j_idt215" name="j_idt213:j_idt215" onclick="jsf.util.chain(this,event,&quot;hideLetterModalDialog(); return false;&quot;,&quot;RichFaces.ajax(\&quot;j_idt213:j_idt215\&quot;,event,{\&quot;incId\&quot;:\&quot;1\&quot;} )&quot;);return false;" value="Жабу" class="btn btn-default" style="float: right; margin-left: 8px" type="button">
+                    <a href="/resources/files/letter.docx" class="btn btn-default">Басып шығару</a>
+                </div></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:5" value="-1981003707951077025:-259851155083925549" autocomplete="off">
+</form>
+
+    </div>
+
+    <script type="text/javascript">
+        function showLetterModalDialog() {
+            $('#letterModalDialog').modal('show');
+        }
+
+        function hideLetterModalDialog() {
+            $('#letterModalDialog').modal('hide');
+        }
+
+        // $(document).ready(function () {
+        //     $('#letterModalDialog').modal({
+        //         backdrop: 'static',
+        //         show: false
+        //     }).on('shown.bs.modal', function () {
+        //         if (true) {
+        //             $("#letterModalDialog").find(".needAddRedStar").append("<span class='form-required' title='Толтырылуы міндетті жол.'\> *</span>");
+        //         }
+        //     });
+        // });
+
+    </script>
+    <style>
+        .statement{
+
+        }
+        .statement p{
+            margin: 0px;
+            text-indent: 32px;
+            line-height: 1.4;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+    </style>
+    <div id="statementModalDialog" class="modal fade" style="display: none; z-index: 999999;">
+<form id="j_idt219" name="j_idt219" method="post" action="/courtActs/index.xhtml" class="mmodal" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt219" value="j_idt219">
+<span id="j_idt219:statementModalDialogPanel">
+                <div class="modal-body">
+                    <div class="statement">
+                        <p>Справедливость в <b>гражданском процессе.</b></p>
+                        <p>Не так оформил иск, не подал встречный, указал не ту норму, что-то не приложил, разводим руками: «это ваше процессуальное упущение». Ошибся в мелочи, всё - спорить бесполезно. Получается, цель суда – формально соблюсти ГПК, а не решить спор.</p>
+                        <p>А как в Германии? Судья ведёт беседу с истцом и ответчиком и узнаёт - кто чего хочет. Допустим, иск не так написан, нет доказательств или иск должен быть к иному лицу. Судья об этом говорит и делает всё, чтобы решить спор. У наших судей таких прав нет. Он ограничен рамками иска и пассивен. Оценивает, что дали стороны и никаких инициатив.</p>
+                        <p>Другая «беда». «Лабиринт» процедур. Пройдя «круги ада» нашей бюрократии и даже выиграв дело - будут ли считать такое мытарство справедливым?</p>
+                        <p>Одна женщина писала в Фейсбуке, как судилась в Англии. Подала иск онлайн. Простенькая форма: имя - адрес - суть иска - согласна ли на медиацию. Согласилась. Позвонил медиатор и уточнил требования. Затем он переговорил с ответчиком.</p>
+                        <p>Полчаса и спор решён. Медиатор скинул на емэйл одобренное сторонами соглашение, а копию - в суд. Не надо никуда идти, ничего подписывать. Всё удивительно просто, и, главное, по-человечески.</p>
+                        <p>Во вторник был в Сарыаркинском суде. Судьи просили дать им процессуальную активность, чтобы сами могли докопаться до истины. Стыдно перед людьми, говорят. В их глазах – мы формалисты.</p>
+                        <br>
+                        <p><b>КАМЕНЬ ТРЕТИЙ - ЭФФЕКТИВНОСТЬ ПРАВОСУДИЯ.</b></p>
+                        <p>Азаматтық істер қатты көбейіп келеді. 5 жылда 2 есе. 2013 жылы 560 мың іс болса, былтыр 900 мың.</p>
+                        <p>Алматының Әуезов ауданында бір судья күніне 12 іс пен материал қарапты. Төрт жылда жүктеме 3 есе өсті. Судьялар қағазға көмілуде. Адам тағдырын конвейерге айналдырсақ, сапа қайдан болсын?</p>
+                        <p>Әр іс бойынша кемінде екі тарап. Сонда 2 млндай адам сот әуресінде жүр. Оған сот аппаратын, прокурорларды, адвокаттарды, эксперттерді, сот орындаушыларды қосыңыз. Бұл бюджетке үлкен салмақ. Дамуымызға үлкен кедергі.</p>
+                        <p>Арызданып жүргендер бала-шаға, қалшылдаған қарт емес. Көбісі бизнес жасап, жұмыс орындарын ашып, елге пайда келтіріп жүргендер. Кәсібін ысырып қойып, алтын уақыттарын соттасуға жұмсауда.</p>
+                        <p>Біреу меншігін даулайды, екіншісі қарызын талап етеді, үшіншісі еңбекақысын өндіргісі келеді. Үйдегі проблемасын сотта шешемін деушілер де көп - ағасы інісімен, әкесі баласымен соттасып жатқан жағдай аз емес. Кәсіпкерден «жағдай қалай?» деп сұрай қалсаң, соттасып жатырмын дегенді жиі естисің.</p>
+                        <p>Сонда қалай, табиғатынан сабырлы, жанжалды жақтырмайтын халқымыз дауға құмар болып кеткені ме? Басымыз піспей қалса, дереу сотқа жүгіреміз. Қит етсек сол. Екі арадағы дауды сот аренаға шығарып, айқай-шумен шешкіміз келеді. Бітімге келу, татуласу, келісу мәдениетіміз қайда жоғалып кетті?</p>
+                        <p>Сотқа арызды бермей жатып, таныс іздей бастаймыз. «Сотта ағам бар, көкем бар» деп қорқытамыз. Сондағы мақсат - әділдік емес, оппоненттен өш алу, абыройын айрандай төгу.</p>
+                        <p>Сондықтан Елбасымыз дамуымызға кедергі болатын осындай жағымсыз әдеттерден құтылуымыз қажет деп шегелеп айтқан. Рухани жаңғырамыз десек, соның негізгі бір шарты осы.</p>
+                        <p>Әрине, даулар кез-келген қоғамда бар. Бірақ, олардың барлығын сотта шешу мүмкін емес. Сот екі жақты бірдей қанағаттандыра алмайды.</p>
+                        <p>Ең тиімді жол - дауды сотсыз шешетін институттарды дамыту. 2017 жылы бітіммен аяқталған даулардың үлесі 4-ақ пайыз. Бірақ, оған да сені қиын. Өйткені, статистикада жалғандық көп.</p>
+                        <p>Тараптарды бітімге келтіру - біз үшін жаңалық емес. Билер сотының түпкі мақсаты - екі жақты татуластыру, табыстыру болған. «Дау мұраты - біту» деген нақыл сөз осыдан қалған.</p>
+                        <p>Екінші жағынан, бұл әлемдік тренд. Дамыған елдерде тартысты шешетін балама институттар көп.</p>
+                        <p>АҚШ-та, дамыған елдерде даудың көбісі соттан тыс жерде шешіледі. Қытайда таластардың 30%, Словенияда 40% бітіммен соттың өзінде аяқталады.</p>
+                        <p>Дауды тек сот шешеді деген көзқарас бізде қатып қалған. Кейде басында ашуға беріліп, сотқа жүгініп, кейін басылып, «қатты кеткен жоқпын ба, алдыма келсе шешу жолын іздер едім қой» деп жатамыз.</p>
+                        <p>Соттар осындай бейбіт жолды көрсететін, ұрыс-керіссіз, бір-бірін тыңдап, бір мәмілеге келуіне жағдай жасайтын алтын көпір болуы тиіс. Сот, әкімдер, Ассамблея, партиялар болып осыны қолға алсақ.</p>
+                        <p>Қай кезде де сөзге тоқтаған халықпыз ғой. Бітімнің, татуласудың бар пайдасын жылы, сүйегіне өтетіндей, жүрегіне жететіндей сөздермен айтып үйренсек, онда қоғамда шағым да азаяды, жалпы ахуал да жақсарады. Соттасып, тартысып, араздасып жүрген адамдарда қандай көңіл болсын?</p>
+                        <p>Осының барлығын не үшін айтып отырмын?</p>
+                        <p>Отырысқа облыс әкімдерінің орынбасарлары қатысып отыр. Сіздерге өтініш - айтысып жүрген ағайындарымызды компромисске келтіретін, бітімге шақыратын, оның артықшылығын, ұтымды жағын ашып көрсететін, сотқа жеткізбей татуластыратын бір тиімді орын жасасақ. Оған мықты мамандарды дайындасақ - медиатор, психолог, конфликтолог, отставкадағы судьяларды және сөзге шешен, ойы жүйрік, халықпен тікелей сөйлесе білетін, тілін табатын, көндіре алатын тұлғаларды тартсақ.</p>
+                        <p>Мың адамға шаққанда даудың көбісі Алматы, Астана, Орал, Қарағанды, Павлодарда. Шымкентте даулар Алматыға қарағанда 5 есе аз екен.</p>
+                        <p>«Жұмыла көтерген жүк жеңіл» дегендей, бар күшімізді осыған салсақ. Сонда дау да қысқарады, билікке де өкпе азаяды, соттарға да сенім өседі.</p>
+                    </div>
+                </div>
+                <div class="mline"><input id="j_idt219:j_idt221" name="j_idt219:j_idt221" onclick="jsf.util.chain(this,event,&quot;hideStatementModalDialog(); return false;&quot;,&quot;RichFaces.ajax(\&quot;j_idt219:j_idt221\&quot;,event,{\&quot;incId\&quot;:\&quot;1\&quot;} )&quot;);return false;" value="Жабу" class="btn btn-default" style="float: right; margin-left: 8px" type="button">
+                    <a href="/resources/files/statement.docx" class="btn btn-default">Басып шығару</a>
+                </div></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:6" value="-1981003707951077025:-259851155083925549" autocomplete="off">
+</form>
+
+    </div>
+
+    <script type="text/javascript">
+        function showStatementModalDialog() {
+            $('#statementModalDialog').modal('show');
+        }
+
+        function hideStatementModalDialog() {
+            $('#statementModalDialog').modal('hide');
+        }
+    </script>
+    <div id="qrCodeModalDialog" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+<form id="j_idt225" name="j_idt225" method="post" action="/courtActs/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt225" value="j_idt225">
+<div id="j_idt225:qrCodeModalDialogPanel" style="width: 650px;" class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="pure-form pure-form-stacked">
+                            <img src="/resources/img/qr-code-A4.png" style="width: 600px; ">
+                        </div>
+                    </div>
+                    <div class="modal-footer"><input id="j_idt225:j_idt227" name="j_idt225:j_idt227" onclick="jsf.util.chain(this,event,&quot;hideQrCodeModalDialog(); return false;&quot;,&quot;RichFaces.ajax(\&quot;j_idt225:j_idt227\&quot;,event,{\&quot;incId\&quot;:\&quot;1\&quot;} )&quot;);return false;" value="Болдырмау" class="pure-button" type="submit">
+                    </div>
+                </div></div><span id="j_idt225:j_idt229"><span style="display:none" class="rf-st-start"></span><span class="rf-st-stop"></span><script type="text/javascript">new RichFaces.ui.Status("j_idt225:j_idt229",{"onstart":function(event){showLoadingPnl();},"onstop":function(event){hideLoadingPnl();}} )</script></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:7" value="-1981003707951077025:-259851155083925549" autocomplete="off">
+</form>
+    </div>
+<form id="j_idt231" name="j_idt231" method="post" action="/courtActs/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt231" value="j_idt231">
+<span id="j_idt231:j_idt232" style="display: none;"><script type="text/javascript">showQrModalDialog=function(){RichFaces.ajax("j_idt231:j_idt232",null,{"incId":"1"} )};</script></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:8" value="-1981003707951077025:-259851155083925549" autocomplete="off">
+</form>
+    <script type="text/javascript">
+        function hideQrCodeModalDialog() {
+            $('#qrCodeModalDialog').modal('hide');
+        }
+
+        $(document).ready(function () {
+            $('#qrCodeModalDialog').modal({
+                backdrop: 'static',
+                show: false
+            }).on('shown.bs.modal', function() {$("#qrCodeModalDialog").find(".needAddRedStar").append("<span class='form-required' title='Толтырылуы міндетті жол.'\> *</span>");});
+
+        });
+    </script>
+    <div id="availabilityCourtCasesModal" class="modal fade">
+<form id="j_idt235" name="j_idt235" method="post" action="/courtActs/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt235" value="j_idt235">
+<span id="j_idt235:j_idt236"><span style="display:none" class="rf-st-start"></span><span class="rf-st-stop"></span><script type="text/javascript">new RichFaces.ui.Status("j_idt235:j_idt236",{"onstart":function(event){showLoadingPnl();},"onstop":function(event){hideLoadingPnl();}} )</script></span><div id="j_idt235:availabilityCourtCasesModalPanel" class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header"><span style="font-size: 18px; font-weight: bold;">Сот істері және материалдардың бар болуын тексеру</span>
+                    </div>
+                    <div class="modal-body">
+                            <div class="form-wrapper form-group">
+                                <div class="form-type-textfield form-item form-group"><label for="j_idt235:xinHid" class="needAddRedStar">ЖСН<span class="form-required" title="Толтырылуы міндетті жол."> *</span></label><span class="rf-msg " id="j_idt235:j_idt243"></span><input id="j_idt235:xinHid" type="text" name="j_idt235:xinHid" class="form-control">
+                                </div>
+                            </div>
+                    </div>
+                    <div class="modal-footer"><input id="j_idt235:j_idt262" name="j_idt235:j_idt262" onclick="RichFaces.ajax(&quot;j_idt235:j_idt262&quot;,event,{&quot;incId&quot;:&quot;1&quot;} );return false;" value="Жабу" class="btn btn-default" type="submit"><input id="j_idt235:j_idt263" name="j_idt235:j_idt263" onclick="RichFaces.ajax(&quot;j_idt235:j_idt263&quot;,event,{&quot;incId&quot;:&quot;1&quot;} );return false;" value="Тексеру" class="btn btn-primary" type="submit"><span id="j_idt235:j_idt264" style="display: none;"><script type="text/javascript">reRender=function(){RichFaces.ajax("j_idt235:j_idt264",null,{"incId":"1"} )};</script></span><span id="j_idt235:j_idt265" style="display: none;"><script type="text/javascript">backAction=function(){RichFaces.ajax("j_idt235:j_idt265",null,{"incId":"1"} )};</script></span>
+                    </div>
+                </div></div><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:9" value="-1981003707951077025:-259851155083925549" autocomplete="off">
+</form>
+    </div>
+
+    <script type="text/javascript">
+        function availabilityCourtCasesModalShow() {
+            $('#availabilityCourtCasesModal').modal('show');
+        }
+
+        function availabilityCourtCasesModalHide() {
+            $('#availabilityCourtCasesModal').modal('hide');
+        }
+
+        $(document).ready(function () {
+            $('#availabilityCourtCasesModal').modal({
+                backdrop: 'static',
+                show: false
+            }).on('shown.bs.modal', function () {
+
+                hideLoadingPnl();
+            });
+        });
+
+        function updateNeedAddRedStar() {
+            $(".needAddRedStar:not(:has('span.form-required'))").append("<span class='form-required' title='Толтырылуы міндетті жол.'\> *</span>");
+        }
+    </script>
+    <div id="mediationAsnwerDialog" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+<form id="j_idt269" name="j_idt269" method="post" action="/courtActs/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt269" value="j_idt269">
+
+            <style>
+                .modal-body table tr td{
+                    padding-left: 16px;
+                }
+            </style><div id="j_idt269:mediationAsnwerDialogPanel" class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">Вы уверены, что не хотите Медиацию?
+                    </div>
+                    <div class="modal-body"><table id="j_idt269:j_idt275" style="padding: 16px">
+	<tbody><tr>
+<td>
+<input type="radio" checked="checked" name="j_idt269:j_idt275" id="j_idt269:j_idt275:0" value="DONT_KNOW" onclick="RichFaces.ajax(this,event,{&quot;sourceId&quot;:this,&quot;parameters&quot;:{&quot;javax.faces.behavior.event&quot;:&quot;valueChange&quot;,&quot;org.richfaces.ajax.component&quot;:&quot;j_idt269:j_idt275&quot;} } )"><label for="j_idt269:j_idt275:0"> Медиация не екенің білмеймін</label></td>
+<td>
+<input type="radio" name="j_idt269:j_idt275" id="j_idt269:j_idt275:1" value="NOT_TRUST" onclick="RichFaces.ajax(this,event,{&quot;sourceId&quot;:this,&quot;parameters&quot;:{&quot;javax.faces.behavior.event&quot;:&quot;valueChange&quot;,&quot;org.richfaces.ajax.component&quot;:&quot;j_idt269:j_idt275&quot;} } )"><label for="j_idt269:j_idt275:1"> Медиаторға сенбеймін</label></td>
+<td>
+<input type="radio" name="j_idt269:j_idt275" id="j_idt269:j_idt275:2" value="TRUST_THE_COURT" onclick="RichFaces.ajax(this,event,{&quot;sourceId&quot;:this,&quot;parameters&quot;:{&quot;javax.faces.behavior.event&quot;:&quot;valueChange&quot;,&quot;org.richfaces.ajax.component&quot;:&quot;j_idt269:j_idt275&quot;} } )"><label for="j_idt269:j_idt275:2"> Сотқа сенемін</label></td>
+	</tr>
+</tbody></table><table>
+	<tbody><tr>
+	</tr>
+</tbody></table>
+                    </div>
+                    <div class="modal-footer"><span class="rf-msgs errorMsg" id="j_idt269:j_idt278"></span><input id="j_idt269:j_idt279" name="j_idt269:j_idt279" onclick="RichFaces.ajax(&quot;j_idt269:j_idt279&quot;,event,{&quot;incId&quot;:&quot;1&quot;} );return false;" value="Ары қарай" class="btn btn-primary" type="submit">
+                    </div>
+                </div></div><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:10" value="-1981003707951077025:-259851155083925549" autocomplete="off">
+</form>
+    </div>
+    <script type="text/javascript">
+        function goNextRequest() {
+            if(true){
+                sendRequest();
+                return false;
+            }
+        }
+        function showmediationAsnwerDialog() {
+            $('#mediationAsnwerDialog').modal('show');
+        }
+
+        function hidemediationAsnwerDialog() {
+            $('#mediationAsnwerDialog').modal('hide');
+        }
+        $(document).ready(function () {
+            $('#mediationAsnwerDialog').modal({
+                backdrop: 'static',
+                show: false
+            });
+        });
+    </script>
+    <div id="edsConnectionError" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body"><span style="font-size: 14px; color: red; font-weight: bold;">NCALayer қосылу кезінде қателік туындады.&lt;br/&gt;Бағдарламаның қосылғанын тексеріп, қайта көріңіз.</span>
+                </div>
+                <div class="modal-footer">
+                    <input type="button" value="OK" class="button button-primary" onclick="hideEdsConnectionError(); return false;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function showEdsConnectionError() {
+            $('#edsConnectionError').modal('show');
+        }
+
+        function hideEdsConnectionError() {
+            $('#edsConnectionError').modal('hide');
+        }
+
+        $(document).ready(function () {
+            $('#edsConnectionError').modal({
+                backdrop: 'static',
+                show: false
+            });
+        });
+    </script>
+    
+    
+    
+    
+    <div id="videoDialog" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" style="max-width: 90%; width: 1200px;">
+            <div class="modal-content">
+                <div class="modal-body" id="video-container"></div>
+                <div class="modal-footer"><input id="j_idt286" name="j_idt286" onclick="jsf.util.chain(this,event,&quot;hideVideoDialog(); return false;&quot;,&quot;RichFaces.ajax(\&quot;j_idt286\&quot;,event,{\&quot;incId\&quot;:\&quot;1\&quot;} )&quot;);return false;" value="Жабу" class="btn btn-default" type="submit">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function showVideoDialog() {
+            var html = '<iframe id="video-frame" width="557" height="320" src="" frameborder="0"></iframe>';
+            $(html).appendTo('#video-container');//добавляем видео
+
+            var caption = "";
+            var sourceUrl = "";
+            if(caption || sourceUrl) {//если есть Заголовок или Источник, то надо добавить div заголовка
+                var div = '<div class="modal-header" id="video-header"></div>';
+                $(div).insertBefore('#video-container');
+                if(caption) {
+                    $('<span>' + caption + '</span>').appendTo('#video-header');
+                }
+                if(sourceUrl) {
+                    $('<span class="video-dialog-header-source"><a href="' + sourceUrl                             + '" target="_blank">Дереккөзі</a></span>').appendTo('#video-header');
+                }
+            }
+
+            $('#videoDialog').modal('show');
+        }
+
+        $(document).ready(function () {
+            $('#videoDialog').modal({
+                backdrop: 'static',
+                show: false
+            });
+        });
+    </script>
+    <div id="foundErrorModal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+<form id="j_idt290" name="j_idt290" method="post" action="/courtActs/index.xhtml" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_idt290" value="j_idt290">
+<div id="j_idt290:foundErrorModalPanel" class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="flex w100 flex-col flex-jc-start"><span id="j_idt290:j_idt292:cause" style="width: " class="select-one-item-panel "><label for="j_idt290:j_idt292:cause-filed" class="">Қатені сипаттаңыз</label><textarea name="j_idt290:j_idt292:j_idt293"></textarea></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer"><input id="j_idt290:j_idt296" name="j_idt290:j_idt296" onclick="jsf.util.chain(this,event,&quot;hideFoundErrorModal(); return false;&quot;,&quot;RichFaces.ajax(\&quot;j_idt290:j_idt296\&quot;,event,{\&quot;incId\&quot;:\&quot;1\&quot;} )&quot;);return false;" value="Болдырмау" class="btn btn-default" type="submit"><input id="j_idt290:j_idt297" name="j_idt290:j_idt297" onclick="RichFaces.ajax(&quot;j_idt290:j_idt297&quot;,event,{&quot;incId&quot;:&quot;1&quot;} );return false;" value="Жіберу" class="btn btn-primary" type="submit">
+                    </div>
+                </div></div><span id="j_idt290:j_idt299"><span style="display:none" class="rf-st-start"></span><span class="rf-st-stop"></span><script type="text/javascript">new RichFaces.ui.Status("j_idt290:j_idt299",{"onstart":function(event){showLoader();},"onstop":function(event){hideLoader();}} )</script></span><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:11" value="-1981003707951077025:-259851155083925549" autocomplete="off">
+</form>
+    </div>
+    <script type="text/javascript">
+        function showFoundErrorModal() {
+            $('#foundErrorModal').modal('show');
+        }
+
+        function hideFoundErrorModal() {
+            $('#foundErrorModal').modal('hide');
+        }
+
+        $(document).ready(function () {
+            $('#foundErrorModal').modal({
+                backdrop: 'static',
+                show: false
+            })
+        });
+    </script>
+    <button class="button button-primary" style="position: fixed; right: 30px; bottom: 50px" onclick="showFoundErrorModal()">
+        Қате таптыңыз ба?
+    </button>
+        </span><script type="text/javascript">RichFaces.jQuery(document).ready(function() {
+new RichFaces.ui.Message("j_idt43:j_idt53",{"forComponentId":"j_idt43:edit\u002Dperiod","showSummary":false,"showDetail":true} )
+new RichFaces.ui.Message("j_idt43:j_idt58",{"forComponentId":"j_idt43:edit\u002DparticipantTypeCheckbox","showSummary":false,"showDetail":true} )
+new RichFaces.ui.Message("j_idt43:j_idt139",{"globalOnly":true,"isMessages":true} )
+new RichFaces.ui.Message("j_idt189:j_idt194",{"forComponentId":"j_idt189:user\u002Dfio","showSummary":false,"showDetail":true} )
+new RichFaces.ui.Message("j_idt189:j_idt196",{"forComponentId":"j_idt189:user\u002Demail","showSummary":false,"showDetail":true} )
+new RichFaces.ui.Message("j_idt189:j_idt198",{"forComponentId":"j_idt189:feedback","showSummary":false,"showDetail":true} )
+new RichFaces.ui.Message("j_idt235:j_idt243",{"forComponentId":"j_idt235:xinHid","showSummary":false,"showDetail":true} )
+new RichFaces.ui.Message("j_idt269:j_idt278",{"globalOnly":true,"isMessages":true} )
+});
+</script><div style="background-color: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 3px; position: absolute; transition: visibility linear 0.3s, opacity 0.3s linear; opacity: 0; visibility: hidden; z-index: 2000000000; left: 0px; top: -10000px;"><div style="width: 100%; height: 100%; position: fixed; top: 0px; left: 0px; z-index: 2000000000; background-color: rgb(255, 255, 255); opacity: 0.05;"></div><div class="g-recaptcha-bubble-arrow" style="border: 11px solid transparent; width: 0px; height: 0px; position: absolute; pointer-events: none; margin-top: -11px; z-index: 2000000000;"></div><div class="g-recaptcha-bubble-arrow" style="border: 10px solid transparent; width: 0px; height: 0px; position: absolute; pointer-events: none; margin-top: -10px; z-index: 2000000000;"></div><div style="z-index: 2000000000; position: relative;"><iframe title="recaptcha challenge expires in two minutes" name="c-kugc16pvc1sz" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" src="https://www.google.com/recaptcha/api2/bframe?hl=en&amp;v=TnA7HacJFoBWt9hnlunBlYfK&amp;k=6LftPtAZAAAAAJ1TxEeHf0fXD0nHsbysfnTSN_EB&amp;bft=0dAFcWeA6m1XNY-PU5Kw2bPSFls6B5nVC3eo0ZSFrp4FcjsISr1_2YWbsJuCky3ZjtHWv2KuyakISSJq8uqTWnQmBlFHBpFhX2LQ" style="width: 100%; height: 100%;"></iframe></div></div></body></html>

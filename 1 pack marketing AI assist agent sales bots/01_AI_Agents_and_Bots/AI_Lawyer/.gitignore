@@ -1,0 +1,30 @@
+# Секреты и локальные ключи
+.env
+*.p12
+*.pfx
+*.pem
+*.key
+
+# Виртуальные окружения и Python cache
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Локальные browser/session profiles — содержат cookies/localStorage
+data/browser_profiles/
+data/**/*storage*.json
+data/**/*cookie*.json
+data/**/*state*.json
+
+# Скачанные судебные документы и runtime-артефакты
+downloads/cases/
+data/court_acts/*.html
+data/court_acts/*.png
+data/court_acts/*.csv
+data/court_acts/*.json
+data/cabinet/
+
+# macOS / editor
+.DS_Store
+.vscode/

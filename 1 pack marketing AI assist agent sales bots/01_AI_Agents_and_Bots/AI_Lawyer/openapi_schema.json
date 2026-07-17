@@ -1,0 +1,269 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Kazakhstan Court Acts AI Bridge API",
+    "description": "Универсальный API-мост для поиска судебных дел и актов в Республике Казахстан (sud.kz).",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Health Check",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cases/search": {
+      "post": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Search Cases",
+        "description": "Поиск судебных дел по ИИН/БИН контрагента на портале sud.kz.",
+        "operationId": "search_cases_api_v1_cases_search_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaseSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseSearchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CaseSearchRequest": {
+        "properties": {
+          "iin_or_bin": {
+            "type": "string",
+            "title": "Iin Or Bin",
+            "description": "ИИН или БИН контрагента для поиска судебных дел",
+            "example": "123456789012"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year",
+            "description": "Год поиска судебных актов",
+            "default": "2025",
+            "example": "2025"
+          },
+          "max_results": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Results",
+            "description": "Максимальное количество результатов",
+            "default": 20,
+            "example": 10
+          }
+        },
+        "type": "object",
+        "required": [
+          "iin_or_bin"
+        ],
+        "title": "CaseSearchRequest"
+      },
+      "CaseSearchResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "query_iin_bin": {
+            "type": "string",
+            "title": "Query Iin Bin"
+          },
+          "total_found": {
+            "type": "integer",
+            "title": "Total Found"
+          },
+          "cases": {
+            "items": {
+              "$ref": "#/components/schemas/CourtCase"
+            },
+            "type": "array",
+            "title": "Cases"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success",
+          "query_iin_bin",
+          "total_found",
+          "cases"
+        ],
+        "title": "CaseSearchResponse"
+      },
+      "CourtCase": {
+        "properties": {
+          "case_number": {
+            "type": "string",
+            "title": "Case Number",
+            "description": "Номер дела"
+          },
+          "court": {
+            "type": "string",
+            "title": "Court",
+            "description": "Судебный орган"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category",
+            "description": "Категория дела"
+          },
+          "parties": {
+            "type": "string",
+            "title": "Parties",
+            "description": "Стороны по делу"
+          },
+          "judge": {
+            "type": "string",
+            "title": "Judge",
+            "description": "Судья"
+          },
+          "date": {
+            "type": "string",
+            "title": "Date",
+            "description": "Дата регистрации/решения"
+          },
+          "result": {
+            "type": "string",
+            "title": "Result",
+            "description": "Результат рассмотрения"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link",
+            "description": "Ссылка на карточку дела"
+          }
+        },
+        "type": "object",
+        "required": [
+          "case_number",
+          "court",
+          "category",
+          "parties",
+          "judge",
+          "date",
+          "result"
+        ],
+        "title": "CourtCase"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "APIKeyHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    }
+  }
+}
