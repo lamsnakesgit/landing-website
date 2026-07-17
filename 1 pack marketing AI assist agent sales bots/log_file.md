@@ -1,4 +1,15 @@
 
+## 2026-07-17: Загрузка локального видео на YouTube через API Maton.ai (YouTube Upload via Maton.ai API)
+**Победы (Wins):**
+- **Успешная загрузка видео:** Видеофайл `/Users/higherpower/Downloads/VIDEO-2026-07-16-16-25-56.mp4` успешно загружен на YouTube через API-шлюз Maton.ai.
+- **Создан скрипт автоматизации:** Создан скрипт `upload_downloaded_video.py` с автоматическим определением Content-Type (`video/mp4` для `.mp4` и `video/quicktime` для `.mov`) и чтением `MATON_API_KEY` из `.env`.
+- **Получена ссылка:** Ссылка на загруженное видео: https://youtu.be/4Z_wbJH-SHQ
+- [EN] Successfully uploaded `/Users/higherpower/Downloads/VIDEO-2026-07-16-16-25-56.mp4` to YouTube using Maton.ai API. Created a reusable script `upload_downloaded_video.py` that dynamically detects MIME type and securely uses `MATON_API_KEY` from `.env`. Link: https://youtu.be/4Z_wbJH-SHQ
+
+**Ошибки и как решили (Problems & Solutions):**
+- Ошибок при загрузке не возникло. Скрипт корректно определил MIME-тип для формата `.mp4` как `video/mp4` (в отличие от `video/quicktime` для `.mov`), и загрузка завершилась успешно.
+- [EN] No errors during upload. The script correctly set MIME type to `video/mp4` for the `.mp4` video (as opposed to `video/quicktime` for `.mov`), resulting in a successful upload.
+
 ## 2026-07-16: Верификация работы ежедневного сбора лидов по запросу пользователя (Daily Leadgen Pipeline E2E Verification)
 **Победы (Wins):**
 - **Проверка работоспособности системы сбора лидов:** Выполнена сквозная проверка пайплайна сбора контактов с hh.ru, hh.kz, pk.uchet.kz (adata.kz) и threads.net по ключевым направлениям (ИИ, разработка, боты, маркетинг, контекстная реклама, ИИ-контент).
