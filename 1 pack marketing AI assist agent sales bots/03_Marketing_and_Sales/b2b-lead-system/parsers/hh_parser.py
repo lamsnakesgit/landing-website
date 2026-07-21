@@ -33,7 +33,7 @@ AREA_MAP = {
 }
 
 HEADERS = {
-    "User-Agent": "AIAgentOutreach/1.0 (info@aiconicvibe.store)",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
     "Accept": "application/json",
     "Accept-Language": "ru-RU,ru;q=0.9",
 }
@@ -47,6 +47,94 @@ def get_area_id(city: str) -> str:
     return AREA_MAP.get(city.lower(), "40")
 
 
+async def search_ddg_hh(city: str, sphere: str, role: str) -> dict:
+    """Фоллбэк поиск вакансий и компаний HH через DuckDuckGo Lite при блокировке HH API"""
+    import urllib.parse
+    domain = "hh.kz" if city.lower() in ["казахстан", "алматы", "астана", "шымкент"] else "hh.ru"
+    query = f"{role} {sphere}".strip()
+    log.info(f"HH ({domain}) — запуск фоллбэк поиска через DuckDuckGo Lite для: '{query}'")
+    
+    companies = {}
+    vacancies = []
+    contacts = []
+    
+    ddg_url = "https://lite.duckduckgo.com/lite/"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+    data = {"q": f"site:{domain}/vacancy {query}"}
+    
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.post(ddg_url, headers=headers, data=data)
+            if resp.status_code == 200:
+                soup = BeautifulSoup(resp.text, 'html.parser')
+                links = soup.find_all('a', class_='result-link')
+                
+                for link in links:
+                    href = link.get('href', '')
+                    title = link.get_text(strip=True)
+                    decoded_href = urllib.parse.unquote(href)
+                    
+                    match_url = re.search(r"https?://[\w\.]*hh\.(?:ru|kz)/vacancy/(\d+)", decoded_href)
+                    if match_url:
+                        vac_url = match_url.group(0)
+                        vac_id = match_url.group(1)
+                        
+                        snippet = ""
+                        tr = link.find_parent('tr')
+                        if tr:
+                            next_tr = tr.find_next_sibling('tr')
+                            if next_tr:
+                                snip_td = next_tr.select_one('.result-snippet')
+                                if snip_td:
+                                    snippet = snip_td.get_text(strip=True)
+                                    
+                        parts = title.split("–") if "–" in title else title.split("-")
+                        vac_title = parts[0].strip() if len(parts) > 0 else title
+                        comp_name = parts[1].strip() if len(parts) > 1 else f"Компания {domain}"
+                        
+                        comp_id = f"hh_{comp_name.replace(' ', '_')}"
+                        if comp_id not in companies:
+                            phone = extract_phone(snippet) or ""
+                            email = extract_email(snippet) or ""
+                            
+                            companies[comp_id] = {
+                                "id": comp_id,
+                                "name": comp_name,
+                                "site": vac_url,
+                                "phone": phone,
+                                "email": email,
+                                "city": city,
+                                "description": snippet,
+                                "category": sphere,
+                                "source": domain,
+                                "hh_url": vac_url,
+                                "employee_count_range": "",
+                            }
+                            
+                        vacancies.append({
+                            "company_id": comp_id,
+                            "vacancy_id": vac_id,
+                            "title": vac_title,
+                            "description": snippet,
+                            "url": vac_url,
+                            "salary": "",
+                            "city": city,
+                            "published_at": "",
+                            "source": domain,
+                        })
+    except Exception as e:
+        log.warning(f"Ошибка фоллбэка HH через DDG: {e}")
+        
+    return {
+        "companies": list(companies.values()),
+        "vacancies": vacancies,
+        "contacts": contacts
+    }
+
+
 async def fetch_vacancies(
     client: httpx.AsyncClient,
     city: str,
@@ -56,17 +144,21 @@ async def fetch_vacancies(
     per_page: int = 50
 ) -> dict:
     area_id = get_area_id(city)
+    search_text = f"{role} {sphere}".strip()
     params = {
-        "text": f"{role} {sphere}",
+        "text": search_text,
         "area": area_id,
         "per_page": per_page,
         "page": page,
         "order_by": "publication_time",
-        "search_field": "name",  # ищем в названии должности
     }
-    resp = await client.get(f"{HH_API}/vacancies", params=params, headers=HEADERS)
-    resp.raise_for_status()
-    return resp.json()
+    try:
+        resp = await client.get(f"{HH_API}/vacancies", params=params, headers=HEADERS)
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        log.warning(f"HH API недоступен ({e}). Использование фоллбэк поиска...")
+        return await search_ddg_hh(city, sphere, role)
 
 
 async def fetch_vacancy_detail(client: httpx.AsyncClient, vacancy_id: str) -> dict:
@@ -116,6 +208,10 @@ async def parse_hh(city: str, sphere: str, role: str, max_pages: int = 5) -> dic
             except Exception as e:
                 log.error(f"Ошибка при получении страницы {page}: {e}")
                 break
+
+            if "companies" in data and "items" not in data:
+                log.info("Получены вакансии HH через фоллбэк скрапинг.")
+                return data
 
             items = data.get("items", [])
             if not items:

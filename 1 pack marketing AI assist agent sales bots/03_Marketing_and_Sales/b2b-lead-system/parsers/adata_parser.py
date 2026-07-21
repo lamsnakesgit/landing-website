@@ -108,129 +108,77 @@ async def parse_company_page(client: httpx.AsyncClient, company_url: str, city: 
         return None
 
 
-async def search_adata(city: str, sphere: str, role: str, max_pages: int = 5) -> dict:
+async def search_adata(city: str, sphere: str, role: str, max_pages: int = 3) -> dict:
     """
-    adata.kz — поиск по вакансиям и компаниям.
-    Стратегия: используем поиск по каталогу компаний + фильтрация по городу.
+    adata.kz (pk.adata.kz) — поиск по казахстанским компаниям и бизнесам.
+    Используем поисковый фоллбэк (DuckDuckGo Lite + Tavily) по pk.adata.kz для надежного получения реестра.
     """
+    import urllib.parse
     companies = {}
     vacancies = []
     contacts = []
 
-    city_slug = get_city_slug(city)
-    query = f"{role} {sphere}".strip()
+    query = f"{sphere} {role}".strip()
+    log.info(f"adata.kz (pk.adata.kz) — поиск компаний по запросу: '{query}'")
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        for page in range(1, max_pages + 1):
-            # Поиск по вакансиям
-            search_url = f"{BASE_URL}/vacancy/search/?text={query}&city={city_slug}&page={page}"
-            log.info(f"adata.kz вакансии — страница {page}: {search_url}")
+    # Ищем компании через DuckDuckGo Lite по pk.adata.kz
+    ddg_url = "https://lite.duckduckgo.com/lite/"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+    data = {"q": f"site:pk.adata.kz {query} {city}"}
 
-            try:
-                html = await fetch_page(client, search_url)
-                soup = BeautifulSoup(html, "html.parser")
-
-                # Ищем карточки вакансий
-                vacancy_cards = soup.select(".vacancy-card, .vacancy-item, article.vacancy, .job-item")
-                if not vacancy_cards:
-                    # Fallback: ищем ссылки на вакансии
-                    vacancy_cards = soup.select("a[href*='/vacancy/']")
-
-                if not vacancy_cards:
-                    log.info(f"Нет результатов на странице {page}")
-                    break
-
-                for card in vacancy_cards:
-                    try:
-                        # Название вакансии
-                        title_el = card.select_one("h2, h3, .title, .vacancy-title, a.vacancy-name")
-                        title = title_el.get_text(strip=True) if title_el else ""
-
-                        if not title and card.name == "a":
-                            title = card.get_text(strip=True)
-
-                        # Ссылка
-                        link_el = card.select_one("a") if card.name != "a" else card
-                        href = link_el.get("href", "") if link_el else ""
-                        vacancy_url = BASE_URL + href if href.startswith("/") else href
-
-                        # Компания
-                        company_el = card.select_one(".company-name, .employer, .org-name")
-                        company_name = company_el.get_text(strip=True) if company_el else ""
-
-                        # Зарплата
-                        salary_el = card.select_one(".salary, .wage")
-                        salary = salary_el.get_text(strip=True) if salary_el else ""
-
-                        # Город
-                        city_el = card.select_one(".city, .location, .address")
-                        card_city = city_el.get_text(strip=True) if city_el else city
-
-                        vac_id = href.strip("/").split("/")[-1] if href else ""
-                        comp_key = company_name or f"adata_{vac_id}"
-
-                        if comp_key not in companies:
-                            companies[comp_key] = {
-                                "id": comp_key,
-                                "name": company_name,
-                                "site": "",
-                                "phone": "",
-                                "email": "",
-                                "city": card_city,
-                                "description": "",
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.post(ddg_url, headers=headers, data=data)
+            if resp.status_code == 200:
+                soup = BeautifulSoup(resp.text, 'html.parser')
+                links = soup.find_all('a', class_='result-link')
+                
+                for link in links:
+                    href = link.get('href', '')
+                    title = link.get_text(strip=True)
+                    decoded_href = urllib.parse.unquote(href)
+                    
+                    match_url = re.search(r"https?://pk\.adata\.kz/company/\d+", decoded_href)
+                    if match_url:
+                        comp_url = match_url.group(0)
+                        bin_match = re.search(r"/company/(\d+)", comp_url)
+                        bin_code = bin_match.group(1) if bin_match else ""
+                        
+                        snippet = ""
+                        tr = link.find_parent('tr')
+                        if tr:
+                            next_tr = tr.find_next_sibling('tr')
+                            if next_tr:
+                                snip_td = next_tr.select_one('.result-snippet')
+                                if snip_td:
+                                    snippet = snip_td.get_text(strip=True)
+                                    
+                        comp_name = title.replace("- adata.kz", "").replace("– adata.kz", "").strip()
+                        
+                        comp_id = f"adata_{bin_code}" if bin_code else comp_name
+                        if comp_id not in companies:
+                            phone = extract_phone(snippet) or ""
+                            email = extract_email(snippet) or ""
+                            
+                            companies[comp_id] = {
+                                "id": comp_id,
+                                "name": comp_name,
+                                "bin": bin_code,
+                                "inn": bin_code,
+                                "site": comp_url,
+                                "phone": phone,
+                                "email": email,
+                                "city": city,
+                                "description": snippet,
                                 "category": sphere,
                                 "source": "adata.kz",
-                                "hh_url": "",
+                                "hh_url": comp_url,
                             }
-
-                        if vac_id:
-                            vacancies.append({
-                                "company_id": comp_key,
-                                "vacancy_id": f"adata_{vac_id}",
-                                "title": title,
-                                "description": "",
-                                "url": vacancy_url,
-                                "salary": salary,
-                                "city": card_city,
-                                "published_at": "",
-                                "source": "adata.kz",
-                            })
-
-                    except Exception as e:
-                        log.warning(f"Ошибка обработки карточки: {e}")
-                        continue
-
-            except Exception as e:
-                log.error(f"Ошибка получения страницы {page} adata.kz: {e}")
-                break
-
-            await asyncio.sleep(1.5)
-
-        # Поиск по каталогу компаний
-        log.info("adata.kz — поиск по каталогу компаний...")
-        try:
-            catalog_url = f"{BASE_URL}/company/search/?text={query}&city={city_slug}"
-            html = await fetch_page(client, catalog_url)
-            soup = BeautifulSoup(html, "html.parser")
-
-            company_links = soup.select("a[href*='/company/']")
-            seen_links = set()
-            for link in company_links[:30]:  # первые 30 компаний
-                href = link.get("href", "")
-                if "/company/" not in href or href in seen_links:
-                    continue
-                seen_links.add(href)
-                company_url = BASE_URL + href if href.startswith("/") else href
-                comp_data = await parse_company_page(client, company_url, city, sphere)
-                if comp_data:
-                    key = comp_data["name"]
-                    if key not in companies:
-                        comp_data["id"] = key
-                        companies[key] = comp_data
-                await asyncio.sleep(0.8)
-
-        except Exception as e:
-            log.warning(f"Каталог компаний adata.kz: {e}")
+    except Exception as e:
+        log.warning(f"Каталог компаний adata.kz: {e}")
 
     return {
         "companies": list(companies.values()),
