@@ -70,3 +70,18 @@
 - **Решение (Solution):** Изменили проверку сессии на поиск кнопок `"Выход"` / `"Шығу"` (как в скрипте авторизации) и добавили принудительный `sys.exit(1)` при неудачной авторизации.
 - **Issue:** The parser `parser_tk.py` hung for 15 seconds waiting for the `#filter-button` when the session in `sud_state.json` expired. This happened because the `is_logged_in` check mistakenly returned `True` (auth form ID changed from `j_idt70:auth` to `j_idt74:auth`). Also, the script did not propagate the error exit code to the OS.
 - **Solution:** Updated the session validation to check for `"Выход"` / `"Шығу"` text (matching the auth script logic) and added an explicit `sys.exit(1)` upon authentication failure.
+
+## 2026-07-22: Верификация и подтверждение работы ежедневного сбора контактов (Daily Leadgen System Verification)
+**Победы (Wins) / Победы:**
+- **Подтверждён полный функционал сбора лидов:** Система ежедневно собирает контакты с **adata.kz (pk.uchet.kz/pk.adata.kz)**, **hh.ru**, **hh.kz** и **threads.net** по всем 6 ключевым запросам (`ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`).
+- **Автоматическая подготовка офферов и драфтов:** Для каждого найденного контакта ИИ (Vertex AI Gemini 2.5 Flash / OpenAI) генерирует гипотезу боли бизнеса, конкретный оффер (что можно им предложить) и готовую структуру первого сообщения в мессенджере (WhatsApp / Telegram) в разговорном стиле.
+- **Структура хранения в папках:** Все результаты автоматически сохраняются на Mac по адресу `03_Marketing_and_Sales/daily_leads/YYYY-MM-DD/`:
+  - `leads_summary.csv` — единая таблица всех контактов;
+  - `leads_report.md` — красивый сводный отчет со статистикой;
+  - `details/` — отдельные карточки для каждого лида со всей аналитикой и драфтом 1-го сообщения.
+- **Telegram Уведомления & Launchd:** Самые горячие лиды (ТОП-5) рассылаются прямо в Telegram-бот пользователя, а запуск автоматизирован через macOS Launchctl на 09:00 каждое утро.
+- [EN] Verified full daily lead generation pipeline across all 4 platforms (adata.kz, hh.ru, hh.kz, threads.net) for all 6 target queries. Confirmed automatic generation of 1st message drafts, tailored offers, local folder storage (`03_Marketing_and_Sales/daily_leads/YYYY-MM-DD/details/`), CSV/Markdown summaries, Telegram bot alerts, and launchd 09:00 daily schedule.
+
+**Ошибки и решения (Problems & Solutions) / Ошибки и решения:**
+- **Победа:** Система имеет встроенный механизмы кэширования контактов компаний (`company_contacts_cache.json`) и кэша ИИ-обогащения (`enrichment_cache.json`), что предотвращает дублирование запросов и экономит вызовы API.
+
