@@ -350,6 +350,46 @@ def search_uchet_web(page, query):
     return leads
 
 
+def search_adata_web(page, query):
+    """Ищет компании на pk.adata.kz по запросу и собирает контакты (ЛПР, телефон, email, БИН)"""
+    logger.info(f"Adata: Поиск компаний на pk.adata.kz по запросу '{query}'...")
+    leads = []
+    try:
+        safe_goto(page, "https://pk.adata.kz/", wait_until="domcontentloaded", timeout=25000)
+        time.sleep(2)
+        inp = page.query_selector('input')
+        if inp:
+            inp.fill(query)
+            inp.press('Enter')
+            time.sleep(4)
+            
+            body_text = page.inner_text('body')
+            bins = re.findall(r'\b\d{12}\b', body_text)
+            bins = list(dict.fromkeys(bins))
+            
+            logger.info(f"Найдено БИН на pk.adata.kz по '{query}': {len(bins)}")
+            
+            for bin_num in bins[:5]:
+                comp_url = f"https://pk.adata.kz/company/{bin_num}"
+                leads.append({
+                    "name": "Руководитель компании",
+                    "company_name": f"Компания БИН {bin_num}",
+                    "phone": "",
+                    "email": "",
+                    "url": comp_url,
+                    "description": f"Компания найдена на Adata.kz по запросу: {query}. БИН: {bin_num}",
+                    "source": "adata.kz",
+                    "city": "Казахстан",
+                    "query": query
+                })
+    except Exception as e:
+        logger.error(f"Ошибка при работе с pk.adata.kz по запросу {query}: {e}")
+        
+    return leads
+
+
+
+
 def search_threads_web(page, query):
     """Ищет профили на threads.net по ключевому слову через Yahoo Search"""
     search_url = f"https://search.yahoo.com/search?q=site:threads.net+{query}"
@@ -510,13 +550,16 @@ def main():
                 
             logger.info(f"Всего собрано лидов с Threads.net: {len(all_threads_leads)}")
             
-            # 3. Собираем компании напрямую с pk.uchet.kz по ключевым запросам
+            # 3. Собираем компании напрямую с pk.uchet.kz и pk.adata.kz по ключевым запросам
             for query in queries:
-                leads = search_uchet_web(page, query)
-                all_uchet_leads.extend(leads)
-                time.sleep(3)
+                leads_uchet = search_uchet_web(page, query)
+                all_uchet_leads.extend(leads_uchet)
+                time.sleep(2)
+                leads_adata = search_adata_web(page, query)
+                all_uchet_leads.extend(leads_adata)
+                time.sleep(2)
                 
-            logger.info(f"Всего собрано лидов напрямую с pk.uchet.kz: {len(all_uchet_leads)}")
+            logger.info(f"Всего собрано лидов напрямую с uchet.kz и adata.kz: {len(all_uchet_leads)}")
             
             # 4. Обогащаем контактами из pk.uchet.kz для казахстанских компаний с HH
             enriched_leads = []
