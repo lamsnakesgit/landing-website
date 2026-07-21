@@ -630,6 +630,31 @@
 - **Победы**: Проведена комплексная проверка планировщика `launchd`, скрипта-обертки `run_daily_pipeline_wrapper.sh` и оркестратора `run_pipeline.py`. Подтверждена стабильная работа ежедневного запуска в 09:00 утра на macOS (через `osascript` для обхода TCC). ИИ-обогащение через Vertex AI (Gemini 2.5 Flash) с сервисным аккаунтом `vertex_sa.json` работает корректно как резервный канал при 401 ошибках OpenAI. Кэширование лидов и ротация логов (удаление старше 7 дней) работают исправно.
 - **Проблемы**: Ключ OpenAI/AIHubMix в `.env` недействителен (возвращает 401), поэтому пайплайн автоматически использует Vertex AI. Запись в Supabase пропускается, так как в `.env` не настроены переменные `SUPABASE_URL` и `SUPABASE_KEY`.
 
+---
+
+## 2026-07-21 — Автоматизация ежедневного сбора лидов (Adata.kz, HH.ru, HH.kz, Threads.net)
+
+### Current Status
+- Verified and fully validated daily automated lead generation pipeline (`run_pipeline.py`) across all target channels: `adata.kz` (via pk.uchet.kz), `hh.ru`, `hh.kz`, `threads.net`.
+- Confirmed search by all requested business queries: "ии", "разработка", "боты", "маркетинг", "контекстная реклама", "ии контент".
+- Verified output directory structure in `03_Marketing_and_Sales/daily_leads/YYYY-MM-DD/details/`, where individual markdown files are saved per lead containing:
+  - Full company and LPR contacts (Phone, Email, BIN, URL, Source)
+  - AI relevance score (1-10)
+  - Business pain hypothesis & approach angle
+  - Tailored solution proposals (AI chatbots, n8n CRM integrations, AI content, targeted advertising)
+  - Draft of 1st outreach message ready to copy & send in WhatsApp / Telegram.
+- Confirmed LaunchAgent (`com.higherpower.daily_leadgen`) is loaded and scheduled for daily execution on macOS at 09:00 AM.
+- Direct Telegram report notifications with top lead cards sent automatically via Bot API.
+
+### Wins / Победы
+- Пайплайн полностью автоматизирован и покрывает все запрашиваемые площадки (`adata.kz`, `hh.ru`, `hh.kz`, `threads.net`) по всем нужным тематикам.
+- Каждая компания сохраняется в отдельный файл с индивидуальным гипотезами боли, готовым коммерческим предложением и готовым текстом 1-го сообщения для мессенджера.
+- Настроен ежедневный автоматический запуск через macOS `launchd` агент в 09:00 утра с отправкой итогов и ТОП-лидов в Telegram.
+
+### Problems / Issues / Проблемы
+- OpenAI API ключ в `.env` возвращает ошибку 401/Insufficent Quota; пайплайн автоматически использует быстрый резервный канал Vertex AI (Gemini 2.5 Flash), поэтому обработка проходит без сбоев.
+
+
 
 
 
