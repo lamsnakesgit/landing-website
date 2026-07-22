@@ -3,364 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Авторизация AI Lawyer через NCALayer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Авторизация ЭЦП | AI Lawyer KZ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4F46E5;
-            --primary-hover: #4338CA;
-            --bg-color: #0F172A;
-            --surface-color: rgba(30, 41, 59, 0.7);
-            --text-main: #F8FAFC;
-            --text-muted: #94A3B8;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --error: #EF4444;
-            --success: #10B981;
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --error: #ef4444;
+            --success: #10b981;
         }
 
         body {
+            margin: 0;
+            padding: 0;
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.15) 0px, transparent 50%);
-            background-attachment: fixed;
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.15) 0px, transparent 50%);
             color: var(--text-main);
-            margin: 0;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
         }
 
         .container {
-            background: var(--surface-color);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 40px;
-            max-width: 480px;
             width: 100%;
+            max-width: 480px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px 32px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .header {
             text-align: center;
-            animation: fadeIn 0.5s ease-out;
+            margin-bottom: 32px;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--primary), #8B5CF6);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            font-size: 32px;
-            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
-        }
-
-        h1 {
+        .header h1 {
+            margin: 0 0 12px 0;
             font-size: 24px;
-            font-weight: 700;
-            margin: 0 0 12px;
-            background: linear-gradient(to right, #fff, #94A3B8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-weight: 600;
         }
 
-        p {
+        .header p {
+            margin: 0;
             color: var(--text-muted);
             font-size: 15px;
             line-height: 1.5;
-            margin: 0 0 32px;
         }
 
-        .status-box {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
+        .form-group {
             margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
 
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
             font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
         }
 
-        .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: var(--error);
-            box-shadow: 0 0 10px var(--error);
-            transition: all 0.3s ease;
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        input[type="file"]::file-selector-button {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: white;
+            padding: 8px 12px;
+            margin-right: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .dot.connected {
-            background-color: var(--success);
-            box-shadow: 0 0 10px var(--success);
+        input[type="file"]::file-selector-button:hover {
+            background: rgba(255,255,255,0.2);
         }
 
-        button {
-            background: linear-gradient(135deg, var(--primary), #6366F1);
+        input[type="password"] {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="password"]:focus {
+            border-color: var(--primary);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-top: 3px;
+            accent-color: var(--primary);
+        }
+        
+        .checkbox-group a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .checkbox-group a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-connect {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary);
             color: white;
             border: none;
-            padding: 16px 32px;
             border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+            transition: all 0.2s;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 8px;
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 25px rgba(79, 70, 229, 0.4);
-            background: linear-gradient(135deg, var(--primary-hover), #4F46E5);
+        .btn-connect:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
         }
-
-        button:disabled {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-muted);
+        
+        .btn-connect:disabled {
+            opacity: 0.5;
             cursor: not-allowed;
             transform: none;
-            box-shadow: none;
         }
 
-        .loader {
+        .status-box {
+            margin-top: 24px;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 14px;
             display: none;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
+            line-height: 1.5;
+            word-break: break-all;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .status-box.error {
+            display: block;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--error);
         }
 
-        #message {
-            margin-top: 20px;
-            font-size: 14px;
-            min-height: 20px;
+        .status-box.success {
+            display: block;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--success);
         }
         
-        .error-text { color: var(--error); }
-        .success-text { color: var(--success); }
-        
-        .steps {
-            text-align: left;
-            margin-bottom: 24px;
-            font-size: 14px;
-            color: var(--text-muted);
+        .token-display {
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-family: monospace;
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 1px;
+            border: 1px dashed var(--success);
+            cursor: pointer;
         }
-        .steps ol {
-            padding-left: 20px;
-            margin: 10px 0 0;
-        }
-        .steps li {
-            margin-bottom: 8px;
+
+        .footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(148, 163, 184, 0.6);
         }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <div class="logo">⚖️</div>
-        <h1>Безопасный Вход</h1>
-        <p>Авторизация в системе AI Lawyer для доступа к материалам судебных дел через ЭЦП (NCALayer).</p>
-
-        <div class="steps">
-            <strong>Как это работает:</strong>
-            <ol>
-                <li>Убедитесь, что приложение <b>NCALayer</b> запущено на вашем ПК.</li>
-                <li>Нажмите "Авторизоваться".</li>
-                <li>Выберите ключ AUTH_RSA в появившемся окне.</li>
-                <li>Введите пароль. Ваш ключ не передается на сервер.</li>
-            </ol>
-        </div>
-
-        <div class="status-box">
-            <span style="font-size: 14px; color: var(--text-muted);">Статус NCALayer:</span>
-            <div class="status-indicator">
-                <div class="dot" id="nca-dot"></div>
-                <span id="nca-status">Проверка...</span>
+        <div class="auth-card">
+            <div class="header">
+                <h1>AI Lawyer KZ</h1>
+                <p>Загрузите ваш ключ ЭЦП (AUTH_RSA) для доступа к базе судебных актов</p>
             </div>
+
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label for="ecpFile">Файл ключа (.p12)</label>
+                    <input type="file" id="ecpFile" accept=".p12" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ecpPassword">Пароль от ключа</label>
+                    <input type="password" id="ecpPassword" placeholder="Введите пароль..." required>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="consentCheck" required>
+                    <label for="consentCheck">
+                        Я даю согласие на временную передачу ключа ЭЦП для автоматизированного доступа к порталу электронного правосудия. Ключ не сохраняется и удаляется сразу после поиска. Подробнее в <a href="privacy.html" target="_blank">Политике конфиденциальности</a>.
+                    </label>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn-connect">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    Авторизоваться
+                </button>
+            </form>
+
+            <div id="statusBox" class="status-box"></div>
         </div>
 
-        <button id="auth-btn" disabled onclick="startAuth()">
-            <span id="btn-text">Авторизоваться</span>
-            <div class="loader" id="btn-loader"></div>
-        </button>
-
-        <div id="message"></div>
+        <div class="footer">
+            Безопасное соединение • Не храним ключи
+        </div>
     </div>
 
     <script>
-        const wsUrl = "wss://127.0.0.1:13579/";
-        let webSocket = null;
-        let isConnected = false;
+        const form = document.getElementById('uploadForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusBox = document.getElementById('statusBox');
 
-        // Инициализация соединения с NCALayer
-        function initNCALayer() {
-            webSocket = new WebSocket(wsUrl);
-            
-            webSocket.onopen = function() {
-                isConnected = true;
-                document.getElementById('nca-dot').classList.add('connected');
-                document.getElementById('nca-status').textContent = 'Подключено';
-                document.getElementById('nca-status').style.color = 'var(--success)';
-                document.getElementById('auth-btn').disabled = false;
-            };
-
-            webSocket.onclose = function() {
-                isConnected = false;
-                document.getElementById('nca-dot').classList.remove('connected');
-                document.getElementById('nca-status').textContent = 'Не найдено';
-                document.getElementById('nca-status').style.color = 'var(--error)';
-                document.getElementById('auth-btn').disabled = true;
-                showMessage('Запустите NCALayer и обновите страницу', 'error-text');
-                
-                // Попытка переподключения через 3 секунды
-                setTimeout(initNCALayer, 3000);
-            };
-
-            webSocket.onmessage = function(event) {
-                const response = JSON.parse(event.data);
-                handleNCAResponse(response);
-            };
-        }
-
-        // Показываем сообщения пользователю
-        function showMessage(text, className) {
-            const msgEl = document.getElementById('message');
-            msgEl.textContent = text;
-            msgEl.className = className;
-        }
-
-        // Изменение состояния кнопки
-        function setButtonLoading(loading) {
-            const btn = document.getElementById('auth-btn');
-            const txt = document.getElementById('btn-text');
-            const ldr = document.getElementById('btn-loader');
-            
-            if (loading) {
-                btn.disabled = true;
-                txt.style.display = 'none';
-                ldr.style.display = 'block';
+        function showStatus(type, message, token = null) {
+            statusBox.className = 'status-box ' + type;
+            if (type === 'success' && token) {
+                statusBox.innerHTML = `
+                    <strong>Успешно!</strong> ${message}<br>
+                    Ваш токен сессии (нажмите чтобы скопировать):
+                    <div class="token-display" onclick="copyToken('${token}')">${token}</div>
+                    <div style="margin-top:8px; font-size:12px; color:var(--text-muted)">
+                    Скопируйте этот токен и отправьте боту в чат.
+                    </div>
+                `;
             } else {
-                btn.disabled = false;
-                txt.style.display = 'block';
-                ldr.style.display = 'none';
+                statusBox.textContent = message;
             }
         }
 
-        // Запуск процесса авторизации
-        function startAuth() {
-            if (!isConnected) {
-                showMessage("NCALayer не подключен", "error-text");
-                return;
-            }
-            
-            setButtonLoading(true);
-            showMessage("Ожидание выбора ЭЦП...", "");
-
-            // Формируем случайный токен для подписи
-            const nonce = "AI_LAWYER_AUTH_" + Math.random().toString(36).substring(2, 15);
-            // Сохраняем nonce в localStorage
-            localStorage.setItem("auth_nonce", nonce);
-            
-            // Кодируем nonce в Base64 (в браузере btoa поддерживает только ASCII)
-            const base64Nonce = btoa(unescape(encodeURIComponent(nonce)));
-
-            // Отправляем команду в NCALayer на подпись
-            const request = {
-                "module": "kz.gov.pki.knca.commonUtils",
-                "method": "createCAdESFromBase64",
-                "args": ["PKCS12", base64Nonce, "true"]
-            };
-            
-            webSocket.send(JSON.stringify(request));
+        window.copyToken = function(token) {
+            navigator.clipboard.writeText(token).then(() => {
+                alert('Токен скопирован в буфер обмена!');
+            });
         }
 
-        // Обработка ответа от NCALayer
-        function handleNCAResponse(response) {
-            if (response.code === "500") {
-                setButtonLoading(false);
-                showMessage("Авторизация отменена пользователем или ошибка выбора", "error-text");
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('ecpFile');
+            const passwordInput = document.getElementById('ecpPassword');
+            const consentCheck = document.getElementById('consentCheck');
+
+            if (!fileInput.files.length) {
+                showStatus('error', 'Выберите файл .p12');
                 return;
             }
 
-            if (response.code === "200" && response.responseObject) {
-                const signature = response.responseObject;
-                showMessage("Подпись получена, отправка на сервер...", "success-text");
-                
-                // Отправляем подпись на наш бэкенд
-                sendSignatureToServer(signature);
+            if (!consentCheck.checked) {
+                showStatus('error', 'Необходимо подтвердить согласие');
+                return;
             }
-        }
 
-        // Отправка подписи на FastAPI бэкенд
-        async function sendSignatureToServer(signature) {
-            const nonce = localStorage.getItem("auth_nonce");
-            
-            // Получаем user_id из URL параметров, если есть
-            const urlParams = new URLSearchParams(window.location.search);
-            const userId = urlParams.get('user_id') || "anonymous";
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Загрузка...';
+            statusBox.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('password', passwordInput.value);
 
             try {
-                const res = await fetch("/api/v1/auth/ncalayer", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        signature: signature,
-                        nonce: nonce,
-                        user_id: userId
-                    })
+                // ВАЖНО: Укажите здесь реальный IP/домен VPS
+                const response = await fetch('/api/v1/auth/upload_ecp', {
+                    method: 'POST',
+                    body: formData
                 });
 
-                const data = await res.json();
-                
-                setButtonLoading(false);
+                const data = await response.json();
 
-                if (res.ok && data.success) {
-                    showMessage("Успешная авторизация! Вы можете закрыть это окно.", "success-text");
-                    document.getElementById('auth-btn').style.display = 'none';
-                    // Здесь можно сделать редирект или отправить сообщение родительскому окну/боту
+                if (response.ok && data.success) {
+                    showStatus('success', 'Файл загружен и зашифрован.', data.session_token);
+                    form.reset();
                 } else {
-                    showMessage(data.detail || "Ошибка проверки подписи на сервере", "error-text");
+                    showStatus('error', data.detail || data.message || 'Ошибка загрузки');
                 }
-            } catch (error) {
-                setButtonLoading(false);
-                showMessage("Сетевая ошибка при связи с сервером", "error-text");
+            } catch (err) {
+                showStatus('error', 'Ошибка соединения с сервером. Проверьте сеть.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Авторизоваться';
             }
-        }
-
-        // Запускаем подключение при загрузке страницы
-        window.onload = initNCALayer;
+        });
     </script>
 </body>
 </html>

@@ -2,7 +2,7 @@ import os
 import asyncio
 import subprocess
 import json
-from fastapi import FastAPI, Depends, HTTPException, Security, status, Request
+from fastapi import FastAPI, Depends, HTTPException, Security, status, Request, UploadFile, File, Form, BackgroundTasks
 from fastapi.staticfiles import StaticFiles
 from fastapi.security.api_key import APIKeyHeader
 from fastapi.middleware.cors import CORSMiddleware
@@ -31,9 +31,17 @@ if os.path.exists(static_dir):
 API_KEY_NAME = "Authorization"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
+import uuid
+
 # Считываем мастер-ключ из .env / окружения
 MASTER_API_KEY = os.getenv("AI_LAWYER_API_KEY", "kz_lawyer_master_secret_2026")
-ECP_PASSWORD = os.getenv("ECP_PASSWORD", "Prioritize_resource3!")
+
+# Директория для хранения временных ключей
+TEMP_KEYS_DIR = "/root/ai_lawyer/temp_keys"
+os.makedirs(TEMP_KEYS_DIR, exist_ok=True)
+
+# In-memory хранилище сессий: session_token -> {"filepath": str, "password": str}
+sessions_db = {}
 
 async def get_api_key(api_key: str = Depends(api_key_header)):
     if not api_key:
@@ -50,6 +58,7 @@ async def get_api_key(api_key: str = Depends(api_key_header)):
     return clean_key
 
 class CaseSearchRequest(BaseModel):
+    session_token: str = Field(..., description="Токен сессии, полученный после загрузки ЭЦП", example="session_12345")
     iin_or_bin: str = Field(..., description="ИИН или БИН контрагента для поиска судебных дел", example="123456789012")
     year: Optional[str] = Field("2025", description="Год поиска судебных актов", example="2025")
     max_results: Optional[int] = Field(20, description="Максимальное количество результатов", example=10)
@@ -85,44 +94,68 @@ class NCALayerAuthResponse(BaseModel):
 async def health_check():
     return {"status": "ok", "message": "API Bridge работает исправно, Docker доступен"}
 
-@app.post("/api/v1/auth/ncalayer", response_model=NCALayerAuthResponse, tags=["Auth"])
-async def auth_ncalayer(request: NCALayerAuthRequest):
+@app.post("/api/v1/auth/upload_ecp", tags=["Auth"])
+async def upload_ecp(
+    file: UploadFile = File(...),
+    password: str = Form(...)
+):
     """
-    Верификация подписи NCALayer и создание защищенной сессии.
+    Загрузка файла ЭЦП и пароля. Возвращает session_token.
     """
-    # В реальном приложении здесь будет проверка подписи CMS через крипто-библиотеку
-    # и извлечение ИИН из сертификата.
-    # Пока мы делаем мок для MVP.
+    if not file.filename.endswith(".p12"):
+        raise HTTPException(status_code=400, detail="Разрешены только файлы формата .p12")
     
-    if not request.signature:
-        raise HTTPException(status_code=400, detail="Подпись отсутствует")
+    session_token = f"sess_{uuid.uuid4().hex}"
+    filepath = os.path.join(TEMP_KEYS_DIR, f"{session_token}.p12")
+    
+    with open(filepath, "wb") as f:
+        f.write(await file.read())
         
-    # Имитация успешной валидации и создания сессии
-    session_token = f"session_{request.user_id}_{os.urandom(8).hex()}"
+    sessions_db[session_token] = {
+        "filepath": filepath,
+        "password": password
+    }
     
-    print(f"Пользователь {request.user_id} успешно авторизован через NCALayer. Токен: {session_token}")
-    
-    return NCALayerAuthResponse(
-        success=True,
-        message="Авторизация успешна. Подпись верифицирована.",
-        session_token=session_token
-    )
+    return {"success": True, "session_token": session_token, "message": "Файл успешно загружен. Скопируйте токен и передайте его боту."}
+
+def cleanup_session(session_token: str):
+    session = sessions_db.pop(session_token, None)
+    if session and os.path.exists(session["filepath"]):
+        os.remove(session["filepath"])
+        print(f"Ключ ЭЦП удален: {session['filepath']}")
 
 @app.post("/api/v1/cases/search", response_model=CaseSearchResponse, tags=["Search"])
-async def search_cases(request: CaseSearchRequest, api_key: str = Depends(get_api_key)):
+async def search_cases(request: CaseSearchRequest, background_tasks: BackgroundTasks, api_key: str = Depends(get_api_key)):
     """
-    Поиск судебных дел по ИИН/БИН контрагента на портале sud.kz с реальной авторизацией ЭЦП через Docker.
+    Поиск судебных дел по ИИН/БИН контрагента на портале sud.kz с использованием переданной сессии ЭЦП.
     """
+    if request.session_token not in sessions_db:
+        return CaseSearchResponse(
+            success=False,
+            query_iin_bin=request.iin_or_bin,
+            total_found=0,
+            cases=[],
+            error="Сессия не найдена или истекла. Пожалуйста, загрузите ЭЦП заново."
+        )
+        
+    session_data = sessions_db[request.session_token]
+    user_p12_path = session_data["filepath"]
+    user_password = session_data["password"]
+
+    # Запланировать удаление файла после ответа API
+    background_tasks.add_task(cleanup_session, request.session_token)
+
     print(f"Запуск реального поиска в Docker по ИИН/БИН: {request.iin_or_bin} (Год: {request.year})")
     
     # Формируем команду запуска Docker с вызовом нашего API-воркера
+    # Прокидываем конкретный файл ключа юзера вместо всей папки keys
     docker_cmd = [
         "docker", "run", "--rm",
-        "-e", f"ECP_PASSWORD={ECP_PASSWORD}",
+        "-e", f"ECP_PASSWORD={user_password}",
         "-e", "PYTHONUNBUFFERED=1",
         "-v", "/root/ai_lawyer:/app",
         "-v", "/root/ai_lawyer/output:/output",
-        "-v", "/root/ai_lawyer/keys:/keys",
+        "-v", f"{user_p12_path}:/keys/AUTH_RSA.p12",
         "-v", "/root/ai_lawyer/kalkan_test:/app_temp",
         "-w", "/app",
         "playwright_kalkan",

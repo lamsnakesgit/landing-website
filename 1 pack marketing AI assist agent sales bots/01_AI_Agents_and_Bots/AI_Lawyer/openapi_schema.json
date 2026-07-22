@@ -77,6 +77,12 @@
     "schemas": {
       "CaseSearchRequest": {
         "properties": {
+          "session_token": {
+            "type": "string",
+            "title": "Session Token",
+            "description": "Токен сессии, полученный после загрузки ЭЦП",
+            "example": "session_12345"
+          },
           "iin_or_bin": {
             "type": "string",
             "title": "Iin Or Bin",
@@ -114,6 +120,7 @@
         },
         "type": "object",
         "required": [
+          "session_token",
           "iin_or_bin"
         ],
         "title": "CaseSearchRequest"

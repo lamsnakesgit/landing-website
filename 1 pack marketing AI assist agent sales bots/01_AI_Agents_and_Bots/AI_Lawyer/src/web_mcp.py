@@ -57,6 +57,7 @@ def search_court_cases(iin_or_bin: str, year: str = "2025") -> str:
 # Но мы можем запустить его в режиме sse через командную строку или метод mcp.run(transport='sse')
 
 if __name__ == "__main__":
-    # Запускаем сервер по протоколу SSE на порту 8001
+    # Запускаем сервер по протоколу SSE на порту 8001 через uvicorn
     print("Запускаем Web MCP Сервер (SSE) на порту 8001...")
-    mcp.run(transport="sse")
+    import uvicorn
+    uvicorn.run(mcp._app if hasattr(mcp, '_app') else mcp.sse_app, host="0.0.0.0", port=8001)
