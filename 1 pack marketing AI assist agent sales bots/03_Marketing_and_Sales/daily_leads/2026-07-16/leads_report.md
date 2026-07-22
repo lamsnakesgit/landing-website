@@ -4,14 +4,14 @@
 - **Всего собрано лидов**: 2
 - Распределение по источникам:
   - **hh.kz**: 1 лидов
-  - **adata.kz**: 1 лидов
+  - **uchet.kz**: 1 лидов
 
 ## 📋 Список лидов на сегодня
 
 | № | Компания | Контакт | Источник | Оценка ИИ | Телефон | Ссылка |
 |---|----------|---------|----------|-----------|---------|--------|
 | 1 | ПК AKASHI Data Center PLC | Представитель компании | `hh.kz` | **9** | 🚫 | [Перейти](https://almaty.hh.kz/vacancy/135171273?query=%D0%B8%D0%B8&hhtmFrom=vacancy_search_list) |
-| 2 | ИП Pride consulting | Представитель компании | `adata.kz` | **9** | 🚫 | [Перейти](https://pk.adata.kz/company/160540000287?most_viewed_companies=0&keyword=Pride+consulting) |
+| 2 | ИП Pride consulting | Представитель компании | `uchet.kz` | **9** | 🚫 | [Перейти](https://pk.adata.kz/company/160540000287?most_viewed_companies=0&keyword=Pride+consulting) |
 
 ---
 *Все индивидуальные драфты сообщений и коммерческие предложения сохранены в папке [details](./details).*

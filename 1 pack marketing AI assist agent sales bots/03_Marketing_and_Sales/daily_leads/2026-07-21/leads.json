@@ -1,0 +1,47 @@
+{
+  "date": "2026-07-21",
+  "leads": [
+    {
+      "id": "threads_aimalls.app",
+      "name": "Shop & Earn More with $AIT Tokens on #AiMalls! ️ Use $AIT tokens to ...",
+      "site": "https://www.threads.net/@aimalls.app",
+      "phone": "",
+      "email": "",
+      "city": "Удалённо / СНГ",
+      "description": "AiMalls (@aimalls.app). 🚀 Shop & Earn More with $AIT Tokens on #AiMalls! 🛍️ 🔥Use $AIT tokens to unlock exclusive perks while shopping. Start collecting...",
+      "category": "Threads Profile: боты",
+      "source": "threads.net",
+      "hh_url": "https://www.threads.net/@aimalls.app",
+      "tax_analysis": {},
+      "tax_summary": "ℹ️ ИНН/БИН не указан — налоговый анализ невозможен",
+      "pain_points": [
+        "Ошибка генерации: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-8EobY***************************************A9Ac. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}"
+      ],
+      "outreach_angle": "Стандартный аутрич",
+      "offer": "Предложить услуги автоматизации в сфере Threads Profile: боты",
+      "draft_pitch": "Здравствуйте! Обратили внимание на компанию Shop & Earn More with $AIT Tokens on #AiMalls! ️ Use $AIT tokens to .... Хотели бы предложить наши услуги автоматизации и маркетинга."
+    },
+    {
+      "id": "threads_realdrivernile",
+      "name": "Music Producer John Young is ready to craft the next big hit in his ...",
+      "site": "https://www.threads.net/@realdrivernile",
+      "phone": "",
+      "email": "",
+      "city": "Удалённо / СНГ",
+      "description": "Real D (@realdrivernile). Music Producer John Young is ready to craft the next big hit in his golden studio! 💯 Ai art by @realdrivernile For...",
+      "category": "Threads Profile: боты",
+      "source": "threads.net",
+      "hh_url": "https://www.threads.net/@realdrivernile",
+      "tax_analysis": {},
+      "tax_summary": "ℹ️ ИНН/БИН не указан — налоговый анализ невозможен",
+      "pain_points": [
+        "Ошибка генерации: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-8EobY***************************************A9Ac. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}"
+      ],
+      "outreach_angle": "Стандартный аутрич",
+      "offer": "Предложить услуги автоматизации в сфере Threads Profile: боты",
+      "draft_pitch": "Здравствуйте! Обратили внимание на компанию Music Producer John Young is ready to craft the next big hit in his .... Хотели бы предложить наши услуги автоматизации и маркетинга."
+    }
+  ],
+  "vacancies": [],
+  "contacts": []
+}
