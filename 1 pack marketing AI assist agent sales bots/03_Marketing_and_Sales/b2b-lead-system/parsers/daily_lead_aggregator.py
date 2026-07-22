@@ -54,34 +54,56 @@ def clean_company_name(name: str) -> str:
     return name_clean.strip()
 
 async def analyze_lead_with_vertex_ai(comp_name, category, description, source, vacancies_str, system_prompt, user_prompt) -> dict:
+    """Осуществляет ИИ-анализ через Vertex AI HTTP REST API (Gemini 2.5 Flash)"""
     from google.oauth2 import service_account
-    import vertexai
-    from vertexai.generative_models import GenerativeModel, GenerationConfig
+    from google.auth.transport.requests import Request
+    import requests
     
     sa_path = os.path.join(project_root, "vertex_sa.json")
     if not os.path.exists(sa_path):
         raise FileNotFoundError("Файл vertex_sa.json не найден")
         
-    with open(sa_path, "r") as f:
+    with open(sa_path, "r", encoding="utf-8") as f:
         sa_info = json.load(f)
         project_id = sa_info.get("project_id")
         
-    credentials = service_account.Credentials.from_service_account_file(sa_path)
-    vertexai.init(project=project_id, location="us-central1", credentials=credentials)
+    credentials = service_account.Credentials.from_service_account_file(
+        sa_path,
+        scopes=['https://www.googleapis.com/auth/cloud-platform']
+    )
+    credentials.refresh(Request())
     
-    def call_gemini():
-        model = GenerativeModel("gemini-2.5-flash", system_instruction=system_prompt)
-        response = model.generate_content(
-            user_prompt,
-            generation_config=GenerationConfig(
-                response_mime_type="application/json"
-            )
-        )
-        return response.text.strip()
+    url = f"https://us-central1-aiplatform.googleapis.com/v1/projects/{project_id}/locations/us-central1/publishers/google/models/gemini-2.5-flash:generateContent"
+    headers = {
+        "Authorization": f"Bearer {credentials.token}",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {
+        "systemInstruction": {
+            "parts": [{"text": system_prompt}]
+        },
+        "contents": [
+            {"role": "user", "parts": [{"text": user_prompt}]}
+        ],
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "temperature": 0.7,
+            "maxOutputTokens": 1000
+        }
+    }
+    
+    def call_http():
+        resp = requests.post(url, headers=headers, json=payload, timeout=20)
+        resp.raise_for_status()
+        res_data = resp.json()
+        text = res_data["candidates"][0]["content"]["parts"][0]["text"].strip()
+        if text.startswith("```"):
+            text = re.sub(r"^```json\s*|```$", "", text, flags=re.MULTILINE)
+        return json.loads(text)
         
     loop = asyncio.get_event_loop()
-    res_text = await loop.run_in_executor(None, call_gemini)
-    return json.loads(res_text)
+    return await loop.run_in_executor(None, call_http)
 
 async def analyze_lead_with_ai(client, company: dict, vacancies: list) -> dict:
     comp_name = company.get("name", "Неизвестно")
