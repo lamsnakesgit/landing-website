@@ -1,10 +1,14 @@
+"""
+threads.net Parser — профили, эксперты и компании с Threads
+"""
+
 import os
 import re
-import urllib.parse
-import httpx
+import asyncio
 import logging
-from bs4 import BeautifulSoup
 from typing import Optional, List, Dict
+from bs4 import BeautifulSoup
+from playwright.async_api import async_playwright
 
 log = logging.getLogger(__name__)
 
@@ -17,168 +21,84 @@ def extract_email(text: str) -> Optional[str]:
 def extract_phone(text: str) -> Optional[str]:
     if not text:
         return ""
-    # Matches typical Russian/Kazakh phone formats
     match = re.search(r"[\+7|8][\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}", text)
     return match.group(0) if match else ""
 
-def parse_threads_username(url: str) -> str:
-    match = re.search(r"threads\.net/@([a-zA-Z0-9_\.]+)", url)
-    if match:
-        return match.group(1)
-    return ""
-
-def search_tavily(query: str, api_key: str) -> List[Dict]:
-    """Search Threads.net profiles using Tavily Search API"""
-    log.info(f"Используем Tavily API для поиска в Threads.net по запросу: {query}")
-    try:
-        url = "https://api.tavily.com/search"
-        payload = {
-            "api_key": api_key,
-            "query": f"site:threads.net {query}",
-            "search_depth": "basic",
-            "include_answer": False,
-            "max_results": 15
-        }
-        resp = httpx.post(url, json=payload, timeout=15.0)
-        resp.raise_for_status()
-        data = resp.json()
-        
-        results = []
-        for item in data.get("results", []):
-            url = item.get("url", "")
-            title = item.get("title", "")
-            content = item.get("content", "")
-            
-            if "threads.net/@" in url:
-                results.append({
-                    "title": title,
-                    "url": url,
-                    "snippet": content
-                })
-        return results
-    except Exception as e:
-        log.error(f"Ошибка при вызове Tavily API: {e}")
-        return []
-
-def search_ddg_lite(query: str) -> List[Dict]:
-    """Search Threads.net profiles using DuckDuckGo Lite as fallback (no JS, highly reliable)"""
-    log.info(f"Используем DuckDuckGo Lite для поиска в Threads.net по запросу: {query}")
-    results = []
-    url = "https://lite.duckduckgo.com/lite/"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-    data = {
-        "q": f"site:threads.net {query}"
-    }
-    try:
-        resp = httpx.post(url, headers=headers, data=data, timeout=15.0)
-        if resp.status_code == 200:
-            soup = BeautifulSoup(resp.text, 'html.parser')
-            links = soup.find_all('a', class_='result-link')
-            
-            for link in links:
-                href = link.get('href', '')
-                title = link.get_text(strip=True)
-                
-                # Extract snippet
-                snippet = ""
-                tr = link.find_parent('tr')
-                if tr:
-                    next_tr = tr.find_next_sibling('tr')
-                    if next_tr:
-                        snippet_td = next_tr.select_one('.result-snippet')
-                        if snippet_td:
-                            snippet = snippet_td.get_text(strip=True)
-                
-                # Декодируем редиректы DDG
-                decoded_href = urllib.parse.unquote(href)
-                
-                # Ищем URL Threads
-                threads_url = ""
-                if "threads.net/@" in decoded_href:
-                    # Попробуем вытащить чистую ссылку из параметра uddg
-                    match = re.search(r'uddg=(https://(?:www\.)?threads\.net/@[a-zA-Z0-9_\.]+)', decoded_href)
-                    if match:
-                        threads_url = match.group(1)
-                    else:
-                        # Если не в параметре, но threads.net/@ есть в самой ссылке
-                        match_direct = re.search(r'(https://(?:www\.)?threads\.net/@[a-zA-Z0-9_\.]+)', decoded_href)
-                        if match_direct:
-                            threads_url = match_direct.group(1)
-                
-                if threads_url:
-                    results.append({
-                        "title": title,
-                        "url": threads_url,
-                        "snippet": snippet
-                    })
-    except Exception as e:
-        log.error(f"Ошибка при поиске через DuckDuckGo Lite: {e}")
-    return results
-
-def parse_threads(query: str, max_results: int = 10) -> Dict:
-    """
-    Основная функция для поиска аккаунтов на threads.net по ключевому слову
-    """
-    log.info(f"Threads.net — поиск по запросу: '{query}'")
-    
-    tavily_key = os.getenv("TAVILY_API_KEY")
-    raw_results = []
-    
-    if tavily_key:
-        raw_results = search_tavily(query, tavily_key)
-    
-    if not raw_results:
-        # Fallback to DDG Lite
-        raw_results = search_ddg_lite(query)
-        
+async def parse_threads_async(query: str, max_results: int = 15) -> Dict:
+    log.info(f"Threads.net — запуск Playwright скрапинга по запросу: '{query}'")
     companies = []
     seen_usernames = set()
-    
-    for r in raw_results:
-        url = r["url"]
-        username = parse_threads_username(url)
-        if not username or username in seen_usernames:
-            continue
-        seen_usernames.add(username)
-        
-        title = r["title"]
-        # Clean title
-        name = title.split("(@")[0].strip()
-        if not name:
-            name = username
+
+    try:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            context = await browser.new_context(
+                user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+            )
+            page = await context.new_page()
+            url = f"https://www.threads.net/search?q={query}"
+            await page.goto(url, wait_until="networkidle", timeout=20000)
             
-        snippet = r["snippet"]
-        email = extract_email(snippet)
-        phone = extract_phone(snippet)
-        
-        companies.append({
-            "id": f"threads_{username}",
-            "name": name,
-            "site": f"https://www.threads.net/@{username}",
-            "phone": phone,
-            "email": email,
-            "city": "Удалённо / СНГ",
-            "description": snippet,
-            "category": f"Threads Profile: {query}",
-            "source": "threads.net",
-            "hh_url": f"https://www.threads.net/@{username}",
-        })
-        
-    log.info(f"Threads.net поиск завершен. Найдено уникальных профилей: {len(companies)}")
+            # Немного прокрутим вниз для загрузки карточек
+            await page.evaluate("window.scrollBy(0, 800)")
+            await page.wait_for_timeout(2000)
+            
+            links = await page.query_selector_all('a[href*="/@"]')
+            
+            for l in links:
+                href = await l.get_attribute("href")
+                if not href or "/post/" in href:
+                    continue
+                    
+                match = re.search(r"/@([a-zA-Z0-9_\.]+)", href)
+                if not match:
+                    continue
+                    
+                username = match.group(1)
+                if username in seen_usernames:
+                    continue
+                seen_usernames.add(username)
+                
+                raw_text = await l.inner_text()
+                lines = [line.strip() for line in raw_text.split('\n') if line.strip()]
+                disp_name = lines[0] if lines else username
+                
+                profile_url = f"https://www.threads.net/@{username}"
+                
+                email = extract_email(raw_text)
+                phone = extract_phone(raw_text)
+                
+                companies.append({
+                    "id": f"threads_{username}",
+                    "name": f"{disp_name} (@{username})",
+                    "site": profile_url,
+                    "phone": phone,
+                    "email": email,
+                    "city": "Удалённо / СНГ",
+                    "description": f"Профиль Threads по теме: {query}. Аккаунт: @{username}",
+                    "category": f"Threads: {query}",
+                    "source": "threads.net",
+                    "hh_url": profile_url,
+                })
+                
+                if len(companies) >= max_results:
+                    break
+                    
+            await browser.close()
+    except Exception as e:
+        log.error(f"Ошибка при скрапинге Threads.net через Playwright: {e}")
+
+    log.info(f"Threads.net поиск завершен. Найдено профилей: {len(companies)}")
     return {
         "companies": companies,
         "vacancies": [],
         "contacts": []
     }
 
+def parse_threads(query: str, max_results: int = 15) -> Dict:
+    return asyncio.run(parse_threads_async(query, max_results))
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    import sys
-    q = "маркетинг"
-    if len(sys.argv) > 1:
-        q = sys.argv[1]
-    res = parse_threads(q)
+    res = parse_threads("маркетинг")
     print(res)

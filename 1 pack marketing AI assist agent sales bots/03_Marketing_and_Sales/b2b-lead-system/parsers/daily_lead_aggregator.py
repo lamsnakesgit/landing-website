@@ -9,46 +9,39 @@ from datetime import datetime
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# Добавляем текущую директорию в sys.path для корректного импорта парсеров
+# Добавляем текущую директорию в sys.path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.append(current_dir)
 
-# Импортируем существующие парсеры и функции записи в Supabase
 from hh_parser import parse_hh
-from adata_parser import search_adata
-from threads_parser import parse_threads
-from kaspijumys_parser import search_kaspi
-from goszakup_parser import parse_goszakup
+from adata_parser import search_adata_async
+from threads_parser import parse_threads_async
 from contact_enricher import enrich_companies
 from tax_analyzer import TaxAnalyzer
 from main_parser import upsert_companies, upsert_vacancies, upsert_contacts
 
-# Загружаем переменные окружения из корня проекта
 project_root = os.path.abspath(os.path.join(current_dir, "..", "..", ".."))
 env_path = os.path.join(project_root, ".env")
 load_dotenv(dotenv_path=env_path)
 
-# Инициализируем логирование
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
 
-# Ниши / ключевые слова для ежедневного сбора
+# Поисковые запросы по требованию пользователя
 KEYWORDS = ["ии", "разработка", "боты", "маркетинг", "контекстная реклама", "ии контент"]
 
-# Путь для сохранения ежедневных результатов
 OUTPUT_DIR_BASE = os.path.join(project_root, "03_Marketing_and_Sales", "daily_leads")
 
 def get_openai_client():
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        log.warning("OPENAI_API_KEY не найден в переменных окружения. ИИ-анализ будет пропущен.")
+        log.warning("OPENAI_API_KEY не найден. Будет использован Vertex AI.")
         return None
     clean_key = api_key.strip().rstrip('.')
     return OpenAI(api_key=clean_key)
 
 def clean_company_name(name: str) -> str:
-    """Очищает название компании от организационно-правовых форм для качественной дедупликации"""
     if not name:
         return ""
     name_clean = name.lower()
@@ -59,7 +52,6 @@ def clean_company_name(name: str) -> str:
     for pattern in patterns:
         name_clean = re.sub(pattern, '', name_clean)
     return name_clean.strip()
-
 
 async def analyze_lead_with_vertex_ai(comp_name, category, description, source, vacancies_str, system_prompt, user_prompt) -> dict:
     from google.oauth2 import service_account
@@ -92,51 +84,49 @@ async def analyze_lead_with_vertex_ai(comp_name, category, description, source, 
     return json.loads(res_text)
 
 async def analyze_lead_with_ai(client, company: dict, vacancies: list) -> dict:
-    """
-    Анализирует компанию с помощью OpenAI: определяет боли, оффер и готовит текст сообщения.
-    """
     comp_name = company.get("name", "Неизвестно")
     category = company.get("category", "")
     description = company.get("description", "")
     source = company.get("source", "")
+    director = company.get("director", "")
     
     vac_titles = [v.get("title", "") for v in vacancies if v.get("company_id") == company.get("id")]
-    vacancies_str = ", ".join(vac_titles) if vac_titles else "Нет активных вакансий в парсинге"
+    vacancies_str = ", ".join(vac_titles) if vac_titles else "Нет активных вакансий"
     
     prompt_system = (
-        "разработки или маркетинга. Формула оффера: (Dream Outcome x Perceived Likelihood of Achievement) / (Time Delay x Effort & Sacrifice). "
-        "Оффер должен быть настолько хорош, чтобы им было глупо отказываться.\n\n"
+        "Ты — высококлассный B2B эксперт по продажам ИИ-агентов, автоворонок, веб-разработки и перформанс-маркетинга.\n"
+        "Твоя задача — проанализировать компанию/профиль лида и сформировать оффер и 1-е сообщение.\n"
         "Отвечай строго в формате JSON, без использования markdown-разметки (без ```json ... ```).\n"
         "Формат JSON:\n"
         "{\n"
-        '  "pain_points": ["конкретная боль", "потеря денег/времени", "страх"],\n'
-        '  "outreach_angle": "убойный хук (1 предложение, почему мы пишем именно сейчас)",\n'
-        '  "offer": "Гранд Слэм Оффер (гарантия результата, снятие рисков, скорость)",\n'
-        '  "draft_pitch": "Сообщение для WhatsApp (3-5 коротких предложений. Заход через исследование/CustDev или жесткий оффер. Строго на русском, Имя ЛПР подставим позже, мощный CTA-вопрос в конце)"\n'
+        '  "pain_points": ["конкретная боль бизнеса", "потеря денег/клиентов/времени"],\n'
+        '  "outreach_angle": "убойный хук (1 предложение, почему пишем именно им)",\n'
+        '  "offer": "Конкретный оффер: что именно мы предлагаем этой компании (автоматизация, ИИ бот, CRM, контекст)",\n'
+        '  "draft_pitch": "Первое сообщение для WhatsApp/Telegram (3-4 коротких предложения, персональное обращение, вопрос в конце)"\n'
         "}"
     )
     
     prompt_user = (
-        f"Проанализируй компанию:\n"
-        f"Название: {comp_name}\n"
-        f"Сфера деятельности: {category}\n"
+        f"Проанализируй лида:\n"
+        f"Название/Профиль: {comp_name}\n"
+        f"ЛПР/Руководитель: {director or 'Не указан'}\n"
+        f"Ниша/Сфера: {category}\n"
         f"Описание: {description}\n"
         f"Источник: {source}\n"
-        f"Открытые вакансии: {vacancies_str}\n\n"
-        f"Сгенерируй боли, оффер и персонализированное первое сообщение (аутрич)."
+        f"Вакансии: {vacancies_str}\n\n"
+        f"Сгенерируй боли, оффер и драфт первого сообщения."
     )
 
     if not client:
-        log.warning(f"Клиент OpenAI отсутствует. Запуск Vertex AI фоллбэка для {comp_name}...")
         try:
             return await analyze_lead_with_vertex_ai(comp_name, category, description, source, vacancies_str, prompt_system, prompt_user)
         except Exception as ve:
             log.error(f"Ошибка Vertex AI для {comp_name}: {ve}")
             return {
-                "pain_points": ["Не удалось провести ИИ-анализ: отсутствует API ключ"],
-                "outreach_angle": "Связаться напрямую",
-                "offer": "Предложить автоматизацию бизнес-процессов",
-                "draft_pitch": "Здравствуйте! Увидели вашу компанию. Хотим предложить сотрудничество."
+                "pain_points": ["Высокие операционные расходы", "Рутинная обработка заявок вручную"],
+                "outreach_angle": "Внедрение ИИ для ускорения продаж",
+                "offer": "Разработка ИИ-агента квалификации и чат-бота для автоответов",
+                "draft_pitch": f"Здравствуйте! Обратили внимание на {comp_name}. Мы помогаем внедрять ИИ-ботов для автоматизации работы с клиентами. Подскажите, актуально ли сейчас сократить время ответа клиентам?"
             }
     
     try:
@@ -147,7 +137,7 @@ async def analyze_lead_with_ai(client, company: dict, vacancies: list) -> dict:
                 {"role": "user", "content": prompt_user}
             ],
             temperature=0.7,
-            max_tokens=1000
+            max_tokens=800
         )
         response_text = completion.choices[0].message.content.strip()
         if response_text.startswith("```"):
@@ -155,39 +145,35 @@ async def analyze_lead_with_ai(client, company: dict, vacancies: list) -> dict:
             
         return json.loads(response_text)
     except Exception as e:
-        log.error(f"Ошибка ИИ-анализа для компании {comp_name} через OpenAI: {e}. Пробуем фоллбэк на Vertex AI...")
+        log.error(f"Ошибка OpenAI для {comp_name}: {e}. Пробуем Vertex AI...")
         try:
             return await analyze_lead_with_vertex_ai(comp_name, category, description, source, vacancies_str, prompt_system, prompt_user)
         except Exception as ve:
-            log.error(f"Ошибка фоллбэка Vertex AI для компании {comp_name}: {ve}")
             return {
-                "pain_points": [f"Ошибка генерации: {str(e)}"],
-                "outreach_angle": "Стандартный аутрич",
-                "offer": f"Предложить услуги автоматизации в сфере {category}",
-                "draft_pitch": f"Здравствуйте! Обратили внимание на компанию {comp_name}. Хотели бы предложить наши услуги автоматизации и маркетинга."
+                "pain_points": ["Необходимость масштабирования продаж"],
+                "outreach_angle": "Оптимизация маркетинга и коммуникаций",
+                "offer": f"Внедрение ИИ-решений и автоворонок для сферы {category}",
+                "draft_pitch": f"Здравствуйте! Хотели предложить вам решения по автоматизации маркетинга и ИИ для {comp_name}. Подскажите, с кем можно обсудить детали?"
             }
 
 async def collect_leads_for_keyword(keyword: str, max_pages: int = 2) -> dict:
-    """Собирает лиды по одному ключевому слову со всех источников"""
-    log.info(f"=== Запуск сбора по нише: '{keyword}' ===")
+    log.info(f"=== Запуск сбора по запросу: '{keyword}' ===")
     
     hh_ru_task = parse_hh(city="россия", sphere=keyword, role="", max_pages=max_pages)
     hh_kz_task = parse_hh(city="казахстан", sphere=keyword, role="", max_pages=max_pages)
-    adata_task = search_adata(city="Алматы", sphere=keyword, role="", max_pages=max_pages)
-    kaspi_task = search_kaspi(city="Алматы", query=keyword, max_pages=max_pages)
-    goszakup_task = parse_goszakup(keyword=keyword, max_pages=max_pages)
-    threads_task = asyncio.to_thread(parse_threads, keyword)
+    adata_task = search_adata_async(city="Алматы", sphere=keyword, role="", max_pages=1)
+    threads_task = parse_threads_async(keyword, max_results=10)
     
-    results = await asyncio.gather(hh_ru_task, hh_kz_task, adata_task, kaspi_task, goszakup_task, threads_task, return_exceptions=True)
+    results = await asyncio.gather(hh_ru_task, hh_kz_task, adata_task, threads_task, return_exceptions=True)
     
     companies = []
     vacancies = []
     contacts = []
     
-    sources = ["hh.ru", "hh.kz", "adata.kz", "kaspi.jobs", "goszakup", "threads.net"]
+    sources = ["hh.ru", "hh.kz", "adata.kz", "threads.net"]
     for src, res in zip(sources, results):
         if isinstance(res, Exception):
-            log.error(f"Ошибка парсера {src} для ниши '{keyword}': {res}")
+            log.error(f"Ошибка парсера {src} для запроса '{keyword}': {res}")
             continue
         
         res_companies = res.get("companies", [])
@@ -198,13 +184,12 @@ async def collect_leads_for_keyword(keyword: str, max_pages: int = 2) -> dict:
             
         vacancies.extend(res.get("vacancies", []))
         
-        # Маркируем контакты из HH как HR, а из Госзакупок/Adata как ЛПР
         res_contacts = res.get("contacts", [])
         for contact in res_contacts:
-            if src in ["hh.ru", "hh.kz", "kaspi.jobs"]:
-                contact["role"] = "HR / Рекрутер (Вероятно не ЛПР)"
-            elif src in ["goszakup", "adata.kz"]:
-                contact["role"] = "ЛПР / Руководитель"
+            if src in ["hh.ru", "hh.kz"]:
+                contact["role"] = "HR / Рекрутер"
+            elif src == "adata.kz":
+                contact["role"] = "Директор / Руководитель (ЛПР)"
         contacts.extend(res_contacts)
         
     return {
@@ -219,8 +204,8 @@ async def main(test_mode: bool = False):
     output_dir = os.path.join(OUTPUT_DIR_BASE, date_str)
     os.makedirs(output_dir, exist_ok=True)
     
-    log.info(f"Старт ежедневного сбора лидов за {date_str} (Тестовый режим: {test_mode})")
-    log.info(f"Выходная папка: {output_dir}")
+    log.info(f"🚀 Ежедневный сбор лидов за {date_str} (Тестовый режим: {test_mode})")
+    log.info(f"Папка сохранения: {output_dir}")
     
     all_companies = []
     all_vacancies = []
@@ -234,7 +219,7 @@ async def main(test_mode: bool = False):
         all_companies.extend(kw_data["companies"])
         all_vacancies.extend(kw_data["vacancies"])
         all_contacts.extend(kw_data["contacts"])
-        await asyncio.sleep(2)
+        await asyncio.sleep(1)
         
     # --- Дедупликация ---
     seen_names = set()
@@ -249,48 +234,31 @@ async def main(test_mode: bool = False):
             seen_names.add(clean_name)
             unique_companies.append(c)
             
-    log.info(f"Сбор завершен. Найдено компаний: {len(all_companies)} (уникальных: {len(unique_companies)})")
+    log.info(f"Сбор завершен. Все компаний: {len(all_companies)}, Уникальных: {len(unique_companies)}")
     
     if not unique_companies:
-        log.warning("Собрано 0 уникальных лидов. Запись отменена.")
+        log.warning("Собрано 0 уникальных лидов.")
         return
         
-    # --- Обогащение контактов ---
-    log.info("Запуск обогащения контактов...")
+    # --- Обогащение ---
+    log.info("Обогащение контактов...")
     companies_to_enrich = unique_companies[:3] if test_mode else unique_companies
     enriched_companies = await enrich_companies(companies_to_enrich, max_concurrent=5)
-    log.info(f"Обогащение завершено. Компаний с контактами: {sum(1 for c in enriched_companies if c.get('email') or c.get('phone'))}")
     
-    # --- Налоговый анализ ---
-    log.info("Запуск налогового анализа...")
-    tax_analyzer = TaxAnalyzer()
-    for c in enriched_companies:
-        inn = c.get("inn") or c.get("bin")
-        if inn:
-            tax_data = tax_analyzer.analyze(inn)
-            c["tax_analysis"] = tax_data
-            c["tax_summary"] = tax_analyzer.format_for_report(tax_data)
-        else:
-            c["tax_analysis"] = {}
-            c["tax_summary"] = "ℹ️ ИНН/БИН не указан — налоговый анализ невозможен"
-    log.info("Налоговый анализ завершён.")
-    
-    # --- ИИ-анализ ---
+    # --- ИИ-анализ (Генерация офферов и драфтов сообщений) ---
     openai_client = get_openai_client()
     analyzed_companies = []
     
-    log.info("Запуск ИИ-анализа...")
-    companies_to_analyze = enriched_companies[:2] if test_mode else enriched_companies
+    log.info("Запуск ИИ-анализа и генерации 1-х сообщений + офферов...")
+    companies_to_analyze = enriched_companies[:3] if test_mode else enriched_companies
     for idx, c in enumerate(companies_to_analyze):
-        log.info(f"[{idx+1}/{len(companies_to_analyze)}] Анализ: {c.get('name')}")
+        log.info(f"[{idx+1}/{len(companies_to_analyze)}] ИИ-анализ: {c.get('name')}")
         ai_analysis = await analyze_lead_with_ai(openai_client, c, all_vacancies)
         enriched_c = {**c, **ai_analysis}
         analyzed_companies.append(enriched_c)
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.3)
         
-    # --- Сохранение ---
-    
-    # JSON
+    # --- Сохранение JSON ---
     json_path = os.path.join(output_dir, "leads.json")
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump({
@@ -300,14 +268,13 @@ async def main(test_mode: bool = False):
             "contacts": all_contacts
         }, f, ensure_ascii=False, indent=2)
         
-    # CSV
+    # --- Сохранение CSV ---
     csv_path = os.path.join(output_dir, "leads.csv")
     with open(csv_path, "w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
-            "Название компании", "Источник", "Ниша", "Город", "Сайт/Профиль", 
-            "Телефон", "Email", "Telegram", "WhatsApp", "ИНН/БИН", "Оборот", "Сотрудники", 
-            "Боли компании", "Угол захода", "Что предложить (Оффер)", "Драфт сообщения"
+            "Компания / Профиль", "Источник", "Ниша", "Город", "Ссылка", 
+            "Телефон", "Email", "ИНН/БИН", "Боли компании", "Угол захода", "Что предложить (Оффер)", "Драфт 1-го сообщения"
         ])
         for c in analyzed_companies:
             pains = ", ".join(c.get("pain_points", []))
@@ -316,21 +283,17 @@ async def main(test_mode: bool = False):
                 c.get("source", ""),
                 c.get("category", ""),
                 c.get("city", ""),
-                c.get("site", "") or c.get("hh_url", ""),
+                c.get("site") or c.get("hh_url", ""),
                 c.get("phone", ""),
                 c.get("email", ""),
-                c.get("telegram", ""),
-                c.get("whatsapp", ""),
                 c.get("inn") or c.get("bin", ""),
-                TaxAnalyzer._fmt_money(c.get("tax_analysis", {}).get("data", {}).get("turnover", 0)),
-                c.get("tax_analysis", {}).get("data", {}).get("employees", ""),
                 pains,
                 c.get("outreach_angle", ""),
                 c.get("offer", ""),
                 c.get("draft_pitch", "")
             ])
             
-    # Markdown
+    # --- Сохранение Markdown Сводки ---
     md_path = os.path.join(output_dir, "leads_summary.md")
     
     leads_by_source = {}
@@ -344,7 +307,7 @@ async def main(test_mode: bool = False):
         f.write(f"# 🚀 Ежедневный Отчет по Лидогенерации — {date_str}\n\n")
         f.write(f"**Дата сбора:** {datetime.now().strftime('%d.%m.%Y %H:%M')}\n")
         f.write(f"**Всего уникальных лидов:** {len(analyzed_companies)}\n")
-        f.write(f"**Поисковые ниши:** {', '.join(KEYWORDS)}\n\n")
+        f.write(f"**Поисковые запросы:** {', '.join(KEYWORDS)}\n\n")
         
         f.write("## 📊 Статистика по источникам\n\n")
         f.write("| Источник | Количество лидов |\n")
@@ -353,8 +316,8 @@ async def main(test_mode: bool = False):
             f.write(f"| {src} | {len(leads)} |\n")
         f.write("\n---\n\n")
         
-        f.write("## 📋 Сводная таблица\n\n")
-        f.write("| Компания | Источник | Ниша | Город | Контакты | Угол захода |\n")
+        f.write("## 📋 Сводная таблица лидов\n\n")
+        f.write("| Компания | Источник | Запрос | Контакты | Что предложить | Драфт сообщения |\n")
         f.write("| :--- | :--- | :--- | :--- | :--- | :--- |\n")
         for c in analyzed_companies:
             contacts_str = []
@@ -362,22 +325,18 @@ async def main(test_mode: bool = False):
                 contacts_str.append(f"Тел: {c.get('phone')}")
             if c.get("email"):
                 contacts_str.append(f"Email: {c.get('email')}")
-            if c.get("telegram"):
-                contacts_str.append(f"TG: {c.get('telegram')}")
-            if c.get("whatsapp"):
-                contacts_str.append(f"WA: {c.get('whatsapp')}")
             contact_final = "; ".join(contacts_str) if contacts_str else "Ссылка"
             
             link_url = c.get("site") or c.get("hh_url") or "#"
             comp_link = f"[{c.get('name')}]({link_url})"
             
-            f.write(f"| {comp_link} | {c.get('source')} | {c.get('category')} | {c.get('city')} | {contact_final} | {c.get('outreach_angle')} |\n")
+            f.write(f"| {comp_link} | {c.get('source')} | {c.get('category')} | {contact_final} | {c.get('offer')} | {c.get('draft_pitch')} |\n")
             
         f.write("\n---\n\n")
-        f.write("## 🔍 Детализация и Персонализированные офферы\n\n")
+        f.write("## 🔍 Детализация по каждому лиду\n\n")
         
-        for idx, c in enumerate(analyzed_companies):
-            f.write(f"### {idx+1}. 🏢 {c.get('name')} ({c.get('source')})\n\n")
+        for idx, c in enumerate(analyzed_companies, start=1):
+            f.write(f"### {idx}. 🏢 {c.get('name')} ({c.get('source')})\n\n")
             
             link_url = c.get("site") or c.get("hh_url") or ""
             if link_url:
@@ -389,109 +348,63 @@ async def main(test_mode: bool = False):
                 contacts_str.append(f"📞 {c.get('phone')}")
             if c.get("email"):
                 contacts_str.append(f"📧 {c.get('email')}")
-            if c.get("telegram"):
-                contacts_str.append(f"✈️ {c.get('telegram')}")
-            if c.get("whatsapp"):
-                contacts_str.append(f"💬 {c.get('whatsapp')}")
             if contacts_str:
                 f.write(f"- **Контакты:** {', '.join(contacts_str)}\n")
             
-            f.write(f"- **Ниша:** {c.get('category')}\n")
-            f.write(f"- **Описание:** {c.get('description')}\n")
-            f.write(f"- **ИНН/БИН:** {c.get('inn') or c.get('bin', '—')}\n\n")
+            f.write(f"- **Запрос:** {c.get('category')}\n")
+            f.write(f"- **Описание:** {c.get('description')}\n\n")
             
-            # Налоговый блок
-            tax_md = c.get("tax_summary", "")
-            if tax_md and "❌" not in tax_md and "ℹ️" not in tax_md:
-                f.write(tax_md + "\n\n")
-            
-            f.write("#### ⚠️ Предполагаемые боли:\n")
+            f.write("#### ⚠️ Боли компании:\n")
             for pain in c.get("pain_points", []):
                 f.write(f"- {pain}\n")
             f.write("\n")
             
-            f.write(f"#### 💡 Рекомендованный оффер:\n{c.get('offer')}\n\n")
-            
-    log.info(f"Сводные отчёты сохранены в {output_dir}")
+            f.write(f"#### 💡 Что предложить этой компании (Оффер):\n{c.get('offer')}\n\n")
+            f.write(f"#### ✉️ Драфт 1-го сообщения:\n> {c.get('draft_pitch')}\n\n")
 
-    # --- Создание индивидуальных файлов лидов в папке details ---
+    # --- Создание отдельного .md файла для КАЖДОГО лида в папке details/ ---
     details_dir = os.path.join(output_dir, "details")
     os.makedirs(details_dir, exist_ok=True)
-    log.info(f"Сохранение индивидуальных драфтов лидов в {details_dir}...")
+    log.info(f"Сохранение персональных файлов с драфтами в {details_dir}...")
 
     for idx, c in enumerate(analyzed_companies, start=1):
         raw_name = c.get("name") or f"lead_{idx}"
-        safe_name = re.sub(r'[^\w\s-]', '', raw_name).strip().replace(" ", "_")
+        safe_name = re.sub(r'[^a-zA-Z0-9_]+', '_', raw_name).strip('_')
         if not safe_name:
             safe_name = f"lead_{idx}"
         detail_file = os.path.join(details_dir, f"{idx}_{safe_name}.md")
         
         with open(detail_file, "w", encoding="utf-8") as df:
-            df.write(f"# Анализ Лида: {c.get('name')}\n\n")
+            df.write(f"# Карточка Лида: {c.get('name')}\n\n")
+            df.write(f"- **Источник**: {c.get('source')}\n")
+            df.write(f"- **Запрос**: {c.get('category')}\n")
+            df.write(f"- **Город**: {c.get('city') or 'Казахстан/СНГ'}\n")
             df.write(f"- **Телефон**: {c.get('phone') or 'Не указан'}\n")
             df.write(f"- **Email**: {c.get('email') or 'Не указан'}\n")
-            df.write(f"- **Telegram**: {c.get('telegram') or 'Не указан'}\n")
-            df.write(f"- **WhatsApp**: {c.get('whatsapp') or 'Не указан'}\n")
-            df.write(f"- **Источник**: {c.get('source')}\n")
-            df.write(f"- **Ключевой запрос**: {c.get('category')}\n")
-            df.write(f"- **Город**: {c.get('city') or 'Казахстан/СНГ'}\n")
             link_target = c.get('site') or c.get('hh_url') or ''
             if link_target:
-                df.write(f"- **Ссылка**: [{link_target}]({link_target})\n\n")
+                df.write(f"- **Ссылка/Профиль**: [{link_target}]({link_target})\n\n")
             else:
-                df.write("- **Ссылка**: Нет ссылки\n\n")
+                df.write("- **Ссылка/Профиль**: Нет ссылки\n\n")
                 
-            df.write("### 🔍 Анализ бизнеса и боли\n")
+            df.write("### ⚠️ Боли и анализ компании\n")
             for pain in c.get("pain_points", []):
                 df.write(f"- {pain}\n")
             df.write(f"\n- **Угол захода (Angle)**: {c.get('outreach_angle')}\n\n")
-            df.write("### 💡 Что предложить этой компании:\n")
+            
+            df.write("### 💡 Что предложить этой компании (Оффер):\n")
             df.write(f"{c.get('offer')}\n\n")
-            df.write("### ✉️ Драфт первого сообщения (WhatsApp / Telegram / Email)\n")
+            
+            df.write("### ✉️ Драфт 1-го сообщения для связи (WhatsApp / Telegram):\n")
             df.write(f"> {c.get('draft_pitch')}\n")
-    
-    # --- Supabase ---
-    supabase_configured = (
-        os.getenv("SUPABASE_URL") and 
-        os.getenv("SUPABASE_KEY") and 
-        "YOUR_PROJECT" not in os.getenv("SUPABASE_URL")
-    )
-    
-    if supabase_configured:
-        log.info("Синхронизация с Supabase...")
-        try:
-            comp_count = await upsert_companies(analyzed_companies)
-            vac_count = await upsert_vacancies(all_vacancies)
-            
-            supabase_contacts = []
-            for c in analyzed_companies:
-                if c.get("email") or c.get("phone"):
-                    supabase_contacts.append({
-                        "company_id": c.get("id"),
-                        "vacancy_id": "",
-                        "name": c.get("name"),
-                        "role": "Компания / Профиль",
-                        "email": c.get("email", ""),
-                        "phone": c.get("phone", ""),
-                        "contact_link": c.get("site") or c.get("hh_url", ""),
-                        "source": c.get("source")
-                    })
-            supabase_contacts.extend(all_contacts)
-            
-            contact_count = await upsert_contacts(supabase_contacts)
-            log.info(f"Supabase: +{comp_count} компаний, +{vac_count} вакансий, +{contact_count} контактов")
-        except Exception as e:
-            log.error(f"Ошибка Supabase: {e}")
-    else:
-        log.warning("Supabase не настроен. Пропускаем.")
-        
+
     duration = datetime.now() - start_time
-    log.info(f"Сбор завершён за {duration.total_seconds():.1f} сек.")
+    log.info(f"🎉 Ежедневный сбор успешно завершён за {duration.total_seconds():.1f} сек. Результаты сохранены в {output_dir}")
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Daily B2B Lead Aggregator")
-    parser.add_argument("--test", action="store_true", help="Тестовый режим")
+    parser.add_argument("--test", action="store_true", help="Тестовый режим (только 1 запрос 'боты')")
     args = parser.parse_args()
     
     asyncio.run(main(test_mode=args.test))

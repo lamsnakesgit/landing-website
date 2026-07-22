@@ -1,6 +1,5 @@
 """
-hh.kz Parser — вакансии, компании, контакты
-Запуск: python hh_parser.py --city Алматы --sphere IT --role "директор"
+hh.kz & hh.ru Parser — вакансии, компании, контакты
 """
 
 import httpx
@@ -9,10 +8,9 @@ import argparse
 import json
 import re
 import os
-import time
 import logging
-from typing import Optional
-from urllib.parse import quote_plus
+from typing import Optional, List, Dict
+from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,333 +18,136 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
 
-HH_API = "https://api.hh.ru"
-
-AREA_MAP = {
-    "алматы": "160",
-    "астана": "159",
-    "шымкент": "202",
-    "актау": "167",
-    "атырау": "168",
-    "казахстан": "40",  # вся страна
-    "россия": "113",  # вся Россия
-}
-
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-    "Accept": "application/json",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "ru-RU,ru;q=0.9",
 }
 
-hh_cookie = os.getenv("HH_COOKIE")
-if hh_cookie:
-    HEADERS["Cookie"] = hh_cookie
-    log.info("Найден HH_COOKIE в .env. Будем запрашивать данные как авторизованный пользователь.")
+def extract_email(text: str) -> Optional[str]:
+    if not text:
+        return ""
+    match = re.search(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", text)
+    return match.group(0) if match else ""
 
-def get_area_id(city: str) -> str:
-    return AREA_MAP.get(city.lower(), "40")
+def extract_phone(text: str) -> Optional[str]:
+    if not text:
+        return ""
+    match = re.search(r"[\+7|8][\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}", text)
+    return match.group(0) if match else ""
 
-
-async def search_ddg_hh(city: str, sphere: str, role: str) -> dict:
-    """Фоллбэк поиск вакансий и компаний HH через DuckDuckGo Lite при блокировке HH API"""
-    import urllib.parse
-    domain = "hh.kz" if city.lower() in ["казахстан", "алматы", "астана", "шымкент"] else "hh.ru"
+async def parse_hh_html(domain: str, city: str, sphere: str, role: str = "", max_pages: int = 2) -> Dict:
     query = f"{role} {sphere}".strip()
-    log.info(f"HH ({domain}) — запуск фоллбэк поиска через DuckDuckGo Lite для: '{query}'")
-    
+    log.info(f"HH ({domain}) — запуск HTML поиска по запросу: '{query}'")
+
     companies = {}
     vacancies = []
     contacts = []
+
+    area = "40" if domain == "hh.kz" else "113"
     
-    ddg_url = "https://lite.duckduckgo.com/lite/"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-    data = {"q": f"site:{domain}/vacancy {query}"}
-    
-    try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
-            resp = await client.post(ddg_url, headers=headers, data=data)
-            if resp.status_code == 200:
-                soup = BeautifulSoup(resp.text, 'html.parser')
-                links = soup.find_all('a', class_='result-link')
-                
-                for link in links:
-                    href = link.get('href', '')
-                    title = link.get_text(strip=True)
-                    decoded_href = urllib.parse.unquote(href)
+    async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:
+        for page in range(max_pages):
+            url = f"https://{domain}/search/vacancy?text={query}&area={area}&page={page}"
+            try:
+                resp = await client.get(url, headers=HEADERS)
+                if resp.status_code != 200:
+                    log.warning(f"HH HTML {domain} вернул статус {resp.status_code}")
+                    break
                     
-                    match_url = re.search(r"https?://[\w\.]*hh\.(?:ru|kz)/vacancy/(\d+)", decoded_href)
-                    if match_url:
-                        vac_url = match_url.group(0)
-                        vac_id = match_url.group(1)
+                soup = BeautifulSoup(resp.text, 'html.parser')
+                links = soup.find_all('a', href=lambda h: h and '/vacancy/' in h and 'query=' in h)
+                
+                if not links:
+                    log.info(f"На странице {page+1} {domain} вакансий не найдено.")
+                    break
+                    
+                for l in links:
+                    vac_title = l.get_text(strip=True)
+                    vac_url = l.get('href').split('?')[0]
+                    if not vac_url.startswith('http'):
+                        vac_url = f"https://{domain}{vac_url}"
                         
-                        snippet = ""
-                        tr = link.find_parent('tr')
-                        if tr:
-                            next_tr = tr.find_next_sibling('tr')
-                            if next_tr:
-                                snip_td = next_tr.select_one('.result-snippet')
-                                if snip_td:
-                                    snippet = snip_td.get_text(strip=True)
-                                    
-                        parts = title.split("–") if "–" in title else title.split("-")
-                        vac_title = parts[0].strip() if len(parts) > 0 else title
-                        comp_name = parts[1].strip() if len(parts) > 1 else f"Компания {domain}"
+                    vac_id = re.search(r"/vacancy/(\d+)", vac_url)
+                    v_id = vac_id.group(1) if vac_id else vac_url
+                    
+                    container = l.find_parent('div', class_=re.compile(r'vacancy-card|serp-item')) or l.find_parent('div', class_=re.compile(r'template-svg|magritte')) or l.parent.parent.parent
+                    
+                    comp_link = container.find('a', href=lambda h: h and '/employer/' in h) if container else None
+                    comp_name = comp_link.get_text(strip=True) if comp_link else f"Компания ({domain})"
+                    comp_url = ""
+                    if comp_link:
+                        c_href = comp_link.get('href', '').split('?')[0]
+                        comp_url = f"https://{domain}{c_href}" if c_href.startswith('/') else c_href
                         
-                        comp_id = f"hh_{comp_name.replace(' ', '_')}"
-                        if comp_id not in companies:
-                            phone = extract_phone(snippet) or ""
-                            email = extract_email(snippet) or ""
+                    clean_name = re.sub(r'[^a-zA-Z0-9_]+', '_', comp_name)
+                    comp_id = f"hh_{clean_name}"
+                    
+                    snippet = ""
+                    if container:
+                        snippet_el = container.select_one('[class*="snippet"], [class*="responsibility"], [class*="requirement"]')
+                        if snippet_el:
+                            snippet = snippet_el.get_text(strip=True)
                             
-                            companies[comp_id] = {
-                                "id": comp_id,
-                                "name": comp_name,
-                                "site": vac_url,
-                                "phone": phone,
-                                "email": email,
-                                "city": city,
-                                "description": snippet,
-                                "category": sphere,
-                                "source": domain,
-                                "hh_url": vac_url,
-                                "employee_count_range": "",
-                            }
-                            
-                        vacancies.append({
-                            "company_id": comp_id,
-                            "vacancy_id": vac_id,
-                            "title": vac_title,
+                    city_el = container.select_one('[data-qa*="address"], [class*="address"]') if container else None
+                    vac_city = city_el.get_text(strip=True) if city_el else city
+                    
+                    phone = extract_phone(snippet)
+                    email = extract_email(snippet)
+                    
+                    if comp_id not in companies:
+                        companies[comp_id] = {
+                            "id": comp_id,
+                            "name": comp_name,
+                            "site": comp_url or vac_url,
+                            "phone": phone,
+                            "email": email,
+                            "city": vac_city,
                             "description": snippet,
-                            "url": vac_url,
-                            "salary": "",
-                            "city": city,
-                            "published_at": "",
+                            "category": sphere,
                             "source": domain,
+                            "hh_url": vac_url,
+                        }
+                        
+                    vacancies.append({
+                        "company_id": comp_id,
+                        "vacancy_id": v_id,
+                        "title": vac_title,
+                        "description": snippet,
+                        "url": vac_url,
+                        "salary": "",
+                        "city": vac_city,
+                        "published_at": "",
+                        "source": domain,
+                    })
+                    
+                    if phone or email:
+                        contacts.append({
+                            "company_id": comp_id,
+                            "vacancy_id": v_id,
+                            "name": "HR / Рекрутер",
+                            "role": vac_title,
+                            "email": email,
+                            "phone": phone,
+                            "contact_link": vac_url,
+                            "source": domain
                         })
-    except Exception as e:
-        log.warning(f"Ошибка фоллбэка HH через DDG: {e}")
-        
+                        
+            except Exception as e:
+                log.error(f"Ошибка при скрапинге HTML HH ({domain}, стр {page}): {e}")
+                break
+
+    log.info(f"HH ({domain}) завершен. Компаний: {len(companies)}, Вакансий: {len(vacancies)}")
     return {
         "companies": list(companies.values()),
         "vacancies": vacancies,
         "contacts": contacts
     }
 
-
-async def fetch_vacancies(
-    client: httpx.AsyncClient,
-    city: str,
-    sphere: str,
-    role: str,
-    page: int = 0,
-    per_page: int = 50
-) -> dict:
-    area_id = get_area_id(city)
-    search_text = f"{role} {sphere}".strip()
-    params = {
-        "text": search_text,
-        "area": area_id,
-        "per_page": per_page,
-        "page": page,
-        "order_by": "publication_time",
-    }
-    try:
-        resp = await client.get(f"{HH_API}/vacancies", params=params, headers=HEADERS)
-        resp.raise_for_status()
-        return resp.json()
-    except Exception as e:
-        log.warning(f"HH API недоступен ({e}). Использование фоллбэк поиска...")
-        return await search_ddg_hh(city, sphere, role)
-
-
-async def fetch_vacancy_detail(client: httpx.AsyncClient, vacancy_id: str) -> dict:
-    resp = await client.get(f"{HH_API}/vacancies/{vacancy_id}", headers=HEADERS)
-    resp.raise_for_status()
-    return resp.json()
-
-
-async def fetch_employer(client: httpx.AsyncClient, employer_id: str) -> dict:
-    resp = await client.get(f"{HH_API}/employers/{employer_id}", headers=HEADERS)
-    resp.raise_for_status()
-    return resp.json()
-
-
-def extract_email(text: str) -> Optional[str]:
-    if not text:
-        return None
-    match = re.search(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", text)
-    return match.group(0) if match else None
-
-
-def extract_phone(text: str) -> Optional[str]:
-    if not text:
-        return None
-    match = re.search(r"[\+7|8][\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}", text)
-    return match.group(0) if match else None
-
-
-def clean_html(text: str) -> str:
-    if not text:
-        return ""
-    clean = re.sub(r"<[^>]+>", " ", text)
-    clean = re.sub(r"\s+", " ", clean).strip()
-    return clean[:1000]
-
-
-async def parse_hh(city: str, sphere: str, role: str, max_pages: int = 5) -> dict:
-    companies = {}
-    vacancies = []
-    contacts = []
-
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        for page in range(max_pages):
-            log.info(f"hh.kz — страница {page + 1}/{max_pages}")
-            try:
-                data = await fetch_vacancies(client, city, sphere, role, page=page)
-            except Exception as e:
-                log.error(f"Ошибка при получении страницы {page}: {e}")
-                break
-
-            if "companies" in data and "items" not in data:
-                log.info("Получены вакансии HH через фоллбэк скрапинг.")
-                return data
-
-            items = data.get("items", [])
-            if not items:
-                break
-
-            tasks = [fetch_vacancy_detail(client, v["id"]) for v in items]
-            details = await asyncio.gather(*tasks, return_exceptions=True)
-
-            for item, detail in zip(items, details):
-                if isinstance(detail, Exception):
-                    log.warning(f"Пропуск вакансии {item.get('id')}: {detail}")
-                    continue
-
-                emp = detail.get("employer", {})
-                emp_id = str(emp.get("id", ""))
-                if not emp_id:
-                    continue
-
-                # --- Компания ---
-                if emp_id not in companies:
-                    try:
-                        emp_detail = await fetch_employer(client, emp_id)
-                        site = emp_detail.get("site_url") or emp_detail.get("alternate_url", "")
-                        description_raw = emp_detail.get("description", "")
-                        description = clean_html(description_raw)
-                        emp_email = extract_email(description_raw)
-                        emp_phone = extract_phone(description_raw)
-                        area = emp_detail.get("area", {}).get("name", city)
-                        industries = [i.get("name", "") for i in emp_detail.get("industries", [])]
-                    except Exception as e:
-                        log.warning(f"Ошибка получения работодателя {emp_id}: {e}")
-                        site = emp.get("alternate_url", "")
-                        description = ""
-                        emp_email = None
-                        emp_phone = None
-                        area = city
-                        industries = []
-
-                    companies[emp_id] = {
-                        "id": emp_id,
-                        "name": emp.get("name", ""),
-                        "site": site,
-                        "email": emp_email,
-                        "phone": emp_phone,
-                        "city": area,
-                        "description": description,
-                        "category": ", ".join(industries) if industries else sphere,
-                        "source": "hh.kz",
-                        "hh_url": emp.get("alternate_url", ""),
-                        "employee_count_range": emp.get("employer_type", ""),
-                    }
-                    await asyncio.sleep(0.3)
-
-                # --- Вакансия ---
-                desc_raw = detail.get("description", "")
-                salary = detail.get("salary") or {}
-                salary_str = ""
-                if salary:
-                    fr = salary.get("from")
-                    to = salary.get("to")
-                    curr = salary.get("currency", "")
-                    salary_str = f"{fr or ''}-{to or ''} {curr}".strip("- ")
-
-                vacancies.append({
-                    "company_id": emp_id,
-                    "vacancy_id": detail.get("id"),
-                    "title": detail.get("name", ""),
-                    "description": clean_html(desc_raw),
-                    "url": detail.get("alternate_url", ""),
-                    "salary": salary_str,
-                    "city": detail.get("area", {}).get("name", city),
-                    "published_at": detail.get("published_at", ""),
-                    "experience": detail.get("experience", {}).get("name", ""),
-                    "employment": detail.get("employment", {}).get("name", ""),
-                    "source": "hh.kz",
-                })
-
-                # --- Контакт ---
-                contact_info = detail.get("contacts", {})
-                if contact_info:
-                    c_name = contact_info.get("name", "")
-                    c_email = contact_info.get("email", "")
-                    c_phones = contact_info.get("phones", [])
-                    c_phone = c_phones[0].get("formatted", "") if c_phones else ""
-                    if c_name or c_email or c_phone:
-                        contacts.append({
-                            "company_id": emp_id,
-                            "vacancy_id": str(detail.get("id", "")),
-                            "name": c_name,
-                            "role": detail.get("name", ""),
-                            "email": c_email,
-                            "phone": c_phone,
-                            "contact_link": detail.get("alternate_url", ""),
-                            "source": "hh.kz",
-                        })
-
-                # Проверяем email/телефон в тексте вакансии
-                desc_email = extract_email(desc_raw)
-                desc_phone = extract_phone(desc_raw)
-                if desc_email or desc_phone:
-                    contacts.append({
-                        "company_id": emp_id,
-                        "vacancy_id": str(detail.get("id", "")),
-                        "name": "",
-                        "role": detail.get("name", ""),
-                        "email": desc_email or "",
-                        "phone": desc_phone or "",
-                        "contact_link": detail.get("alternate_url", ""),
-                        "source": "hh.kz (из описания)",
-                    })
-
-            total_pages = data.get("pages", 1)
-            if page >= total_pages - 1:
-                break
-            await asyncio.sleep(1)
-
-    return {
-        "companies": list(companies.values()),
-        "vacancies": vacancies,
-        "contacts": contacts,
-    }
-
+async def parse_hh(city: str, sphere: str, role: str, max_pages: int = 2) -> dict:
+    domain = "hh.kz" if city.lower() in ["казахстан", "алматы", "астана", "шымкент"] else "hh.ru"
+    return await parse_hh_html(domain, city, sphere, role, max_pages)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="hh.kz B2B Parser")
-    parser.add_argument("--city", default="Алматы")
-    parser.add_argument("--sphere", default="IT")
-    parser.add_argument("--role", default="директор")
-    parser.add_argument("--pages", type=int, default=3)
-    parser.add_argument("--output", default="hh_result.json")
-    args = parser.parse_args()
-
-    result = asyncio.run(parse_hh(args.city, args.sphere, args.role, args.pages))
-    with open(args.output, "w", encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=2)
-
-    log.info(f"Готово: {len(result['companies'])} компаний, {len(result['vacancies'])} вакансий, {len(result['contacts'])} контактов")
-    log.info(f"Результат сохранён в {args.output}")
+    res = asyncio.run(parse_hh("Алматы", "боты", ""))
+    print(f"Найдено компаний: {len(res['companies'])}, вакансий: {len(res['vacancies'])}")
