@@ -1,13 +1,12 @@
 
 
-## 2026-07-24: Проверка и запуск автоматического ежедневного сбора контактов (adata.kz, hh.ru, hh.kz, threads.net)
+## 2026-07-24: Проверка и автоматический сбор контактов (adata.kz, hh.ru, hh.kz, threads.net)
 **Победы (Wins) / Победы:**
-- **Подтверждено автоматическое ежедневное исполнение:** Выполнен контрольный запуск пайплайна лидогенератора за 24.07.2026 (`run_pipeline.py`).
-- **Сбор контактов с 4 источников по 6 направлениям:** Собрана база по ключам (`ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`) с платформ `adata.kz`, `hh.ru`, `hh.kz`, `threads.net`.
-- **ИИ-анализ боли, персонализированные офферы и питчи:** Для каждого контакта сгенерированы предложения (офферы под проблему бизнеса) и драфты 1-го сообщения для связи в мессенджерах (WhatsApp / Telegram) через Vertex AI Gemini 2.5 Flash / OpenAI.
-- **Сохранение в папки:** Отчеты и детальные карточки каждого лида сохранены в `03_Marketing_and_Sales/daily_leads/2026-07-24/` (включая CSV `leads_summary.csv`, Markdown отчет `leads_report.md` и файлы в `details/*.md`).
-- **Автоматизация и уведомления:** Проверена служба `launchctl` (`com.higherpower.daily_leadgen`), запускающая процесс ежедневно в 09:00, и отправка карточек ТОП-лидов с контактами в Telegram.
-- [EN] Executed and verified daily leadgen pipeline for 2026-07-24. Collected contacts from `adata.kz`, `hh.ru`, `hh.kz`, and `threads.net` for keywords (`AI`, `development`, `bots`, `marketing`, `context ads`, `AI content`). Enriched leads with AI business pain hypotheses, custom offers, and 1st message drafts into `03_Marketing_and_Sales/daily_leads/2026-07-24/details/`. Confirmed launchd daily scheduler (09:00 AM) and Telegram bot notifications.
+- **Выполнен автоматический сбор лидов за 24.07.2026:** Запущен пайплайн `daily_lead_aggregator.py` по всем целевым запросам (`ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`).
+- **Сбор с 4 платформ:** Собраны контакты и вакансии с `adata.kz`, `hh.ru`, `hh.kz`, `threads.net`.
+- **Генерация офферов и драфтов:** Для каждого лида сгенерированы боли бизнеса, коммерческое предложение (оффер) и драфт первого сообщения в WhatsApp/Telegram.
+- **Сохранение результатов:** Данные сохранены в `03_Marketing_and_Sales/daily_leads/2026-07-24/` (включая CSV `leads.csv`, сводку `leads_summary.md` и персональные файлы с офферами в `details/*.md`).
+- - [EN] Verified and executed daily lead generation script (`daily_lead_aggregator.py`) for 2026-07-24 across `adata.kz`, `hh.ru`, `hh.kz`, and `threads.net` for keywords (`AI`, `dev`, `bots`, `marketing`, `context ads`, `AI content`). Created lead folders, offers, and first message drafts in `03_Marketing_and_Sales/daily_leads/2026-07-24/details/`.
 
 ## 2026-07-23: Ежедневный сбор контактов с adata.kz, hh.ru, hh.kz, threads.net (Daily Leadgen Execution & Verification)
 **Победы (Wins) / Победы:**

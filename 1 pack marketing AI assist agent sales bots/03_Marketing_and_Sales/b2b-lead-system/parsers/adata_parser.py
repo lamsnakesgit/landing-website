@@ -44,7 +44,8 @@ async def search_adata_async(city: str, sphere: str, role: str = "", max_pages: 
                 user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
             )
             page = await context.new_page()
-            await page.goto(url, wait_until="networkidle", timeout=20000)
+            await page.goto(url, wait_until="domcontentloaded", timeout=20000)
+            await page.wait_for_timeout(3000)
             
             content = await page.content()
             soup = BeautifulSoup(content, 'html.parser')

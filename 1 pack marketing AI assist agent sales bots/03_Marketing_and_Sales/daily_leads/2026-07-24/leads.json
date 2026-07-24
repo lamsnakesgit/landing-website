@@ -1,0 +1,694 @@
+{
+  "date": "2026-07-24",
+  "leads": [
+    {
+      "id": "hh__",
+      "name": "Правительство Московской области",
+      "site": "https://hh.ru/employer/1575814",
+      "phone": "",
+      "email": "",
+      "city": "Красногорск",
+      "description": "",
+      "category": "боты",
+      "source": "hh.ru",
+      "hh_url": "https://hh.ru/vacancy/135512300",
+      "pain_points": [
+        "Необходимость масштабирования продаж"
+      ],
+      "outreach_angle": "Оптимизация маркетинга и коммуникаций",
+      "offer": "Внедрение ИИ-решений и автоворонок для сферы боты",
+      "draft_pitch": "Здравствуйте! Хотели предложить вам решения по автоматизации маркетинга и ИИ для Правительство Московской области. Подскажите, с кем можно обсудить детали?"
+    },
+    {
+      "id": "hh_MOSAIC",
+      "name": "MOSAIC",
+      "site": "https://hh.ru/employer/716909",
+      "phone": "",
+      "email": "",
+      "city": "Москва, р-н Басманный",
+      "description": "",
+      "category": "боты",
+      "source": "hh.ru",
+      "hh_url": "https://hh.ru/vacancy/133273838",
+      "pain_points": [
+        "Высокие операционные расходы",
+        "Рутинная обработка заявок вручную"
+      ],
+      "outreach_angle": "Внедрение ИИ для ускорения продаж",
+      "offer": "Разработка ИИ-агента квалификации и чат-бота для автоответов",
+      "draft_pitch": "Здравствуйте! Обратили внимание на MOSAIC. Мы помогаем внедрять ИИ-ботов для автоматизации работы с клиентами. Подскажите, актуально ли сейчас сократить время ответа клиентам?"
+    },
+    {
+      "id": "hh__Active_Project_management",
+      "name": "ОООActive Project management",
+      "site": "https://hh.ru/employer/1693887",
+      "phone": "",
+      "email": "",
+      "city": "Москва, р-н Даниловский",
+      "description": "",
+      "category": "боты",
+      "source": "hh.ru",
+      "hh_url": "https://hh.ru/vacancy/135543595",
+      "pain_points": [
+        "Высокие операционные расходы",
+        "Рутинная обработка заявок вручную"
+      ],
+      "outreach_angle": "Внедрение ИИ для ускорения продаж",
+      "offer": "Разработка ИИ-агента квалификации и чат-бота для автоответов",
+      "draft_pitch": "Здравствуйте! Обратили внимание на ОООActive Project management. Мы помогаем внедрять ИИ-ботов для автоматизации работы с клиентами. Подскажите, актуально ли сейчас сократить время ответа клиентам?"
+    }
+  ],
+  "vacancies": [
+    {
+      "company_id": "hh__",
+      "vacancy_id": "135512300",
+      "title": "Аналитик данных LLM (чат боты)",
+      "description": "",
+      "url": "https://hh.ru/vacancy/135512300",
+      "salary": "",
+      "city": "Красногорск",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh__",
+      "vacancy_id": "135410966",
+      "title": "Рекламщик / Маркетолог (Запрещеннограмм, Ютуб, SEO, SMM, T-боты)",
+      "description": "",
+      "url": "https://hh.ru/vacancy/135410966",
+      "salary": "",
+      "city": "Санкт-Петербург",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh_",
+      "vacancy_id": "134298011",
+      "title": "Руководитель направления по автоматизации процессов контакт - центра (чат-боты)",
+      "description": "",
+      "url": "https://hh.ru/vacancy/134298011",
+      "salary": "",
+      "city": "Москва, р-н Обручевский",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh__",
+      "vacancy_id": "134955768",
+      "title": "Рекламщик / Маркетолог (Запрещеннограмм, Ютуб, SEO, SMM, T-боты)",
+      "description": "",
+      "url": "https://hh.ru/vacancy/134955768",
+      "salary": "",
+      "city": "Нижний Новгород",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh__",
+      "vacancy_id": "134617238",
+      "title": "ИИ-инженер (Чат-боты)",
+      "description": "",
+      "url": "https://hh.ru/vacancy/134617238",
+      "salary": "",
+      "city": "Ярославль, р-н Кировский",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh__",
+      "vacancy_id": "134585859",
+      "title": "SMM менеджер/Контент-менеджер (автоворонки, боты, автооплаты)",
+      "description": "",
+      "url": "https://hh.ru/vacancy/134585859",
+      "salary": "",
+      "city": "Москва",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh__",
+      "vacancy_id": "134843476",
+      "title": "Маркетолог в стоматологическую клинику",
+      "description": "",
+      "url": "https://hh.ru/vacancy/134843476",
+      "salary": "",
+      "city": "Москва",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh__",
+      "vacancy_id": "133400939",
+      "title": "Повар горячего цеха",
+      "description": "",
+      "url": "https://hh.ru/vacancy/133400939",
+      "salary": "",
+      "city": "Верхняя Пышма, улица Орджоникидзе, 18",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh_",
+      "vacancy_id": "135542205",
+      "title": "Cтажер/Аналитик данных/Разработчик",
+      "description": "",
+      "url": "https://hh.ru/vacancy/135542205",
+      "salary": "",
+      "city": "Москва",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh_",
+      "vacancy_id": "135552476",
+      "title": "Риелтор-стажер",
+      "description": "",
+      "url": "https://hh.ru/vacancy/135552476",
+      "salary": "",
+      "city": "Нижневартовск, улица Героев Самотлора, 18",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh__",
+      "vacancy_id": "135559950",
+      "title": "Senior Product Manager",
+      "description": "",
+      "url": "https://hh.ru/vacancy/135559950",
+      "salary": "",
+      "city": "Москва",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh_MOSAIC",
+      "vacancy_id": "133273838",
+      "title": "SMM Manager Senior/Head (офис)",
+      "description": "",
+      "url": "https://hh.ru/vacancy/133273838",
+      "salary": "",
+      "city": "Москва, р-н Басманный",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh__Active_Project_management",
+      "vacancy_id": "135543595",
+      "title": "Account manager",
+      "description": "",
+      "url": "https://hh.ru/vacancy/135543595",
+      "salary": "",
+      "city": "Москва, р-н Даниловский",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh_",
+      "vacancy_id": "135558336",
+      "title": "Оператор сделок с недвижимостью",
+      "description": "",
+      "url": "https://hh.ru/vacancy/135558336",
+      "salary": "",
+      "city": "Брянск, р-н Советский",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh_",
+      "vacancy_id": "131765772",
+      "title": "Агент по продаже недвижимости",
+      "description": "",
+      "url": "https://hh.ru/vacancy/131765772",
+      "salary": "",
+      "city": "Геленджик, Геленджикский проспект, 168А",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh_BAW_Russia",
+      "vacancy_id": "135559546",
+      "title": "Интернет-маркетолог",
+      "description": "",
+      "url": "https://hh.ru/vacancy/135559546",
+      "salary": "",
+      "city": "Москва",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh_Assistance_Group",
+      "vacancy_id": "133602942",
+      "title": "Программист 1С Интеграционный контур",
+      "description": "",
+      "url": "https://hh.ru/vacancy/133602942",
+      "salary": "",
+      "city": "Москва",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh__",
+      "vacancy_id": "135554176",
+      "title": "Инженер по внедрению ИИ-решений",
+      "description": "",
+      "url": "https://hh.ru/vacancy/135554176",
+      "salary": "",
+      "city": "Красногорск",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh__",
+      "vacancy_id": "135545197",
+      "title": "Руководитель направления голосовых цифровых технологий (продажи)",
+      "description": "",
+      "url": "https://hh.ru/vacancy/135545197",
+      "salary": "",
+      "city": "Москва",
+      "published_at": "",
+      "source": "hh.ru"
+    },
+    {
+      "company_id": "hh__ChatApp_",
+      "vacancy_id": "135055240",
+      "title": "Бизнес / системный аналитик (SaaS, чат-боты, AI)",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135055240",
+      "salary": "",
+      "city": "Алматы, улица Жандосова, 87А",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__Crocos_Systems",
+      "vacancy_id": "134694000",
+      "title": "Conversational AI Engineer (голосовые и чат-боты на low-code платформе)",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/134694000",
+      "salary": "",
+      "city": "Астана, проспект Республики, 34А",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__PRODVIG",
+      "vacancy_id": "134818666",
+      "title": "CRM-интегратор Битрикс24",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/134818666",
+      "salary": "",
+      "city": "Алматы",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__Mutayev_CO",
+      "vacancy_id": "134626884",
+      "title": "Ментор в школу программирования с возможностью стать спикером",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/134626884",
+      "salary": "",
+      "city": "Астана, улица Алматы, 1",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__MATRAS_KZ",
+      "vacancy_id": "135509846",
+      "title": "Менеджер по онлайн-продажам",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135509846",
+      "salary": "",
+      "city": "Атырау",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__MATRAS_KZ",
+      "vacancy_id": "135509847",
+      "title": "Менеджер по онлайн-продажам",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135509847",
+      "salary": "",
+      "city": "Актау",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__MATRAS_KZ",
+      "vacancy_id": "135509848",
+      "title": "Менеджер по онлайн-продажам",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135509848",
+      "salary": "",
+      "city": "Уральск",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__MATRAS_KZ",
+      "vacancy_id": "135508073",
+      "title": "Менеджер по онлайн-продажам",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135508073",
+      "salary": "",
+      "city": "Астана",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__MATRAS_KZ",
+      "vacancy_id": "135508074",
+      "title": "Менеджер по онлайн-продажам",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135508074",
+      "salary": "",
+      "city": "Алматы",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__MATRAS_KZ",
+      "vacancy_id": "135508075",
+      "title": "Менеджер по онлайн-продажам",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135508075",
+      "salary": "",
+      "city": "Караганда",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__MATRAS_KZ",
+      "vacancy_id": "135508076",
+      "title": "Менеджер по онлайн-продажам",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135508076",
+      "salary": "",
+      "city": "Актобе",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__",
+      "vacancy_id": "135511472",
+      "title": "Графический дизайнер",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135511472",
+      "salary": "",
+      "city": "Павлодар, улица Ломова, 64",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__Geometry",
+      "vacancy_id": "134795770",
+      "title": "Delivery Teamlead",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/134795770",
+      "salary": "",
+      "city": "Астана, проспект Кабанбай батыра, 49",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__Smart_Innovations",
+      "vacancy_id": "134854050",
+      "title": "Менеджер по продажам",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/134854050",
+      "salary": "",
+      "city": "Усть-Каменогорск, улица Металлургов, 23",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__Astana_Construction_Business_Group",
+      "vacancy_id": "135406637",
+      "title": "Менеджер по аренде и продажам спецтехники",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135406637",
+      "salary": "",
+      "city": "Шымкент",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__California",
+      "vacancy_id": "135336632",
+      "title": "Менеджер по продажам",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135336632",
+      "salary": "",
+      "city": "Астана, проспект Мангилик Ел, 68",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__HIVE_finance_law",
+      "vacancy_id": "135107524",
+      "title": "Маркетолог (B2B, контент, аналитика, развитие каналов)",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135107524",
+      "salary": "",
+      "city": "Астана, улица Тараса Шевченко, 4/1",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__",
+      "vacancy_id": "135361192",
+      "title": "Член Совета директоров по операционно-инвестиционной деятельности (направление недвижимость)",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135361192",
+      "salary": "",
+      "city": "город республиканского значения Астана",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__OXFLO",
+      "vacancy_id": "135173484",
+      "title": "Специалист ИИ",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135173484",
+      "salary": "",
+      "city": "Караганда, проспект Бухар Жырау, 49",
+      "published_at": "",
+      "source": "hh.kz"
+    },
+    {
+      "company_id": "hh__Astana_Mall_Trading_",
+      "vacancy_id": "135265605",
+      "title": "Член Совета директоров по операционно-инвестиционной деятельности (направление недвижимость)",
+      "description": "",
+      "url": "https://almaty.hh.kz/vacancy/135265605",
+      "salary": "",
+      "city": "Астана, проспект Тауелсиздик, 34",
+      "published_at": "",
+      "source": "hh.kz"
+    }
+  ],
+  "contacts": [
+    {
+      "company_id": "adata_091240004642",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/091240004642",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_941240000193",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/941240000193",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_200740017338",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/200740017338",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_971240001315",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/971240001315",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_200140027096",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/200140027096",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_140340014944",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/140340014944",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_940140000385",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/940140000385",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_000140002158",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/000140002158",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_200140023023",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/200140023023",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_050140000656",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/050140000656",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_130940015561",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/130940015561",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_210541021425",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/210541021425",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_050840000334",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/050840000334",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_951140000042",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/951140000042",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_980540001197",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/980540001197",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_020240000555",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/020240000555",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_170140017744",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/170140017744",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_980540000397",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/980540000397",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_181040037076",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/181040037076",
+      "source": "adata.kz"
+    },
+    {
+      "company_id": "adata_070640007922",
+      "vacancy_id": "",
+      "name": "ТАНЦАРОВ НУРЖАН АДЫЛБЕКОВИЧ",
+      "role": "Директор / Руководитель (ЛПР)",
+      "email": "",
+      "phone": "71240001315",
+      "contact_link": "https://pk.adata.kz/company/070640007922",
+      "source": "adata.kz"
+    }
+  ]
+}

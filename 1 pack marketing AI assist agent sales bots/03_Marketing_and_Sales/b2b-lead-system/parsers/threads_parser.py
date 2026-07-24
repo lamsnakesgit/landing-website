@@ -37,7 +37,7 @@ async def parse_threads_async(query: str, max_results: int = 15) -> Dict:
             )
             page = await context.new_page()
             url = f"https://www.threads.net/search?q={query}"
-            await page.goto(url, wait_until="networkidle", timeout=20000)
+            await page.goto(url, wait_until="domcontentloaded", timeout=20000)
             
             # Немного прокрутим вниз для загрузки карточек
             await page.evaluate("window.scrollBy(0, 800)")
