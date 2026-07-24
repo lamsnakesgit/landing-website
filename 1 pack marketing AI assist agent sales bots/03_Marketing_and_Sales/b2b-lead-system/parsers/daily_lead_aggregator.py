@@ -33,7 +33,12 @@ KEYWORDS = ["ии", "разработка", "боты", "маркетинг", "�
 
 OUTPUT_DIR_BASE = os.path.join(project_root, "03_Marketing_and_Sales", "daily_leads")
 
+OPENAI_FAILED = False
+
 def get_openai_client():
+    global OPENAI_FAILED
+    if OPENAI_FAILED:
+        return None
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         log.warning("OPENAI_API_KEY не найден. Будет использован Vertex AI.")
@@ -100,13 +105,17 @@ async def analyze_lead_with_vertex_ai(comp_name, category, description, source, 
         text = res_data["candidates"][0]["content"]["parts"][0]["text"].strip()
         if text.startswith("```"):
             text = re.sub(r"^```json\s*|```$", "", text, flags=re.MULTILINE)
-        return json.loads(text)
+        try:
+            return json.loads(text)
+        except Exception:
+            return json.loads(text, strict=False)
         
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(None, call_http)
 
 async def analyze_lead_with_ai(client, company: dict, vacancies: list) -> dict:
-    comp_name = company.get("name", "Неизвестно")
+    global OPENAI_FAILED
+    comp_name = company.get("name", "Неизвестная компания")
     category = company.get("category", "")
     description = company.get("description", "")
     source = company.get("source", "")
@@ -139,7 +148,7 @@ async def analyze_lead_with_ai(client, company: dict, vacancies: list) -> dict:
         f"Сгенерируй боли, оффер и драфт первого сообщения."
     )
 
-    if not client:
+    if not client or OPENAI_FAILED:
         try:
             return await analyze_lead_with_vertex_ai(comp_name, category, description, source, vacancies_str, prompt_system, prompt_user)
         except Exception as ve:
@@ -167,7 +176,8 @@ async def analyze_lead_with_ai(client, company: dict, vacancies: list) -> dict:
             
         return json.loads(response_text)
     except Exception as e:
-        log.error(f"Ошибка OpenAI для {comp_name}: {e}. Пробуем Vertex AI...")
+        OPENAI_FAILED = True
+        log.error(f"Ошибка OpenAI для {comp_name}: {e}. Включаем Vertex AI для последующих запросов...")
         try:
             return await analyze_lead_with_vertex_ai(comp_name, category, description, source, vacancies_str, prompt_system, prompt_user)
         except Exception as ve:
