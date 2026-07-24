@@ -1,5 +1,14 @@
 
 
+## 2026-07-24: Проверка и запуск автоматического ежедневного сбора контактов (adata.kz, hh.ru, hh.kz, threads.net)
+**Победы (Wins) / Победы:**
+- **Подтверждено автоматическое ежедневное исполнение:** Выполнен контрольный запуск пайплайна лидогенератора за 24.07.2026 (`run_pipeline.py`).
+- **Сбор контактов с 4 источников по 6 направлениям:** Собрана база по ключам (`ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`) с платформ `adata.kz`, `hh.ru`, `hh.kz`, `threads.net`.
+- **ИИ-анализ боли, персонализированные офферы и питчи:** Для каждого контакта сгенерированы предложения (офферы под проблему бизнеса) и драфты 1-го сообщения для связи в мессенджерах (WhatsApp / Telegram) через Vertex AI Gemini 2.5 Flash / OpenAI.
+- **Сохранение в папки:** Отчеты и детальные карточки каждого лида сохранены в `03_Marketing_and_Sales/daily_leads/2026-07-24/` (включая CSV `leads_summary.csv`, Markdown отчет `leads_report.md` и файлы в `details/*.md`).
+- **Автоматизация и уведомления:** Проверена служба `launchctl` (`com.higherpower.daily_leadgen`), запускающая процесс ежедневно в 09:00, и отправка карточек ТОП-лидов с контактами в Telegram.
+- [EN] Executed and verified daily leadgen pipeline for 2026-07-24. Collected contacts from `adata.kz`, `hh.ru`, `hh.kz`, and `threads.net` for keywords (`AI`, `development`, `bots`, `marketing`, `context ads`, `AI content`). Enriched leads with AI business pain hypotheses, custom offers, and 1st message drafts into `03_Marketing_and_Sales/daily_leads/2026-07-24/details/`. Confirmed launchd daily scheduler (09:00 AM) and Telegram bot notifications.
+
 ## 2026-07-23: Ежедневный сбор контактов с adata.kz, hh.ru, hh.kz, threads.net (Daily Leadgen Execution & Verification)
 **Победы (Wins) / Победы:**
 - **Полное соответствие требованиям пользователя:** Подтверждена работа пайплайна сбора контактов с платформ `adata.kz`, `hh.ru`, `hh.kz`, `threads.net` по всем 6 ключевым запросам (`ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`).
