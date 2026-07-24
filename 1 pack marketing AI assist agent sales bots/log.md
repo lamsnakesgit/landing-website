@@ -1,5 +1,13 @@
 
 
+## 2026-07-25: Автоматический сбор контактов (adata.kz, hh.ru, hh.kz, threads.net)
+**Победы (Wins) / Победы:**
+- **Выполнен автоматический сбор лидов за 25.07.2026:** Проведён контрольный запуск пайплайна `run_pipeline.py --force --quick` по целевым запросам (`ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`).
+- **Сбор со всех 4 платформ:** Проверен скрапинг `adata.kz`, `hh.ru`, `hh.kz`, `threads.net`.
+- **ИИ-обогащение и персонализация:** Для каждого лида сгенерированы гипотезы болей бизнеса, коммерческое предложение (оффер) и драфт первого сообщения для WhatsApp/Telegram через Vertex AI (Gemini 2.5 Flash).
+- **Сохранение результатов:** Результаты сохранены в `03_Marketing_and_Sales/daily_leads/2026-07-25/` (включая CSV `leads_summary.csv`, сводный отчет `leads_report.md` и персональные файлы в `details/*.md`).
+- - [EN] Executed daily lead generation pipeline (`run_pipeline.py --force --quick`) for 2026-07-25 across `adata.kz`, `hh.ru`, `hh.kz`, `threads.net` for all target keywords. Enriched leads via Vertex AI, generated offers and 1st message drafts in `03_Marketing_and_Sales/daily_leads/2026-07-25/details/`.
+
 ## 2026-07-24: Проверка и автоматический сбор контактов (adata.kz, hh.ru, hh.kz, threads.net)
 **Победы (Wins) / Победы:**
 - **Выполнен автоматический сбор лидов за 24.07.2026:** Запущен пайплайн `daily_lead_aggregator.py` по всем целевым запросам (`ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`).
