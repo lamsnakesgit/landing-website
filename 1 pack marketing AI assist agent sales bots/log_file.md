@@ -100,6 +100,14 @@
 - **Решение (Solution):** Извлечение полей контактов из кэша в `playwright_leadgen.py` заменено на безопасный метод `.get()` с дефолтными значениями (например, `"Представитель компании"` для имени).
 - [EN] Fixed a `KeyError: 'name'` crash during HH.kz leads enrichment by changing raw dict key access to `.get()` method in `playwright_leadgen.py`.
 
+## 2026-07-25: Подтверждение работы ежедневного сбора контактов и генерации офферов
+**Победы (Wins):**
+- **Полная поддержка всех источников и ниш:** Верифицирован ежедневный конвейер сбора контактных данных по запросам: `ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент` со всех четырех площадок: `adata.kz` (uchet.kz), `hh.ru`, `hh.kz`, `threads.net`.
+- **Генерация офферов и 1-го сообщения:** Каждая компания обогащается через ИИ (Gemini 2.5 Flash / GPT-4o-mini), создаются гипотезы болей бизнеса, углы захода (offer angle), 2-3 конкретных пункта предложения и разговорный драфт 1-го сообщения.
+- **Ежедневное автоматическое сохранение:** Отчеты и 300+ индивидуальных карточек лидов сохраняются в папку `03_Marketing_and_Sales/daily_leads/YYYY-MM-DD/details/` с генерацией сводного CSV и файла отчета.
+- [EN] Verified daily lead generation pipeline covering adata.kz, hh.ru, hh.kz, and threads.net for queries (ai, dev, bots, marketing, ppc, ai content). Confirmed daily auto-saving of CSV summary and individual Markdown lead cards with 1st message drafts and offer proposals.
+
+
 ## 2026-07-16: Верификация сегодняшнего сбора и предоставление отчета (Daily Leadgen Verification & Audit Report)
 **Победы (Wins):**
 - **Проверена структура папок и файлы результатов:** Сводный отчет [leads_report.md](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-07-16/leads_report.md) и папка с деталями [details/](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-07-16/details/) проверены. Все 98 лидов успешно собраны и обогащены.
