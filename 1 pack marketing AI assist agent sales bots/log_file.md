@@ -1,4 +1,23 @@
 
+## 2026-07-25: Запуск и оптимизация системы ежедневного сбора контактов и генерации ИИ-офферов (Daily Leadgen Pipeline)
+
+**Победы (Wins):**
+- **Автоматизированный ежедневный сбор контактов:** Проведена полная проверка и оптимизация системы сбора лидов с `adata.kz` (`pk.adata.kz`), `hh.ru`, `hh.kz` и `threads.net` по 6 ключевым направлениям: ИИ, разработка, боты, маркетинг, контекстная реклама, ИИ-контент.
+- **Оптимизация ИИ-анализа (Gemini 2.5 Flash / Vertex AI):** Скрипт `daily_lead_aggregator.py` переведен на прямой высокоскоростной вызов Vertex AI REST API (Gemini 2.5 Flash) без задержек и ошибок сторонних ключей API.
+- **Улучшенный парсинг JSON и инструкция кавычек:** В промпт системы добавлена строгая инструкция по использованию кавычек-ёлочек « », исключившая ошибки неэкранированных кавычек в ответах ИИ.
+- **Сохранение в структуры и папки:** Каждая компания/профиль сохраняется в `03_Marketing_and_Sales/daily_leads/YYYY-MM-DD/` в виде:
+  - `leads_summary.md` (общий текстовый отчет и сводная таблица)
+  - `leads.csv` (структурированная таблица для Excel / Google Таблиц)
+  - `leads.json` (полные данные)
+  - Папка `details/` с персональными карточками `.md` для каждого лида, содержащими контакты, выявленные боли бизнеса, индивидуальный оффер ("Что предложить") и готовый драфт 1-го сообщения для мессенджеров (WhatsApp / Telegram).
+- **Дублирование на английском (EN):** Verified and optimized the daily leadgen pipeline collecting leads from `adata.kz`, `hh.ru`, `hh.kz`, and `threads.net` across all 6 requested niches (AI, development, bots, marketing, PPC, AI content). Transitioned to direct Vertex AI (Gemini 2.5 Flash) calls with robust JSON parsing, generating custom pain analysis, value proposals, and 1st message outreach drafts for each lead saved into `03_Marketing_and_Sales/daily_leads/YYYY-MM-DD/details/`.
+
+**Ошибки и как решили (Problems & Solutions):**
+- **Проблема:** Возникали ошибки JSONDecodeError из-за неэкранированных двойных кавычек в ответах ИИ при упоминании названий компаний в драфте сообщений.
+- **Решение:** Добавлена система безошибочного парсинга JSON и усовершенствован промпт для использования кавычек-ёлочек « ». Все лиды обрабатываются и сохраняются без сбоев.
+- **[EN] Problem:** JSON parsing errors occurred due to unescaped double quotes in AI-generated pitch drafts.
+- **[EN] Solution:** Updated the system prompt to enforce guillemets (« ») for string values and implemented safe JSON fallback parsing.
+
 ## 2026-07-24: Проверка и запуск ежедневного сбора контактов и офферов (Daily Leadgen Pipeline)
 **Победы (Wins):**
 - **Автоматизированный ежедневный сбор контактов:** Проведена полная проверка и запуск системы сбора лидов с `adata.kz` (`pk.uchet.kz`), `hh.ru`, `hh.kz` и `threads.net` по 6 ключевым нишам: ИИ, разработка, боты, маркетинг, контекстная реклама, ИИ-контент.

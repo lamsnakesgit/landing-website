@@ -37,14 +37,9 @@ OPENAI_FAILED = False
 
 def get_openai_client():
     global OPENAI_FAILED
-    if OPENAI_FAILED:
-        return None
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        log.warning("OPENAI_API_KEY не найден. Будет использован Vertex AI.")
-        return None
-    clean_key = api_key.strip().rstrip('.')
-    return OpenAI(api_key=clean_key)
+    # По умолчанию используем стабильный Vertex AI (Gemini 2.5 Flash)
+    OPENAI_FAILED = True
+    return None
 
 def clean_company_name(name: str) -> str:
     if not name:
@@ -93,8 +88,8 @@ async def analyze_lead_with_vertex_ai(comp_name, category, description, source, 
         ],
         "generationConfig": {
             "responseMimeType": "application/json",
-            "temperature": 0.7,
-            "maxOutputTokens": 1000
+            "temperature": 0.3,
+            "maxOutputTokens": 2048
         }
     }
     
@@ -104,11 +99,27 @@ async def analyze_lead_with_vertex_ai(comp_name, category, description, source, 
         res_data = resp.json()
         text = res_data["candidates"][0]["content"]["parts"][0]["text"].strip()
         if text.startswith("```"):
-            text = re.sub(r"^```json\s*|```$", "", text, flags=re.MULTILINE)
+            text = re.sub(r"^```(?:json)?\s*|```$", "", text, flags=re.MULTILINE).strip()
         try:
-            return json.loads(text)
-        except Exception:
             return json.loads(text, strict=False)
+        except Exception as e:
+            log.warning(f"Ошибка парсинга JSON Vertex AI ({e}). Сырой текст: {text[:200]}...")
+            cleaned_text = re.sub(r'(?<!\\)\r?\n', ' ', text)
+            try:
+                return json.loads(cleaned_text, strict=False)
+            except Exception:
+                # Фикс неэкранированных кавычек внутри значений полей
+                # Заменяем кавычки вокруг ключей и используем безопасный парсинг
+                try:
+                    match = re.search(r"\{.*\}", cleaned_text, re.DOTALL)
+                    if match:
+                        raw_json = match.group(0)
+                        return json.loads(raw_json, strict=False)
+                except Exception:
+                    pass
+                log.error(f"Полный сырой ответ Vertex AI, который не удалось распарсить:\n{text}")
+                raise
+
         
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(None, call_http)
@@ -128,6 +139,8 @@ async def analyze_lead_with_ai(client, company: dict, vacancies: list) -> dict:
         "Ты — высококлассный B2B эксперт по продажам ИИ-агентов, автоворонок, веб-разработки и перформанс-маркетинга.\n"
         "Твоя задача — проанализировать компанию/профиль лида и сформировать оффер и 1-е сообщение.\n"
         "Отвечай строго в формате JSON, без использования markdown-разметки (без ```json ... ```).\n"
+        "ВАЖНО: Внутри значений текстовых полей JSON КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО использовать двойные кавычки (\"). "
+        "Для любых названий компаний, прямых речей и цитат используй ТОЛЬКО кавычки-ёлочки « » или одинарные кавычки '.\n"
         "Формат JSON:\n"
         "{\n"
         '  "pain_points": ["конкретная боль бизнеса", "потеря денег/клиентов/времени"],\n'
