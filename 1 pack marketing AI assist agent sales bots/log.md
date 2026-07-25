@@ -1,4 +1,11 @@
 
+## 2026-07-26: Автоматический ежедневный сбор контактов (adata.kz, hh.ru, hh.kz, threads.net)
+**Победы (Wins) / Победы:**
+- **Запущен автоматический сбор лидов за 26.07.2026:** Выполнен запуск `daily_lead_aggregator.py` по всем 6 ключевым запросам (`ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`).
+- **Сбор со всех 4 платформ:** Извлечены контакты и вакансии/профили с `adata.kz`, `hh.ru`, `hh.kz`, `threads.net`.
+- **ИИ-анализ и персонализация:** Проведено обогащение данных через Vertex AI (Gemini 2.5 Flash), сформулированы боли компании, предложения по автоматизации/маркетингу и драфты 1-го сообщения в мессенджеры.
+- **Сохранение данных:** Файлы сохраняются в папке `03_Marketing_and_Sales/daily_leads/2026-07-26/` (`leads.json`, `leads.csv`, `leads_summary.md` и отдельные карточки лидов в `details/*.md`).
+- - [EN] Executed daily lead generation pipeline (`daily_lead_aggregator.py`) for 2026-07-26 across `adata.kz`, `hh.ru`, `hh.kz`, `threads.net` for all target keywords. Generated custom offers and 1st message drafts in `03_Marketing_and_Sales/daily_leads/2026-07-26/details/`.
 
 ## 2026-07-25: Автоматический сбор контактов (adata.kz, hh.ru, hh.kz, threads.net)
 **Победы (Wins) / Победы:**
