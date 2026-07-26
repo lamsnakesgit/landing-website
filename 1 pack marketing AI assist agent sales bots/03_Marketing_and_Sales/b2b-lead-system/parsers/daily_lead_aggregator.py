@@ -59,9 +59,14 @@ async def analyze_lead_with_vertex_ai(comp_name, category, description, source, 
     from google.auth.transport.requests import Request
     import requests
     
-    sa_path = os.path.join(project_root, "vertex_sa.json")
-    if not os.path.exists(sa_path):
-        raise FileNotFoundError("Файл vertex_sa.json не найден")
+    possible_paths = [
+        os.path.join(project_root, "vertex_sa.json"),
+        os.path.join(project_root, "scripts", "vertex_sa.json"),
+        os.path.join(project_root, "00_Inbox", "data", "vertex_sa.json")
+    ]
+    sa_path = next((p for p in possible_paths if os.path.exists(p)), None)
+    if not sa_path:
+        raise FileNotFoundError("Файл vertex_sa.json не найден ни по одному из известных путей")
         
     with open(sa_path, "r", encoding="utf-8") as f:
         sa_info = json.load(f)

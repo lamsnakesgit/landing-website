@@ -1,4 +1,19 @@
 
+## 2026-07-27: Проверка путь-разрешения Vertex SA и успешный запуск сбора лидов (Daily Leadgen Pipeline)
+
+**Победы (Wins):**
+- **Исправление пути к ключу Vertex SA:** Исправлено динамическое определение пути к `vertex_sa.json` в `daily_lead_aggregator.py` (проверяет корневую папку проекта, `scripts/` и `00_Inbox/data/`).
+- **100% покрытие источников и ключевых запросов:** Запущен и проверен сбор контактов с `adata.kz`, `hh.ru`, `hh.kz` и `threads.net` по всем 6 запросам (ИИ, разработка, боты, маркетинг, контекстная реклама, ИИ-контент).
+- **ИИ-анализ и офферы (Vertex AI / Gemini 2.5 Flash):** Для каждой компании/профиля сформированы гипотезы болей, персонализированные предложения ("Что предложить") и драфты 1-го сообщения в мессенджеры.
+- **Сохранение в `03_Marketing_and_Sales/daily_leads/2026-07-27/`:** Созданы файлы `leads.json`, `leads.csv`, `leads_summary.md` и индивидуальные карточки лидов в папке `details/*.md`.
+- **Дублирование на английском (EN):** Fixed `vertex_sa.json` key path resolution in `daily_lead_aggregator.py` supporting root, `scripts/`, and `00_Inbox/data/` locations. Ran full daily collection across `adata.kz`, `hh.ru`, `hh.kz`, and `threads.net` for all 6 target keywords (`AI`, `dev`, `bots`, `marketing`, `PPC`, `AI content`). Generated custom offers and 1st contact drafts in `03_Marketing_and_Sales/daily_leads/2026-07-27/details/`.
+
+**Ошибки и как решили (Problems & Solutions):**
+- **Проблема:** Возникала ошибка поиска `vertex_sa.json`, если скрипт вызывался из внешней рабочей директории.
+- **Решение:** Добавлен динамический поиск пути к `vertex_sa.json` относительно расположения самого скрипта и корня репозитория.
+- **[EN] Problem:** Key error when finding `vertex_sa.json` if executing from outside the repo working dir.
+- **[EN] Solution:** Added dynamic search for `vertex_sa.json` relative to script location and repo root.
+
 ## 2026-07-26: Запуск и проверка ежедневного сбора контактов и ИИ-офферов (Daily Leadgen Pipeline)
 
 **Победы (Wins):**
