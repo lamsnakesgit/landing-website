@@ -1,0 +1,17 @@
+#!/usr/bin/expect -f
+
+set timeout 30
+set password "r0oLNJP3xCO7O4SnL0bj"
+set ip "151.241.100.226"
+set user "root"
+
+puts "=== ЗАПРОС К БД N8N НА VPS ==="
+
+spawn ssh -o StrictHostKeyChecking=no $user@$ip "docker exec -t n8n-postgres-1 psql -U n8n_admin -d n8n_prod -c \"SELECT id, name, type FROM credentials_entity;\""
+expect {
+    "assword:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}

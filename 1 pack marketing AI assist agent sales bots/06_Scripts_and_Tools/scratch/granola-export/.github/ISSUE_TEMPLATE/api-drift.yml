@@ -1,0 +1,37 @@
+name: API drift report
+description: Granola changed their API and this tool no longer works
+title: "[api-drift] "
+labels: [api-drift]
+body:
+  - type: input
+    attributes:
+      label: Granola Mac app version (current)
+      placeholder: e.g. 7.180.0
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: When did this stop working?
+      description: Approximate date when extract.py last succeeded for you
+      placeholder: e.g. last worked one week ago
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Which endpoint(s) are affected?
+      description: Look at the error output. Which `/v1/...` or `/v2/...` paths are returning new errors?
+      placeholder: |
+        - /v2/get-documents now returns 400 with body {"message": "..."}
+        - /v1/get-document-transcript now requires a new field
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Error output
+      description: Full stderr. Redact auth tokens.
+      render: shell
+  - type: textarea
+    attributes:
+      label: New endpoint shape (if known)
+      description: |
+        If you've already figured out the new shape, paste it here. PRs welcome.

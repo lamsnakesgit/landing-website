@@ -1,0 +1,196 @@
+=== INPUTS ON PK.ADATA.KZ ===
+Input 0:
+  id: Введите ИИН, БИН, ФИО, название компании
+  class: ['w-full', 'border-0', 'rounded-md', 'text-deepblue-900', 'dark:text-gray-200', 'hover:outline', 'outline-offset-[-1px]', 'hover:outline-1', 'hover:outline-blue-700', 'hover:dark:outline-blue-500', 'focus:outline', 'focus:outline-blue-700', 'focus:dark:outline-blue-500', 'mt-0', 'h-10', 'pl-4', 'pr-10', 'pb-1.5', 'pt-[18px]', 'md', '!ps-10', 'bg-white', 'dark:bg-gray-950', 'input']
+  placeholder: None
+  type: search
+  name: None
+  attrs: {'id': 'Введите ИИН, БИН, ФИО, название компании', 'type': 'search', 'class': ['w-full', 'border-0', 'rounded-md', 'text-deepblue-900', 'dark:text-gray-200', 'hover:outline', 'outline-offset-[-1px]', 'hover:outline-1', 'hover:outline-blue-700', 'hover:dark:outline-blue-500', 'focus:outline', 'focus:outline-blue-700', 'focus:dark:outline-blue-500', 'mt-0', 'h-10', 'pl-4', 'pr-10', 'pb-1.5', 'pt-[18px]', 'md', '!ps-10', 'bg-white', 'dark:bg-gray-950', 'input'], 'required': '', 'tabindex': '0', 'autocomplete': 'off', 'data-test-id': 'pk-main-page-company-search-input', 'value': '', 'data-v-41b51d7d': ''}
+Input 1:
+  id: ФИО
+  class: ['w-full', 'border-0', 'rounded-md', 'text-deepblue-900', 'dark:text-gray-200', 'hover:outline', 'outline-offset-[-1px]', 'hover:outline-1', 'hover:outline-blue-700', 'hover:dark:outline-blue-500', 'focus:outline', 'focus:outline-blue-700', 'focus:dark:outline-blue-500', 'mt-0', 'h-10', 'px-4', 'pb-1.5', 'pt-[18px]', 'md', 'bg-deepblue-50', 'dark:bg-gray-200', 'dark:bg-opacity-5', 'input']
+  placeholder: None
+  type: text
+  name: None
+  attrs: {'id': 'ФИО', 'type': 'text', 'class': ['w-full', 'border-0', 'rounded-md', 'text-deepblue-900', 'dark:text-gray-200', 'hover:outline', 'outline-offset-[-1px]', 'hover:outline-1', 'hover:outline-blue-700', 'hover:dark:outline-blue-500', 'focus:outline', 'focus:outline-blue-700', 'focus:dark:outline-blue-500', 'mt-0', 'h-10', 'px-4', 'pb-1.5', 'pt-[18px]', 'md', 'bg-deepblue-50', 'dark:bg-gray-200', 'dark:bg-opacity-5', 'input'], 'required': '', 'tabindex': '0', 'value': '', 'data-v-41b51d7d': ''}
+Input 2:
+  id: Email
+  class: ['w-full', 'border-0', 'rounded-md', 'text-deepblue-900', 'dark:text-gray-200', 'hover:outline', 'outline-offset-[-1px]', 'hover:outline-1', 'hover:outline-blue-700', 'hover:dark:outline-blue-500', 'focus:outline', 'focus:outline-blue-700', 'focus:dark:outline-blue-500', 'mt-0', 'h-10', 'px-4', 'pb-1.5', 'pt-[18px]', 'md', 'bg-deepblue-50', 'dark:bg-gray-200', 'dark:bg-opacity-5', 'input']
+  placeholder: None
+  type: email
+  name: None
+  attrs: {'id': 'Email', 'type': 'email', 'class': ['w-full', 'border-0', 'rounded-md', 'text-deepblue-900', 'dark:text-gray-200', 'hover:outline', 'outline-offset-[-1px]', 'hover:outline-1', 'hover:outline-blue-700', 'hover:dark:outline-blue-500', 'focus:outline', 'focus:outline-blue-700', 'focus:dark:outline-blue-500', 'mt-0', 'h-10', 'px-4', 'pb-1.5', 'pt-[18px]', 'md', 'bg-deepblue-50', 'dark:bg-gray-200', 'dark:bg-opacity-5', 'input'], 'required': '', 'tabindex': '0', 'value': '', 'data-v-41b51d7d': ''}
+Input 3:
+  id: Номер телефона
+  class: ['w-full', 'border-0', 'rounded-md', 'text-deepblue-900', 'dark:text-gray-200', 'hover:outline', 'outline-offset-[-1px]', 'hover:outline-1', 'hover:outline-blue-700', 'hover:dark:outline-blue-500', 'focus:outline', 'focus:outline-blue-700', 'focus:dark:outline-blue-500', 'mt-0', 'h-10', 'px-4', 'pb-1.5', 'pt-[18px]', 'md', 'bg-deepblue-50', 'dark:bg-gray-200', 'dark:bg-opacity-5', 'input']
+  placeholder: None
+  type: tel
+  name: None
+  attrs: {'id': 'Номер телефона', 'type': 'tel', 'class': ['w-full', 'border-0', 'rounded-md', 'text-deepblue-900', 'dark:text-gray-200', 'hover:outline', 'outline-offset-[-1px]', 'hover:outline-1', 'hover:outline-blue-700', 'hover:dark:outline-blue-500', 'focus:outline', 'focus:outline-blue-700', 'focus:dark:outline-blue-500', 'mt-0', 'h-10', 'px-4', 'pb-1.5', 'pt-[18px]', 'md', 'bg-deepblue-50', 'dark:bg-gray-200', 'dark:bg-opacity-5', 'input'], 'required': '', 'tabindex': '0', 'data-maska': '8 (###) ###-##-##', 'value': '', 'data-v-41b51d7d': ''}
+Input 4:
+  id: Введите сумму
+  class: ['w-full', 'border-0', 'rounded-md', 'text-deepblue-900', 'dark:text-gray-200', 'hover:outline', 'outline-offset-[-1px]', 'hover:outline-1', 'hover:outline-blue-700', 'hover:dark:outline-blue-500', 'focus:outline', 'focus:outline-blue-700', 'focus:dark:outline-blue-500', 'mt-0', 'h-10', 'pl-4', 'pr-10', 'pb-1.5', 'pt-[18px]', 'md', 'bg-deepblue-50', 'dark:bg-gray-200', 'dark:bg-opacity-5', 'input']
+  placeholder: None
+  type: number
+  name: None
+  attrs: {'data-v-41b51d7d': '', 'id': 'Введите сумму', 'type': 'number', 'class': ['w-full', 'border-0', 'rounded-md', 'text-deepblue-900', 'dark:text-gray-200', 'hover:outline', 'outline-offset-[-1px]', 'hover:outline-1', 'hover:outline-blue-700', 'hover:dark:outline-blue-500', 'focus:outline', 'focus:outline-blue-700', 'focus:dark:outline-blue-500', 'mt-0', 'h-10', 'pl-4', 'pr-10', 'pb-1.5', 'pt-[18px]', 'md', 'bg-deepblue-50', 'dark:bg-gray-200', 'dark:bg-opacity-5', 'input'], 'required': '', 'tabindex': '0', 'pattern': '[0-9]*'}
+Input 5:
+  id: payment.method.kaspi
+  class: ['hidden']
+  placeholder: None
+  type: radio
+  name: payment.method.kaspi
+  attrs: {'id': 'payment.method.kaspi', 'name': 'payment.method.kaspi', 'type': 'radio', 'class': ['hidden'], 'checked': ''}
+Input 6:
+  id: payment.method.other
+  class: ['hidden']
+  placeholder: None
+  type: radio
+  name: payment.method.other
+  attrs: {'id': 'payment.method.other', 'name': 'payment.method.other', 'type': 'radio', 'class': ['hidden']}
+
+=== BUTTONS ON PK.ADATA.KZ ===
+Button 0:
+  text: RU
+  class: ['text-xs', 'font-semibold', 'py-1', 'px-2', 'bg-gray-100', 'dark:bg-gray-200/5', 'rounded']
+  attrs: {'class': ['text-xs', 'font-semibold', 'py-1', 'px-2', 'bg-gray-100', 'dark:bg-gray-200/5', 'rounded'], 'aria-hidden': 'true', 'data-test-id': 'header-switch-language-button-mobile', 'data-v-16e4e676': ''}
+Button 1:
+  text: 
+  class: ['relative', 'inline-flex', 'flex-shrink-0', 'border-2', 'border-transparent', 'disabled:cursor-not-allowed', 'disabled:opacity-50', 'focus:outline-none', 'transition', 'ease-in-out', 'h-8', 'w-[3.75rem]', 'rounded-full', 'focus-visible:ring-2', 'focus-visible:ring-blue-500', 'dark:focus-visible:ring-blue-400', 'focus-visible:ring-offset-2', 'focus-visible:ring-offset-white', 'dark:focus-visible:ring-offset-gray-900', 'bg-gray-200', 'dark:bg-gray-200/20']
+  attrs: {'class': ['relative', 'inline-flex', 'flex-shrink-0', 'border-2', 'border-transparent', 'disabled:cursor-not-allowed', 'disabled:opacity-50', 'focus:outline-none', 'transition', 'ease-in-out', 'h-8', 'w-[3.75rem]', 'rounded-full', 'focus-visible:ring-2', 'focus-visible:ring-blue-500', 'dark:focus-visible:ring-blue-400', 'focus-visible:ring-offset-2', 'focus-visible:ring-offset-white', 'dark:focus-visible:ring-offset-gray-900', 'bg-gray-200', 'dark:bg-gray-200/20'], 'aria-label': 'Switch', 'data-test-id': 'header-switch-theme-toggle', 'id': 'headlessui-switch-v-0-0', 'role': 'switch', 'type': 'button', 'tabindex': '0', 'aria-checked': 'false', 'data-headlessui-state': '', 'style': 'border-color: transparent;'}
+Button 2:
+  text: RU
+  class: ['text-xs', 'font-semibold', 'py-1', 'px-2', 'bg-gray-100', 'dark:bg-gray-200/5', 'rounded']
+  attrs: {'class': ['text-xs', 'font-semibold', 'py-1', 'px-2', 'bg-gray-100', 'dark:bg-gray-200/5', 'rounded'], 'aria-hidden': 'true', 'data-test-id': 'header-switch-language-button', 'data-v-16e4e676': ''}
+Button 3:
+  text: Найти
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-8', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center']
+  attrs: {'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-8', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center'], 'to': '', 'aria-label': 'search', 'data-test-id': 'pk-main-page-company-find-button'}
+Button 4:
+  text: Избранные
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', 'group', 'hidden', 'lg:block']
+  attrs: {'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', 'group', 'hidden', 'lg:block'], 'to': '', 'aria-label': 'chosen'}
+Button 5:
+  text: КонтрагентыПроверяйте деловую репутацию партнёров и обеспечивайте надёжность сделок
+  class: ['curve-block', 'relative', 'w-full', 'cursor-pointer', 'active-item']
+  attrs: {'to': '', 'class': ['curve-block', 'relative', 'w-full', 'cursor-pointer', 'active-item'], 'active-class': 'active-item', 'data-v-dd5b2768': ''}
+Button 6:
+  text: О тарифе
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', '!rounded-full']
+  attrs: {'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', '!rounded-full'], 'to': '', 'data-v-a4bdcb3f': ''}
+Button 7:
+  text: Авторизоваться
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', 'w-full', '!rounded-full']
+  attrs: {'data-v-0fc55a77': '', 'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', 'w-full', '!rounded-full'], 'to': ''}
+Button 8:
+  text: О тарифе
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', '!rounded-full']
+  attrs: {'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', '!rounded-full'], 'to': '', 'data-v-a4bdcb3f': ''}
+Button 9:
+  text: Подключить
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', 'w-full', '!rounded-full']
+  attrs: {'data-v-0fc55a77': '', 'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', 'w-full', '!rounded-full'], 'to': ''}
+Button 10:
+  text: За месяц
+  class: ['bg-transparent', 'text-deepblue-900', 'hover:bg-black/5', 'dark:text-gray-200', 'dark:hover:bg-white/10', 'w-full', 'rounded-md', 'px-4', 'py-[7.5px]', 'text-sm', 'transition-colors']
+  attrs: {'type': 'button', 'class': ['bg-transparent', 'text-deepblue-900', 'hover:bg-black/5', 'dark:text-gray-200', 'dark:hover:bg-white/10', 'w-full', 'rounded-md', 'px-4', 'py-[7.5px]', 'text-sm', 'transition-colors'], 'data-v-a4bdcb3f': ''}
+Button 11:
+  text: За год
+  class: ['bg-white', 'font-semibold', 'text-deepblue-900', 'shadow', 'dark:bg-gray-900', 'dark:text-gray-200', 'w-full', 'rounded-md', 'px-4', 'py-[7.5px]', 'text-sm', 'transition-colors']
+  attrs: {'type': 'button', 'class': ['bg-white', 'font-semibold', 'text-deepblue-900', 'shadow', 'dark:bg-gray-900', 'dark:text-gray-200', 'w-full', 'rounded-md', 'px-4', 'py-[7.5px]', 'text-sm', 'transition-colors'], 'data-v-a4bdcb3f': ''}
+Button 12:
+  text: О тарифе
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', '!rounded-full']
+  attrs: {'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', '!rounded-full'], 'to': '', 'data-v-a4bdcb3f': ''}
+Button 13:
+  text: Подключить
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', 'w-full', '!rounded-full']
+  attrs: {'data-v-0fc55a77': '', 'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', 'w-full', '!rounded-full'], 'to': ''}
+Button 14:
+  text: О тарифе
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', '!rounded-full']
+  attrs: {'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', '!rounded-full'], 'to': '', 'data-v-a4bdcb3f': ''}
+Button 15:
+  text: Оставить заявку
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', 'w-full', '!rounded-full']
+  attrs: {'data-v-0fc55a77': '', 'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-4', 'py-1.5', '!h-[32px]', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center', 'w-full', '!rounded-full'], 'to': ''}
+Button 16:
+  text: Отправить заявку
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center']
+  attrs: {'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center'], 'to': ''}
+Button 17:
+  text: 
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'bg-deepblue-900/5', 'text-deepblue-900', 'hover:bg-deepblue-900/10', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-gray-200/5', 'dark:hover:bg-gray-200/10', 'dark:active:bg-gray-200', 'dark:text-gray-200', 'dark:active:text-gray-900', 'p-2', 'text-2xl', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center']
+  attrs: {'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'bg-deepblue-900/5', 'text-deepblue-900', 'hover:bg-deepblue-900/10', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-gray-200/5', 'dark:hover:bg-gray-200/10', 'dark:active:bg-gray-200', 'dark:text-gray-200', 'dark:active:text-gray-900', 'p-2', 'text-2xl', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center'], 'to': ''}
+Button 18:
+  text: Тарифы
+  class: ['h-16', 'w-auto', 'min-w-16', 'max-w-[168px]', 'lg:hover:bg-blue-700/20', 'lg:hover:text-blue-700']
+  attrs: {'class': ['h-16', 'w-auto', 'min-w-16', 'max-w-[168px]', 'lg:hover:bg-blue-700/20', 'lg:hover:text-blue-700']}
+Button 19:
+  text: Продукты и решения
+  class: ['h-16', 'w-auto', 'min-w-16', 'max-w-[168px]', 'lg:hover:bg-blue-700/20', 'lg:hover:text-blue-700']
+  attrs: {'class': ['h-16', 'w-auto', 'min-w-16', 'max-w-[168px]', 'lg:hover:bg-blue-700/20', 'lg:hover:text-blue-700']}
+Button 20:
+  text: Профиль
+  class: ['h-16', 'w-auto', 'min-w-16', 'max-w-[168px]']
+  attrs: {'style': 'display:none;', 'class': ['h-16', 'w-auto', 'min-w-16', 'max-w-[168px]']}
+Button 21:
+  text: Войти
+  class: ['h-16', 'w-auto', 'min-w-16', 'max-w-[168px]']
+  attrs: {'style': '', 'class': ['h-16', 'w-auto', 'min-w-16', 'max-w-[168px]']}
+Button 22:
+  text: 2 000 ₸
+  class: ['flex', 'items-center', 'gap-2', 'rounded-3xl', 'border', 'border-solid', 'px-2.5', 'text-xs', 'hover:bg-deepblue-100', 'dark:hover:bg-[#E3E5E80D]', 'focus-visible:shadow-[0_0_0_4px#1B64B3]', 'active:bg-blue', 'active:text-white', 'disabled:border-deepblue-200', 'disabled:text-deepblue-200', 'text-deepblue', 'border-gray', 'focus-visible:outline-gray', 'h-7']
+  attrs: {'class': ['flex', 'items-center', 'gap-2', 'rounded-3xl', 'border', 'border-solid', 'px-2.5', 'text-xs', 'hover:bg-deepblue-100', 'dark:hover:bg-[#E3E5E80D]', 'focus-visible:shadow-[0_0_0_4px#1B64B3]', 'active:bg-blue', 'active:text-white', 'disabled:border-deepblue-200', 'disabled:text-deepblue-200', 'text-deepblue', 'border-gray', 'focus-visible:outline-gray', 'h-7']}
+Button 23:
+  text: 5 000 ₸
+  class: ['flex', 'items-center', 'gap-2', 'rounded-3xl', 'border', 'border-solid', 'px-2.5', 'text-xs', 'hover:bg-deepblue-100', 'dark:hover:bg-[#E3E5E80D]', 'focus-visible:shadow-[0_0_0_4px#1B64B3]', 'active:bg-blue', 'active:text-white', 'disabled:border-deepblue-200', 'disabled:text-deepblue-200', 'text-deepblue', 'border-gray', 'focus-visible:outline-gray', 'h-7']
+  attrs: {'class': ['flex', 'items-center', 'gap-2', 'rounded-3xl', 'border', 'border-solid', 'px-2.5', 'text-xs', 'hover:bg-deepblue-100', 'dark:hover:bg-[#E3E5E80D]', 'focus-visible:shadow-[0_0_0_4px#1B64B3]', 'active:bg-blue', 'active:text-white', 'disabled:border-deepblue-200', 'disabled:text-deepblue-200', 'text-deepblue', 'border-gray', 'focus-visible:outline-gray', 'h-7']}
+Button 24:
+  text: 10 000 ₸
+  class: ['flex', 'items-center', 'gap-2', 'rounded-3xl', 'border', 'border-solid', 'px-2.5', 'text-xs', 'hover:bg-deepblue-100', 'dark:hover:bg-[#E3E5E80D]', 'focus-visible:shadow-[0_0_0_4px#1B64B3]', 'active:bg-blue', 'active:text-white', 'disabled:border-deepblue-200', 'disabled:text-deepblue-200', 'text-deepblue', 'border-gray', 'focus-visible:outline-gray', 'h-7']
+  attrs: {'class': ['flex', 'items-center', 'gap-2', 'rounded-3xl', 'border', 'border-solid', 'px-2.5', 'text-xs', 'hover:bg-deepblue-100', 'dark:hover:bg-[#E3E5E80D]', 'focus-visible:shadow-[0_0_0_4px#1B64B3]', 'active:bg-blue', 'active:text-white', 'disabled:border-deepblue-200', 'disabled:text-deepblue-200', 'text-deepblue', 'border-gray', 'focus-visible:outline-gray', 'h-7']}
+Button 25:
+  text: 20 000 ₸
+  class: ['flex', 'items-center', 'gap-2', 'rounded-3xl', 'border', 'border-solid', 'px-2.5', 'text-xs', 'hover:bg-deepblue-100', 'dark:hover:bg-[#E3E5E80D]', 'focus-visible:shadow-[0_0_0_4px#1B64B3]', 'active:bg-blue', 'active:text-white', 'disabled:border-deepblue-200', 'disabled:text-deepblue-200', 'text-deepblue', 'border-gray', 'focus-visible:outline-gray', 'h-7']
+  attrs: {'class': ['flex', 'items-center', 'gap-2', 'rounded-3xl', 'border', 'border-solid', 'px-2.5', 'text-xs', 'hover:bg-deepblue-100', 'dark:hover:bg-[#E3E5E80D]', 'focus-visible:shadow-[0_0_0_4px#1B64B3]', 'active:bg-blue', 'active:text-white', 'disabled:border-deepblue-200', 'disabled:text-deepblue-200', 'text-deepblue', 'border-gray', 'focus-visible:outline-gray', 'h-7']}
+Button 26:
+  text: Пополнить
+  class: ['body-600', 'rounded-md', 'outline-none', 'transition', 'duration-200', 'select-none', 'bg-deepblue-900/5', 'text-deepblue-900/20', 'dark:bg-gray-200/5', 'dark:text-gray-200/20', 'pointer-events-none', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center']
+  attrs: {'class': ['body-600', 'rounded-md', 'outline-none', 'transition', 'duration-200', 'select-none', 'bg-deepblue-900/5', 'text-deepblue-900/20', 'dark:bg-gray-200/5', 'dark:text-gray-200/20', 'pointer-events-none', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center'], 'disabled': '', 'to': ''}
+Button 27:
+  text: Назад
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center']
+  attrs: {'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center'], 'to': ''}
+Button 28:
+  text: 
+  class: None
+  attrs: {}
+Button 29:
+  text: Пополнить
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center']
+  attrs: {'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center'], 'to': ''}
+Button 30:
+  text: Закрыть
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center']
+  attrs: {'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center'], 'to': ''}
+Button 31:
+  text: 
+  class: None
+  attrs: {}
+Button 32:
+  text: Сменить способ оплаты
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center']
+  attrs: {'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center'], 'to': ''}
+Button 33:
+  text: Перейти на Kaspi.kz
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center']
+  attrs: {'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'bg-blue-700', 'text-white', 'hover:bg-blue-900', 'active:bg-deepblue-900', 'active:text-white', 'dark:bg-blue-500', 'dark:text-gray-900', 'dark:hover:bg-blue-700', 'dark:active:bg-gray-200', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center'], 'to': ''}
+Button 34:
+  text: Сменить способ оплаты
+  class: ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center']
+  attrs: {'class': ['body-600', 'rounded-md', 'cursor-pointer', 'outline-none', 'transition', 'duration-200', 'select-none', 'w-full', 'border', 'border-blue-700', 'text-blue-700', 'hover:bg-blue-100', 'active:bg-blue-700', 'active:text-white', 'dark:border-blue-500', 'dark:text-blue-500', 'dark:hover:bg-blue-500/20', 'dark:active:bg-blue-500', 'dark:active:text-gray-900', 'px-4', 'py-2.5', 'relative', 'h-fit', 'transition', 'flex', 'items-center', 'justify-center'], 'to': ''}
+Button 35:
+  text: 
+  class: ['faq-button', 'relative', 'flex', 'size-14', 'items-center', 'justify-center', 'rounded-full']
+  attrs: {'data-v-1cd3e1b0': '', 'class': ['faq-button', 'relative', 'flex', 'size-14', 'items-center', 'justify-center', 'rounded-full']}

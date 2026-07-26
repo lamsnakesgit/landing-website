@@ -1,0 +1,170 @@
+[
+  [
+    "ShallowReactive",
+    1
+  ],
+  {
+    "data": 2,
+    "state": 4,
+    "once": 26,
+    "_errors": 27,
+    "serverRendered": 9,
+    "path": 30,
+    "pinia": 31
+  },
+  [
+    "ShallowReactive",
+    3
+  ],
+  {},
+  [
+    "Reactive",
+    5
+  ],
+  {
+    "$snuxt-i18n-meta": 6,
+    "$scolor-mode": 7,
+    "$suser-services": 11,
+    "$suser-info": 12,
+    "$sanother-device-modal": 10,
+    "$sauth-modal": 10,
+    "$spaid-tariff-modal": 10,
+    "$stariff-pro-modal": 10,
+    "$stariff-adata-pro-modal": 10,
+    "$sno-access-modal": 10,
+    "$scurrent-module": 13,
+    "$scontacts": 14,
+    "$slogin-modal": 10,
+    "$stwo-factor-modal": 10,
+    "$sregistration-modal": 10,
+    "$sconfirm-account-otp-modal": 10,
+    "$sconfirm-successful-modal": 10,
+    "$srecovery-modal": 10,
+    "$sreset-password-otp-modal": 10,
+    "$snew-password-modal": 10,
+    "$spassword-successful-modal": 10,
+    "$sauto-logout-modal": 10,
+    "$sid-intermediate-state": 15,
+    "$stop-up-side-panel": 10,
+    "$smethod-side-panel": 10,
+    "$skaspi-qr-side-panel": 10,
+    "$skaspi-redirect-side-panel": 10,
+    "$ssite-config": 17
+  },
+  {},
+  {
+    "preference": 8,
+    "value": 8,
+    "unknown": 9,
+    "forced": 10
+  },
+  "light",
+  true,
+  false,
+  [
+    "Set"
+  ],
+  {},
+  "pk",
+  [],
+  {
+    "email": 16,
+    "password": 16,
+    "otp": 16,
+    "token": 16
+  },
+  "",
+  {
+    "_priority": 18,
+    "currentLocale": 22,
+    "defaultLocale": 22,
+    "env": 23,
+    "name": 24,
+    "url": 25
+  },
+  {
+    "name": 19,
+    "env": 20,
+    "url": 21,
+    "defaultLocale": 21,
+    "currentLocale": 21
+  },
+  -10,
+  -15,
+  -2,
+  "ru",
+  "production",
+  "nuxt-app",
+  "https://pk.adata.kz",
+  [
+    "Set"
+  ],
+  [
+    "ShallowReactive",
+    28
+  ],
+  {
+    "search_components": 29,
+    "$QJvm218O1o": 29,
+    "$lkbGhuePgl": 29
+  },
+  null,
+  "/search?query=%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0",
+  {
+    "ai-faq": 32
+  },
+  {
+    "history": 33,
+    "historyTemplate": 36,
+    "quickButtons": 39,
+    "loading": 42,
+    "isChatOpen": 44,
+    "isOfferOpen": 45,
+    "trigger": 46
+  },
+  [
+    "Ref",
+    34
+  ],
+  [
+    "Reactive",
+    35
+  ],
+  [],
+  [
+    "Ref",
+    37
+  ],
+  [
+    "Reactive",
+    38
+  ],
+  [],
+  [
+    "Ref",
+    40
+  ],
+  [
+    "Reactive",
+    41
+  ],
+  [],
+  [
+    "EmptyRef",
+    43
+  ],
+  "false",
+  [
+    "EmptyRef",
+    43
+  ],
+  [
+    "EmptyRef",
+    43
+  ],
+  [
+    "Ref",
+    47
+  ],
+  "DEFAULT"
+]

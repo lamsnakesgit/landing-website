@@ -1,0 +1,2 @@
+const e=require(`./readFile-HsNFZ68U.js`),t=require(`./getSSOTokenFromFile-rd66y1sX.js`);var n={getFileRecord(){return e.t},interceptFile(t,n){e.t[t]=Promise.resolve(n)},getTokenRecord(){return t.n},interceptToken(e,n){t.n[e]=n}};Object.defineProperty(exports,`t`,{enumerable:!0,get:function(){return n}});
+//# sourceMappingURL=externalDataInterceptor-Cm-4n6Wp.js.map

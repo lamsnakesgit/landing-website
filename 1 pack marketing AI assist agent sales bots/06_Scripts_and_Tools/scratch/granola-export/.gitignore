@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+build/
+dist/
+
+# Virtualenv
+.venv/
+venv/
+env/
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Output of running the tool — should never be committed
+# (the tool's default output dir is outside this repo, but defensive)
+extracted/
+my-data/
+
+# Auth artifacts that should never end up in commits
+*.token
+*.access_token
+*supabase*.json

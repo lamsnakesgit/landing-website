@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <!-- <meta
+      http-equiv="Content-Security-Policy"
+      content="child-src 'self' blob:; worker-src 'self' blob:; script-src 'self' 'unsafe-inline' https://cdn.lr-ingest.io https://cdn.lr-in.com https://cdn.lr-in-prod.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com;"
+    /> -->
+    <style>
+      /* Enable dragging for the nub */
+      body.nub {
+        -webkit-user-select: none;
+        -webkit-app-region: drag;
+      }
+
+      body.nub .disable-drag {
+        -webkit-app-region: no-drag;
+      }
+
+      /* GranolaTalk window styling */
+      body.granolatalk {
+        background: transparent !important;
+        overflow: hidden;
+      }
+
+      /* Agenda window drag regions (custom title bar with traffic lights) */
+      body.agenda-window .agenda-drag-region {
+        -webkit-app-region: drag;
+        -webkit-user-select: none;
+      }
+      body.agenda-window .agenda-no-drag {
+        -webkit-app-region: no-drag;
+      }
+
+      /* Gentle pulse for the stopping/processing state */
+      @keyframes gtPulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+    </style>
+    <title>Granola</title>
+    <script type="module" crossorigin src="./assets/index-Bm7v_SYO.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/_sentry-release-injection-file-VRd8JZZe.js">
+    <link rel="modulepreload" crossorigin href="./assets/toUtf8.browser-DGTK8U3h.js">
+    <link rel="modulepreload" crossorigin href="./assets/tslib.es6-CZDqeLO7.js">
+    <link rel="modulepreload" crossorigin href="./assets/extensions-D6gxxrt4.js">
+    <link rel="modulepreload" crossorigin href="./assets/schemas-COPueaY7.js">
+    <link rel="modulepreload" crossorigin href="./assets/cache-D9zeBCtZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-C1RCAzx_.js">
+    <link rel="modulepreload" crossorigin href="./assets/sentry-renderer-DIx63ouJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/ipcPrimaryWindow-BXWUsOI9.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-4CXZJ5H0.css">
+  </head>
+  <body class="adora-mask antialiased">
+    <div id="root"></div>
+  </body>
+</html>

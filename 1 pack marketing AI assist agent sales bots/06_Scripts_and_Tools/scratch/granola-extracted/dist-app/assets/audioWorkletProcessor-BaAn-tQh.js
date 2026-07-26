@@ -1,0 +1,2 @@
+(function(){var e=class extends AudioWorkletProcessor{process(e){let t=e[0];return t&&t.length>0&&t[0]&&t[0].length>0&&this.port.postMessage({audioData:t[0],timestamp:Date.now()}),!0}};registerProcessor(`audio-capture-processor`,e)})();
+//# sourceMappingURL=audioWorkletProcessor-BaAn-tQh.js.map

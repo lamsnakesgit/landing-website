@@ -371,15 +371,31 @@ def search_adata_web(page, query):
             
             for bin_num in bins[:5]:
                 comp_url = f"https://pk.adata.kz/company/{bin_num}"
+                try:
+                    # Обогащаем данными компании с uchet/adata
+                    contacts = get_uchet_company_info(page, f"БИН {bin_num}")
+                    comp_name = contacts.get("company_name") if contacts else f"Компания (БИН {bin_num})"
+                    lpr_name = contacts.get("name") if contacts else "Руководитель компании"
+                    phone = contacts.get("phone", "") if contacts else ""
+                    email = contacts.get("email", "") if contacts else ""
+                    city = contacts.get("city", "Казахстан") if contacts else "Казахстан"
+                except Exception as e:
+                    logger.warning(f"Не удалось вытащить детали для БИН {bin_num}: {e}")
+                    comp_name = f"Компания (БИН {bin_num})"
+                    lpr_name = "Руководитель компании"
+                    phone = ""
+                    email = ""
+                    city = "Казахстан"
+
                 leads.append({
-                    "name": "Руководитель компании",
-                    "company_name": f"Компания БИН {bin_num}",
-                    "phone": "",
-                    "email": "",
+                    "name": lpr_name,
+                    "company_name": comp_name,
+                    "phone": phone,
+                    "email": email,
                     "url": comp_url,
                     "description": f"Компания найдена на Adata.kz по запросу: {query}. БИН: {bin_num}",
                     "source": "adata.kz",
-                    "city": "Казахстан",
+                    "city": city,
                     "query": query
                 })
     except Exception as e:
@@ -388,98 +404,106 @@ def search_adata_web(page, query):
     return leads
 
 
-
-
 def search_threads_web(page, query):
-    """Ищет профили на threads.net по ключевому слову через Yahoo Search"""
-    search_url = f"https://search.yahoo.com/search?q=site:threads.net+{query}"
-    logger.info(f"Открываем поиск Threads в Yahoo Search: {search_url}")
+    """Ищет профили и посты на threads.net по ключевому слову через DuckDuckGo и Yahoo Search"""
     leads = []
     
+    # 1. Сначала пробуем DuckDuckGo для свежих результатов по Threads
     try:
-        safe_goto(page, search_url, wait_until="domcontentloaded", timeout=25000)
-        time.sleep(3)
-        
-        html = page.content()
-        from bs4 import BeautifulSoup
-        soup = BeautifulSoup(html, 'html.parser')
-        
-        # Находим все блоки результатов поиска Yahoo
-        results = soup.select('ol.reg li') or soup.select('div.algo-sr')
-        logger.info(f"Yahoo Search: Найдено блоков результатов для Threads по запросу '{query}': {len(results)}")
-        
-        from urllib.parse import unquote
-        def clean_yahoo_url(url):
-            if "r.search.yahoo.com" in url:
-                match = re.search(r'/RU=([^/]+)', url)
-                if match:
-                    return unquote(match.group(1))
-            return url
-            
-        for item in results:
-            try:
-                title_link = item.find('a')
-                if not title_link:
-                    continue
-                href = title_link.get('href', '')
-                cleaned_url = clean_yahoo_url(href)
+        from duckduckgo_search import DDGS
+        ddg_query = f"site:threads.net {query} (ищу OR нужен OR ищем OR контакты OR bot OR AI)"
+        logger.info(f"Ищем лидов Threads через DuckDuckGo: {ddg_query}")
+        with DDGS() as ddgs:
+            results = list(ddgs.text(ddg_query, max_results=7))
+            for res in results:
+                url = res.get('href', '')
+                title = res.get('title', '')
+                snippet = res.get('body', '')
                 
-                # Игнорируем служебные ссылки Yahoo
-                if 'threads.net' not in cleaned_url or 'yahoo.com' in cleaned_url:
-                    continue
-                
-                title = title_link.get_text().strip()
-                
-                snippet_div = item.find('div', class_='compText') or item.find('span', class_='fc-falcon') or item.find('div', class_='desc')
-                snippet = snippet_div.get_text().strip() if snippet_div else ""
-                
-                # Пытаемся извлечь имя пользователя из URL или текста
-                username = None
-                match_url = re.search(r'threads\.net/@([a-zA-Z0-9_\.]+)', cleaned_url)
-                if match_url:
-                    username = match_url.group(1)
-                else:
-                    # Извлекаем из заголовка или сниппета (@username)
-                    match_text = re.search(r'@([a-zA-Z0-9_\.]+)', title + " " + snippet)
-                    if match_text:
-                        username = match_text.group(1)
-                
-                if not username:
-                    # Если не нашли юзернейм, сгенерируем временный из ID поста
-                    match_post = re.search(r'/t/([a-zA-Z0-9_\-]+)', cleaned_url)
-                    if match_post:
-                        username = f"post_{match_post.group(1)}"
-                    else:
-                        username = "unknown"
-                
-                profile_url = f"https://www.threads.net/@{username}" if not username.startswith("post_") else cleaned_url
-                
-                # Извлекаем контакты из сниппета
-                email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', snippet)
-                phone_match = re.search(r'(?:\+7|8)[\s\-]?\(?[79][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}', snippet)
-                
-                email = email_match.group(0) if email_match else ""
-                phone = phone_match.group(0) if phone_match else ""
-                
-                # Формируем имя для отображения
-                display_name = title.replace(" - Threads", "").replace(" on Threads", "").strip()
-                
-                leads.append({
-                    "name": display_name,
-                    "company_name": f"Threads: @{username}" if not username.startswith("post_") else "Threads Post",
-                    "phone": phone,
-                    "email": email,
-                    "url": profile_url,
-                    "description": f"Профиль в Threads. Био/Пост: {snippet}",
-                    "source": "threads.net",
-                    "city": "СНГ",
-                    "query": query
-                })
-            except Exception as e:
-                logger.error(f"Ошибка при парсинге результата Threads: {e}")
+                if 'threads.net' in url:
+                    match_url = re.search(r'threads\.net/@([a-zA-Z0-9_\.]+)', url)
+                    username = match_url.group(1) if match_url else "threads_user"
+                    
+                    email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', snippet + " " + title)
+                    phone_match = re.search(r'(?:\+7|8)[\s\-]?\(?[79][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}', snippet + " " + title)
+                    
+                    leads.append({
+                        "name": title.replace(" - Threads", "").replace(" on Threads", "").strip(),
+                        "company_name": f"Threads: @{username}",
+                        "phone": phone_match.group(0) if phone_match else "",
+                        "email": email_match.group(0) if email_match else "",
+                        "url": url,
+                        "description": f"Пост/Профиль Threads ({query}): {snippet}",
+                        "source": "threads.net",
+                        "city": "СНГ",
+                        "query": query
+                    })
     except Exception as e:
-        logger.error(f"Ошибка при поиске Threads: {e}")
-        
+        logger.warning(f"DuckDuckGo поиск Threads завершился с предупреждением: {e}")
+
+    # 2. Дополнительный поиск через Yahoo Search если результаты малые
+    if len(leads) < 3:
+        search_url = f"https://search.yahoo.com/search?q=site:threads.net+{query}"
+        logger.info(f"Открываем поиск Threads в Yahoo Search: {search_url}")
+        try:
+            safe_goto(page, search_url, wait_until="domcontentloaded", timeout=25000)
+            time.sleep(3)
+            
+            html = page.content()
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(html, 'html.parser')
+            
+            results = soup.select('ol.reg li') or soup.select('div.algo-sr')
+            logger.info(f"Yahoo Search: Найдено блоков результатов для Threads по запросу '{query}': {len(results)}")
+            
+            from urllib.parse import unquote
+            def clean_yahoo_url(url):
+                if "r.search.yahoo.com" in url:
+                    match = re.search(r'/RU=([^/]+)', url)
+                    if match:
+                        return unquote(match.group(1))
+                return url
+                
+            for item in results:
+                try:
+                    title_link = item.find('a')
+                    if not title_link:
+                        continue
+                    href = title_link.get('href', '')
+                    cleaned_url = clean_yahoo_url(href)
+                    
+                    if 'threads.net' not in cleaned_url or 'yahoo.com' in cleaned_url:
+                        continue
+                    
+                    title = title_link.get_text().strip()
+                    snippet_div = item.find('div', class_='compText') or item.find('span', class_='fc-falcon') or item.find('div', class_='desc')
+                    snippet = snippet_div.get_text().strip() if snippet_div else ""
+                    
+                    match_url = re.search(r'threads\.net/@([a-zA-Z0-9_\.]+)', cleaned_url)
+                    username = match_url.group(1) if match_url else "threads_user"
+                    profile_url = f"https://www.threads.net/@{username}" if username != "threads_user" else cleaned_url
+                    
+                    email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', snippet)
+                    phone_match = re.search(r'(?:\+7|8)[\s\-]?\(?[79][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}', snippet)
+                    
+                    display_name = title.replace(" - Threads", "").replace(" on Threads", "").strip()
+                    
+                    leads.append({
+                        "name": display_name,
+                        "company_name": f"Threads: @{username}",
+                        "phone": phone_match.group(0) if phone_match else "",
+                        "email": email_match.group(0) if email_match else "",
+                        "url": profile_url,
+                        "description": f"Профиль в Threads. Био/Пост: {snippet}",
+                        "source": "threads.net",
+                        "city": "СНГ",
+                        "query": query
+                    })
+                except Exception as e:
+                    logger.error(f"Ошибка при парсинге результата Threads: {e}")
+        except Exception as e:
+            logger.error(f"Ошибка при поиске Threads через Yahoo: {e}")
+            
     return leads
 
 def main():

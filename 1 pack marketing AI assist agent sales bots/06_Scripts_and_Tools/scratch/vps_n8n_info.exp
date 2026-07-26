@@ -1,0 +1,29 @@
+#!/usr/bin/expect -f
+
+set timeout 30
+set password "r0oLNJP3xCO7O4SnL0bj"
+set ip "151.241.100.226"
+set user "root"
+
+puts "=== ИНСПЕКТИРУЕМ N8N КОНТЕЙНЕР НА VPS ==="
+
+# Получаем рабочую папку compose-проекта для n8n-n8n-1
+spawn ssh -o StrictHostKeyChecking=no $user@$ip "docker inspect n8n-n8n-1 --format '{{index .Config.Labels \"com.docker.compose.project.working_dir\"}}'"
+expect {
+    "assword:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}
+
+# Получаем переменные окружения контейнера n8n-n8n-1
+puts "\n--- ПЕРЕМЕННЫЕ ОКРУЖЕНИЯ N8N ---"
+spawn ssh -o StrictHostKeyChecking=no $user@$ip "docker inspect n8n-n8n-1 --format '{{range .Config.Env}}{{println .}}{{end}}'"
+expect {
+    "assword:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}

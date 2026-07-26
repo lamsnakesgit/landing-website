@@ -1,0 +1,49 @@
+# -*- coding: utf-8 -*-
+import os
+import sys
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+
+def main():
+    load_dotenv()
+    
+    service_account = "vertex_sa.json"
+    project_id = "my-project-28666-8-5-26-0-crm"
+    location = "us-central1"
+    
+    if not os.path.exists(service_account):
+        print(f"Ошибка: Не найден {service_account}")
+        sys.exit(1)
+        
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = service_account
+    client = genai.Client(vertexai=True, project=project_id, location=location)
+    
+    local_video = "04_Design_and_Media/spy_downloads/kaisar_reel.mp4"
+    with open(local_video, "rb") as f:
+        video_bytes = f.read()
+        
+    prompt = (
+        "Проанализируй видео kaisar_reel.mp4 на следующих интервалах:\n"
+        "1. 0:00 - 0:02 (где показана тарифная сетка)\n"
+        "2. 0:26 - 0:35 (где показана LM Arena)\n\n"
+        "Опиши визуальную композицию: в какой части экрана находится полезный B-roll (интерфейс, цены, скриншот), "
+        "а в какой части экрана находится лицо/тело мужчины-спикера.\n"
+        "Как нам лучше всего кадрировать (обрезать/зумировать) видео в CSS (например, с помощью transform: scale() или clip-path / object-position), "
+        "чтобы скрыть лицо и тело мужчины, оставив только чистый интерфейс на экране?"
+    )
+    
+    video_part = types.Part.from_bytes(data=video_bytes, mime_type="video/mp4")
+    
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[video_part, prompt]
+        )
+        print("\n=== РЕКОМЕНДАЦИИ ПО КАДРИРОВАНИЮ ===")
+        print(response.text)
+    except Exception as e:
+        print(f"Ошибка: {e}")
+
+if __name__ == "__main__":
+    main()

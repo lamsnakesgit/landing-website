@@ -1,0 +1,38 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+set password "r0oLNJP3xCO7O4SnL0bj"
+set ip "151.241.100.226"
+set user "root"
+
+# Create directory on VPS
+spawn ssh -o StrictHostKeyChecking=no $user@$ip "mkdir -p /root/hermes_agent"
+expect {
+    "assword:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}
+
+# SCP files
+spawn scp -o StrictHostKeyChecking=no tg_bot_agent.py skills_engine.py threads_parser.py .env requirements.txt $user@$ip:/root/hermes_agent/
+expect {
+    "assword:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}
+
+# Install dependencies and start in tmux
+spawn ssh -o StrictHostKeyChecking=no $user@$ip "cd /root/hermes_agent && apt update && apt install -y python3-pip tmux python3-venv && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && tmux kill-session -t hermes || true && tmux new-session -d -s hermes 'source /root/hermes_agent/venv/bin/activate && python3 tg_bot_agent.py'"
+expect {
+    "assword:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}
+
+puts "Deployment to VPS completed!"

@@ -1,0 +1,15 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+set password "r0oLNJP3xCO7O4SnL0bj"
+set ip "151.241.100.226"
+set user "root"
+
+spawn ssh -o StrictHostKeyChecking=no $user@$ip "cd /root/hermes_agent && source venv/bin/activate && python3 tg_bot_agent.py"
+expect {
+    "assword:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}

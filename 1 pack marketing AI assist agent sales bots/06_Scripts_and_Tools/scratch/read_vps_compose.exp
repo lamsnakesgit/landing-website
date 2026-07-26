@@ -1,0 +1,41 @@
+#!/usr/bin/expect -f
+
+set timeout 30
+set password "r0oLNJP3xCO7O4SnL0bj"
+set ip "151.241.100.226"
+set user "root"
+
+puts "=== ЧТЕНИЕ КОНФИГУРАЦИЙ VPS ==="
+
+# 1. Читаем /root/.env
+puts "\n--- /root/.env ---"
+spawn ssh -o StrictHostKeyChecking=no $user@$ip "cat /root/.env"
+expect {
+    "assword:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}
+
+# 2. Читаем /root/sales_os/.env
+puts "\n--- /root/sales_os/.env ---"
+spawn ssh -o StrictHostKeyChecking=no $user@$ip "cat /root/sales_os/.env"
+expect {
+    "assword:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}
+
+# 3. Читаем /root/docker-compose.yml
+puts "\n--- /root/docker-compose.yml ---"
+spawn ssh -o StrictHostKeyChecking=no $user@$ip "cat /root/docker-compose.yml"
+expect {
+    "assword:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}

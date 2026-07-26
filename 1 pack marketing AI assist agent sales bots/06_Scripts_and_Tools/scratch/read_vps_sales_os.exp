@@ -1,0 +1,17 @@
+#!/usr/bin/expect -f
+
+set timeout 30
+set password "r0oLNJP3xCO7O4SnL0bj"
+set ip "151.241.100.226"
+set user "root"
+
+puts "=== ЧТЕНИЕ SALES_OS DOCKER-COMPOSE ==="
+
+spawn ssh -o StrictHostKeyChecking=no $user@$ip "cat /root/sales_os/docker-compose.yml"
+expect {
+    "assword:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}

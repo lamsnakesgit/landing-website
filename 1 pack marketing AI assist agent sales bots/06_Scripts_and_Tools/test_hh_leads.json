@@ -1,0 +1,46 @@
+[
+    {
+        "name": "Представитель компании",
+        "company_name": "ТОО MacStar",
+        "phone": "",
+        "email": "",
+        "url": "https://taraz.hh.kz/vacancy/134557861?query=%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0+%D0%B1%D0%BE%D1%82%D0%BE%D0%B2&hhtmFrom=vacancy_search_list",
+        "description": "Вакансия: Контент-менеджер",
+        "source": "hh.kz",
+        "city": "Алматы, улица Северное Кольцо, 62Б",
+        "query": "разработка ботов"
+    },
+    {
+        "name": "Представитель компании",
+        "company_name": "ТОО Skill Hub",
+        "phone": "",
+        "email": "",
+        "url": "https://taraz.hh.kz/vacancy/134624413?query=%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0+%D0%B1%D0%BE%D1%82%D0%BE%D0%B2&hhtmFrom=vacancy_search_list",
+        "description": "Вакансия: Маркетолог в автосалон",
+        "source": "hh.kz",
+        "city": "Алматы",
+        "query": "разработка ботов"
+    },
+    {
+        "name": "Представитель компании",
+        "company_name": "PravoTech",
+        "phone": "",
+        "email": "",
+        "url": "https://hh.ru/vacancy/134724609?query=%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0+%D0%B1%D0%BE%D1%82%D0%BE%D0%B2&hhtmFrom=vacancy_search_list",
+        "description": "Вакансия: DBA-инженер",
+        "source": "hh.ru",
+        "city": "Москва",
+        "query": "разработка ботов"
+    },
+    {
+        "name": "Представитель компании",
+        "company_name": "Лучи",
+        "phone": "",
+        "email": "",
+        "url": "https://hh.ru/vacancy/134104402?query=%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0+%D0%B1%D0%BE%D1%82%D0%BE%D0%B2&hhtmFrom=vacancy_search_list",
+        "description": "Вакансия: Бизнес-аналитик (AI & Автоматизация CRM)",
+        "source": "hh.ru",
+        "city": "Москва",
+        "query": "разработка ботов"
+    }
+]

@@ -1,0 +1,102 @@
+2026-05-26 03:10:03,754 [INFO] Инициализация ночного рендеринга...
+2026-05-26 03:10:03,809 [INFO] Клиент Vertex AI успешно инициализирован.
+2026-05-26 03:10:03,809 [INFO] === НАЧАЛО ОБРАБОТКИ СЦЕНЫ 4 ===
+2026-05-26 03:10:03,809 [INFO] Видео clip4_anime_silent.mp4 уже существует, пропускаем генерацию.
+2026-05-26 03:10:03,809 [INFO] Генерация TTS: А ИИ сможет прессовать, как Баке? (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 03:10:31,851 [WARNING] Попытка 1 не удалась: Command '['/Users/higherpower/Library/Python/3.9/bin/edge-tts', '--text', 'А ИИ сможет прессовать, как Баке?', '--voice', 'ru-RU-DmitryNeural', '--write-media', '/Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene4_part0.mp3']' returned non-zero exit status 1.
+2026-05-26 03:10:36,857 [INFO] Генерация TTS: А ИИ сможет прессовать, как Баке? (Голос: ru-RU-DmitryNeural, Попытка: 2)
+2026-05-26 03:11:19,929 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene4_part0.mp3
+2026-05-26 03:11:19,930 [INFO] Генерация TTS: Он будет делать это в тысячу раз хуже. Запускаем поток! (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 16:51:53,222 [INFO] Инициализация ночного рендеринга...
+2026-05-26 16:51:53,353 [INFO] Клиент Vertex AI успешно инициализирован.
+2026-05-26 16:51:53,354 [INFO] === НАЧАЛО ОБРАБОТКИ СЦЕНЫ 4 ===
+2026-05-26 16:51:53,354 [INFO] Видео clip4_anime_silent.mp4 уже существует, пропускаем генерацию.
+2026-05-26 16:51:53,354 [INFO] Генерация TTS: А ИИ сможет прессовать, как Баке? (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 16:51:54,795 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene4_part0.mp3
+2026-05-26 16:51:54,795 [INFO] Генерация TTS: Он будет делать это в тысячу раз хуже. Запускаем поток! (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 16:51:57,715 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene4_part1.mp3
+2026-05-26 16:51:57,715 [INFO] Объединение аудио для сцены 4...
+2026-05-26 16:52:08,715 [INFO] Инициализация ночного рендеринга...
+2026-05-26 16:52:08,871 [INFO] Клиент Vertex AI успешно инициализирован.
+2026-05-26 16:52:08,871 [INFO] === НАЧАЛО ОБРАБОТКИ СЦЕНЫ 4 ===
+2026-05-26 16:52:08,872 [INFO] Видео clip4_anime_silent.mp4 уже существует, пропускаем генерацию.
+2026-05-26 16:52:08,872 [INFO] Генерация TTS: А ИИ сможет прессовать, как Баке? (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 16:52:10,316 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene4_part0.mp3
+2026-05-26 16:52:10,316 [INFO] Генерация TTS: Он будет делать это в тысячу раз хуже. Запускаем поток! (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 16:52:11,614 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene4_part1.mp3
+2026-05-26 16:52:11,615 [INFO] Объединение аудио для сцены 4...
+2026-05-26 16:52:11,757 [INFO] Склейка видео /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip4_anime_silent.mp4 и аудио /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene4_combined.mp3...
+2026-05-26 16:52:11,942 [INFO] Финальный клип сохранен: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip4_anime_final.mp4
+2026-05-26 16:52:11,943 [INFO] === НАЧАЛО ОБРАБОТКИ СЦЕНЫ 5 ===
+2026-05-26 16:52:11,943 [INFO] Запуск Veo 3.1 для clip5_silent.mp4 (Попытка 1)...
+2026-05-26 16:52:17,429 [INFO] HTTP Request: POST https://us-central1-aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0675220826/locations/us-central1/publishers/google/models/veo-3.1-generate-001:predictLongRunning "HTTP/1.1 200 OK"
+2026-05-26 16:52:17,434 [INFO] Операция Veo создана: projects/gen-lang-client-0675220826/locations/us-central1/publishers/google/models/veo-3.1-generate-001/operations/997132bd-0ad5-4cbf-b963-a9dc31f49c3e. Ожидание завершения...
+2026-05-26 16:52:33,699 [INFO] HTTP Request: POST https://us-central1-aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0675220826/locations/us-central1/publishers/google/models/veo-3.1-generate-001:fetchPredictOperation "HTTP/1.1 200 OK"
+2026-05-26 16:52:49,862 [INFO] HTTP Request: POST https://us-central1-aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0675220826/locations/us-central1/publishers/google/models/veo-3.1-generate-001:fetchPredictOperation "HTTP/1.1 200 OK"
+2026-05-26 16:53:06,415 [INFO] HTTP Request: POST https://us-central1-aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0675220826/locations/us-central1/publishers/google/models/veo-3.1-generate-001:fetchPredictOperation "HTTP/1.1 200 OK"
+2026-05-26 16:53:08,367 [INFO] Видео успешно сохранено в /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip5_silent.mp4
+2026-05-26 16:53:08,367 [INFO] Генерация TTS: Смотри, переводы пошли! Пятьдесят тысяч... Сто тысяч! (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 16:53:12,093 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene5_part0.mp3
+2026-05-26 16:53:12,094 [INFO] Склейка видео /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip5_silent.mp4 и аудио /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene5_part0.mp3...
+2026-05-26 16:53:12,276 [INFO] Финальный клип сохранен: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip5_final.mp4
+2026-05-26 16:53:12,276 [INFO] === НАЧАЛО ОБРАБОТКИ СЦЕНЫ 6 ===
+2026-05-26 16:53:12,276 [INFO] Видео clip6_video_silent.mp4 уже существует, пропускаем генерацию.
+2026-05-26 16:53:12,277 [INFO] Генерация TTS: Мансик! Бот выбил два ляма... Но нас кто-то взломал! Бакой голосом: Бабки уходят на левый криптокошелек! (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 16:53:16,950 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene6_part0.mp3
+2026-05-26 16:53:16,950 [INFO] Склейка видео /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip6_video_silent.mp4 и аудио /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene6_part0.mp3...
+2026-05-26 16:53:17,124 [INFO] Финальный клип сохранен: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip6_final.mp4
+2026-05-26 16:53:17,125 [INFO] === НАЧАЛО ОБРАБОТКИ СЦЕНЫ 7 ===
+2026-05-26 16:53:17,125 [INFO] Видео clip7_silent.mp4 уже существует, пропускаем генерацию.
+2026-05-26 16:53:17,125 [INFO] Генерация TTS: Если через минуту не остановишь вывод — я с вас шкуру спущу! (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 16:53:19,262 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene7_part0.mp3
+2026-05-26 16:53:19,263 [INFO] Генерация TTS: Я не могу зайти в админку! (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 16:53:20,938 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene7_part1.mp3
+2026-05-26 16:53:20,938 [INFO] Объединение аудио для сцены 7...
+2026-05-26 16:53:21,091 [INFO] Склейка видео /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip7_silent.mp4 и аудио /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene7_combined.mp3...
+2026-05-26 16:53:21,296 [INFO] Финальный клип сохранен: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip7_final.mp4
+2026-05-26 16:53:21,297 [INFO] === НАЧАЛО ОБРАБОТКИ СЦЕНЫ 8 ===
+2026-05-26 16:53:21,298 [INFO] Видео clip8_silent.mp4 уже существует, пропускаем генерацию.
+2026-05-26 16:53:21,298 [INFO] Генерация TTS: Пароль изменен... Мы потеряли контроль. (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 16:53:24,295 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene8_part0.mp3
+2026-05-26 16:53:24,295 [INFO] Склейка видео /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip8_silent.mp4 и аудио /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene8_part0.mp3...
+2026-05-26 16:53:24,569 [INFO] Финальный клип сохранен: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip8_final.mp4
+2026-05-26 16:53:24,569 [INFO] Рендеринг всех сцен завершен!
+2026-05-26 21:24:50,695 [INFO] Инициализация ночного рендеринга...
+2026-05-26 21:24:50,817 [INFO] Клиент Vertex AI успешно инициализирован.
+2026-05-26 21:24:50,820 [INFO] === НАЧАЛО ОБРАБОТКИ СЦЕНЫ 4 ===
+2026-05-26 21:24:50,820 [INFO] Видео clip4_anime_silent.mp4 уже существует, пропускаем генерацию.
+2026-05-26 21:24:50,820 [INFO] Генерация TTS: А ИИ сможет прессовать, как Баке? (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 21:24:52,435 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene4_part0.mp3
+2026-05-26 21:24:52,436 [INFO] Генерация TTS: Еще жестче. Бот готов. Запускаем поток! (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 21:24:55,021 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene4_part1.mp3
+2026-05-26 21:24:55,022 [INFO] Объединение аудио для сцены 4...
+2026-05-26 21:24:55,310 [INFO] Склейка видео /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip4_anime_silent.mp4 и аудио /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene4_combined.mp3...
+2026-05-26 21:24:55,483 [INFO] Финальный клип сохранен: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip4_anime_final.mp4
+2026-05-26 21:24:55,483 [INFO] === НАЧАЛО ОБРАБОТКИ СЦЕНЫ 5 ===
+2026-05-26 21:24:55,483 [INFO] Видео clip5_silent.mp4 уже существует, пропускаем генерацию.
+2026-05-26 21:24:55,483 [INFO] Генерация TTS: Смотри, переводы пошли! Пятьдесят тысяч... Сто тысяч! (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 21:24:58,292 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene5_part0.mp3
+2026-05-26 21:24:58,292 [INFO] Склейка видео /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip5_silent.mp4 и аудио /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene5_part0.mp3...
+2026-05-26 21:24:58,436 [INFO] Финальный клип сохранен: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip5_final.mp4
+2026-05-26 21:24:58,437 [INFO] === НАЧАЛО ОБРАБОТКИ СЦЕНЫ 6 ===
+2026-05-26 21:24:58,437 [INFO] Видео clip6_video_silent.mp4 уже существует, пропускаем генерацию.
+2026-05-26 21:24:58,437 [INFO] Генерация TTS: Мансик! Бот выбил два ляма... Но нас кто-то взломал! Бакой голосом: Бабки уходят на левый криптокошелек! (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 21:24:59,979 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene6_part0.mp3
+2026-05-26 21:24:59,980 [INFO] Склейка видео /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip6_video_silent.mp4 и аудио /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene6_part0.mp3...
+2026-05-26 21:25:00,380 [INFO] Финальный клип сохранен: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip6_final.mp4
+2026-05-26 21:25:00,381 [INFO] === НАЧАЛО ОБРАБОТКИ СЦЕНЫ 7 ===
+2026-05-26 21:25:00,381 [INFO] Видео clip7_silent.mp4 уже существует, пропускаем генерацию.
+2026-05-26 21:25:00,382 [INFO] Генерация TTS: Если через минуту не остановишь вывод — я с вас шкуру спущу! (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 21:25:02,251 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene7_part0.mp3
+2026-05-26 21:25:02,252 [INFO] Генерация TTS: Я не могу зайти в админку! (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 21:25:04,340 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene7_part1.mp3
+2026-05-26 21:25:04,342 [INFO] Объединение аудио для сцены 7...
+2026-05-26 21:25:04,419 [INFO] Склейка видео /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip7_silent.mp4 и аудио /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene7_combined.mp3...
+2026-05-26 21:25:04,546 [INFO] Финальный клип сохранен: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip7_final.mp4
+2026-05-26 21:25:04,547 [INFO] === НАЧАЛО ОБРАБОТКИ СЦЕНЫ 8 ===
+2026-05-26 21:25:04,547 [INFO] Видео clip8_silent.mp4 уже существует, пропускаем генерацию.
+2026-05-26 21:25:04,547 [INFO] Генерация TTS: Пароль изменен... Мы потеряли контроль. (Голос: ru-RU-DmitryNeural, Попытка: 1)
+2026-05-26 21:25:07,657 [INFO] Аудио успешно сохранено: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene8_part0.mp3
+2026-05-26 21:25:07,658 [INFO] Склейка видео /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip8_silent.mp4 и аудио /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/scene8_part0.mp3...
+2026-05-26 21:25:07,919 [INFO] Финальный клип сохранен: /Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/scratch/series/pacany_i_ii/04_renders/clip8_final.mp4
+2026-05-26 21:25:07,919 [INFO] Рендеринг всех сцен завершен!

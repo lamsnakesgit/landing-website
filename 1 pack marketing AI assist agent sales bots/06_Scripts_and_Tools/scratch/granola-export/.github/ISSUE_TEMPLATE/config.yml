@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Granola Terms of Service
+    url: https://www.granola.ai/policies/terms
+    about: Read Granola's Terms of Service. This tool is for personal data recovery from your own account.
+  - name: GDPR data portability
+    url: https://gdpr-info.eu/art-20-gdpr/
+    about: The legal framework for data portability rights in the EU.

@@ -1,0 +1,59 @@
+name: Bug report
+description: Something in granola-export doesn't work as expected
+title: "[bug] "
+labels: [bug]
+body:
+  - type: checkboxes
+    attributes:
+      label: Confirmation
+      description: Please confirm before proceeding. Issues that do not meet these criteria will be closed.
+      options:
+        - label: I am running this tool against my own Granola account, not someone else's
+          required: true
+        - label: I have read the README and DISCLAIMER
+          required: true
+  - type: input
+    attributes:
+      label: Granola Mac app version
+      description: Granola → menu bar → About Granola
+      placeholder: e.g. 7.155.1
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: macOS version
+      placeholder: e.g. 14.4
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Python version
+      description: Output of `python3 --version`
+      placeholder: e.g. 3.11.5
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What happened
+      description: |
+        What command did you run? What did you expect to happen? What actually happened?
+        Include the full command line.
+      placeholder: |
+        I ran `python3 scripts/extract.py` and expected it to fetch my documents.
+        Instead, it errored after the first page of /v2/get-documents with HTTP 401.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Error output
+      description: |
+        Paste the full stderr output. **Redact any auth tokens** (anything starting with `eyJ...` is a JWT — do not paste it).
+      render: shell
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Anything else
+      description: Workarounds you tried, related Granola behavior, etc.
+    validations:
+      required: false

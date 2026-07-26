@@ -1,0 +1,12 @@
+import paramiko
+ssh = paramiko.SSHClient()
+ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+ssh.connect('151.241.100.226', username='root', password='r0oLNJP3xCO7O4SnL0bj', timeout=10)
+print("Killing old python processes...")
+ssh.exec_command('pkill -f run_all_years.py')
+ssh.exec_command('pkill -f sud_parser.py')
+ssh.exec_command('docker ps -q | xargs -r docker kill')
+print("Restarting parser...")
+ssh.exec_command('cd /root/ai_lawyer/kalkan_docker && nohup python3 run_all_years.py > run_all_years.log 2>&1 &')
+print("Done!")
+ssh.close()

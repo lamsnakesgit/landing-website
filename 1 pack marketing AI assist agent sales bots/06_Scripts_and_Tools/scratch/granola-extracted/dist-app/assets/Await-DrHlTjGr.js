@@ -1,0 +1,2 @@
+try{let e=typeof window<`u`?window:typeof global<`u`?global:typeof globalThis<`u`?globalThis:typeof self<`u`?self:{},t=new e.Error().stack;t&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[t]=`b9963a93-00b3-45e1-9cc2-145b55f7b717`,e._sentryDebugIdIdentifier=`sentry-dbid-b9963a93-00b3-45e1-9cc2-145b55f7b717`)}catch{}import{a as e}from"./_sentry-release-injection-file-VRd8JZZe.js";import{t}from"./react-C1RCAzx_.js";var n=e(t());function r({promise:e,children:t}){return(0,n.use)(e),t}export{r as t};
+//# sourceMappingURL=Await-DrHlTjGr.js.map

@@ -1,0 +1,20 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+set password "r0oLNJP3xCO7O4SnL0bj"
+set ip "151.241.100.226"
+set user "root"
+set outfile "/Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/06_Scripts_and_Tools/scratch/n8n_creds_dump.txt"
+
+puts "=== ДАМПИМ CREDENTIALS ИЗ N8N НА VPS ==="
+
+# Запускаем psql без пейджера и перенаправляем вывод в локальный файл
+spawn ssh -o StrictHostKeyChecking=no $user@$ip "docker exec -i n8n-postgres-1 psql -U n8n_admin -d n8n_prod -P pager=off -c \"SELECT id, name, type, data FROM credentials_entity;\""
+expect {
+    "assword:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}
+# Expect соберет весь вывод. Но чтобы сохранить его чисто, мы перенаправим его при вызове скрипта в bash.

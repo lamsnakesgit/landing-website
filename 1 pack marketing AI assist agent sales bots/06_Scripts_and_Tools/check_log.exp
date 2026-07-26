@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+set timeout 10
+spawn ssh root@151.241.100.226 "ls -la /root/ai_lawyer/kalkan_docker/output/pdfs/ | awk '{print \$9}' | grep -o '^[0-9]\\\{4\\\}' | sort | uniq -c"
+expect "password:"
+send "r0oLNJP3xCO7O4SnL0bj\r"
+expect eof

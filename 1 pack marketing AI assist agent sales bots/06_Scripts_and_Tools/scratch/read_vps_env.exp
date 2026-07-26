@@ -1,0 +1,28 @@
+#!/usr/bin/expect -f
+
+set timeout 30
+set password "r0oLNJP3xCO7O4SnL0bj"
+set ip "151.241.100.226"
+set user "root"
+
+puts "=== ПОДКЛЮЧАЕМСЯ К VPS ДЛЯ АУДИТА ==="
+
+# 1. Читаем .env файл в папке hermes_agent на VPS
+spawn ssh -o StrictHostKeyChecking=no $user@$ip "cat /root/hermes_agent/.env"
+expect {
+    "assword:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}
+
+# 2. Проверяем докер-контейнеры и установленные службы на VPS
+spawn ssh -o StrictHostKeyChecking=no $user@$ip "docker ps -a || echo 'Docker not installed'"
+expect {
+    "assword:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}

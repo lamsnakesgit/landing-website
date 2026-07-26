@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "name": "Кочевник Фуд (Kochevnik Food)",
+    "city": "Алматы",
+    "niche": "доставка_плов_шашлык",
+    "phone": "+77775772200",
+    "instagram": "@kochevnik.almaty",
+    "has_website": false,
+    "order_method": "WhatsApp",
+    "status": "new",
+    "note": "Принимают заказы WhatsApp. Плов, шашлычные сеты, домашняя кухня. Нет нормального сайта-меню."
+  },
+  {
+    "id": 2,
+    "name": "Плов в коробочке",
+    "city": "Алматы",
+    "niche": "доставка_плов",
+    "phone": "+77010535000",
+    "instagram": null,
+    "has_website": false,
+    "order_method": "телефон/WhatsApp",
+    "status": "new",
+    "note": "Комбо-наборы, принимают по телефону. Нет интерактивного меню."
+  },
+  {
+    "id": 3,
+    "name": "Meat Master",
+    "city": "Алматы/Астана",
+    "niche": "полуфабрикаты_халал",
+    "phone": "+77778473535",
+    "instagram": "@meatmaster_kz",
+    "has_website": false,
+    "order_method": "WhatsApp",
+    "status": "new",
+    "note": "Манты, пельмени, хинкали, самса ручной лепки. Халал. Заказ через WhatsApp. Нет сайта с корзиной."
+  },
+  {
+    "id": 4,
+    "name": "SAQ Delivery",
+    "city": "Астана",
+    "niche": "доставка_восточная_кухня",
+    "phone": "+77755920007",
+    "instagram": "@saq_delivery",
+    "has_website": false,
+    "order_method": "WhatsApp",
+    "status": "new",
+    "note": "Плов, манты, шашлык, выпечка, полуфабрикаты. Принимают в WhatsApp. Нет онлайн-меню."
+  },
+  {
+    "id": 5,
+    "name": "Традициональ",
+    "city": "Астана",
+    "niche": "доставка_домашняя_кухня",
+    "phone": "+77020002181",
+    "instagram": null,
+    "has_website": false,
+    "order_method": "WhatsApp",
+    "status": "new",
+    "note": "Домашняя кухня, первые/вторые блюда, котлеты, салаты. WhatsApp. Нет меню-сайта."
+  },
+  {
+    "id": 6,
+    "name": "Hello Food KZ",
+    "city": "Алматы",
+    "niche": "доставка_пп_питание",
+    "phone": null,
+    "instagram": "@hellofood.kz",
+    "has_website": true,
+    "order_method": "сайт/WhatsApp",
+    "status": "low_priority",
+    "note": "Правильное питание. Есть базовый сайт, но меню статичное. Может быть интересна автоматизация заказов."
+  },
+  {
+    "id": 7,
+    "name": "Balqaimaq",
+    "city": "Алматы",
+    "niche": "полуфабрикаты_домашние",
+    "phone": null,
+    "instagram": "@balqaimaq.kz",
+    "has_website": false,
+    "order_method": "WhatsApp/Instagram Direct",
+    "status": "new",
+    "note": "Домашние полуфабрикаты, натуральный состав. Заказ через WhatsApp по ссылке в шапке Инст. Нет сайта."
+  },
+  {
+    "id": 8,
+    "name": "RAYAT Кулинария",
+    "city": "Алматы",
+    "niche": "полуфабрикаты_мясные",
+    "phone": null,
+    "instagram": "@rayat.kz",
+    "has_website": false,
+    "order_method": "WhatsApp/Instagram Direct",
+    "status": "new",
+    "note": "Мясные полуфабрикаты ручной лепки, доставка в день заказа. Нет сайта с корзиной."
+  },
+  {
+    "id": 9,
+    "name": "BVD Catering",
+    "city": "Алматы",
+    "niche": "корпоративное_питание_доставка",
+    "phone": null,
+    "instagram": null,
+    "has_website": true,
+    "order_method": "WhatsApp",
+    "status": "low_priority",
+    "note": "Корпоративные обеды и доставка домашней еды. Сайт есть, но заказ через WA. Интересна автоматизация."
+  },
+  {
+    "id": 10,
+    "name": "Лепим Сами / Сама Лепила",
+    "city": "Алматы",
+    "niche": "магазин_полуфабрикатов",
+    "phone": null,
+    "instagram": "@lepimsami_almaty",
+    "has_website": false,
+    "order_method": "WhatsApp",
+    "status": "new",
+    "note": "Сеть точек домашних полуфабрикатов. Несколько филиалов в Алматы. Заказы через WhatsApp. Нет QR-меню."
+  }
+]
