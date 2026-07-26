@@ -89,12 +89,12 @@ async def analyze_lead_with_vertex_ai(comp_name, category, description, source, 
         "generationConfig": {
             "responseMimeType": "application/json",
             "temperature": 0.3,
-            "maxOutputTokens": 2048
+            "maxOutputTokens": 4096
         }
     }
     
     def call_http():
-        resp = requests.post(url, headers=headers, json=payload, timeout=20)
+        resp = requests.post(url, headers=headers, json=payload, timeout=30)
         resp.raise_for_status()
         res_data = resp.json()
         text = res_data["candidates"][0]["content"]["parts"][0]["text"].strip()
@@ -103,24 +103,28 @@ async def analyze_lead_with_vertex_ai(comp_name, category, description, source, 
         try:
             return json.loads(text, strict=False)
         except Exception as e:
-            log.warning(f"Ошибка парсинга JSON Vertex AI ({e}). Сырой текст: {text[:200]}...")
+            log.warning(f"Ошибка парсинга JSON Vertex AI ({e}). Восстанавливаем JSON...")
             cleaned_text = re.sub(r'(?<!\\)\r?\n', ' ', text)
+            # Автозакрытие незавершенных кавычек/скобок
+            if cleaned_text.count('"') % 2 != 0:
+                cleaned_text += '"'
+            if not cleaned_text.endswith("}"):
+                if not cleaned_text.endswith("]"):
+                    cleaned_text += "]}"
+                else:
+                    cleaned_text += "}"
             try:
                 return json.loads(cleaned_text, strict=False)
             except Exception:
-                # Фикс неэкранированных кавычек внутри значений полей
-                # Заменяем кавычки вокруг ключей и используем безопасный парсинг
                 try:
                     match = re.search(r"\{.*\}", cleaned_text, re.DOTALL)
                     if match:
-                        raw_json = match.group(0)
-                        return json.loads(raw_json, strict=False)
+                        return json.loads(match.group(0), strict=False)
                 except Exception:
                     pass
                 log.error(f"Полный сырой ответ Vertex AI, который не удалось распарсить:\n{text}")
                 raise
 
-        
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(None, call_http)
 
