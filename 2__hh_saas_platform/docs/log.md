@@ -50,3 +50,5 @@
 
 **Problems/Issues (English):**
 - The source Google Document was closed for automatic parsing, solved by requesting screenshots from the user.
+
+- Переписана Задача 2 с фокусом на релевантные боли AI-креаторов (пластиковость генераций, неумение продавать брендам).
