@@ -614,16 +614,60 @@ def main():
                     welcome_text = (
                         "👋 Привет! Я твой локальный ИИ-агент Antigravity.\n\n"
                         "Я могу:\n"
-                        "1. **Вести РНП:** просто напиши мне 'Запиши в РНП: выручка 15000, 3 лида, рычаг: рассылка, мешал спам'\n"
-                        "2. **Запускать скрипты:** например, 'Запусти сбор лидов'\n"
-                        "3. **Работать с файлами:** 'Покажи лог' или 'Покажи blockers.md'\n"
-                        "4. **Выполнять команды:** 'Запусти cmd: ls -la'\n"
-                        "5. **Постить сторис:** отправь мне картинку/видео и напиши 'выложи в сторис ватсап и тг'\n"
-                        "6. **Анализировать креативы:** отправь сценарий/текст и укажи референс\n"
-                        "7. **Вести SMM аналитику:** напиши 'запусти сбор аналитики' или 'составь контент-план'\n\n"
+                        "1. **Квалифицированные лиды:** напиши `/leads` для просмотра лидов С КОНТАКТАМИ\n"
+                        "2. **Вести РНП:** просто напиши мне 'Запиши в РНП: выручка 15000, 3 лида, рычаг: рассылка'\n"
+                        "3. **Запускать скрипты:** например, 'Запусти сбор лидов'\n"
+                        "4. **Работать с файлами:** 'Покажи лог' или 'Покажи blockers.md'\n"
+                        "5. **Постить сторис:** отправь мне картинку/видео и напиши 'выложи в сторис ватсап и тг'\n\n"
                         "Что делаем сегодня?"
                     )
                     send_telegram_message(chat_id, welcome_text)
+                    continue
+
+                if text.strip() == "/leads" or "покажи лидов" in text.lower():
+                    send_chat_action(chat_id, "typing")
+                    date_today = datetime.now().strftime('%Y-%m-%d')
+                    qual_path = f"03_Marketing_and_Sales/daily_leads/{date_today}/leads_qualified.json"
+                    
+                    if not os.path.exists(qual_path):
+                        base_dir = "03_Marketing_and_Sales/daily_leads"
+                        if os.path.exists(base_dir):
+                            subdirs = sorted([d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))], reverse=True)
+                            if subdirs:
+                                qual_path = os.path.join(base_dir, subdirs[0], "leads_qualified.json")
+                                
+                    if os.path.exists(qual_path):
+                        try:
+                            with open(qual_path, "r", encoding="utf-8") as f:
+                                qual_leads = json.load(f)
+                            send_telegram_message(chat_id, f"🎯 *Мульти-канальный LeadGen OS | Горячие лиды: `{len(qual_leads)}`*\nПоказываю лиды с гарантированными контактами:")
+                            
+                            for idx, lead in enumerate(qual_leads[:7], 1):
+                                contacts = []
+                                if lead.get("phone"): contacts.append(f"📞 `{lead['phone']}`")
+                                if lead.get("whatsapp"): contacts.append(f"📲 [WhatsApp]({lead['whatsapp']})")
+                                if lead.get("telegram"): contacts.append(f"✈️ `{lead['telegram']}`")
+                                if lead.get("email"): contacts.append(f"✉️ `{lead['email']}`")
+                                if lead.get("profile_url"): contacts.append(f"🌐 [Профиль]({lead['profile_url']})")
+                                
+                                source_badge = f"`[{lead.get('source', 'Multi-Source')}]`"
+                                score_val = lead.get('ai_score', 8)
+                                score_badge = f"🔥 `{score_val}/10` (Горячий)" if score_val >= 8 else f"⚡ `{score_val}/10` (Теплый)"
+                                
+                                lead_card = (
+                                    f"🎯 *Лид №{idx} | {lead.get('company_name')}*\n"
+                                    f"👤 *ЛПР/Автор:* {lead.get('name', 'Не указано')}\n"
+                                    f"📍 *Канал:* {source_badge} | *Скоринг:* {score_badge}\n"
+                                    f"💡 *Интент:* _{lead.get('intent_type', 'Поиск решений')}_\n\n"
+                                    f"📇 *КОНТАКТЫ:* {', '.join(contacts)}\n\n"
+                                    f"💬 *ПЕРВОЕ СООБЩЕНИЕ (Адаптировано под канал):*\n_{lead.get('generated_pitch', '')}_"
+                                )
+                                send_telegram_message(chat_id, lead_card)
+                                time.sleep(0.5)
+                        except Exception as e:
+                            send_telegram_message(chat_id, f"Ошибка чтения квалифицированных лидов: {e}")
+                    else:
+                        send_telegram_message(chat_id, "⚠️ Квалифицированные лиды за сегодня еще не собраны. Напиши 'запусти лидогенерацию'.")
                     continue
                 
                 # Обработка сообщения через ИИ

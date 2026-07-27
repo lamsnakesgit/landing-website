@@ -6,8 +6,8 @@ from duckduckgo_search import DDGS
 
 logger = logging.getLogger(__name__)
 
-def extract_contacts_from_text(text: str) -> dict:
-    """Извлекает контакты (телефон, email, telegram, whatsapp) из произвольного текста"""
+def extract_contacts(text: str) -> dict:
+    """Извлекает контакты из LinkedIn сниппета или био профиля"""
     phones = re.findall(r'\+?\d{1,4}[-.\s]?\(?\d{1,3}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}', text)
     emails = re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', text)
     tgs = re.findall(r't\.me/([a-zA-Z0-9_]+)|@([a-zA-Z0-9_]{5,})', text)
@@ -34,15 +34,14 @@ def extract_contacts_from_text(text: str) -> dict:
         "whatsapp": clean_wa
     }
 
-def parse_threads_leads(keyword: str, max_results: int = 15) -> list:
+def parse_linkedin_leads(keyword: str, max_results: int = 15) -> list:
     """
-    Поиск профилей и коммерческих постов в Threads.net по ключевому слову.
-    Возвращает список структурированных карточек лидов.
+    Выполняет X-ray поиск B2B профилей ЛПР и постов в LinkedIn (Казахстан / СНГ / Глобал).
     """
-    logger.info(f"Threads: Начинаю поиск лидов по запросу: '{keyword}'")
+    logger.info(f"LinkedIn: Поиск B2B ЛПР по запросу '{keyword}'...")
     queries = [
-        f'site:threads.net "{keyword}" (email OR whatsapp OR tg OR contact OR dm OR "+7")',
-        f'site:threads.net "{keyword}" (нужен OR ищу OR требуется OR разработка)'
+        f'site:linkedin.com/in ("CEO" OR "Founder" OR "Директор" OR "CMO" OR "Head of Sales") "{keyword}" (Казахстан OR Алматы OR Астана OR СНГ)',
+        f'site:linkedin.com/posts "{keyword}" (нужен OR ищу OR требуется OR contact OR email)'
     ]
     
     leads = []
@@ -57,22 +56,24 @@ def parse_threads_leads(keyword: str, max_results: int = 15) -> list:
                     title = res.get('title', '')
                     snippet = res.get('body', '')
                     
-                    if 'threads.net' not in url or url in seen_urls:
+                    if 'linkedin.com' not in url or url in seen_urls:
                         continue
                     seen_urls.add(url)
                     
-                    # Извлекаем хэндл пользователя Threads
-                    handle_match = re.search(r'threads\.net/@([a-zA-Z0-9._]+)', url)
-                    handle = f"@{handle_match.group(1)}" if handle_match else "@threads_user"
+                    # Очищаем заголовок профиля (Имя | Должность | Компания)
+                    clean_title = re.sub(r'\s*\|\s*LinkedIn.*$', '', title)
+                    parts = clean_title.split('-')
+                    name = parts[0].strip() if len(parts) > 0 else "B2B ЛПР LinkedIn"
+                    position = parts[1].strip() if len(parts) > 1 else "Руководитель / Founder"
                     
                     full_text = f"{title} {snippet}"
-                    contacts = extract_contacts_from_text(full_text)
+                    contacts = extract_contacts(full_text)
                     
                     leads.append({
-                        "source": "Threads.net",
-                        "company_name": f"Threads {handle}",
-                        "name": handle,
-                        "position": "Автор поста / Владелец аккаунта",
+                        "source": "LinkedIn B2B",
+                        "company_name": name,
+                        "name": name,
+                        "position": position,
                         "profile_url": url,
                         "snippet": snippet,
                         "title": title,
@@ -81,17 +82,17 @@ def parse_threads_leads(keyword: str, max_results: int = 15) -> list:
                         "telegram": contacts["telegram"],
                         "whatsapp": contacts["whatsapp"],
                         "query": keyword,
-                        "ai_score": 8 if contacts["phone"] or contacts["telegram"] else 6,
-                        "intent_type": "💡 Социальный запрос"
+                        "ai_score": 9 if contacts["email"] or contacts["phone"] else 8,
+                        "intent_type": "💼 B2B ЛПР (LinkedIn)"
                     })
                     
-        logger.info(f"Threads: Найдено {len(leads)} лидов по запросу '{keyword}'.")
+        logger.info(f"LinkedIn: Найдено {len(leads)} лидов по запросу '{keyword}'.")
         return leads
     except Exception as e:
-        logger.error(f"Ошибка парсинга Threads: {e}")
+        logger.error(f"Ошибка парсинга LinkedIn: {e}")
         return []
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    res = parse_threads_leads("ищу маркетолога")
-    print(f"Результат Threads: найдено {len(res)} лидов")
+    res = parse_linkedin_leads("разработка ботов")
+    print(f"Результат LinkedIn: {len(res)} лидов")
