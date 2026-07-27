@@ -99,9 +99,17 @@ async def analyze_lead_with_vertex_ai(comp_name, category, description, source, 
     }
     
     def call_http():
-        resp = requests.post(url, headers=headers, json=payload, timeout=30)
-        resp.raise_for_status()
-        res_data = resp.json()
+        import time
+        max_retries = 3
+        for attempt in range(max_retries):
+            resp = requests.post(url, headers=headers, json=payload, timeout=30)
+            if resp.status_code == 429 and attempt < max_retries - 1:
+                log.warning(f"Vertex AI вернул 429 (Too Many Requests). Ожидание 3 сек перед повтором (попытка {attempt+1}/{max_retries})...")
+                time.sleep(3)
+                continue
+            resp.raise_for_status()
+            res_data = resp.json()
+            break
         text = res_data["candidates"][0]["content"]["parts"][0]["text"].strip()
         if text.startswith("```"):
             text = re.sub(r"^```(?:json)?\s*|```$", "", text, flags=re.MULTILINE).strip()

@@ -25,10 +25,11 @@ def extract_phone(text: str) -> Optional[str]:
     return match.group(0) if match else ""
 
 async def parse_threads_async(query: str, max_results: int = 15) -> Dict:
-    log.info(f"Threads.net — запуск Playwright скрапинга по запросу: '{query}'")
+    log.info(f"Threads.net — запуск скрапинга по запросу: '{query}'")
     companies = []
     seen_usernames = set()
 
+    # 1. Пробуем Playwright если он доступен
     try:
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
@@ -39,7 +40,6 @@ async def parse_threads_async(query: str, max_results: int = 15) -> Dict:
             url = f"https://www.threads.net/search?q={query}"
             await page.goto(url, wait_until="domcontentloaded", timeout=20000)
             
-            # Немного прокрутим вниз для загрузки карточек
             await page.evaluate("window.scrollBy(0, 800)")
             await page.wait_for_timeout(2000)
             
@@ -86,7 +86,37 @@ async def parse_threads_async(query: str, max_results: int = 15) -> Dict:
                     
             await browser.close()
     except Exception as e:
-        log.error(f"Ошибка при скрапинге Threads.net через Playwright: {e}")
+        log.warning(f"Playwright скрапинг Threads.net не удался ({e}). Переход на веб-поиск профилей...")
+
+    # 2. Если Playwright не вернул результатов или упал, используем прямое решение через httpx search
+    if not companies:
+        import httpx
+        try:
+            ddg_url = f"https://html.duckduckgo.com/html/?q=site:threads.net+{query}"
+            headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
+            async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
+                resp = await client.get(ddg_url, headers=headers)
+                if resp.status_code == 200:
+                    found_users = set(re.findall(r'threads\.net/@([a-zA-Z0-9_\.]+)', resp.text))
+                    for username in list(found_users)[:max_results]:
+                        if username in seen_usernames:
+                            continue
+                        seen_usernames.add(username)
+                        profile_url = f"https://www.threads.net/@{username}"
+                        companies.append({
+                            "id": f"threads_{username}",
+                            "name": f"Эксперт / Профиль (@{username})",
+                            "site": profile_url,
+                            "phone": "",
+                            "email": "",
+                            "city": "Удалённо / СНГ",
+                            "description": f"Threads профиль по ключу '{query}'. Аккаунт: @{username}",
+                            "category": f"Threads: {query}",
+                            "source": "threads.net",
+                            "hh_url": profile_url,
+                        })
+        except Exception as se:
+            log.error(f"Ошибка резервного поиска Threads.net: {se}")
 
     log.info(f"Threads.net поиск завершен. Найдено профилей: {len(companies)}")
     return {

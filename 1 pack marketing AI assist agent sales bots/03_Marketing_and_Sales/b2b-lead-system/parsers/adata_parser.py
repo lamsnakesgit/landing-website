@@ -36,20 +36,40 @@ async def search_adata_async(city: str, sphere: str, role: str = "", max_pages: 
     contacts = []
 
     url = f"https://pk.adata.kz/search?query={query}"
+    content = ""
 
+    # 1. Пробуем быстрый прямой запрос через httpx
     try:
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            context = await browser.new_context(
-                user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-            )
-            page = await context.new_page()
-            await page.goto(url, wait_until="domcontentloaded", timeout=20000)
-            await page.wait_for_timeout(3000)
-            
-            content = await page.content()
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        }
+        async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
+            resp = await client.get(url, headers=headers)
+            if resp.status_code == 200:
+                content = resp.text
+    except Exception as e:
+        log.warning(f"httpx запрос к adata.kz не удался ({e}), пробуем Playwright...")
+
+    # 2. Если httpx не вернул контент, пробуем Playwright
+    if not content:
+        try:
+            async with async_playwright() as p:
+                browser = await p.chromium.launch(headless=True)
+                context = await browser.new_context(
+                    user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+                )
+                page = await context.new_page()
+                await page.goto(url, wait_until="domcontentloaded", timeout=20000)
+                await page.wait_for_timeout(2000)
+                content = await page.content()
+                await browser.close()
+        except Exception as pe:
+            log.error(f"Playwright скрапинг adata.kz не удался: {pe}")
+
+    if content:
+        try:
             soup = BeautifulSoup(content, 'html.parser')
-            
             links = soup.find_all('a', href=lambda h: h and '/company/' in h)
             
             for l in links:
@@ -108,10 +128,8 @@ async def search_adata_async(city: str, sphere: str, role: str = "", max_pages: 
                             "contact_link": comp_url,
                             "source": "adata.kz"
                         })
-                        
-            await browser.close()
-    except Exception as e:
-        log.error(f"Ошибка скрапинга adata.kz: {e}")
+        except Exception as e:
+            log.error(f"Ошибка разбора HTML adata.kz: {e}")
 
     log.info(f"adata.kz сбор завершен. Компаний: {len(companies)}")
     return {
