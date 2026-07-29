@@ -1,4 +1,13 @@
 
+## 2026-07-29: Асинхронное ускорение ИИ-обогащения и успешный сбор 167 лидов
+**Победы (Wins) / Победы:**
+- **Асинхронная ИИ-обработка лидов (Semaphore 10):** Переведен скрипт `daily_lead_aggregator.py` на `asyncio.gather` с семафором на 10 параллельных запросов к Vertex AI (Gemini 2.5 Flash). Время обогащения 167 лидов сократилось с 25 минут до 5.5 минут (344 секунды)!
+- **Авто-повтор при 429 от Vertex AI:** Добавлен механизм повторных попыток (exponential backoff retry), позволивший безошибочно обработать все 167 компании без сбоев.
+- **Сбор 167 уникальных лидов:** Собраны контакты со всех 4 источников (`hh.ru`: 47, `hh.kz`: 90, `adata.kz`: 1, `threads.net`: 29) по всем 6 запросам.
+- **Генерация офферов и драфтов 1-го сообщения:** Для всех 167 лидов составлены уникальные предложения и драфты сообщений в мессенджеры.
+- **Сохранение отчетов:** Результаты сохранены в `03_Marketing_and_Sales/daily_leads/2026-07-29/` (`leads.json`, `leads.csv`, `leads_summary.md` и 167 индивидуальных карточек в `details/*.md`).
+- - [EN] Parallelized Vertex AI enrichment loop in `daily_lead_aggregator.py` using `asyncio.Semaphore(10)` with automatic 429 retry backoff. Successfully generated 167 enriched leads with custom offers and drafts in `03_Marketing_and_Sales/daily_leads/2026-07-29/details/`.
+
 ## 2026-07-26: Автоматический ежедневный сбор контактов (adata.kz, hh.ru, hh.kz, threads.net)
 **Победы (Wins) / Победы:**
 - **Запущен автоматический сбор лидов за 26.07.2026:** Выполнен запуск `daily_lead_aggregator.py` по всем 6 ключевым запросам (`ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`).

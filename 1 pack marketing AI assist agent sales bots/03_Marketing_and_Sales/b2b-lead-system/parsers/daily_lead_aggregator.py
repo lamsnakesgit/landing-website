@@ -309,16 +309,20 @@ async def main(test_mode: bool = False):
     
     # --- ИИ-анализ (Генерация офферов и драфтов сообщений) ---
     openai_client = get_openai_client()
-    analyzed_companies = []
     
-    log.info("Запуск ИИ-анализа и генерации 1-х сообщений + офферов...")
+    log.info("Запуск параллельного ИИ-анализа и генерации 1-х сообщений + офферов...")
     companies_to_analyze = enriched_companies[:3] if test_mode else enriched_companies
-    for idx, c in enumerate(companies_to_analyze):
-        log.info(f"[{idx+1}/{len(companies_to_analyze)}] ИИ-анализ: {c.get('name')}")
-        ai_analysis = await analyze_lead_with_ai(openai_client, c, all_vacancies)
-        enriched_c = {**c, **ai_analysis}
-        analyzed_companies.append(enriched_c)
-        await asyncio.sleep(0.3)
+    sem = asyncio.Semaphore(10)
+    
+    async def process_single_company(idx, c):
+        async with sem:
+            log.info(f"[{idx+1}/{len(companies_to_analyze)}] ИИ-анализ: {c.get('name')}")
+            ai_analysis = await analyze_lead_with_ai(openai_client, c, all_vacancies)
+            return {**c, **ai_analysis}
+            
+    tasks = [process_single_company(i, c) for i, c in enumerate(companies_to_analyze)]
+    analyzed_companies = list(await asyncio.gather(*tasks))
+
         
     # --- Сохранение JSON ---
     json_path = os.path.join(output_dir, "leads.json")
