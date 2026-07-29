@@ -1,0 +1,3 @@
+- [x] Defined and saved room search requirements (docs/room_search_requirements.md).
+- [ ] Implement Krisha.kz/OLX.kz monitoring bot.
+- [ ] Connect Telegram bot to notify the user.
