@@ -1,4 +1,21 @@
 
+## 2026-07-31: Проверка и запуск системы ежедневного сбора B2B-контактов и ИИ-драфтов (Daily Leadgen Pipeline)
+
+**Победы (Wins):**
+- **Полное выполнение задачи по 4 площадкам:** Выполнен ежедневный сбор B2B-контактов с `adata.kz`, `hh.ru`, `hh.kz`, `threads.net` по всем 6 ключевым запросам (*ии, разработка, боты, маркетинг, контекстная реклама, ии контент*).
+- **Собрано 159 целевых лидов за сегодня (2026-07-31):** Сформированы персональные гипотезы болей, разработанные офферы ("Что предложить") и драфты 1-х сообщений через Vertex AI (Gemini 2.5 Flash).
+- **Сохранение результатов:**
+  - Сводка: `03_Marketing_and_Sales/daily_leads/2026-07-31/leads_summary.md`
+  - Таблица Excel/CSV: `03_Marketing_and_Sales/daily_leads/2026-07-31/leads.csv`
+  - Данные JSON: `03_Marketing_and_Sales/daily_leads/2026-07-31/leads.json`
+  - Индивидуальные карточки лидов (159 файлов с офферами и сообщениями): `03_Marketing_and_Sales/daily_leads/2026-07-31/details/`
+- **Автоматизация:** Cron ежедневно в 09:00 запускает `run_daily_leadgen.sh`.
+- **Дублирование на английском (EN):** Executed daily B2B leadgen pipeline across `adata.kz`, `hh.ru`, `hh.kz`, `threads.net` for 6 keywords. Generated 159 customized leads with AI offers and 1st message outreach drafts stored in `03_Marketing_and_Sales/daily_leads/2026-07-31/details/`.
+
+**Ошибки и как решили (Problems & Solutions):**
+- Система работает в штатном режиме. Все 159 карточек лидов полностью сформированы.
+- [EN] System operates autonomously without errors. 159 individual lead cards fully populated with offers and messages.
+
 ## 2026-07-30: Проверка и верификация системы ежедневного сбора B2B-контактов и ИИ-драфтов (Daily Leadgen Pipeline)
 
 **Победы (Wins):**
@@ -414,4 +431,26 @@
 - **Решение:** Семафор с ограничением параллелизма (max 10) и автоматическая обработка 429 ответов предотвращают сбои.
 - [EN] Managed API load with concurrency semaphore (max 10) and automatic 429 response handling.
 
+## 2026-07-31: Ежедневная верификация сбора контактов (HH, Adata, Threads)
+**Победы (Wins):**
+- Успешно проверен и подтвержден рабочий ежедневный автосбор контактов с платформ `adata.kz`, `hh.ru`, `hh.kz` и `threads.net` по всем 6 поисковым ключевым словам: `ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`.
+- В текущем массиве за `2026-07-31` обработано **159 уникальных целевых лидов**:
+  - `hh.kz`: 91 лид;
+  - `hh.ru`: 35 лидов;
+  - `threads.net`: 32 лида;
+  - `adata.kz`: 1 лид.
+- Для каждого лида ИИ на базе Vertex AI (Gemini 2.5 Flash) сформулировал:
+  1. Выявленные боли и потребности компании/автора;
+  2. Персонализированное предложение (оффер);
+  3. Готовый драфт 1-го сообщения для первичного контакта в WhatsApp/Telegram/LinkedIn/Email.
+- Все результаты сохранены в папке `03_Marketing_and_Sales/daily_leads/2026-07-31/`:
+  - `leads_summary.md` — сводный отчет и таблицы;
+  - `leads.csv` и `leads.json` — структурированные базы для экспорта/CRM;
+  - `details/` — **159 персональных `.md` карточек** под каждый лид со всеми деталями.
+- Подтверждена активность расписания в `crontab` (ежедневный запуск в 09:00).
+- [EN] Verified and active daily B2B lead generation for 2026-07-31 across hh.ru, hh.kz, adata.kz, threads.net for queries: `ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`. Generated 159 individual lead pitches and custom offers via Vertex AI (Gemini 2.5 Flash), saving all structured files in `03_Marketing_and_Sales/daily_leads/2026-07-31/` with 159 lead `.md` cards in `details/`. Daily crontab at 09:00 AM confirmed active.
 
+**Ошибки и решения (Problems & Solutions):**
+- Обработка сотен компаний требовала сохранения стабильности браузерных парсеров при изменении структуры страниц.
+- **Решение:** В `playwright_leadgen.py` реализованы fallback-селекторы и эмуляция живого пользователя без WebDriver флагов.
+- [EN] Handled site markup variances gracefully with fallback Playwright selectors and stealth mode navigator settings.
