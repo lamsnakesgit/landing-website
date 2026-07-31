@@ -16,15 +16,15 @@ logger.add("logs/telegram_agent_bot.log", rotation="10 MB", retention="7 days", 
 
 # Загрузка переменных окружения
 load_dotenv()
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-ALLOWED_USER_ID_STR = os.getenv("ALLOWED_TELEGRAM_USER_ID")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") or os.getenv("ANTIGRAVITY_BOT_TOKEN")
+ALLOWED_USER_ID_STR = os.getenv("ALLOWED_TELEGRAM_USER_ID") or os.getenv("TG_CHAT_ID_MAIN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Проверка ключей
 if not TELEGRAM_BOT_TOKEN:
-    logger.error("Критическая ошибка: TELEGRAM_BOT_TOKEN не задан в .env!")
+    logger.error("Критическая ошибка: TELEGRAM_BOT_TOKEN и ANTIGRAVITY_BOT_TOKEN не заданы в .env!")
 if not ALLOWED_USER_ID_STR:
-    logger.error("Критическая ошибка: ALLOWED_TELEGRAM_USER_ID не задан в .env!")
+    logger.error("Критическая ошибка: ALLOWED_TELEGRAM_USER_ID и TG_CHAT_ID_MAIN не заданы в .env!")
 if not OPENAI_API_KEY:
     logger.error("Критическая ошибка: OPENAI_API_KEY не задан в .env!")
 
@@ -36,7 +36,7 @@ if OPENAI_API_KEY:
     clean_key = OPENAI_API_KEY.strip().rstrip('.')
     openai_client = OpenAI(api_key=clean_key)
 
-WORKSPACE_DIR = "/Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots"
+WORKSPACE_DIR = os.getenv("WORKSPACE_DIR") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Ограничение истории диалога
 MAX_HISTORY = 20

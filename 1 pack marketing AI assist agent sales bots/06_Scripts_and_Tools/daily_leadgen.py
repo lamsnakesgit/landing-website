@@ -15,25 +15,32 @@ from openai import OpenAI
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Импорт OSINT обогатителя и парсеров соцсетей
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 try:
     from lpr_enricher import enrich_lead_data
+except ImportError:
+    enrich_lead_data = None
+
+try:
     from threads_parser import parse_threads_leads
+except ImportError:
+    parse_threads_leads = None
+
+try:
     from twitter_x_parser import parse_twitter_x_leads
+except ImportError:
+    parse_twitter_x_leads = None
+
+try:
     from linkedin_parser import parse_linkedin_leads
+except ImportError:
+    parse_linkedin_leads = None
+
+try:
     from telegram_chat_parser import parse_telegram_chat_leads
 except ImportError:
-    try:
-        from 06_Scripts_and_Tools.lpr_enricher import enrich_lead_data
-        from 06_Scripts_and_Tools.threads_parser import parse_threads_leads
-        from 06_Scripts_and_Tools.twitter_x_parser import parse_twitter_x_leads
-        from 06_Scripts_and_Tools.linkedin_parser import parse_linkedin_leads
-        from 06_Scripts_and_Tools.telegram_chat_parser import parse_telegram_chat_leads
-    except ImportError:
-        enrich_lead_data = None
-        parse_threads_leads = None
-        parse_twitter_x_leads = None
-        parse_linkedin_leads = None
-        parse_telegram_chat_leads = None
+    parse_telegram_chat_leads = None
 
 # Установка глобального таймаута для сокетов
 socket.setdefaulttimeout(35)
