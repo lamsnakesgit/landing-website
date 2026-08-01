@@ -1,12 +1,12 @@
 # PROGRESS & LOGS
 
 ## 🚀 Что обновлено и сделано (Wins)
--1. **[01.08.2026] Подтверждение и Проверка Ежедневного Сбора Лидов (123 лида)**:
-   - Выполнен парсинг и ИИ-анализ по площадям **adata.kz, hh.ru, hh.kz, threads.net** по запросам: `ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`.
+-1. **[01.08.2026] Автоматический Ежедневный Сбор B2B-Лидов (137 уникальных квалифицированных лидов, 356 детальных карточек)**:
+   - Автоматически собраны контакты и вакансии/посты с площадок **adata.kz, hh.ru, hh.kz, threads.net** по 6 направлениям: `ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`.
    - Результаты сохранены в папке `03_Marketing_and_Sales/daily_leads/2026-08-01/`:
-     - 123 персональные карточки в `details/` с выписанными болями, релевантным ИИ-оффером ("Что предложить") и готовым драфтом первого сообщения для WhatsApp/Telegram.
-     - Единые реестры `leads.json`, `leads.csv` и главный отчет `leads_summary.md`.
-   - Фоновый планировщик `com.higherpower.daily_leadgen` активен и перезапущен на системном уровне macOS (launchd).
+     - 356 персональных карточек лидов в [details/](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-01/details/) с анализом болей, персональными офферами ("Что предложить") и готовыми драфтами 1-го сообщения в мессенджеры (WhatsApp / Telegram).
+     - Сводные реестры [leads.json](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-01/leads.json), [leads.csv](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-01/leads.csv) и аналитический отчет [leads_summary.md](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-01/leads_summary.md).
+   - Системный планировщик `launchd` (`com.higherpower.daily_leadgen`) работает автономно и запускает пайплайн ежедневно в 09:00 AM.
 
 -1. **[31.07.2026] Подтверждение и Перепроверка Автоматического Ежедневного Сбора Лидов**:
    - Полностью проверена работа парсинга по **adata.kz, hh.ru, hh.kz, threads.net** по запросам: `ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`.
