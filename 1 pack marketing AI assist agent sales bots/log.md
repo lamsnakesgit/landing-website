@@ -158,4 +158,18 @@
 - **Структура хранения:** Файлы сохранены в папке `03_Marketing_and_Sales/daily_leads/2026-07-22/` (`leads_summary.md`, `leads.csv`, `leads.json`, `details/1_Zekir_Numani.md`, `details/2_ТОО_Алмата_Инструмент...md` и др.).
 - [EN] Successfully executed daily lead aggregator pipeline for 2026-07-22. Verified data extraction from adata.kz, hh.ru, hh.kz, threads.net, AI analysis via Vertex AI Gemini 2.5 Flash, offer generation, 1st message draft creation, and file structure in `03_Marketing_and_Sales/daily_leads/2026-07-22/details/`.
 
+## 2026-08-02: Успешная установка Playwright браузеров, запуск конвейера сбора лидов и регистрация планера macOS Launchd (Daily Leadgen Production Active)
+**Победы (Wins) / Победы:**
+- **Полная автоматизация сбора лидов по 4 источникам:** Проверен и запущен конвейер сбора контактов с `adata.kz` (`pk.uchet.kz`), `hh.ru`, `hh.kz` и `threads.net` по всем 6 целевым запросам: `ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`.
+- **Генерация персонализированных офферов и драфтов 1-го сообщения:** Для всех квалифицированных контактов с помощью Gemini 2.5 Flash через Vertex AI прямо сформированы:
+  - Драфт 1-го разговорного сообщения с хуком и мягким CTA;
+  - Персонализированный список предложений ("Что предложить компании");
+  - Анализ болей и гипотеза проблемы бизнеса;
+  - Оценка лида (AI Score 1-10).
+- **Сохранение в папки по дате (`2026-08-02`):** Сформированы 25 отдельных карточек в `03_Marketing_and_Sales/daily_leads/2026-08-02/details/` (например `1_ТОО_HeadHunter__Казахстан.md`, `3_ИП_Глушкова_Ксения_Евгеньевна.md`, `6_ТОО_DauInvest.md`), а также сводные файлы `leads_qualified.json` и `leads_summary.csv`.
+- **Настройка автоматического расписания:** Зарегистрирован агент `com.higherpower.daily_leadgen` в launchd macOS, который гарантирует ежедневный запуск сбора каждое утро в 09:00.
+- **Отправка в Telegram:** Результаты и живые карточки контактов рассылаются прямо в Telegram Sales Hub.
 
+**Ошибки и решения (Problems & Solutions) / Ошибки и решения:**
+- **Проблема (Issue):** При первом запуске Playwright скрипта возникла ошибка отсутствия исполнимого файла `chrome-headless-shell`.
+- **Решение (Solution):** Выполнена установка полной браузерной подсистемы `playwright install chromium`, после чего конвейер полностью отработал без сбоев.
