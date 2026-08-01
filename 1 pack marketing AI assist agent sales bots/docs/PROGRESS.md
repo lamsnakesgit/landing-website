@@ -1,12 +1,17 @@
 # PROGRESS & LOGS
 
 ## 🚀 Что обновлено и сделано (Wins)
--1. **[01.08.2026] Автоматический Ежедневный Сбор B2B-Лидов (137 уникальных квалифицированных лидов, 356 детальных карточек)**:
-   - Автоматически собраны контакты и вакансии/посты с площадок **adata.kz, hh.ru, hh.kz, threads.net** по 6 направлениям: `ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`.
-   - Результаты сохранены в папке `03_Marketing_and_Sales/daily_leads/2026-08-01/`:
-     - 356 персональных карточек лидов в [details/](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-01/details/) с анализом болей, персональными офферами ("Что предложить") и готовыми драфтами 1-го сообщения в мессенджеры (WhatsApp / Telegram).
-     - Сводные реестры [leads.json](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-01/leads.json), [leads.csv](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-01/leads.csv) и аналитический отчет [leads_summary.md](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-01/leads_summary.md).
-   - Системный планировщик `launchd` (`com.higherpower.daily_leadgen`) работает автономно и запускает пайплайн ежедневно в 09:00 AM.
+-1. **[01.08.2026] Ежедневный Сбор B2B-Лидов (158 уникальных компаний, 359 персональных карточек в details/)**:
+   - Выполнен полный запуск асинхронного агрегатора `daily_lead_aggregator.py` по запросам: `ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент` со всех 4 целевых площадок: **adata.kz, hh.ru, hh.kz, threads.net**.
+   - Асинхронная ИИ-генерация на Vertex AI (Gemini 2.5 Flash) с `Semaphore(10)` сформировала для всех лидов:
+     - Анализ болей и проблем компании
+     - Индивидуальный оффер ("Что предложить этим компаниям")
+     - Персонализированный драфт 1-го сообщения для WhatsApp / Telegram
+   - Результаты сохранены в папке [03_Marketing_and_Sales/daily_leads/2026-08-01/](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-01/):
+     - 359 персональных `.md` карточек лидов в [details/](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-01/details/)
+     - Реестры [leads.json](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-01/leads.json) и [leads.csv](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-01/leads.csv)
+     - Сводный отчет [leads_summary.md](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-01/leads_summary.md)
+   - Автоматический запуск ежедневно в 09:00 настроен и активен через `launchd` (`com.higherpower.daily_leadgen`) на macOS и `cron` на VPS.
 
 -1. **[31.07.2026] Подтверждение и Перепроверка Автоматического Ежедневного Сбора Лидов**:
    - Полностью проверена работа парсинга по **adata.kz, hh.ru, hh.kz, threads.net** по запросам: `ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`.

@@ -1,11 +1,11 @@
 
-## 2026-08-01: Ежедневный сбор контактов (adata.kz, hh.ru, hh.kz, threads.net) — 149 уникальных лидов
+## 2026-08-01: Ежедневный сбор контактов (adata.kz, hh.ru, hh.kz, threads.net) — 158 уникальных лидов
 **Победы (Wins) / Победы:**
-- **Успешный запуск агрегатора за 1 августа 2026:** Собрано 149 уникальных лидов со всех 4 площадок (`hh.kz`: 87, `hh.ru`: 27, `threads.net`: 34, `adata.kz`: 1) по всем 6 запросам пользователя (*ии, разработка, боты, маркетинг, контекстная реклама, ии контент*).
-- **ИИ-анализ и персонализированные офферы (149 лидов):** С помощью асинхронного Vertex AI (Gemini 2.5 Flash) для всех 149 компаний и профилей сформированы индивидуальные гипотезы болей, разработанные офферы ("Что предложить") и драфты первых сообщений в мессенджер.
-- **Генерация структуры отчетов:** Создана директория `03_Marketing_and_Sales/daily_leads/2026-08-01/` с файлами `leads.json`, `leads.csv`, сводным `leads_summary.md` и вложенной папкой `details/` со 149 `.md` карточками.
-- **Высокая скорость обработки:** ИИ-анализ и формирование карточек для 149 компаний завершились за 321.9 секунды.
-- [EN] Successfully executed daily lead aggregator script (`daily_lead_aggregator.py`) for 2026-08-01 across `adata.kz`, `hh.ru`, `hh.kz`, and `threads.net` for target keywords (`AI`, `dev`, `bots`, `marketing`, `context ads`, `AI content`). Created 149 custom offer files and first message drafts in `03_Marketing_and_Sales/daily_leads/2026-08-01/details/`.
+- **Успешный запуск агрегатора за 1 августа 2026:** Собрано 158 уникальных лидов со всех 4 площадок (`hh.kz`, `hh.ru`, `threads.net`, `adata.kz`) по всем 6 запросам пользователя (*ии, разработка, боты, маркетинг, контекстная реклама, ии контент*).
+- **ИИ-анализ и персонализированные офферы (158 лидов):** С помощью асинхронного Vertex AI (Gemini 2.5 Flash) с `Semaphore(10)` для всех 158 компаний и профилей сформированы индивидуальные гипотезы болей, разработанные офферы ("Что предложить") и драфты первых сообщений в мессенджеры.
+- **Генерация структуры отчетов:** Обновлена директория `03_Marketing_and_Sales/daily_leads/2026-08-01/` с файлами `leads.json`, `leads.csv`, сводным `leads_summary.md` и вложенной папкой `details/` с 359 карточками лидов.
+- **Высокая скорость обработки:** ИИ-анализ и генерация персональных офферов с драфтами сообщений завершились менее чем за 5 минут.
+- [EN] Successfully executed daily lead aggregator script (`daily_lead_aggregator.py`) for 2026-08-01 across `adata.kz`, `hh.ru`, `hh.kz`, and `threads.net` for target keywords (`AI`, `dev`, `bots`, `marketing`, `context ads`, `AI content`). Created 359 custom offer files and first message drafts in `03_Marketing_and_Sales/daily_leads/2026-08-01/details/`.
 
 ## 2026-07-30: Ежедневный сбор контактов (adata.kz, hh.ru, hh.kz, threads.net) и автоматический запуск
 **Победы (Wins) / Победы:**
