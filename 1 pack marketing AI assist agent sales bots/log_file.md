@@ -471,3 +471,23 @@
 - Обработка сотен компаний требовала сохранения стабильности браузерных парсеров при изменении структуры страниц.
 - **Решение:** В `playwright_leadgen.py` реализованы fallback-селекторы и эмуляция живого пользователя без WebDriver флагов.
 - [EN] Handled site markup variances gracefully with fallback Playwright selectors and stealth mode navigator settings.
+
+## 2026-08-01: Ежедневный запуск и верификация системы автосбора лидов (adata.kz, hh.ru, hh.kz, threads.net)
+**Победы (Wins):**
+- Проверена и подтверждена полная работоспособность автоматической системы ежедневного сбора B2B контактов по 6 ключевым запросам: `ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент` с платформ **adata.kz**, **hh.ru**, **hh.kz**, **threads.net**.
+- Собрана свежая база лидов за `2026-08-01` (сохранена в [03_Marketing_and_Sales/daily_leads/2026-08-01/](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-01/)):
+  - `leads_summary.md` — аналитический сводный отчёт и таблицы;
+  - `leads.csv` и `leads.json` — полная выгрузка базы для экселя/CRM;
+  - `details/` — **357 индивидуальных `.md` карточек** на каждый лид.
+- Для каждой компании и профиля с помощью Vertex AI (Gemini 2.5 Flash) сгенерированы:
+  1. Выявленные боли бизнеса и задачи;
+  2. Персонализированный ИИ-оффер (что предложить компании);
+  3. Готовый готовый драфт 1-го сообщения для рассылки/связи в WhatsApp / Telegram / Email.
+- Подтвержден автоматический запуск системы в crontab ежедневно в 09:00 утра (`0 9 * * * run_daily_leadgen.sh`).
+- [EN] Verified and executed daily lead generation pipeline for 2026-08-01 across `adata.kz`, `hh.ru`, `hh.kz`, `threads.net` for 6 keywords: `ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`. AI analysis using Gemini 2.5 Flash generated business pains, tailored offers, and 1st message drafts. Created 357 individual lead files in `03_Marketing_and_Sales/daily_leads/2026-08-01/details/`. Confirmed active daily cron execution at 09:00 AM.
+
+**Ошибки и решения (Problems & Solutions):**
+- Предотвращение блокировок API при одновременной генерации сотен офферов и драфтов.
+- **Решение:** Использование лимитирующего семафора и fallback на автоматический ретрай с экспоненциальной задержкой.
+- [EN] Protected API calls via concurrency limits and automatic exponential backoff retries.
+
