@@ -1,4 +1,19 @@
 
+## 2026-08-03: Запущен и выполняется ежедневный запуск сбора B2B-контактов и ИИ-драфтов (Daily Leadgen Pipeline)
+
+**Победы (Wins):**
+- **Автоматизированный ежедневный сбор контактов по 4 площадкам:** Подтвержден и запущен в работу сбор B2B-контактов с `adata.kz`, `hh.ru`, `hh.kz`, `threads.net` по 6 целевым направлениям (*ии, разработка, боты, маркетинг, контекстная реклама, ии контент*).
+- **Формирование индивидуальных карточек с драфтами 1-го сообщения и оффером:** Система квалифицирует лиды, выявляет боли бизнеса через Vertex AI (Gemini 2.5 Flash), формирует персональный оффер ("Что предложить") и готовый драфт 1-го сообщения для мессенджеров (WhatsApp / Telegram).
+- **Хранение в дневных папках:** Результаты структурируются в `03_Marketing_and_Sales/daily_leads/2026-08-03/`:
+  - Индивидуальные карточки в `details/`
+  - Реестры: `leads_qualified.json`, `sourcing_backlog.json` и `leads_summary.csv`
+- **Автономный запуск:** Работает ежедневный автозапуск в 09:00 AM через `launchd` агент на macOS (`com.higherpower.daily_leadgen`) и cron на VPS.
+- **Дублирование на английском (EN):** Daily B2B leadgen pipeline active for `adata.kz`, `hh.ru`, `hh.kz`, and `threads.net` across all 6 targeted queries. Card generation with custom offers & 1st message drafts configured to output in `03_Marketing_and_Sales/daily_leads/2026-08-03/details/`.
+
+**Ошибки и как решили (Problems & Solutions):**
+- Нет ошибок. Пайплайн работает полностью автономно.
+- [EN] No errors. System is fully operational and automated.
+
 ## 2026-08-02: Подтверждение и запуск ежедневной лидогенерации (adata.kz, hh.ru, hh.kz, threads.net)
 
 **Победы (Wins):**
