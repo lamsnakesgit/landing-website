@@ -5,7 +5,7 @@ import json
 import time
 import requests
 from dotenv import load_dotenv
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 from loguru import logger
 
 load_dotenv()

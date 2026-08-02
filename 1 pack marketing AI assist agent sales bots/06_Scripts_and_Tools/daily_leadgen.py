@@ -386,18 +386,50 @@ def save_local_results(qualified_leads, backlog_leads, date_str):
         clean_company = re.sub(r'[^a-zA-Z0-9_а-яА-Я]', '_', lead['company_name'])
         detail_file = f"{base_dir}/details/{idx}_{clean_company}.md"
         
+        offers_list = lead.get('offer_details') or [
+            "Внедрение ИИ-агентов продаж 24/7 для квалификации и закрытия заявок в WhatsApp/Telegram",
+            "Сквозные автоворонки обработки лидов на n8n со спикерами и интеграцией CRM",
+            "Автоматическая генерация рекламных креативов и ИИ-контента для маркетинга",
+            "Оптимизация контекстной рекламы с умным ИИ-конвертером входящего трафика"
+        ]
+        if isinstance(offers_list, list):
+            offers_str = "\n".join([f"- {item}" for item in offers_list])
+        else:
+            offers_str = f"- {offers_list}"
+
         details_content = f"""# 🎯 Квалифицированный Лид: {lead['company_name']}
 
 - **ЛПР / Контакт**: {lead.get('name', 'Не указано')}
-- **📞 Телефон**: `{lead.get('phone') or 'Нет'}`
-- **📲 WhatsApp**: `{lead.get('whatsapp') or 'Нет'}`
-- **✈️ Telegram**: `{lead.get('telegram') or 'Нет'}`
-- **✉️ Email**: `{lead.get('email') or 'Нет'}`
-- **Источник**: {lead['source']}
+- **Ниша / Запрос**: {lead.get('query', 'Общий')}
+- **Город**: {lead.get('city', 'Не указан')}
+- **Источник**: {lead.get('source', 'Не указан')}
+- **Ссылка**: {lead.get('url', 'Нет')}
 - **Оценка ИИ**: **{lead.get('ai_score', 7)}/10**
 
-### 💡 Питч сообщения:
+---
+
+## 📇 Контакты для связи
+- **📞 Телефон**: `{lead.get('phone') or 'Нет'}`
+- **📲 WhatsApp**: {f"[{lead.get('phone')}]({lead.get('whatsapp')})" if lead.get('whatsapp') else '`Нет`'}
+- **✈️ Telegram**: `{lead.get('telegram') or 'Нет'}`
+- **✉️ Email**: `{lead.get('email') or 'Нет'}`
+
+---
+
+## 💬 Драфт 1-го сообщения в мессенджер
 > {lead.get('generated_pitch', '')}
+
+---
+
+## 💼 Что предложить этой компании (Персонализированный оффер)
+{offers_str}
+
+---
+
+## 🔍 Аналитика и гипотеза проблемы
+- **Гипотеза проблемы**: {lead.get('pain_hypothesis', 'Ручная обработка входящих заявок и потеря лидов во нерабочее время')}
+- **Роль контакта**: {lead.get('role_guess', 'Руководитель / ЛПР')}
+- **Угол захода**: {lead.get('offer_angle', 'Автоматизация продаж и внедрение ИИ')}
 """
         with open(detail_file, "w", encoding="utf-8") as f:
             f.write(details_content)

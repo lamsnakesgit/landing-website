@@ -2,7 +2,7 @@ import os
 import re
 import json
 import logging
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 
 logger = logging.getLogger(__name__)
 
