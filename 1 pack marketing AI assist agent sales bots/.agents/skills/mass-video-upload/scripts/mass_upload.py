@@ -2,6 +2,7 @@ import os
 import json
 import subprocess
 import time
+from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -23,6 +24,15 @@ google_drive_files = [
 yt_url = "https://gateway.maton.ai/youtube/upload/youtube/v3/videos?uploadType=multipart&part=snippet,status"
 gd_url = "https://gateway.maton.ai/google-drive/upload/drive/v3/files?uploadType=multipart"
 
+def get_file_dates(file_path):
+    try:
+        stat = os.stat(file_path)
+        created = datetime.fromtimestamp(stat.st_birthtime if hasattr(stat, 'st_birthtime') else stat.st_ctime).strftime('%Y-%m-%d %H:%M:%S')
+        modified = datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
+        return f"Created: {created}\nModified: {modified}"
+    except Exception:
+        return "Dates: Unknown"
+
 print(f"Starting upload job. Google Drive: {len(google_drive_files)} files, YouTube: {len(youtube_files)} files.", flush=True)
 
 # Google Drive Uploads
@@ -32,9 +42,15 @@ for idx, file_path in enumerate(google_drive_files):
         continue
     
     filename = os.path.basename(file_path)
+    dates_info = get_file_dates(file_path)
+    description = f"Uploaded via Maton AI Gateway\n{dates_info}"
+    
     print(f"[Google Drive {idx+1}/{len(google_drive_files)}] Uploading {filename}...", flush=True)
     
-    metadata = {"name": filename}
+    metadata = {
+        "name": filename,
+        "description": description
+    }
     cmd = [
         "curl", "-s", "-X", "POST", gd_url,
         "-H", f"Authorization: Bearer {API_KEY}",
@@ -56,12 +72,15 @@ for idx, file_path in enumerate(youtube_files):
         continue
         
     filename = os.path.basename(file_path)
+    dates_info = get_file_dates(file_path)
+    description = f"Uploaded via Maton AI Gateway\n{dates_info}"
+    
     print(f"\n[YouTube {idx+1}/{total_yt}] Uploading {filename}...", flush=True)
     
     metadata = {
         "snippet": {
             "title": filename,
-            "description": "Uploaded via Maton AI Gateway"
+            "description": description
         },
         "status": {
             "privacyStatus": "unlisted"
