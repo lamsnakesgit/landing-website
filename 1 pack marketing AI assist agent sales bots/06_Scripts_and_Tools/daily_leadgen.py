@@ -96,7 +96,7 @@ def has_valid_contact(lead):
 def search_hh_vacancies(text_query, area_id, per_page=10):
     """Ищет вакансии на HH.ru/HH.kz по запросу и региону"""
     logger.info(f"HH: Поиск вакансий '{text_query}' в регионе {area_id}...")
-    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+    headers = {"User-Agent": "LeadGenOS/1.0 (contact@leadgen-bot.com)"}
     params = {"text": text_query, "area": area_id, "per_page": per_page, "page": 0}
     try:
         response = requests.get(HH_API_URL, params=params, headers=headers, timeout=10)
@@ -109,7 +109,7 @@ def search_hh_vacancies(text_query, area_id, per_page=10):
 def get_hh_vacancy_details(vacancy_id):
     """Получает детальную информацию по вакансии, включая контакты"""
     url = f"{HH_API_URL}/{vacancy_id}"
-    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+    headers = {"User-Agent": "LeadGenOS/1.0 (contact@leadgen-bot.com)"}
     try:
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
@@ -143,6 +143,16 @@ def collect_hh_leads():
     backup_path = "06_Scripts_and_Tools/hh_leads.json"
     leads = []
     
+    if os.path.exists(backup_path):
+        try:
+            with open(backup_path, "r", encoding="utf-8") as f:
+                leads = json.load(f)
+            if leads:
+                logger.info(f"Загружено {len(leads)} лидов HH из локального кэша {backup_path}")
+                return leads
+        except Exception as e:
+            logger.error(f"Ошибка чтения {backup_path}: {e}")
+
     queries = ["ии", "разработка", "боты", "маркетинг", "контекстная реклама", "ии контент"]
     regions = {"hh.ru": 113, "hh.kz": 40}
     seen_ids = set()
@@ -185,13 +195,6 @@ def collect_hh_leads():
                 json.dump(leads, f, ensure_ascii=False, indent=2)
         except Exception as e:
             logger.warning(f"Не удалось сохранить кэш hh_leads.json: {e}")
-    elif os.path.exists(backup_path):
-        logger.info("HH API не вернул вакансий, используем локальный бэкап hh_leads.json...")
-        try:
-            with open(backup_path, "r", encoding="utf-8") as f:
-                leads = json.load(f)
-        except Exception as e:
-            logger.error(f"Ошибка чтения бэкапа hh_leads.json: {e}")
 
     return leads
 

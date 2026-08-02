@@ -5,7 +5,13 @@ import json
 import time
 import requests
 from dotenv import load_dotenv
-from ddgs import DDGS
+try:
+    from duckduckgo_search import DDGS
+except ImportError:
+    try:
+        from ddgs import DDGS
+    except ImportError:
+        DDGS = None
 from loguru import logger
 
 load_dotenv()
