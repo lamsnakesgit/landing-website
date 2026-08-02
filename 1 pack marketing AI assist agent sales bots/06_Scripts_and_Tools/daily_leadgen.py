@@ -42,6 +42,11 @@ try:
 except ImportError:
     parse_telegram_chat_leads = None
 
+try:
+    from adata_parser import parse_adata_leads
+except ImportError:
+    parse_adata_leads = None
+
 # Установка глобального таймаута для сокетов
 socket.setdefaulttimeout(35)
 
@@ -91,7 +96,7 @@ def has_valid_contact(lead):
 def search_hh_vacancies(text_query, area_id, per_page=10):
     """Ищет вакансии на HH.ru/HH.kz по запросу и региону"""
     logger.info(f"HH: Поиск вакансий '{text_query}' в регионе {area_id}...")
-    headers = {"User-Agent": "AIAgentOutreach/1.0 (info@aiconicvibe.store)"}
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
     params = {"text": text_query, "area": area_id, "per_page": per_page, "page": 0}
     try:
         response = requests.get(HH_API_URL, params=params, headers=headers, timeout=10)
@@ -104,7 +109,7 @@ def search_hh_vacancies(text_query, area_id, per_page=10):
 def get_hh_vacancy_details(vacancy_id):
     """Получает детальную информацию по вакансии, включая контакты"""
     url = f"{HH_API_URL}/{vacancy_id}"
-    headers = {"User-Agent": "AIAgentOutreach/1.0 (info@aiconicvibe.store)"}
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
     try:
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
@@ -134,26 +139,10 @@ def extract_contacts_from_hh(vacancy_details):
     return name, email, phone_val
 
 def collect_hh_leads():
-    """Собирает лидов по всем ключевым словам с HH.ru и HH.kz"""
+    """Собирает лидов по целевым запросам с HH.ru и HH.kz"""
     backup_path = "06_Scripts_and_Tools/hh_leads.json"
     leads = []
     
-    if os.path.exists(backup_path):
-        logger.info("Обнаружен локальный файл hh_leads.json. Загружаем данные...")
-        try:
-            with open(backup_path, "r", encoding="utf-8") as f:
-                backup_leads = json.load(f)
-                for l in backup_leads:
-                    l.setdefault("phone", "")
-                    l.setdefault("email", "")
-                    l.setdefault("whatsapp", "")
-                    l.setdefault("telegram", "")
-                    leads.append(l)
-            logger.info(f"Загружено {len(leads)} лидов из hh_leads.json.")
-            return leads
-        except Exception as e:
-            logger.error(f"Ошибка чтения hh_leads.json: {e}")
-
     queries = ["ии", "разработка", "боты", "маркетинг", "контекстная реклама", "ии контент"]
     regions = {"hh.ru": 113, "hh.kz": 40}
     seen_ids = set()
@@ -188,7 +177,21 @@ def collect_hh_leads():
                     "city": item.get("area", {}).get("name", ""),
                     "query": query
                 })
-                time.sleep(0.3)
+                time.sleep(0.2)
+
+    if leads:
+        try:
+            with open(backup_path, "w", encoding="utf-8") as f:
+                json.dump(leads, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.warning(f"Не удалось сохранить кэш hh_leads.json: {e}")
+    elif os.path.exists(backup_path):
+        logger.info("HH API не вернул вакансий, используем локальный бэкап hh_leads.json...")
+        try:
+            with open(backup_path, "r", encoding="utf-8") as f:
+                leads = json.load(f)
+        except Exception as e:
+            logger.error(f"Ошибка чтения бэкапа hh_leads.json: {e}")
 
     return leads
 
@@ -485,23 +488,26 @@ def send_telegram_notification(qualified_leads, backlog_count):
             logger.error(f"Ошибка отправки карточки лида №{idx}: {e}")
 
 def main():
-    logger.info("=== Запуск LeadGen OS (Contact Validation Strict Mode + Multi-Channel Social) ===")
+    logger.info("=== Запуск LeadGen OS (Contact Validation Strict Mode + adata.kz + threads.net + HH) ===")
+    
+    queries = ["ии", "разработка", "боты", "маркетинг", "контекстная реклама", "ии контент"]
     
     hh_leads = collect_hh_leads()
     external_leads = load_external_leads()
     court_leads = load_court_leads()
     
     social_leads = []
-    queries = ["ищу маркетолога", "нужен бот", "разработка ИИ", "нужна автоворонка"]
     for q in queries:
         if parse_threads_leads:
             social_leads.extend(parse_threads_leads(q, max_results=5))
+        if parse_adata_leads:
+            social_leads.extend(parse_adata_leads(q, max_results=5))
         if parse_twitter_x_leads:
-            social_leads.extend(parse_twitter_x_leads(q, max_results=5))
+            social_leads.extend(parse_twitter_x_leads(q, max_results=3))
         if parse_linkedin_leads:
-            social_leads.extend(parse_linkedin_leads(q, max_results=5))
+            social_leads.extend(parse_linkedin_leads(q, max_results=3))
         if parse_telegram_chat_leads:
-            social_leads.extend(parse_telegram_chat_leads(q, max_results=5))
+            social_leads.extend(parse_telegram_chat_leads(q, max_results=3))
     
     raw_leads = []
     seen_keys = set()
@@ -513,7 +519,7 @@ def main():
             seen_keys.add(key)
             raw_leads.append(l)
 
-    logger.info(f"Всего собрано исходных лидов: {len(raw_leads)}")
+    logger.info(f"Всего собрано исходных лидов с adata.kz, hh.ru, hh.kz, threads.net: {len(raw_leads)}")
 
     # 1. Прогон через OSINT Enricher для тех, у кого нет прямых контактов
     qualified_leads = []
