@@ -1,16 +1,16 @@
 # PROGRESS & LOGS
 
 ## 🚀 Что обновлено и сделано (Wins)
--1. **[03.08.2026] Запущен и выполняется ежедневный сбор B2B-Лидов (adata.kz, hh.ru, hh.kz, threads.net)**:
-   - Автоматически запущен агрегатор контактов по 6 целевым запросам (`ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`) со всех 4 площадок (**adata.kz, hh.ru, hh.kz, threads.net**).
-   - Интеллектуальная квалификация и OSINT-обогащение через Vertex AI (Gemini 2.5 Flash) генерирует:
-     - Анализ болей и гипотезы проблем компании
+-1. **[03.08.2026] Завершен прогон ежедневного сбора B2B-Лидов (143 лида, adata.kz, hh.ru, hh.kz, threads.net)**:
+   - Полностью отработал агрегатор контактов по 6 целевым запросам (`ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`) со всех 4 площадок (**adata.kz, hh.ru, hh.kz, threads.net**).
+   - За 253.8 секунд выполнен ИИ-анализ и OSINT-обогащение через Vertex AI (Gemini 2.5 Flash) для 143 уникальных компаний:
+     - Выявлены боли и гипотезы проблем бизнеса
      - Персонализированный коммерческий оффер ("Что предложить")
      - Готовый драфт 1-го сообщения для мессенджеров (WhatsApp / Telegram)
-   - Результаты сохраняются в дневной директории [03_Marketing_and_Sales/daily_leads/2026-08-03/](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-03/):
-     - Персональные `.md` карточки в папке `details/`
-     - Реестры `leads_qualified.json`, `sourcing_backlog.json`, `leads_summary.md` и `leads.csv`
-   - Настроен и подтвержден расписание автозапуска через `launchd` агент (`com.higherpower.daily_leadgen`) ежедневно в 09:00 AM на macOS и Cron на VPS.
+   - Результаты сохранены в [03_Marketing_and_Sales/daily_leads/2026-08-03/](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-03/):
+     - 143 индивидуальные карточки в папке [details/](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-03/details/)
+     - Файлы `leads_summary.md`, `leads.csv`, `leads.json`
+   - Автоматический запуск ежедневно в 09:00 настроен и подтверждён через `launchd` (`com.higherpower.daily_leadgen`) на macOS и Cron на VPS.
 
 -1. **[02.08.2026] Подтверждение и запуск сбора B2B-Лидов (adata.kz, hh.ru, hh.kz, threads.net)**:
    - Подтверждена и за пущена работа полного агрегатора лидов и OSINT Contact Miner по запросам: `ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент` со всех 4 источников (**adata.kz, hh.ru, hh.kz, threads.net**).
