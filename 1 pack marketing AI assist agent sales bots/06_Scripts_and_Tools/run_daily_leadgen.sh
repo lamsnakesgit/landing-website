@@ -12,7 +12,7 @@ export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/opt/homebrew/bin:$PAT
 
 echo "=== [$(date)] Запуск ежедневного сбора контактов ==="
 
-# Запуск основного пайплайна
-"/Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/.venv/bin/python" 06_Scripts_and_Tools/run_pipeline.py
+# Запуск основного пайплайна сбора контактов
+"/Users/higherpower/Desktop/1_Active_Projects/2 Ai_agents/1 pack marketing AI assist agent sales bots/.venv/bin/python" 03_Marketing_and_Sales/daily_lead_harvester/main.py --now
 
 echo "=== [$(date)] Сбор контактов завершен ==="

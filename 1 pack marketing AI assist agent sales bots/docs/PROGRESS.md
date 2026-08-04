@@ -1,6 +1,16 @@
 # PROGRESS & LOGS
 
 ## 🚀 Что обновлено и сделано (Wins)
+-1. **[04.08.2026] Успешно запущен ежедневный сбор B2B-Лидов (135 контактов с adata.kz, hh.ru, hh.kz, threads.net)**:
+   - Собран полный стек лидов по 6 ключевым запросам (`ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`) со всех 4 источников (**adata.kz, hh.ru, hh.kz, threads.net**).
+   - Выполнено формирование персональных коммерческих офферов ("Что предложить") и готовых драфтов 1-го сообщения для каждого контакта.
+   - Результаты сохранены в папке [03_Marketing_and_Sales/daily_leads/2026-08-04/](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-04/):
+     - `summary_leads.xlsx` (полная стилизованная таблица Excel)
+     - `summary_leads.csv` и `summary_leads.json`
+     - Индивидуальные Markdown-карточки по каждому лиду в папке [cards/](file:///Users/higherpower/Desktop/1_Active_Projects/2%20Ai_agents/1%20pack%20marketing%20AI%20assist%20agent%20sales%20bots/03_Marketing_and_Sales/daily_leads/2026-08-04/cards/)
+   - Готовый итоговый отчёт и файл Excel автоматически отправлены в Telegram пользователю.
+   - Подтверждён планировщик ежедневного запуска в 09:00.
+
 -1. **[03.08.2026] Завершен прогон ежедневного сбора B2B-Лидов (143 лида, adata.kz, hh.ru, hh.kz, threads.net)**:
    - Полностью отработал агрегатор контактов по 6 целевым запросам (`ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`) со всех 4 площадок (**adata.kz, hh.ru, hh.kz, threads.net**).
    - За 253.8 секунд выполнен ИИ-анализ и OSINT-обогащение через Vertex AI (Gemini 2.5 Flash) для 143 уникальных компаний:
