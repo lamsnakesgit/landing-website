@@ -113,6 +113,9 @@
 - `users.system_prompt` — кастомный системный промпт для каждого юзера
 - Сохраняется история диалогов (Supabase)
 - Контекст: последние N сообщений
+- Постоянная память и task routing описаны в `docs/ASSISTANT_MEMORY_AND_TASKS.md`.
+- Для Telegram group/forum topic память должна быть scoped по `chat_id` + `message_thread_id`, чтобы разные топики не смешивались.
+- Execution-запросы должны нормализоваться в `agent_tasks` перед выполнением: route, objective, priority, status, context.
 
 ## 9. Бонус: Carousel Generation
 

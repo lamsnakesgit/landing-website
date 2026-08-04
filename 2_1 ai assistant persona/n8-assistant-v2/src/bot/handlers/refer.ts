@@ -31,7 +31,7 @@ export async function referHandler(ctx: Context) {
 
     const totalEarned = earnings?.reduce((sum, e) => sum + Number(e.amount), 0) || 0;
 
-    const refLink = `https://t.me/${process.env.TELEGRAM_BOT_USERNAME || "n8assistant_bot"}?start=ref_${userId}`;
+    const refLink = `https://t.me/${process.env.TELEGRAM_BOT_USERNAME || "aihandsworkcontentbot"}?start=ref_${userId}`;
 
     await ctx.reply(
       `🔗 **Твоя реферальная ссылка:**\n\`${refLink}\`\n\n` +

@@ -13,7 +13,7 @@ export default function DashboardLayout({
         <div className="h-16 flex items-center px-6 border-b border-white/10">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <Bot className="w-5 h-5 text-blue-500" />
-            <span>N8 Assistant</span>
+            <span>AI Hands Assistant</span>
           </Link>
         </div>
         
@@ -49,7 +49,7 @@ export default function DashboardLayout({
         {/* Mobile Header */}
         <header className="h-16 border-b border-white/10 flex items-center px-6 md:hidden glass-panel z-10">
           <Bot className="w-5 h-5 text-blue-500 mr-2" />
-          <span className="font-bold">N8</span>
+          <span className="font-bold">AI Hands</span>
         </header>
         
         {/* Content Scroll Area */}

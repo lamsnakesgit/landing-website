@@ -73,7 +73,7 @@ export async function POST(req: Request) {
         const ref = user?.referred_by ? `\n🤝 Приглашён пользователем: \`${user.referred_by}\`` : '';
         await sendTelegramMessage(chatId, `👤 *Ваш профиль:*\n\n🪙 Токены: *${tokens}*${ref}\n\nЗа каждую генерацию карусели списывается 1 токен.`);
       } else if (data === 'referral') {
-        const refLink = `https://t.me/n8assistant_bot?start=ref_${chatId}`;
+        const refLink = `https://t.me/aihandsworkcontent_bot?start=ref_${chatId}`;
         await sendTelegramMessage(chatId, `🔗 *Ваша реф-ссылка:*\n\n\`${refLink}\`\n\nДелитесь с друзьями — вы получаете *50 токенов*!`);
         if (chatId !== ADMIN_ID) await sendAdminNotification(`🔗 @${from.username} запросил реф-ссылку`);
       } else if (data === 'draft_retry') {
@@ -142,7 +142,7 @@ export async function POST(req: Request) {
       const greeting = referredBy ? `👋 Привет, ${firstName}! Тебя пригласил друг.\n\nВыбери действие:` : `👋 Привет, ${firstName}! Я твой AI-сотрудник с руками.\n\nВыбери действие:`;
       await sendTelegramMessage(chatId, greeting, MAIN_MENU);
     } else if (text === '/ref') {
-      const refLink = `https://t.me/n8assistant_bot?start=ref_${chatId}`;
+      const refLink = `https://t.me/aihandsworkcontent_bot?start=ref_${chatId}`;
       await sendTelegramMessage(chatId, `🔗 *Ваша реф-ссылка:*\n\n\`${refLink}\`\n\nДелитесь с друзьями — вы получаете *50 токенов*!`);
     } else if (text === '/connect') {
       await supabase.from('users').update({ state: 'idle' }).eq('telegram_id', chatId);

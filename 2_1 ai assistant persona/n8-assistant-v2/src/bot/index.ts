@@ -21,7 +21,7 @@ bot.command("credits", (ctx) =>
 );
 bot.command("help", (ctx) =>
   ctx.reply(
-    "🤖 N8 Assistant — твой AI-сотрудник\n\n" +
+    "🤖 AI Hands Assistant — твой AI-сотрудник\n\n" +
       "Команды:\n" +
       "/start — начало работы\n" +
       "/ref — реферальная ссылка\n" +

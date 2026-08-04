@@ -466,12 +466,7 @@ export default function CarouselGeneratorPage() {
                   <div className="absolute top-12 left-12 z-20 text-white/50 text-3xl font-mono">
                     0{i + 1}
                   </div>
-                  <div className="absolute bottom-12 z-20 text-white/50 text-2xl font-bold flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                       <span className="text-white">AI</span>
-                    </div>
-                    @n8_assistant_bot
-                  </div>
+
                 </div>
               ))}
             </div>

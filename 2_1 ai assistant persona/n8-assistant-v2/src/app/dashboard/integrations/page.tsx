@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { ArrowLeft, Calendar, FileText, LayoutList, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-
+import { connectNango } from './actions'
+import { startTransition } from 'react'
 interface TgUser {
   id: number
   first_name: string
@@ -38,12 +39,11 @@ export default function IntegrationsPage() {
     )
   }
 
-  // Формируем URL для авторизации (использует NANGO_PUBLIC_KEY)
-  const getAuthUrl = (provider: string) => {
+  const handleConnect = (provider: string) => {
     const chatId = tgUser?.id || 'unknown';
-    // На Vercel нужно добавить NEXT_PUBLIC_NANGO_PUBLIC_KEY
-    const publicKey = process.env.NEXT_PUBLIC_NANGO_PUBLIC_KEY || 'NANGO_PUBLIC_KEY_HERE';
-    return `https://api.nango.dev/oauth/connect/${provider}?connection_id=${chatId}&public_key=${publicKey}`;
+    startTransition(() => {
+      connectNango(provider, String(chatId));
+    });
   };
 
   const integrations = [
@@ -85,12 +85,10 @@ export default function IntegrationsPage() {
 
       <div className="flex flex-col gap-4">
         {integrations.map((integration) => (
-          <a
+          <button
             key={integration.id}
-            href={getAuthUrl(integration.id)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`glass-panel p-5 rounded-2xl flex items-center gap-4 border hover:opacity-80 transition-opacity ${integration.color}`}
+            onClick={() => handleConnect(integration.id)}
+            className={`glass-panel p-5 rounded-2xl flex items-center gap-4 border hover:opacity-80 transition-opacity ${integration.color} text-left w-full`}
           >
             <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-black/20">
               {integration.icon}
@@ -99,7 +97,7 @@ export default function IntegrationsPage() {
               <h3 className="text-lg font-bold mb-1">{integration.name}</h3>
               <p className="text-gray-400 text-xs">{integration.description}</p>
             </div>
-          </a>
+          </button>
         ))}
       </div>
     </div>

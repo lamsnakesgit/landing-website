@@ -1,5 +1,5 @@
 # 📓 Дневник разработки — ИИ с руками / Контент Завод
-_Последнее обновление: 2026-07-02_
+_Последнее обновление: 2026-08-04_
 
 ---
 
@@ -41,6 +41,8 @@ _Последнее обновление: 2026-07-02_
 - [x] Таблица `logs` — история действий
 - [x] Функция `increment_tokens` — начисление токенов
 - [x] **Новые колонки** `state` и `state_data` для State Machine (миграция `00002`)
+- [x] Спроектирована постоянная память ассистента, контекст документов и task routing (гайд `docs/ASSISTANT_MEMORY_AND_TASKS.md`)
+- [x] Добавлена миграция `00003_assistant_memory_tasks.sql` для `assistant_profiles`, `assistant_memories`, `conversation_messages`, `knowledge_sources`, `knowledge_chunks`, `agent_tasks`, `agent_task_events`
 - [x] RLS отключён (управление только через server-side API)
 
 ### Nango SDK
@@ -80,11 +82,16 @@ ALTER TABLE public.users ADD COLUMN IF NOT EXISTS state_data JSONB;
 - [ ] Показывать баланс токенов при каждой генерации
 - [ ] Команда `/status` — статус подключённых интеграций (Google, Notion)
 - [ ] Дедукция 1 токена при каждой генерации черновика
+- [ ] Сохранять входящие/исходящие сообщения в `conversation_messages`
+- [ ] Вычислять `session_key` для DM, group chat и forum topic (`message_thread_id`)
+- [ ] Перед LLM-вызовом подмешивать профильную память, последние сообщения и релевантные knowledge chunks
+- [ ] Нормализовать execution-запросы в `agent_tasks` перед выполнением
 
 ### Mini App
 - [ ] Страница `/dashboard/integrations` — показывать статус "подключено/нет"
 - [ ] Страница `/dashboard/billing` — пополнение токенов
 - [ ] Страница `/dashboard/calendar` — просмотр Google Calendar через Nango proxy
+- [ ] Admin/debug view для memories, knowledge sources и agent tasks
 
 ### Nango / OAuth
 - [ ] Задеплоить Nango на VPS (Docker, HTTPS)
