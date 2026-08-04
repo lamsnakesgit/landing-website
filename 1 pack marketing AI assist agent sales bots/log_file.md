@@ -522,3 +522,20 @@
 - **Решение:** Использование лимитирующего семафора и fallback на автоматический ретрай с экспоненциальной задержкой.
 - [EN] Protected API calls via concurrency limits and automatic exponential backoff retries.
 
+## 2026-08-04: Верификация и запуск ежедневного автосбора контактов (adata.kz, hh.ru, hh.kz, threads.net)
+**Победы (Wins):**
+- Запущен и верифицирован автоматический ежедневный сбор B2B контактов по 6 целевым темам (`ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`) со всех 4 указанных источников: **adata.kz**, **hh.ru**, **hh.kz**, **threads.net**.
+- Сформирована актуальная дневная база за `2026-08-04` и сохранена в папке `03_Marketing_and_Sales/daily_leads/2026-08-04/`:
+  - `summary_leads.xlsx` — форматированная таблица с цветовой группировкой по нишам, контактам, драфтам 1-го сообщения и готовым офферам;
+  - `summary_leads.csv` и `summary_leads.json` — данные в машиночитаемом виде для импорта в CRM/n8n;
+  - `cards/` — 170 индивидуальных карточек лидов в формате `.md` с выведенным персонализированным 1-м сообщением и предложенными офферами.
+- Проверено активное задание в `crontab` (`0 9 * * *`), обеспечивающее автономный ежедневный запуск в 09:00.
+- Настроена мгновенная отправка Excel-отчёта с результатами сбора пользователю в Telegram-чат.
+- [EN] Verified and launched automated daily B2B contact extraction across 4 sources: `adata.kz`, `hh.ru`, `hh.kz`, `threads.net` for keywords: `ии`, `разработка`, `боты`, `маркетинг`, `контекстная реклама`, `ии контент`. Output saved to `03_Marketing_and_Sales/daily_leads/2026-08-04/` with 170 Markdown lead cards containing tailored 1st outreach messages and specific service proposals. Telegram bot report delivery active. Daily crontab at 09:00 AM confirmed active.
+
+**Ошибки и решения (Problems & Solutions):**
+- Отсутствие зависимости `schedule` при запуске standalone-пайплайна `daily_lead_harvester/main.py`.
+- **Решение:** Проведен запуск через настроенный виртуальный окружение `.venv` со всеми установленными библиотеками.
+- [EN] Resolved `schedule` module dependency error by using workspace `.venv` interpreter for standalone runs.
+
+
